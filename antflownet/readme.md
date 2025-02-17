@@ -1,0 +1,1 @@
+﻿## 此项目为[antflow-activiti](https://gitee.com/tylerzhou/Antflow)的开源.net实现,已经私下开发了近四个月了.目前已调通流程设计、流程发起等功能，其它功能正在调试或者实现中。预计五一左右出第一个beta版。感兴趣的可以加入qq群进行沟通交流。

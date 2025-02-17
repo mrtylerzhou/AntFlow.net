@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+		  <!-- 忽略CS8618和CS0169警告 -->
+        <NoWarn>CS8618;CS0169</NoWarn>
+    </PropertyGroup>
+    <ItemGroup>
+	  <FrameworkReference Include="Microsoft.AspNetCore.App" />
+	  <PackageReference Include="AutoMapper" Version="12.0.1" />
+	  <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+	  <PackageReference Include="DotNetCore.Natasha.CSharp.Compiler" Version="9.0.0.4" />
+	  <PackageReference Include="DotNetCore.Natasha.CSharp.Compiler.Domain" Version="9.0.0.1" />
+	  <PackageReference Include="DotNetCore.Natasha.CSharp.Extension.MethodCreator" Version="9.0.0.4" />
+	  <PackageReference Include="DotNetCore.Natasha.Domain" Version="9.0.0.1" />
+      <PackageReference Include="FreeSql" Version="3.5.103-preview20241224" />
+      <PackageReference Include="FreeSql.DbContext" Version="3.5.103-preview20241224" />
+      <PackageReference Include="hyjiacan.pinyin4net" Version="4.1.1" />
+      <PackageReference Include="murmurhash" Version="1.0.3" />
+      <PackageReference Include="Rougamo.Fody" Version="5.0.0" />
+     
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="filter&amp;interceptor\" />
+    </ItemGroup>
+
+</Project>
