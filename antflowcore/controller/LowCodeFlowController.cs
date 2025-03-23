@@ -1,0 +1,25 @@
+﻿using AntFlowCore.Entity;
+using antflowcore.service.biz;
+using antflowcore.service.repository;
+using antflowcore.vo;
+using Microsoft.AspNetCore.Mvc;
+
+namespace antflowcore.controller;
+
+[Route("BpmnConf")]
+public class LowCodeFlowController
+{
+    private readonly BpmnConfLFFormDataBizService _lfformDataBizService;
+    private readonly DictService _dictService;
+
+    public LowCodeFlowController(BpmnConfLFFormDataBizService lfformDataBizService,DictService dictService)
+    {
+        _lfformDataBizService = lfformDataBizService;
+        _dictService = dictService;
+    }
+    [HttpPost]
+    public Result<int> CreateLowCodeFormCode([FromBody] BaseKeyValueStruVo vo){
+        return Result<int>.Succ(_dictService.AddFormCode(vo));
+    }
+    
+}

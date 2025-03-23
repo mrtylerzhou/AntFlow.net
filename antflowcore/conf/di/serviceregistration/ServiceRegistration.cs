@@ -101,7 +101,9 @@ public static class ServiceRegistration
         services.AddSingleton<ITaskListener,BpmnTaskListener>();
         services.AddSingleton<IExecutionListener,BpmnExecutionListener>();
         services.AddSingleton<ProcessNodeJumpService>();
-        
+        services.AddSingleton<BpmnConfLFFormDataBizService>();
+        services.AddSingleton<DicMainService>();
+        services.AddSingleton<DicDataSerivce>();
         
         services.AddSingleton<TaskService>();
         

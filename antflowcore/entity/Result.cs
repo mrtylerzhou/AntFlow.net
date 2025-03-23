@@ -6,7 +6,7 @@ namespace AntFlowCore.Entity
     /// <summary>
     /// 通用结果类
     /// </summary>
-    public class Result<T> where T : class
+    public class Result<T>
     {
         //todo cbcbu
         private static readonly ILogger _logger = new Logger<string>(new LoggerFactory());
