@@ -49,7 +49,7 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
         EventTypeEnum? eventTypeEnum =
             EventTypeEnumExtensions.GetEnumByOperationType(businessDataVo.OperationType.Value);
 
-        if (eventTypeEnum == null)
+        if (eventTypeEnum == null||eventTypeEnum==0)
         {
             return null;
         }

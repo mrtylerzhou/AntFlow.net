@@ -12,13 +12,13 @@ namespace antflowcore.adaptor.processoperation;
  /// <summary>
     /// 流程转发实现类
     /// </summary>
-    public class ForwardProcessService : IProcessOperationAdaptor
+    public class ProcessForwardService : IProcessOperationAdaptor
     {
         private readonly BpmBusinessProcessService _bpmBusinessProcessService;
         private readonly BpmProcessForwardService _processForwardService;
         private readonly TaskMgmtService _taskMgmtService;
 
-        public ForwardProcessService(
+        public ProcessForwardService(
             BpmBusinessProcessService bpmBusinessProcessService,
             BpmProcessForwardService processForwardService,
             TaskMgmtService taskMgmtService)

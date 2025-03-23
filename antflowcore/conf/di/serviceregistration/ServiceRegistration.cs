@@ -232,6 +232,9 @@ public static class ServiceRegistration
         services.AddSingleton<IProcessOperationAdaptor, OutSideAccessSubmitProcessService>();
         services.AddSingleton<IProcessOperationAdaptor, ChangeAssigneeProcessService>();
         services.AddSingleton<IProcessOperationAdaptor,TransferAssigneeProcessService>();
+        services.AddSingleton<IProcessOperationAdaptor, UndertakeProcessService>();
+        services.AddSingleton<IProcessOperationAdaptor, BackToModifyService>();
+        services.AddSingleton<IProcessOperationAdaptor, ProcessForwardService>();
 
         services.AddSingleton<AFDeploymentService>();
         services.AddSingleton<AfTaskInstService>();

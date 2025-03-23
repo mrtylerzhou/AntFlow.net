@@ -4,6 +4,7 @@ using antflowcore.bpmn.listener;
 using antflowcore.constant.enus;
 using AntFlowCore.Constants;
 using antflowcore.entity;
+using antflowcore.exception;
 using antflowcore.service.repository;
 using antflowcore.util;
 using AntFlowCore.Vo;
@@ -58,6 +59,22 @@ public class TaskService
             throw new ApplicationException($"deployment with id {procDefId} not found");
         }
 
+        BpmAfExecution currentExecution = _afExecutionService.baseRepo.Where(a=>a.Id==bpmAfTask.ExecutionId).First();
+        if (currentExecution == null)
+        {
+            throw new AFBizException("未能找到当前流程执行实例!");
+        }
+
+        if (currentExecution.TaskCount!.Value >= 2)
+        {
+            BpmAfExecution afExecution = new BpmAfExecution
+            {
+                Id = currentExecution.Id,
+                TaskCount = currentExecution.TaskCount - 1
+            };
+            _afExecutionService.baseRepo.Update(afExecution);
+            return;
+        }
         string content = bpmAfDeployment.Content;
         List<BpmnConfCommonElementVo> elements = JsonSerializer.Deserialize<List<BpmnConfCommonElementVo>>(content);
         var (nextUserElement, nextFlowElement) = BpmnFlowUtil.GetNextAssigneeAndFlowNode(elements,taskDefKey);

@@ -90,7 +90,7 @@ public class ResubmitProcessService: IProcessOperationAdaptor
                 ProcessCode = vo.ProcessNumber
             };
 
-            //原java方法里把vo返回了,.net实现里返回void
+          
             if (vo != null && !string.IsNullOrEmpty(vo.ProcessDigest))
             {
                 _bpmBusinessProcessService.Update(new BpmBusinessProcess

@@ -9,20 +9,23 @@ using AntFlowCore.Vo;
 
 namespace antflowcore.adaptor.processoperation;
 
-public class UndertakeProcessImpl : IProcessOperationAdaptor
+public class UndertakeProcessService : IProcessOperationAdaptor
     {
         private readonly AFTaskService _taskService;
         private readonly TaskMgmtService _taskMgmtService;
-       
+        private readonly AFExecutionService _afExecutionService;
+
         private readonly BpmVariableMultiplayerPersonnelService _bpmVariableMultiplayerPersonnelService;
 
-        public UndertakeProcessImpl(
+        public UndertakeProcessService(
             AFTaskService taskService,
             TaskMgmtService taskMgmtService,
+            AFExecutionService afExecutionService,
             BpmVariableMultiplayerPersonnelService bpmVariableMultiplayerPersonnelService)
         {
             _taskService = taskService;
             _taskMgmtService = taskMgmtService;
+            _afExecutionService = afExecutionService;
             _bpmVariableMultiplayerPersonnelService = bpmVariableMultiplayerPersonnelService;
         }
 
@@ -40,7 +43,7 @@ public class UndertakeProcessImpl : IProcessOperationAdaptor
                 throw new AFBizException("当前流程节点已经被人承办！");
             }
 
-            List<BpmAfTask> list = _taskMgmtService.GetAgencyList(vo.TaskId, ProcessEnum.AgencyType.Code, task.ProcInstId);
+            List<BpmAfTask> list = _taskMgmtService.GetAgencyList(vo.TaskId, 1, task.ProcInstId);
             if (list.Any())
             {
                 foreach (var t in list)
@@ -51,6 +54,12 @@ public class UndertakeProcessImpl : IProcessOperationAdaptor
             }
 
             _bpmVariableMultiplayerPersonnelService.Undertake(vo.ProcessNumber, task.TaskDefKey);
+            BpmAfExecution execution = new BpmAfExecution()
+            {
+                TaskCount = 1,
+                Id = task.ExecutionId
+            };
+            _afExecutionService.baseRepo.Update(execution);
         }
 
         public void SetSupportBusinessObjects()

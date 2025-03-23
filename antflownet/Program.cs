@@ -32,6 +32,10 @@ public class Program
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 options.JsonSerializerOptions.Converters.Add(new CustomDateTimeConverter());
                 options.JsonSerializerOptions.Converters.Add(new StringOrIntConverter());
+                options.JsonSerializerOptions.Converters.Add(new BooleanJsonConverter());
+                options.JsonSerializerOptions.Converters.Add(new NullAbleBooleanJsonConverter());
+                options.JsonSerializerOptions.Converters.Add(new BooleanToIntJsonConverter());
+                options.JsonSerializerOptions.Converters.Add(new BooleanToNullableIntJsonConverter());
             });
         //freesqlset是创建的freesql的帮助类的方法名称
         builder.Services.FreeSqlSet(builder.Configuration);//注册freesql的相关服务

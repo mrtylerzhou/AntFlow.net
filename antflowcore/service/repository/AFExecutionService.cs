@@ -6,5 +6,6 @@ public class AFExecutionService: AFBaseCurdRepositoryService<BpmAfExecution>
 {
     public AFExecutionService(IFreeSql freeSql) : base(freeSql)
     {
+        
     }
 }
