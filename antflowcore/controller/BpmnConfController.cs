@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using antflowcore.adaptor;
+using antflowcore.dto;
 using AntFlowCore.Entity;
 using antflowcore.factory;
 using antflowcore.http;
@@ -43,5 +44,13 @@ public class BpmnConfController
         BusinessDataVo dataVo = _processApprovalService.ButtonsOperation(values,formCode);
         return Result<BusinessDataVo>.Succ(dataVo);
     }
-  
+
+    [HttpPost("process/listPage/{type}")]
+    public ResultAndPage<TaskMgmtVO> ViewPcProcessList([FromRoute] int type, [FromBody] PageRequestDTO<TaskMgmtVO> requestDto)
+    {
+        PageDto pageDto = requestDto.PageDto;
+        TaskMgmtVO taskMgmtVO = requestDto.Entity;
+        taskMgmtVO.Type=type;
+        throw new NotImplementedException("not implemented yet");
+    }
 }
