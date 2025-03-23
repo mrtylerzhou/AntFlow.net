@@ -43,7 +43,7 @@ create table bpm_af_taskinst
     category       varchar(255)            null,
     tenant_id      varchar(255) default '' null,
     description    varchar(4000)           null,
-    update_user       varchar(64)            null,
+    update_user       varchar(64)            null
 );
 
 create index AF_HI_TASK_INST_PROCINST
