@@ -104,6 +104,7 @@ public static class ServiceRegistration
         services.AddSingleton<BpmnConfLFFormDataBizService>();
         services.AddSingleton<DicMainService>();
         services.AddSingleton<DicDataSerivce>();
+        services.AddSingleton<DictService>();
         
         services.AddSingleton<TaskService>();
         

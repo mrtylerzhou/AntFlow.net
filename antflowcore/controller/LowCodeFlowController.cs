@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace antflowcore.controller;
 
-[Route("BpmnConf")]
+[Route("lowcode")]
 public class LowCodeFlowController
 {
     private readonly BpmnConfLFFormDataBizService _lfformDataBizService;
@@ -17,7 +17,7 @@ public class LowCodeFlowController
         _lfformDataBizService = lfformDataBizService;
         _dictService = dictService;
     }
-    [HttpPost]
+    [HttpPost("createLowCodeFormCode")]
     public Result<int> CreateLowCodeFormCode([FromBody] BaseKeyValueStruVo vo){
         return Result<int>.Succ(_dictService.AddFormCode(vo));
     }
