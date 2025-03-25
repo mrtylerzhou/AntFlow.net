@@ -4,6 +4,7 @@ using antflowcore.adaptor;
 using AntFlowCore.Entity;
 using antflowcore.service.processor.lowcodeflow;
 using antflowcore.util;
+using antflowcore.vo;
 using AntFlowCore.Vo;
 
 namespace antflowcore.factory.tagparser;
@@ -12,16 +13,13 @@ public class ActivitiTagParser<T>: TagParser<IFormOperationAdaptor<T>,BusinessDa
 {
     public IFormOperationAdaptor<T> ParseTag(BusinessDataVo data)
     {
-        if(data.IsLowCodeFlow!=null&&data.IsLowCodeFlow==1)
-        {
-            return (IFormOperationAdaptor<T>)ServiceProviderUtils.GetServices<LowFlowApprovalService>();
-        }
+       
 
         IEnumerable services = ServiceProviderUtils.GetServicesByOpenGenericType(typeof(IFormOperationAdaptor<>));
         foreach (object service in services)
         {
             var customAttributes = service.GetType().GetCustomAttributes(true);
-
+           
             IEnumerable<AfFormServiceAnnoAttribute> afFormServiceAnnoAttributes = customAttributes.OfType<AfFormServiceAnnoAttribute>();
             if (!afFormServiceAnnoAttributes.Any())
             {
@@ -29,7 +27,8 @@ public class ActivitiTagParser<T>: TagParser<IFormOperationAdaptor<T>,BusinessDa
             }
             foreach (AfFormServiceAnnoAttribute afFormServiceAnnoAttribute in afFormServiceAnnoAttributes)
             {
-                if (afFormServiceAnnoAttribute.SvcName.Equals(data.FormCode))
+               
+                if (afFormServiceAnnoAttribute.SvcName.Equals(data.FormCode)||(data.IsLowCodeFlow is 1 && afFormServiceAnnoAttribute.SvcName.Equals("LF")))
                 {
                     //实现IFormOperationAdaptor的类的类型为IFormOperationAdaptor的接口,接口确定只有一个泛型参数,因此取索引0
                     Type superInterfaceArgType = service.GetType().GetInterfaces().First(a => a.GetGenericTypeDefinition()==typeof(IFormOperationAdaptor<>)).GetGenericArguments()[0];

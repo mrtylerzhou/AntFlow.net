@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using antflowcore.conf.json;
 using antflowcore.vo;
 using YourNamespace;
 
@@ -137,7 +138,7 @@ namespace AntFlowCore.Vo
         [JsonPropertyName("isOutSideChecked")]
         public bool IsOutSideChecked { get; set; } = false;
 
-        [JsonPropertyName("isLowCodeFlow")]
+        [JsonPropertyName("isLowCodeFlow"),JsonConverter(typeof(BooleanToNullableIntJsonConverter))]
         public int? IsLowCodeFlow { get; set; } = 0;
 
         [JsonPropertyName("bpmFlowCallbackUrl")]

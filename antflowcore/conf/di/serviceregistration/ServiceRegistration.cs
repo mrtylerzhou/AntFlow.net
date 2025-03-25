@@ -53,6 +53,7 @@ public static class ServiceRegistration
         services.AddSingleton<ProcessApprovalService>();
         services.AddSingleton<IFormOperationAdaptor<ThirdPartyAccountApplyVo>, ThirdPartyAccountApplyService>();
         services.AddSingleton<IFormOperationAdaptor<UDLFApplyVo>,LowFlowApprovalService>();
+        services.AddSingleton<LowFlowApprovalService>();
         services.AddSingleton<OutSideBpmAccessBusinessService>();
         services.AddSingleton<FormFactory>();
         services.AddSingleton<ThirdPartyAccountApplyService>();

@@ -43,7 +43,7 @@ public class LFFormDataPreProcessor : IAntFlowOrderPreProcessor<BpmnConfVo>
             _lfFormdataService.baseRepo.Insert(lfFormdata);
             confVo.LfFormDataId = lfFormdata.Id;
 
-            var formConfigWrapper = JsonSerializer.Deserialize<FormConfigWrapper>(lfForm);
+            FormConfigWrapper formConfigWrapper = JsonSerializer.Deserialize<FormConfigWrapper>(lfForm);
             var lfWidgetList = formConfigWrapper.WidgetList;
 
             if (lfWidgetList == null || !lfWidgetList.Any())

@@ -65,7 +65,7 @@ namespace AntFlowCore.Vo
                 [JsonPropertyName("fieldType"),JsonConverter(typeof(StringToIntConverter))]
                 public int FieldType { get; set; }
 
-                [JsonPropertyName("defaultValue")]
+                [JsonPropertyName("defaultValue"),JsonConverter(typeof(IntToStringConverter))]
                 public string DefaultValue { get; set; }
 
                 [JsonPropertyName("startPlaceholder")]
@@ -122,7 +122,7 @@ namespace AntFlowCore.Vo
                 [JsonPropertyName("validationHint")]
                 public string ValidationHint { get; set; }
 
-                [JsonPropertyName("customClass")]
+                [JsonPropertyName("customClass"),JsonConverter(typeof(StringOrArrayConverter))]
                 public string[] CustomClass { get; set; }
 
                 [JsonPropertyName("labelIconClass")]
@@ -186,7 +186,7 @@ namespace AntFlowCore.Vo
             [JsonPropertyName("cssCode")]
             public string CssCode { get; set; }
 
-            [JsonPropertyName("customClass")]
+            [JsonPropertyName("customClass"),JsonConverter(typeof(StringOrArrayConverter))]
             public string[] CustomClass { get; set; }
 
             [JsonPropertyName("functions")]
