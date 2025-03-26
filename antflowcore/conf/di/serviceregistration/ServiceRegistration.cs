@@ -106,8 +106,10 @@ public static class ServiceRegistration
         services.AddSingleton<DicMainService>();
         services.AddSingleton<DicDataSerivce>();
         services.AddSingleton<DictService>();
-        
         services.AddSingleton<TaskService>();
+        services.AddSingleton<LFMainService>();
+        services.AddSingleton<LFMainFieldService>();
+        
         
         
         services.AddSingleton<AbstractOrderedSignNodeAdp, BpmnLoopSignNodeAdp>();

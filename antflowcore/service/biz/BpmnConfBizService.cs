@@ -97,7 +97,8 @@ public class BpmnConfBizService
         if(confId==null||confId==0){
             throw new AFBizException($"conf id for formcode:{formCode} can not be null");
         }
-        
+        bpmnConfVo.Id=confId;
+        //todo 
         int? isOutSideProcess = bpmnConfVo.IsOutSideProcess;
         int? isLowCodeFlow = bpmnConfVo.IsLowCodeFlow;
         

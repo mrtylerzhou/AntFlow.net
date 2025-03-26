@@ -198,5 +198,6 @@ namespace AntFlowCore.Vo
         /// </summary>
         [JsonPropertyName("lfConditions")]
         public Dictionary<string, object> LfConditions { get; set; }
+        public bool IsLowCodeFlow { get; set; }
     }
 }
