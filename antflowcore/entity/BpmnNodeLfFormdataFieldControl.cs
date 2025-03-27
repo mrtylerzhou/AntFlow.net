@@ -7,6 +7,7 @@ namespace AntFlowCore.Entity
     /// <summary>
     /// Represents the BPMN node form data field control.
     /// </summary>
+    [Table(Name = "t_bpmn_node_lf_formdata_field_control")]
     public class BpmnNodeLfFormdataFieldControl
     {
         /// <summary>

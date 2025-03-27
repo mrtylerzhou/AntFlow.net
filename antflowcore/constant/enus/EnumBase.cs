@@ -51,20 +51,22 @@ public abstract class EnumBase<T> where T : EnumBase<T>
     public static bool operator !=(EnumBase<T>? left, EnumBase<T>? right) => !(left == right);
     public static void InitializeEnumBaseTypes()
     {
-        // 获取当前程序集中的所有类型
+        
         var assembly = Assembly.GetExecutingAssembly();
-        var enumBaseTypes = assembly.GetTypes()
-            .Where(t => t.IsSubclassOf(typeof(EnumBase<>)) && !t.IsAbstract);
+        IEnumerable<Type> enumBaseTypes = assembly.GetTypes()
+            .Where(t => t.BaseType != null &&
+                        t.BaseType.IsGenericType &&
+                        t.BaseType.GetGenericTypeDefinition() == typeof(EnumBase<>));
 
         foreach (var type in enumBaseTypes)
         {
-            // 强制访问该类型的静态字段，确保它们被初始化
+           
             var staticField = type.GetFields(BindingFlags.Public | BindingFlags.Static)
                 .FirstOrDefault(field => field.IsStatic);
 
             if (staticField != null)
             {
-                // 访问静态字段来初始化它
+               
                 var value = staticField.GetValue(null);
             }
         }

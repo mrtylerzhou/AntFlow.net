@@ -8,6 +8,7 @@ using antflowcore.conf.json;
 using antflowcore.conf.middleware;
 using antflowcore.conf.serviceregistration;
 using antflowcore.constant;
+using antflowcore.constant.enus;
 using antflowcore.entity;
 using antflowcore.util;
 using AutoMapper;
@@ -19,9 +20,7 @@ public class Program
 {
     public static void Main(string[] args)
     {
-       
-        string nextId = StrongUuidGenerator.GetNextId();
-        string id = StrongUuidGenerator.GetNextId();
+        EnumBase<LFFieldTypeEnum>.InitializeEnumBaseTypes();
         var builder = WebApplication.CreateBuilder(args);
         ServiceCollectionHolder.SetServiceCollection(builder.Services);
         builder.Services.AddHttpContextAccessor();
