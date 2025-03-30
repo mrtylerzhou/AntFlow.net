@@ -74,7 +74,7 @@ namespace antflowcore.adaptor.processoperation;
 
 
             var processInstanceId = bpmBusinessProcess.ProcInstId;
-            var processState = (int)ProcessStateEnum.CRMCEL_STATE;
+            var processState = (int)ProcessStateEnum.REJECT_STATE;
 
             if (vo.Flag!=null&&vo.Flag.Value)
             {

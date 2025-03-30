@@ -102,7 +102,7 @@ public class OutSideAccessSubmitProcessService : IProcessOperationAdaptor
             CreateUser = businessDataVo.StartUserId,
             UserName = businessDataVo.SubmitUser,
             CreateTime = DateTime.Now,
-            ProcessState = (int)ProcessStateEnum.COMLETE_STATE,
+            ProcessState = (int)ProcessStateEnum.HANDLING_STATE,
             EntryId = processNum,
             Description = $"{processTitlePrefix}-{businessDataVo.BpmnName}",
             Version = businessDataVo.BpmnCode,

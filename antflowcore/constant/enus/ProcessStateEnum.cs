@@ -2,20 +2,20 @@
 
 public enum ProcessStateEnum
 {
-    COMLETE_STATE = 1, // 审批中
+    HANDLING_STATE = 1, // 审批中
     END_STATE = 3,      // 作废
     HANDLE_STATE = 2,   // 审批通过
-    CRMCEL_STATE = 6    // 审批拒绝
+    REJECT_STATE = 6    // 审批拒绝
 }
 public static class ProcessStateEnumExtensions
 {
     // 描述信息字典
     private static readonly Dictionary<ProcessStateEnum, string> Descriptions = new Dictionary<ProcessStateEnum, string>
     {
-        { ProcessStateEnum.COMLETE_STATE, "审批中" },
+        { ProcessStateEnum.HANDLING_STATE, "审批中" },
         { ProcessStateEnum.END_STATE, "作废" },
         { ProcessStateEnum.HANDLE_STATE, "审批通过" },
-        { ProcessStateEnum.CRMCEL_STATE, "审批拒绝" }
+        { ProcessStateEnum.REJECT_STATE, "审批拒绝" }
     };
 
     // 根据枚举值获取描述

@@ -111,6 +111,7 @@ public static class ServiceRegistration
         services.AddSingleton<LFMainFieldService>();
         services.AddSingleton<BpmVerifyInfoBizService>();
         services.AddSingleton<ProcessConstantsService>();
+        services.AddSingleton<ActivitiAdditionalInfoService>();
         
         
         services.AddSingleton<AbstractOrderedSignNodeAdp, BpmnLoopSignNodeAdp>();

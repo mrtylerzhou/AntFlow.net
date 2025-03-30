@@ -18,6 +18,7 @@ namespace antflowcore.controller;
 public class BpmnConfController
 {
     private readonly ProcessApprovalService _processApprovalService;
+    private readonly BpmVerifyInfoBizService _bpmVerifyInfoBizService;
     private readonly IFreeSql _freeSql;
     public BpmnConfBizService _bpmnConfBizService;
     private readonly BpmnConfCommonService _bpmnConfCommonService;
@@ -26,10 +27,12 @@ public class BpmnConfController
         BpmnConfBizService bpmnConfBizService,
         BpmnConfCommonService bpmnConfCommonService,
         ProcessApprovalService processApprovalService,
+        BpmVerifyInfoBizService bpmVerifyInfoBizService,
         IFreeSql freeSql
         )
     {
         _processApprovalService = processApprovalService;
+        _bpmVerifyInfoBizService = bpmVerifyInfoBizService;
         _freeSql = freeSql;
         _bpmnConfBizService = bpmnConfBizService;
         _bpmnConfCommonService = bpmnConfCommonService;
@@ -72,7 +75,10 @@ public class BpmnConfController
             return Result<PreviewNode>.Succ(_bpmnConfCommonService.TaskPagePreviewNode(paramsJson));
         }
     }
-
+    [HttpGet("getBpmVerifyInfoVos")]
+    public Result<List<BpmVerifyInfoVo>> GetBpmVerifyInfoVos(String processNumber) {
+        return Result<List<BpmVerifyInfoVo>>.Succ(_bpmVerifyInfoBizService.GetBpmVerifyInfoVos(processNumber, false));
+    }
     [HttpPost("process/listPage/{type}")]
     public ResultAndPage<TaskMgmtVO> ViewPcProcessList([FromRoute] int type, [FromBody] PageRequestDTO<TaskMgmtVO> requestDto)
     {
