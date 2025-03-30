@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Nodes;
 using antflowcore.adaptor;
 using antflowcore.dto;
 using AntFlowCore.Entity;
@@ -55,6 +56,21 @@ public class BpmnConfController
         string values = accessor.HttpContext!.ReadRawBodyAsString();
         PreviewNode previewNode = _bpmnConfCommonService.PreviewNode(values);
         return Result<PreviewNode>.Succ(previewNode);
+    }
+    [HttpPost("startPagePreviewNode")]
+    public Result<PreviewNode> StartPagePreviewNode([FromBody] string paramsJson)
+    {
+        JsonNode? jsonObject = JsonNode.Parse(paramsJson);
+        bool isStartPreview = jsonObject?["isStartPreview"]?.GetValue<bool>() ?? false;
+
+        if (isStartPreview)
+        {
+            return Result<PreviewNode>.Succ(_bpmnConfCommonService.StartPagePreviewNode(paramsJson));
+        }
+        else
+        {
+            return Result<PreviewNode>.Succ(_bpmnConfCommonService.TaskPagePreviewNode(paramsJson));
+        }
     }
 
     [HttpPost("process/listPage/{type}")]

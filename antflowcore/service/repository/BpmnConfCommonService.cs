@@ -1,7 +1,9 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using antflowcore.constant.enus;
 using antflowcore.entity;
+using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.factory;
 using antflowcore.service.biz;
@@ -28,6 +30,7 @@ public class BpmnConfCommonService
     private readonly BpmnInsertVariablesService _bpmnInsertVariablesService;
     private readonly BpmnCreateAndStartService _bpmnCreateAndStartService;
     private readonly BpmVerifyInfoBizService _bpmVerifyInfoBizService;
+    private readonly BpmVariableService _bpmVariableService;
     private readonly FormFactory _formFactory;
     private readonly IFreeSql _freeSql;
     private readonly ILogger<BpmnConfCommonService> _logger;
@@ -44,6 +47,7 @@ public class BpmnConfCommonService
         BpmnInsertVariablesService bpmnInsertVariablesService,
         BpmnCreateAndStartService bpmnCreateAndStartService,
         BpmVerifyInfoBizService bpmVerifyInfoBizService,
+        BpmVariableService bpmVariableService,
         FormFactory formFactory,
         IFreeSql freeSql,
         ILogger<BpmnConfCommonService> logger)
@@ -59,6 +63,7 @@ public class BpmnConfCommonService
         _bpmnInsertVariablesService = bpmnInsertVariablesService;
         _bpmnCreateAndStartService = bpmnCreateAndStartService;
         _bpmVerifyInfoBizService = bpmVerifyInfoBizService;
+        _bpmVariableService = bpmVariableService;
         _formFactory = formFactory;
         _freeSql = freeSql;
         _logger = logger;
@@ -437,4 +442,41 @@ public class BpmnConfCommonService
         }
     }
 
+    public PreviewNode StartPagePreviewNode(string paramsJson)
+    {
+        return GetPreviewNode(paramsJson, true);
+    }
+
+    public PreviewNode TaskPagePreviewNode(string paramsJson)
+    {
+        // 解析 JSON 请求参数
+        JsonNode? jsonObject = JsonNode.Parse(paramsJson);
+        string? processNumber = jsonObject?["processNumber"]?.GetValue<string>();
+        bool isLowCodeFlow = jsonObject?["isLowCodeFlow"]?.GetValue<bool>() ?? false;
+
+        if (string.IsNullOrEmpty(processNumber))
+        {
+            throw new ArgumentException("processNumber cannot be null or empty");
+        }
+
+     
+        BpmVariable? bpmnVariable = _bpmVariableService.baseRepo.Where(a => a.ProcessNum == processNumber).First();
+           
+
+        if (bpmnVariable == null || string.IsNullOrEmpty(bpmnVariable.ProcessStartConditions))
+        {
+            throw new Exception("BpmVariable not found or processStartConditions is empty");
+        }
+
+        // 解析 processStartConditions 并添加额外字段
+        JsonNode? objectStart = JsonNode.Parse(bpmnVariable.ProcessStartConditions);
+        if (objectStart != null)
+        {
+            objectStart["bpmnCode"] = bpmnVariable.BpmnCode;
+            objectStart["isLowCodeFlow"] = isLowCodeFlow;
+            objectStart["processNumber"] = processNumber;
+            return GetPreviewNode(objectStart.ToJsonString(), false);
+        }
+        return new PreviewNode();
+    }
 }
