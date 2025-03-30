@@ -39,4 +39,10 @@ public class ApplicationService: AFBaseCurdRepositoryService<BpmProcessAppApplic
 
         return vo;
     }
+
+    public List<BpmProcessAppApplication> SelectApplicationList()
+    {
+        List<BpmProcessAppApplication> bpmProcessAppApplications = this.baseRepo.Where(a=>true).ToList();
+        return bpmProcessAppApplications;
+    }
 }

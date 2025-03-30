@@ -18,9 +18,9 @@ public static class PageUtils
     {
         var pageDto = new PageDto
         {
-            Page =(int) page.GetCurrent(),
-            PageSize = (int)page.GetSize(),
-            TotalCount = (int)page.GetTotal(),
+            Page =(int) page.Current,
+            PageSize = (int)page.Size,
+            TotalCount = (int)page.Total,
             PageCount = (int)page.GetPages()
         };
         return pageDto;
@@ -84,12 +84,12 @@ public static class PageUtils
 
     public static ResultAndPage<R> GetResultAndPage<T, R>(Page<T> page, Func<T, R> mapper)
     {
-        return new ResultAndPage<R>(page.GetRecords().Select(mapper).ToList(), GetPageDto(page));
+        return new ResultAndPage<R>(page.Records.Select(mapper).ToList(), GetPageDto(page));
     }
 
     public static ResultAndPage<T> GetResultAndPage<T>(Page<T> page)
     {
-        return new ResultAndPage<T>(page.GetRecords(), GetPageDto(page));
+        return new ResultAndPage<T>(page.Records, GetPageDto(page));
     }
 
     public static ResultAndPage<T> GetResultAndPage<T>(List<T> data, PageDto pageDto)
@@ -99,13 +99,13 @@ public static class PageUtils
 
     public static ResultAndPage<T> GetResultAndPage<T>(Page<T> page, Dictionary<string, object> statistics)
     {
-        return new ResultAndPage<T>(page.GetRecords(), GetPageDto(page), statistics);
+        return new ResultAndPage<T>(page.Records, GetPageDto(page), statistics);
     }
 
     public static ResultAndPage<T> GetResultAndPage<T>(Page<T> page, Dictionary<string, object> statistics,
         Dictionary<string, string> sortColumnMap)
     {
-        return new ResultAndPage<T>(page.GetRecords(), GetPageDto(page), statistics, sortColumnMap);
+        return new ResultAndPage<T>(page.Records, GetPageDto(page), statistics, sortColumnMap);
     }
 
 
@@ -151,7 +151,7 @@ public static class PageUtils
             OrderItem orderItem = new OrderItem();
             orderItem.SetColumn(vo.OrderField);
             orderItem.SetAsc(vo.SortTypeEnum.IsAsc);
-            page.Orders().Add(orderItem);
+            page.Orders.Add(orderItem);
         }
     }
 

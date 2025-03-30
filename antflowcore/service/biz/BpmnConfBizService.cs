@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices.JavaScript;
 using antflowcore.adaptor;
 using antflowcore.constant.enus;
+using antflowcore.dto;
 using antflowcore.entity;
 using AntFlowCore.Entity;
 using AntFlowCore.Enums;
@@ -34,6 +35,7 @@ public class BpmnConfBizService
     private readonly InformationTemplateService _informationTemplateService;
     private readonly BpmnNodeLfFormdataFieldControlService _lfFormdataFieldControlService;
     private readonly BpmnViewPageButtonService _viewPageButtonService;
+    private readonly TaskMgmtService _taskMgmtService;
     private readonly IMapper _mapper;
 
     public BpmnConfBizService(
@@ -53,6 +55,7 @@ public class BpmnConfBizService
         InformationTemplateService informationTemplateService,
         BpmnNodeLfFormdataFieldControlService lfFormdataFieldControlService,
         BpmnViewPageButtonService viewPageButtonService,
+        TaskMgmtService taskMgmtService,
         IMapper mapper
         )
     {
@@ -72,6 +75,7 @@ public class BpmnConfBizService
         _informationTemplateService = informationTemplateService;
         _lfFormdataFieldControlService = lfFormdataFieldControlService;
         _viewPageButtonService = viewPageButtonService;
+        _taskMgmtService = taskMgmtService;
         _mapper = mapper;
     }
     private const String LinkMark = "_";
@@ -152,6 +156,53 @@ public class BpmnConfBizService
             bpmnNodeAdaptor.EditBpmnNode(bpmnNodeVo);
         }
         ProcessorFactory.ExecutePostProcessors(bpmnConfVo);
+    }
+
+    public ResultAndPage<BpmnConfVo> SelectPage(PageDto pageDto, BpmnConfVo vo)
+    {
+        Page<BpmnConfVo> page = PageUtils.GetPageByPageDto<BpmnConfVo>(pageDto);
+        var bpmnConfVos = _bpmnConfService.SelectPageList(page,vo);
+
+        if (bpmnConfVos == null || !bpmnConfVos.Any())
+        {
+            return PageUtils.GetResultAndPage(page);
+        }
+    
+        if (vo.IsOutSideProcess == 1)
+        {
+            List<BpmProcessAppApplication> bizAppList = _applicationService.SelectApplicationList();
+            var bizAppMap = bizAppList.ToDictionary(p => p.ProcessKey, p => p.Title);
+        
+            foreach (var record in bpmnConfVos)
+            {
+                if (record.IsOutSideProcess == 1)
+                {
+                    record.FormCodeDisplayName = bizAppMap.GetValueOrDefault(record.FormCode);
+                }
+            }
+        }
+    
+        if (vo.IsOutSideProcess == 0)
+        {
+            List<DIYProcessInfoDTO> diyFormCodeList = _taskMgmtService.ViewProcessInfo(null);
+            var diyFormCodes = diyFormCodeList.ToDictionary(p => p.Key, p => p.Value);
+        
+            foreach (var record in bpmnConfVos)
+            {
+                if (record.IsLowCodeFlow == 0 && record.IsOutSideProcess == 0)
+                {
+                    record.FormCodeDisplayName = diyFormCodes.GetValueOrDefault(record.FormCode);
+                }
+            }
+        }
+    
+        page.Records = bpmnConfVos.Select(o =>
+        {
+            o.DeduplicationTypeName = DeduplicationTypeEnumExtensions.GetDescByCode(o.DeduplicationType.Value);
+            return o;
+        }).ToList();
+    
+        return PageUtils.GetResultAndPage(page);
     }
 
     /**

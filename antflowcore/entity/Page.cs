@@ -1,4 +1,5 @@
-﻿using antflowcore.interf;
+﻿
+using FreeSql.Internal.Model;
 
 namespace antflowcore.entity;
 
@@ -6,150 +7,113 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-    public class Page<T> : IPage<T>
+    public class Page<T>
     {
-        private List<T> records = new List<T>();
-        private long total = 0L;
-        private long size = 10L;
-        private long current = 1L;
-        private List<OrderItem> orders = new List<OrderItem>();
-        private bool optimizeCountSql = true;
-        private bool searchCount = true;
-        private bool optimizeJoinOfCountSql = true;
-        private string countId;
-        private long? maxLimit;
-
+        public List<T> Records { get; set; } = new List<T>();
+        public int Total = 0;
+        public int Size = 10;
+        public int Current = 1;
+        public List<OrderItem> Orders = new List<OrderItem>();
+        public string CountId { get; set; }
+        public long? MaxLimit { get; set; }
+        public bool SearchCount { get; set; }
         public Page() { }
 
-        public Page(long current, long size) : this(current, size, 0L) { }
+        public Page(int current, int size) : this(current, size, 0) { }
 
-        public Page(long current, long size, long total) : this(current, size, total, true) { }
+        public Page(int current, int size, int total) : this(current, size, total, true) { }
 
-        public Page(long current, long size, bool searchCount) : this(current, size, 0L, searchCount) { }
+        public Page(int current, int size, bool searchCount) : this(current, size, 0, searchCount) { }
 
-        public Page(long current, long size, long total, bool searchCount)
+        public Page(int current, int size, int total, bool searchCount)
         {
             if (current > 1L)
             {
-                this.current = current;
+                this.Current = current;
             }
 
-            this.size = size;
-            this.total = total;
-            this.searchCount = searchCount;
+            this.Size = size;
+            this.Total = total;
+            this.SearchCount = searchCount;
         }
 
-        public bool HasPrevious() => this.current > 1L;
+        public bool HasPrevious() => this.Current > 1L;
 
-        public bool HasNext() => this.current < GetPages();
-
-        public List<T> GetRecords() => this.records;
-
-        public IPage<T> SetRecords(List<T> records)
-        {
-            this.records = records;
-            return this;
-        }
-
-        public long GetTotal() => this.total;
-
-        public IPage<T> SetTotal(long total)
-        {
-            this.total = total;
-            return this;
-        }
-
-        public long GetSize() => this.size;
-
-        public IPage<T> SetSize(long size)
-        {
-            this.size = size;
-            return this;
-        }
-
-        public long GetCurrent() => this.current;
-
-        public IPage<T> SetCurrent(long current)
-        {
-            this.current = current;
-            return this;
-        }
-
-        public string CountId() => this.countId;
-
-        public long? MaxLimit() => this.maxLimit;
+        public bool HasNext() => this.Current < GetPages();
 
         private string[] MapOrderToArray(Func<OrderItem,bool> filter)
         {
            
-            return this.orders.Where(filter).Select(i => i.GetColumn()).ToArray();
+            return this.Orders.Where(filter).Select(i => i.GetColumn()).ToArray();
         }
 
         private void RemoveOrder(Predicate<OrderItem> filter)
         {
-            this.orders.RemoveAll(filter);
+            this.Orders.RemoveAll(filter);
         }
 
-        public IPage<T> AddOrder(params OrderItem[] items)
+        public Page<T> AddOrder(params OrderItem[] items)
         {
-            this.orders.AddRange(items);
+            this.Orders.AddRange(items);
             return this;
         }
 
         public Page<T> AddOrder(List<OrderItem> items)
         {
-            this.orders.AddRange(items);
+            this.Orders.AddRange(items);
             return this;
         }
+        
 
-        public List<OrderItem> Orders() => this.orders;
 
-        public bool OptimizeCountSql() => this.optimizeCountSql;
 
-        public static IPage<T> Of(long current, long size, long total, bool searchCount)
+        public static Page<T> Of(int current, int size, int total, bool searchCount)
         {
             return new Page<T>(current, size, total, searchCount);
         }
+        
 
-        public bool OptimizeJoinOfCountSql() => this.optimizeJoinOfCountSql;
-
-        public IPage<T> SetSearchCount(bool searchCount)
+        public Page<T> SetSearchCount(bool searchCount)
         {
-            this.searchCount = searchCount;
+            this.SearchCount = searchCount;
             return this;
         }
-
-        public IPage<T> SetOptimizeCountSql(bool optimizeCountSql)
+        
+        
+      public  int GetPages()
         {
-            this.optimizeCountSql = optimizeCountSql;
-            return this;
+            if (Size == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                int pages =Total / Size;
+                if (Total % Size != 0L)
+                {
+                    ++pages;
+                }
+
+                return pages;
+            }
+        }
+      
+        
+      public  long Offset()
+        {
+            long current = Current;
+            return current <= 1L ? 0L : Math.Max((current - 1L) * Size, 0L);
         }
 
-        public long GetPages()
+        public BasePagingInfo ToPagingInfo()
         {
-            return (long)Math.Ceiling((double)this.total / this.size);
-        }
-
-     
-
-        public void SetOrders(List<OrderItem> orders)
-        {
-            this.orders = orders;
-        }
-
-        public void SetOptimizeJoinOfCountSql(bool optimizeJoinOfCountSql)
-        {
-            this.optimizeJoinOfCountSql = optimizeJoinOfCountSql;
-        }
-
-        public void SetCountId(string countId)
-        {
-            this.countId = countId;
-        }
-
-        public void SetMaxLimit(long? maxLimit)
-        {
-            this.maxLimit = maxLimit;
+            BasePagingInfo info = new BasePagingInfo()
+            {
+                Count = this.Total,
+                PageSize = (int)this.Size,
+                PageNumber = (int)this.Current,
+            };
+            return info;
         }
     }
 

@@ -117,7 +117,8 @@ using System.Text.RegularExpressions;
         /// </summary>
         [Column(Name = "update_time",IsIgnore = true)]
         public DateTime? UpdateTime { get; set; }
-
+        [Column(Name = "extra_flags")]
+        public int? ExtraFlags { get; set; }
         /// <summary>
         /// Validate BpmnName for business rules.
         /// </summary>
