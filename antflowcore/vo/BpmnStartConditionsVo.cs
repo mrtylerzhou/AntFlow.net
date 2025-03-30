@@ -199,5 +199,11 @@ namespace AntFlowCore.Vo
         [JsonPropertyName("lfConditions")]
         public Dictionary<string, object> LfConditions { get; set; }
         public bool IsLowCodeFlow { get; set; }
+        [JsonPropertyName("bpmnCode")]
+        public String BpmnCode { get; set; }
+        [JsonPropertyName("templateMarkIds")]
+        public List<string> TemplateMarkIds { get; set; }
+        [JsonPropertyName("isPreview")]
+        public bool IsPreview { get; set; }
     }
 }

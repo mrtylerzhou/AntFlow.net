@@ -173,6 +173,10 @@ namespace AntFlowCore.Vo
 
         [JsonPropertyName("msgProcessEventEnum")]
         public MsgProcessEventEnum MsgProcessEventEnum { get; set; }
+
+        [JsonPropertyName("templateMarkIds")]
+        public List<string> TemplateMarkIds { get; set; }
+
         [JsonPropertyName("lfConditions")]
         public Dictionary<String,Object> LfConditions;
     }

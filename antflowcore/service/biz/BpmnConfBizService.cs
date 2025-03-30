@@ -669,4 +669,15 @@ public class BpmnConfBizService
 
         return formCode.Substring(formCode.IndexOf("_") + 1);
     }
+
+    public BpmnConfVo DetailByFormCode(String formCode)
+    {
+
+        BpmnConf bpmnConf = _bpmnConfService.baseRepo.Where(a => a.FormCode == formCode && a.EffectiveStatus == 1)
+            .First();
+        if(bpmnConf==null){
+            throw new AFBizException("can not get a bpmnConf by provided formCode");
+        }
+        return GetBpmnConfVo(bpmnConf);
+    }
 }

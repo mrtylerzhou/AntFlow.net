@@ -27,5 +27,11 @@ namespace AntFlowCore.Vo
 
         [JsonPropertyName("deduplicationTypeName")]
         public string DeduplicationTypeName { get; set; }
+        [JsonPropertyName("currentNodeId")]
+        public String CurrentNodeId { get; set; }
+        [JsonPropertyName("beforeNodeIds")]
+        public  List<String>  BeforeNodeIds { get; set; }
+        [JsonPropertyName("afterNodeIds")]
+        public  List<String>  AfterNodeIds { get; set; }
     }
 }
