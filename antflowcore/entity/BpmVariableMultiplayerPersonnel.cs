@@ -34,7 +34,7 @@ namespace AntFlowCore.Entities
         /// 是否承担，0表示否，1表示是
         /// </summary>
         [Column(Name = "undertake_status")]
-        public int UndertakeStatus { get; set; }
+        public int? UndertakeStatus { get; set; }
 
         /// <summary>
         /// 备注

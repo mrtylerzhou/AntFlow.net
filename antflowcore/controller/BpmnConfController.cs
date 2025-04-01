@@ -79,6 +79,10 @@ public class BpmnConfController
     public Result<List<BpmVerifyInfoVo>> GetBpmVerifyInfoVos(String processNumber) {
         return Result<List<BpmVerifyInfoVo>>.Succ(_bpmVerifyInfoBizService.GetBpmVerifyInfoVos(processNumber, false));
     }
+    [HttpPost("process/viewBusinessProcess")]
+    public Result<BusinessDataVo> viewBusinessProcess( String values, String formCode) {
+        return Result<BusinessDataVo>.Succ(_processApprovalService.GetBusinessInfo(values, formCode));
+    }
     [HttpPost("process/listPage/{type}")]
     public ResultAndPage<TaskMgmtVO> ViewPcProcessList([FromRoute] int type, [FromBody] PageRequestDTO<TaskMgmtVO> requestDto)
     {

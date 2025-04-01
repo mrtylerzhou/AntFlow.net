@@ -1,4 +1,5 @@
 ﻿using antflowcore.conf.di;
+using AntFlowCore.Entity;
 using antflowcore.service.repository;
 using antflowcore.util;
 using antflowcore.vo;
@@ -24,5 +25,16 @@ public class BpmnEmployeeInfoProviderService: IBpmnEmployeeInfoProviderService
             .ToDictionary(user => user.Id, user => user.Name, StringComparer.OrdinalIgnoreCase);
 
         return empIdAndNameMap;
+    }
+
+    public Employee QryLiteEmployeeInfoById(string id)
+    {
+        BaseIdTranStruVo baseIdTranStruVo = _userService.QueryUserById(id);
+        Employee employee = new Employee
+        {
+            Id = baseIdTranStruVo.Id,
+            Username = baseIdTranStruVo.Name
+        };
+        return employee;
     }
 }

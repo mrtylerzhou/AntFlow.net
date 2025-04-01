@@ -12,4 +12,16 @@ public class BpmProcessForwardService: AFBaseCurdRepositoryService<BpmProcessFor
     {
         this.baseRepo.Insert(bpmProcessForward);
     }
+    
+    public void UpdateProcessForward(BpmProcessForward bpmProcessForward)
+    {
+        List<BpmProcessForward> bpmProcessForwards = this
+            .baseRepo.
+            Where(a=>a.ProcessInstanceId==bpmProcessForward.ProcessInstanceId&&a.ForwardUserId==bpmProcessForward.ForwardUserId)
+            .ToList();
+        foreach (BpmProcessForward processForward in bpmProcessForwards)
+        {
+            this.baseRepo.Update(processForward);
+        }
+    }
 }

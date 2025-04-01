@@ -112,6 +112,8 @@ public static class ServiceRegistration
         services.AddSingleton<BpmVerifyInfoBizService>();
         services.AddSingleton<ProcessConstantsService>();
         services.AddSingleton<ActivitiAdditionalInfoService>();
+        services.AddSingleton<UserMessageService>();
+        services.AddSingleton<ConfigFlowButtonContantService>();
         
         
         services.AddSingleton<AbstractOrderedSignNodeAdp, BpmnLoopSignNodeAdp>();

@@ -84,6 +84,7 @@ namespace AntFlowCore.Entities
         [Column(Name = "update_time",IsIgnore = true)]
         public DateTime? UpdateTime { get; set; }
         
-        
+        [Column(Name = "underTakeStatus",IsIgnore = true)]
+        public int? UnderTakeStatus { get; set; }
     }
 }

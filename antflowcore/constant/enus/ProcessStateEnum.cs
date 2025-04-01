@@ -43,4 +43,15 @@ public static class ProcessStateEnumExtensions
             ? (ProcessStateEnum?)code 
             : null;
     }
+    public static string GetDescByCode(int code)
+    {
+        ProcessStateEnum? processStateEnum=Enum.IsDefined(typeof(ProcessStateEnum), code)
+            ? (ProcessStateEnum?)code
+            : null;
+        if (processStateEnum == null)
+        {
+            return "";
+        }
+        return GetDescription(processStateEnum.Value);
+    }
 }
