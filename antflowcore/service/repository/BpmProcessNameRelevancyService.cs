@@ -11,4 +11,18 @@ public class BpmProcessNameRelevancyService: AFBaseCurdRepositoryService<BpmProc
         BpmProcessNameRelevancy bpmProcessNameRelevancy = baseRepo.Where(a=>a.ProcessKey.Equals(formCode)&&a.IsDel==0).ToOne();
         return bpmProcessNameRelevancy;
     }
+
+    public bool SelectCount(string formCode)
+    {
+        long count = this
+            .baseRepo.
+            Where(a=>a.ProcessKey==formCode&&a.IsDel==0)
+            .Count();
+        return count > 0;
+    }
+
+    public void Add(BpmProcessNameRelevancy processNameRelevancy)
+    {
+        this.baseRepo.Insert(processNameRelevancy);
+    }
 }

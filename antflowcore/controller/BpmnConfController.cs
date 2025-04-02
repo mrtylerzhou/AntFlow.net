@@ -19,6 +19,7 @@ public class BpmnConfController
 {
     private readonly ProcessApprovalService _processApprovalService;
     private readonly BpmVerifyInfoBizService _bpmVerifyInfoBizService;
+    private readonly BpmnConfService _bpmnConfService;
     private readonly IFreeSql _freeSql;
     public BpmnConfBizService _bpmnConfBizService;
     private readonly BpmnConfCommonService _bpmnConfCommonService;
@@ -28,11 +29,13 @@ public class BpmnConfController
         BpmnConfCommonService bpmnConfCommonService,
         ProcessApprovalService processApprovalService,
         BpmVerifyInfoBizService bpmVerifyInfoBizService,
+        BpmnConfService bpmnConfService,
         IFreeSql freeSql
         )
     {
         _processApprovalService = processApprovalService;
         _bpmVerifyInfoBizService = bpmVerifyInfoBizService;
+        _bpmnConfService = bpmnConfService;
         _freeSql = freeSql;
         _bpmnConfBizService = bpmnConfBizService;
         _bpmnConfCommonService = bpmnConfCommonService;
@@ -90,5 +93,11 @@ public class BpmnConfController
         TaskMgmtVO taskMgmtVO = requestDto.Entity;
         taskMgmtVO.Type=type;
         throw new NotImplementedException("not implemented yet");
+    }
+   
+    [HttpGet("effectiveBpmn/{id}")]
+    public Result<bool> EffectiveBpmn( int id) {
+        _bpmnConfService.EffectiveBpmnConf(id);
+        return Result<bool>.Succ(true);
     }
 }

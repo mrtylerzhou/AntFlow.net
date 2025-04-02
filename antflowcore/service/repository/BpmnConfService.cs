@@ -2,6 +2,7 @@
 using antflowcore.entity;
 using AntFlowCore.Entity;
 using antflowcore.exception;
+using antflowcore.util;
 using antflowcore.vo;
 using AntOffice.Base.Util;
 using FreeSql;
@@ -103,5 +104,48 @@ public class BpmnConfService
             
         });
         return bpmnConfVos;
+    }
+
+    public void EffectiveBpmnConf(int id)
+    {
+        BpmnConf bpmnConf = this.baseRepo.Where(a=>a.Id==id)
+            .ToOne();
+        if (bpmnConf == null)
+        {
+            throw new Exception($"Bpmn conf with id {id} not found");
+        }
+
+        BpmnConf alreadyEffectiveConf = this.baseRepo.Where(a=>a.FormCode==bpmnConf.FormCode&&a.EffectiveStatus==1).ToOne();
+        if (alreadyEffectiveConf != null)
+        {
+            alreadyEffectiveConf.EffectiveStatus = 0;
+            this.baseRepo.Update(alreadyEffectiveConf);
+        }
+        else
+        {
+            alreadyEffectiveConf=new BpmnConf();
+        }
+
+        BpmnConf confToEffective = new BpmnConf
+        {
+            Id = id,
+            AppId = alreadyEffectiveConf.AppId,
+            FormCode = alreadyEffectiveConf.FormCode,
+            BpmnType = alreadyEffectiveConf.BpmnType,
+            IsAll = GetIsAll(bpmnConf, alreadyEffectiveConf)
+        };
+        this.baseRepo.Update(confToEffective);
+        BpmProcessNameService bpmProcessNameService = ServiceProviderUtils.GetService<BpmProcessNameService>();
+        bpmProcessNameService.EditProcessName(bpmnConf);
+    }
+    private int GetIsAll(BpmnConf bpmnConf, BpmnConf prevBpmnConf) {
+        if (bpmnConf.IsOutSideProcess!=null&&bpmnConf.IsOutSideProcess == 1) {
+            return 1;
+        } else {
+            if (prevBpmnConf.IsAll!=null) {
+                return prevBpmnConf.IsAll;
+            }
+        }
+        return 0;
     }
 }
