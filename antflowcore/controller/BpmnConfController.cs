@@ -92,7 +92,7 @@ public class BpmnConfController
         PageDto pageDto = requestDto.PageDto;
         TaskMgmtVO taskMgmtVO = requestDto.Entity;
         taskMgmtVO.Type=type;
-        throw new NotImplementedException("not implemented yet");
+        return _processApprovalService.FindPcProcessList(pageDto, taskMgmtVO);
     }
    
     [HttpGet("effectiveBpmn/{id}")]

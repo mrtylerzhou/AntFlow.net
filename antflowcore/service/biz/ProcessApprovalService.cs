@@ -1,5 +1,9 @@
-﻿using antflowcore.constant.enus;
+﻿using System.Globalization;
+using System.Linq.Expressions;
+using antflowcore.constant.enus;
 using AntFlowCore.Constants;
+using antflowcore.dto;
+using antflowcore.entity;
 using AntFlowCore.Enums;
 using antflowcore.exception;
 using antflowcore.factory;
@@ -33,7 +37,7 @@ public class ProcessApprovalService
         BpmVariableMultiplayerService bpmVariableMultiplayerService,
         IFreeSql freeSql,
         ILogger<ProcessApprovalService> logger
-        )
+    )
     {
         _formFactory = formFactory;
         _buttonOperationService = buttonOperationService;
@@ -45,41 +49,45 @@ public class ProcessApprovalService
         _freeSql = freeSql;
         _logger = logger;
     }
-    public BusinessDataVo ButtonsOperation(String parameters, String formCode) {
-       _logger.LogInformation($"params:{parameters},formCode:{formCode}");
-       //deserialize parameters that passed in
-       BusinessDataVo vo = _formFactory.DataFormConversion(parameters, formCode);
-       //To determine the operation Type
-       ProcessOperationEnum? poEnum = ProcessOperationEnumExtensions.GetEnumByCode(vo.OperationType);
-       if (poEnum == null)
-       {
-           throw new AFBizException("unknown operation type,please Contact the Administrator");
-       }
-       formCode=vo.FormCode;
-       ThreadLocalContainer.Set(StringConstants.FORM_CODE,formCode);
-       //set the operation Flag
-       if (poEnum==ProcessOperationEnum.BUTTON_TYPE_DIS_AGREE || poEnum==ProcessOperationEnum.BUTTON_TYPE_STOP)
-       {
-           vo.Flag = false;
-       } else if (poEnum==ProcessOperationEnum.BUTTON_TYPE_ABANDON)
-       {
-           vo.Flag = true;
-       }
-       //set start user Info
-       if (string.IsNullOrEmpty(vo.StartUserId)) {
-           vo.StartUserId=SecurityUtils.GetLogInEmpId();
-           vo.StartUserName = SecurityUtils.GetLogInEmpName();
-       }
 
-       BusinessDataVo dataVo = null;
-       _freeSql.Ado.Transaction(() =>
-       {
-            dataVo = _buttonOperationService.ButtonsOperationTransactional(vo);
-       });
+    public BusinessDataVo ButtonsOperation(String parameters, String formCode)
+    {
+        _logger.LogInformation($"params:{parameters},formCode:{formCode}");
+        //deserialize parameters that passed in
+        BusinessDataVo vo = _formFactory.DataFormConversion(parameters, formCode);
+        //To determine the operation Type
+        ProcessOperationEnum? poEnum = ProcessOperationEnumExtensions.GetEnumByCode(vo.OperationType);
+        if (poEnum == null)
+        {
+            throw new AFBizException("unknown operation type,please Contact the Administrator");
+        }
 
-       return dataVo;
+        formCode = vo.FormCode;
+        ThreadLocalContainer.Set(StringConstants.FORM_CODE, formCode);
+        //set the operation Flag
+        if (poEnum == ProcessOperationEnum.BUTTON_TYPE_DIS_AGREE || poEnum == ProcessOperationEnum.BUTTON_TYPE_STOP)
+        {
+            vo.Flag = false;
+        }
+        else if (poEnum == ProcessOperationEnum.BUTTON_TYPE_ABANDON)
+        {
+            vo.Flag = true;
+        }
+
+        //set start user Info
+        if (string.IsNullOrEmpty(vo.StartUserId))
+        {
+            vo.StartUserId = SecurityUtils.GetLogInEmpId();
+            vo.StartUserName = SecurityUtils.GetLogInEmpName();
+        }
+
+        BusinessDataVo dataVo = null;
+        _freeSql.Ado.Transaction(() => { dataVo = _buttonOperationService.ButtonsOperationTransactional(vo); });
+
+        return dataVo;
 
     }
+
     public BusinessDataVo GetBusinessInfo(string parameters, string formCode)
     {
         var vo = _formFactory.DataFormConversion(parameters, formCode);
@@ -93,7 +101,7 @@ public class ProcessApprovalService
         vo.BusinessId = bpmBusinessProcess.BusinessId;
 
         BusinessDataVo businessDataVo;
-        if (vo.IsOutSideAccessProc==null||!vo.IsOutSideAccessProc.Value || vo.IsLowCodeFlow == 1)
+        if (vo.IsOutSideAccessProc == null || !vo.IsOutSideAccessProc.Value || vo.IsLowCodeFlow == 1)
         {
             var formAdaptor = _formFactory.GetFormAdaptor(vo);
             formAdaptor.OnQueryData(vo);
@@ -114,7 +122,8 @@ public class ProcessApprovalService
         // 校验流程权限，并从业务表中获取信息
         businessDataVo.ProcessRecordInfo = _processConstantsService.ProcessInfo(bpmBusinessProcess);
         businessDataVo.ProcessKey = bpmBusinessProcess.BusinessNumber;
-        businessDataVo.ProcessState = bpmBusinessProcess.ProcessState != (int)ProcessStateEnum.END_STATE && bpmBusinessProcess.ProcessState != (int)ProcessStateEnum.REJECT_STATE;
+        businessDataVo.ProcessState = bpmBusinessProcess.ProcessState != (int)ProcessStateEnum.END_STATE &&
+                                      bpmBusinessProcess.ProcessState != (int)ProcessStateEnum.REJECT_STATE;
 
         bool flag = businessDataVo.ProcessRecordInfo.StartUserId == SecurityUtils.GetLogInEmpIdStr();
 
@@ -122,9 +131,9 @@ public class ProcessApprovalService
 
         // 设置操作按钮
         businessDataVo.ProcessRecordInfo.PcButtons = _configFlowButtonContantService.GetButtons(
-            bpmBusinessProcess.BusinessNumber, 
-            businessDataVo.ProcessRecordInfo.NodeId, 
-            isJurisdiction, 
+            bpmBusinessProcess.BusinessNumber,
+            businessDataVo.ProcessRecordInfo.NodeId,
+            isJurisdiction,
             flag
         );
 
@@ -141,6 +150,7 @@ public class ProcessApprovalService
 
         return businessDataVo;
     }
+
     private void AddApproverButton(BusinessDataVo businessDataVo)
     {
         // Set the approver button
@@ -152,7 +162,8 @@ public class ProcessApprovalService
 
         // Set add approver button on the PC
         var pcButtons = businessDataVo.ProcessRecordInfo.PcButtons;
-        if (!pcButtons.TryGetValue(ButtonPageTypeEnumExtensions.GetName(ButtonPageTypeEnum.AUDIT), out var pcProcButtons))
+        if (!pcButtons.TryGetValue(ButtonPageTypeEnumExtensions.GetName(ButtonPageTypeEnum.AUDIT),
+                out var pcProcButtons))
         {
             pcProcButtons = new List<ProcessActionButtonVo>();
             pcButtons[ButtonPageTypeEnumExtensions.GetName(ButtonPageTypeEnum.AUDIT)] = pcProcButtons;
@@ -162,7 +173,110 @@ public class ProcessApprovalService
         {
             pcProcButtons.Add(addApproverButton);
         }
-        
+
+    }
+
+    public ResultAndPage<TaskMgmtVO> FindPcProcessList(PageDto pageDto, TaskMgmtVO vo)
+    {
+        SortedDictionary<String, SortTypeEnum> orderFieldMap = new SortedDictionary<string, SortTypeEnum>();
+        Page<TaskMgmtVO> page = PageUtils.GetPageByPageDto<TaskMgmtVO>(pageDto, orderFieldMap);
+
+        vo.ApplyUser = SecurityUtils.GetLogInEmpIdStr();
+
+        switch (vo.Type)
+        {
+            // view process record
+            case 1:
+                // get the records that current logged in user has access right
+                //todo to be implemented
+                break;
+            // mornitor current processes
+            case 2:
+                page.Records =ViewPcProcessList(page,vo) ;
+                break;
+        }
+        return PageUtils.GetResultAndPage(page);
+    }
+
+    List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
+    {
+        List<TaskMgmtVO> taskMgmtVos = _freeSql
+            .Select<BpmAfTaskInst, BpmBusinessProcess>()
+            .LeftJoin((h, b) => h.ProcInstId == b.ProcInstId)
+            .OrderByDescending((a, b) => a.StartTime)
+            .WithTempQuery(a => new TaskMgmtVO
+            {
+                ProcessInstanceId = a.t1.ProcInstId,
+                ProcessId = a.t1.ProcDefId,
+                ProcessNumber = a.t2.BusinessNumber,
+                UserId = a.t2.CreateUser,
+                BusinessId = a.t2.BusinessId,
+                Description = a.t2.Description,
+                ProcessState = a.t2.ProcessState,
+                RunTime = a.t1.StartTime,
+                ProcessDigest = a.t2.ProcessDigest,
+            })
+            .Where(CommonCond(taskMgmtVO))
+            .Page(page.Current, page.Size).ToList();
+        return taskMgmtVos;
+    }
+
+    private Expression<Func<TaskMgmtVO, bool>> CommonCond(TaskMgmtVO paramVo)
+    {
+        Expression<Func<TaskMgmtVO, bool>> exp = a => true;
+        if (!string.IsNullOrEmpty(paramVo.Search))
+        {
+            exp.And(a => a.Search.Contains(paramVo.Search));
+        }
+
+        if (paramVo.ApplyUserId != 0)
+        {
+            exp.And(a => a.ApplyUserId == paramVo.ApplyUserId);
+        }
+
+        if (!string.IsNullOrEmpty(paramVo.Description))
+        {
+            exp.And(a => a.Description.Contains(paramVo.Description));
+        }
+
+        if (!string.IsNullOrEmpty(paramVo.ProcessNumber))
+        {
+            exp.And(a => a.ProcessNumber == paramVo.ProcessNumber);
+        }
+
+        if (paramVo.ProcessState != null)
+        {
+            exp.And(a => a.ProcessState == paramVo.ProcessState);
+        }
+
+        if (!string.IsNullOrEmpty(paramVo.StartTime) && !string.IsNullOrEmpty(paramVo.EndTime))
+        {
+            DateTime start = DateTime.Parse(paramVo.StartTime);
+            DateTime end = DateTime.Parse(paramVo.EndTime);
+            exp.And(a => a.RunTime.Value.Date.Between(start, end));
+        }
+
+        if (paramVo.ProcessKeyList != null && !paramVo.ProcessKeyList.Any())
+        {
+            exp.And(a => paramVo.ProcessKeyList.Contains(a.ProcessKey));
+        }
+
+        if (paramVo.ProcessNumbers != null && paramVo.ProcessNumbers.Any())
+        {
+            exp.And(a => !paramVo.ProcessNumbers.Contains(a.ProcessNumber));
+        }
+
+        if (paramVo.VersionProcessKeys != null && !paramVo.VersionProcessKeys.Any())
+        {
+            exp.And(a => !paramVo.VersionProcessKeys.Contains(a.ProcessKey));
+        }
+
+        if (!string.IsNullOrEmpty(paramVo.ProcessDigest))
+        {
+            exp.And(a => !a.ProcessDigest.Contains(paramVo.ProcessDigest));
+        }
+
+        return exp;
     }
 }
 

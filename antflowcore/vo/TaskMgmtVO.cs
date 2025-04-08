@@ -76,7 +76,7 @@ namespace AntFlowCore.Vo
         public int TaskStype { get; set; }
 
         [JsonPropertyName("processState")]
-        public int ProcessState { get; set; }
+        public int? ProcessState { get; set; }
 
         [JsonPropertyName("businessId")]
         public string BusinessId { get; set; }
