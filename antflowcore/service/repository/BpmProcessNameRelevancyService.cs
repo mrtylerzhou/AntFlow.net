@@ -25,4 +25,13 @@ public class BpmProcessNameRelevancyService: AFBaseCurdRepositoryService<BpmProc
     {
         this.baseRepo.Insert(processNameRelevancy);
     }
+
+    public List<string> ProcessKeyList(long id)
+    {
+        List<string> processK = this
+            .baseRepo
+            .Where(a=>a.ProcessNameId==id&&a.IsDel==0)
+            .ToList(a=>a.ProcessKey);
+        return processK;
+    }
 }
