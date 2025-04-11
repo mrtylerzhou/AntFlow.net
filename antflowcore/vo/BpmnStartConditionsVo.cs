@@ -79,7 +79,7 @@ namespace AntFlowCore.Vo
         /// Gets or sets the list of approvers.
         /// </summary>
         [JsonPropertyName("approversList")]
-        public List<string> ApproversList { get; set; }
+        public Dictionary<String,List<BaseIdTranStruVo>> ApproversList { get; set; }
 
         /// <summary>
         /// Gets or sets the entry ID.

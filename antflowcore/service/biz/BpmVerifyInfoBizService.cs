@@ -233,7 +233,7 @@ public class BpmVerifyInfoBizService
         BpmAfTaskInst historicProcessInstance, BpmVerifyInfoVo taskVo)
     {
         // Get all Activiti flow nodes list
-        var activitiList = _actitiAdditionalInfoService.GetActivitiList(historicProcessInstance);
+        List<BpmnConfCommonElementVo> activitiList = _actitiAdditionalInfoService.GetActivitiList(historicProcessInstance);
 
         // Query process variable info
         BpmVariable bpmVariable = _bpmVariableService

@@ -62,7 +62,7 @@ namespace AntFlowCore.Vo
         public List<BaseIdTranStruVo> UserInfos { get; set; }
 
         [JsonPropertyName("approversList")] 
-        public List<string> ApproversList { get; set; } = new List<string>();
+        public Dictionary<String,List<BaseIdTranStruVo>> ApproversList { get; set; } = new Dictionary<string, List<BaseIdTranStruVo>>();
 
         [JsonPropertyName("flag")]
         public bool? Flag { get; set; }

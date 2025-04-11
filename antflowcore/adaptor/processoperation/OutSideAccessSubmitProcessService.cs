@@ -5,6 +5,7 @@ using AntFlowCore.Entity;
 using AntFlowCore.Enums;
 using antflowcore.exception;
 using antflowcore.service.repository;
+using antflowcore.vo;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
 
@@ -79,7 +80,7 @@ public class OutSideAccessSubmitProcessService : IProcessOperationAdaptor
         bpmnStartConditionsVo.StartUserId = businessDataVo.StartUserId;
 
         // Set approvers list
-        bpmnStartConditionsVo.ApproversList = businessDataVo.ApproversList ?? new List<string>();
+        bpmnStartConditionsVo.ApproversList = businessDataVo.ApproversList ?? new Dictionary<string, List<BaseIdTranStruVo>>();
 
         // Set process number
         bpmnStartConditionsVo.ProcessNum = processNum;

@@ -104,7 +104,6 @@ public class BpmnConfCommonService
             _bpmnNodeFormatService.GetBpmnConfCommonElementVoList(bpmnConfCommonVo, bpmnConfVo.Nodes,
                 bpmnStartConditions);
         bpmnConfCommonVo.ElementList = bpmnConfCommonElementVoList;
-        string s = "hello";
         _bpmnInsertVariablesService.InsertVariables(bpmnConfCommonVo, bpmnStartConditions);
         _bpmnCreateAndStartService.CreateBpmnAndStart(bpmnConfCommonVo, bpmnStartConditions);
     }

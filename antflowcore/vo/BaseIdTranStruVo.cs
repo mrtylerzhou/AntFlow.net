@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Text.Json.Serialization;
+using antflowcore.conf.json;
 
 namespace antflowcore.vo
 {
     public class BaseIdTranStruVo
     {
-        [JsonPropertyName("id")]
+        [JsonPropertyName("id"),JsonConverter(typeof(IntToStringConverter))]
         public string Id { get; set; }
 
         [JsonPropertyName("name")]
