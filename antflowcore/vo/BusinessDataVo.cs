@@ -132,7 +132,7 @@ namespace AntFlowCore.Vo
         [JsonPropertyName("assignee")]
         public string Assignee { get; set; }
 
-        [JsonPropertyName("isOutSideAccessProc")]
+        [JsonPropertyName("isOutSideAccessProc"),JsonConverter(typeof(StringToNullableBoolConverter))]
         public bool? IsOutSideAccessProc { get; set; } = false;
 
         [JsonPropertyName("isOutSideChecked")]

@@ -187,7 +187,7 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
     private List<BpmVerifyInfoVo> GetVerifyInfo(BpmVerifyInfoVo vo)
     {
        
-        Expression<Func<BpmVerifyInfo, bool>> expression = a => true;
+        Expression<Func<BpmVerifyInfo, bool>> expression = a => 1==1;
         if (!string.IsNullOrEmpty(vo.ProcessCode))
         {
             expression = expression.And(a => a.ProcessCode == vo.ProcessCode);
@@ -213,7 +213,16 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
                 VerifyUserName = w.VerifyUserName,
                 TaskName = w.TaskName,
                 VerifyStatus = w.VerifyStatus,
-                VerifyStatusName = GetVerifyStatusName(w.VerifyStatus),
+                VerifyStatusName = 
+                    w.VerifyStatus == 1 ? "提交" :
+                    w.VerifyStatus == 2 ? "同意" :
+                    w.VerifyStatus == 3 ? "不同意" :
+                    w.VerifyStatus == 4 ? "撤回" :
+                    w.VerifyStatus == 5 ? "作废" :
+                    w.VerifyStatus == 6 ? "终止" :
+                    w.VerifyStatus == 8 ? "退回修改" :
+                    w.VerifyStatus == 9 ? "加批" :
+                    "",
                 VerifyDate = w.VerifyDate,
                 VerifyDesc = w.VerifyDesc,
                 OriginalId = w.OriginalId,
@@ -221,44 +230,7 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
             .ToList();
         return bpmVerifyInfoVos;
     }
-    private string GetVerifyStatusName(int verifyStatus)
-    {
-        string verifyStatusName;
-
-        switch (verifyStatus)
-        {
-            case 1:
-                verifyStatusName = "提交";
-                break;
-            case 2:
-                verifyStatusName = "同意";
-                break;
-            case 3:
-                verifyStatusName = "不同意";
-                break;
-            case 4:
-                verifyStatusName = "撤回";
-                break;
-            case 5:
-                verifyStatusName = "作废";
-                break;
-            case 6:
-                verifyStatusName = "终止";
-                break;
-            case 8:
-                verifyStatusName = "退回修改";
-                break;
-            case 9:
-                verifyStatusName = "加批";
-                break;
-            default:
-                verifyStatusName = "";
-                break;
-        }
-
-        return verifyStatusName;
-    }
-
+    
     public List<BpmVerifyInfoVo> GetBpmVerifyInfoVoList(List<BpmVerifyInfoVo> list, string procInstId)
     {
         var infoVoList = new List<BpmVerifyInfoVo>();

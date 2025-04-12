@@ -7,6 +7,7 @@ using antflowcore.factory;
 using antflowcore.http;
 using antflowcore.service.biz;
 using antflowcore.service.repository;
+using antflowcore.util;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 using Microsoft.AspNetCore.Http;
@@ -64,9 +65,10 @@ public class BpmnConfController
         return Result<PreviewNode>.Succ(previewNode);
     }
     [HttpPost("startPagePreviewNode")]
-    public Result<PreviewNode> StartPagePreviewNode([FromBody] string paramsJson)
+    public Result<PreviewNode> StartPagePreviewNode([FromServices] IHttpContextAccessor accessor)
     {
-        JsonNode? jsonObject = JsonNode.Parse(paramsJson);
+        string paramsJson = accessor.HttpContext!.ReadRawBodyAsString();
+        JsonNode? jsonObject = JsonNodeHelper.SafeParse(paramsJson);
         bool isStartPreview = jsonObject?["isStartPreview"]?.GetValue<bool>() ?? false;
 
         if (isStartPreview)
@@ -83,14 +85,15 @@ public class BpmnConfController
         return Result<List<BpmVerifyInfoVo>>.Succ(_bpmVerifyInfoBizService.GetBpmVerifyInfoVos(processNumber, false));
     }
     [HttpPost("process/viewBusinessProcess")]
-    public Result<BusinessDataVo> viewBusinessProcess( String values, String formCode) {
+    public Result<BusinessDataVo> ViewBusinessProcess( [FromServices] IHttpContextAccessor accessor, String formCode) {
+        string values = accessor.HttpContext!.ReadRawBodyAsString();
         return Result<BusinessDataVo>.Succ(_processApprovalService.GetBusinessInfo(values, formCode));
     }
     [HttpPost("process/listPage/{type}")]
-    public ResultAndPage<TaskMgmtVO> ViewPcProcessList([FromRoute] int type, [FromBody] PageRequestDTO<TaskMgmtVO> requestDto)
+    public ResultAndPage<TaskMgmtVO> ViewPcProcessList([FromRoute] int type, [FromBody] DetailRequestDto requestDto)
     {
         PageDto pageDto = requestDto.PageDto;
-        TaskMgmtVO taskMgmtVO = requestDto.Entity;
+        TaskMgmtVO taskMgmtVO = requestDto.TaskMgmtVO;
         taskMgmtVO.Type=type;
         return _processApprovalService.FindPcProcessList(pageDto, taskMgmtVO);
     }

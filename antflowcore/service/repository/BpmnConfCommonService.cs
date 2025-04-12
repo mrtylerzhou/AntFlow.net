@@ -478,4 +478,13 @@ public class BpmnConfCommonService
         }
         return new PreviewNode();
     }
+
+    public List<BpmnConf> GetBpmnConfByFormCodeBatch(List<string> formCodes)
+    {
+        List<BpmnConf> bpmnConfs = _bpmnConfService
+            .baseRepo
+            .Where(a=>formCodes.Contains(a.FormCode)&&a.EffectiveStatus==1)
+            .ToList();
+        return bpmnConfs;
+    }
 }

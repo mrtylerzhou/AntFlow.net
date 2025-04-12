@@ -26,7 +26,10 @@ public class ProcessApprovalService
     private readonly ConfigFlowButtonContantService _configFlowButtonContantService;
     private readonly BpmVariableMultiplayerService _bpmVariableMultiplayerService;
     private readonly BpmProcessNameRelevancyService _processNameRelevancyService;
+    private readonly BpmProcessForwardService _bpmProcessForwardService;
     private readonly IFreeSql _freeSql;
+    private readonly BpmProcessNameService _bpmProcessNameService;
+    private readonly BpmnConfCommonService _bpmnConfCommonService;
     private readonly ILogger _logger;
 
     public ProcessApprovalService(
@@ -38,7 +41,10 @@ public class ProcessApprovalService
         ConfigFlowButtonContantService configFlowButtonContantService,
         BpmVariableMultiplayerService bpmVariableMultiplayerService,
         BpmProcessNameRelevancyService processNameRelevancyService,
+        BpmProcessForwardService bpmProcessForwardService,
         IFreeSql freeSql,
+        BpmProcessNameService bpmProcessNameService,
+        BpmnConfCommonService bpmnConfCommonService,
         ILogger<ProcessApprovalService> logger
     )
     {
@@ -50,7 +56,10 @@ public class ProcessApprovalService
         _configFlowButtonContantService = configFlowButtonContantService;
         _bpmVariableMultiplayerService = bpmVariableMultiplayerService;
         _processNameRelevancyService = processNameRelevancyService;
+        _bpmProcessForwardService = bpmProcessForwardService;
         _freeSql = freeSql;
+        _bpmProcessNameService = bpmProcessNameService;
+        _bpmnConfCommonService = bpmnConfCommonService;
         _logger = logger;
     }
 
@@ -237,10 +246,98 @@ public class ProcessApprovalService
                 //todo tobe implemented
                 break;
         }
+        if (page.Records!=null&&page.Records.Any()) {
+            if (vo.Type==(ProcessTypeEnum.ENTRUST_TYPE.Code) || vo.Type==(ProcessTypeEnum.ADMIN_TYPE.Code)) {
+                _bpmProcessForwardService.LoadProcessForward(SecurityUtils.GetLogInEmpId());
+                _bpmProcessForwardService.LoadTask(SecurityUtils.GetLogInEmpId());
+            }
+            this.GetPcProcessData(page, vo.Type);
+        }
         return PageUtils.GetResultAndPage(page);
     }
 
-    List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
+   private void GetPcProcessData(Page<TaskMgmtVO>page, int type)
+{
+    var formCodes = page.Records
+        .Select(r => r.ProcessKey)
+        .Where(x => !string.IsNullOrEmpty(x))
+        .Distinct()
+        .ToList();
+
+    List<BpmnConf> bpmnConfs = _bpmnConfCommonService.GetBpmnConfByFormCodeBatch(formCodes);
+    Dictionary<string,BpmnConf> bpmnConfMap = new Dictionary<string, BpmnConf>();
+
+    if (bpmnConfs != null && bpmnConfs.Any())
+    {
+        bpmnConfMap = bpmnConfs
+            .GroupBy(x => x.FormCode)
+            .ToDictionary(g => g.Key, g => g.Last());
+
+        foreach (var record in page.Records)
+        {
+            if (bpmnConfMap.TryGetValue(record.ProcessKey, out var bpmnConf))
+            {
+                record.IsOutSideProcess = bpmnConf.IsOutSideProcess == 1;
+                record.IsLowCodeFlow = bpmnConf.IsLowCodeFlow == 1;
+                record.ConfId = bpmnConf.Id;
+            }
+
+          
+            // TODO: 实际用户信息从 DB 获取
+            record.ActualName = SecurityUtils.GetLogInEmpName();
+
+            // 设置任务状态名称
+            record.TaskState = ProcessStateEnumExtensions.GetDescByCode(record.ProcessState ?? 0);
+
+            if (type == ProcessTypeEnum.ENTRUST_TYPE.Code)
+            {
+                
+                record.IsForward = _bpmProcessForwardService.IsForward(record.ProcessInstanceId);
+
+                if (!string.IsNullOrEmpty(record.TaskName))
+                {
+                    record.IsBatchSubmit = IsOperatable(new TaskMgmtVO
+                    {
+                        ProcessKey = record.ProcessKey,
+                        TaskName = record.TaskName,
+                        Type = ProcessButtonEnum.VIEW_TYPE.Code
+                    });
+
+                    record.NodeType = ProcessNodeEnum.GetCodeByDesc(record.TaskName)??0;
+                }
+            }
+
+            if (type == ProcessTypeEnum.ADMIN_TYPE.Code)
+            {
+                if (!string.IsNullOrEmpty(record.TaskName))
+                {
+                    record.NodeType = ProcessNodeEnum.GetCodeByDesc(record.TaskName)??0;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(record.ProcessKey))
+            {
+                var bpmProcessVo = _bpmProcessNameService.Get(record.ProcessKey);
+                if (bpmProcessVo != null && !string.IsNullOrEmpty(bpmProcessVo.ProcessKey))
+                {
+                    record.ProcessTypeName = bpmProcessVo.ProcessName;
+                    record.ProcessCode = bpmProcessVo.ProcessKey;
+                }
+            }
+        }
+    }
+}
+
+private bool IsOperatable(TaskMgmtVO taskMgmtVo)
+{
+    long count = _freeSql.Select<BpmProcessOperation>()
+        .Where(a=>a.ProcessNode==taskMgmtVo.TaskName&&a.ProcessKey==taskMgmtVo.ProcessKey&&a.Type==taskMgmtVo.Type)
+        .Count();
+    return count <= 0;
+}
+
+
+List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
     {
         List<TaskMgmtVO> taskMgmtVos = _freeSql
             .Select<BpmAfTaskInst, BpmBusinessProcess>()

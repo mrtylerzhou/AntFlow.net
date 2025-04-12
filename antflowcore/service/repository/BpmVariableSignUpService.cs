@@ -28,7 +28,7 @@ public class BpmVariableSignUpService: AFBaseCurdRepositoryService<BpmVariableSi
             return false;
         }
 
-        if (isMoreNode(processNumber, nodeId))
+        if (IsMoreNode(processNumber, nodeId))
         {
             return false;
         }
@@ -54,11 +54,21 @@ public class BpmVariableSignUpService: AFBaseCurdRepositoryService<BpmVariableSi
         multiplayer.UnderTakeStatus = c.UndertakeStatus;
         return multiplayer;
     }
-    private bool isMoreNode(String processNum, String elementId) {
+    private bool IsMoreNode(String processNum, String elementId) {
         List<BpmVariableMultiplayer> bpmVariableMultiplayers = Frsql.Select<BpmVariableMultiplayer, BpmVariable, BpmVariableMultiplayerPersonnel>()
             .LeftJoin((a, b, c) => a.VariableId == b.Id)
             .LeftJoin((a, b, c) => c.VariableMultiplayerId == a.Id)
-            .ToList((a, b, c) => MapToPersonnel(a,b,c));
+            .ToList((a, b, c) => new
+            {
+                Multiplayer = a,
+                UndertakeStatus = c.UndertakeStatus
+            })
+            .Select(x =>
+            {
+                x.Multiplayer.UnderTakeStatus = x.UndertakeStatus;
+                return x.Multiplayer;
+            })
+            .ToList();
         List<BpmVariableMultiplayer> filteredPlayers = bpmVariableMultiplayers.Where(a=>a.UnderTakeStatus==null||a.UnderTakeStatus==0).ToList();
         return filteredPlayers!=null && filteredPlayers.Count>1&&filteredPlayers[0].SignType==2;
     }

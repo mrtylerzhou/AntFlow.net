@@ -1,4 +1,6 @@
-﻿namespace antflowcore.conf.json;
+﻿using antflowcore.exception;
+
+namespace antflowcore.conf.json;
 
 using System;
 using System.Text.Json;
@@ -8,24 +10,32 @@ public class StringOrIntConverter : JsonConverter<string>
 {
     public override string Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        // 如果当前值是数字类型，转换为字符串
-        if (reader.TokenType == JsonTokenType.Number)
+        switch (reader.TokenType)
         {
-            return reader.GetInt32().ToString();
+            case JsonTokenType.Number:
+                return reader.GetDouble().ToString();
+            case JsonTokenType.String:
+                return reader.GetString();
+            case JsonTokenType.Null:
+                return "";
+            case JsonTokenType.True:
+            case JsonTokenType.False:
+                return reader.GetBoolean().ToString();
+            default:
+                try
+                {
+                    return reader.GetString();
+                }
+                catch
+                {
+                    throw new AFBizException("json处理失败");
+                }
         }
-
-        // 如果当前值已经是字符串，直接返回
-        if (reader.TokenType == JsonTokenType.String)
-        {
-            return reader.GetString();
-        }
-
-        throw new JsonException("Invalid token type for id.");
     }
 
     public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options)
     {
-        // 直接写入字符串值
+        
         writer.WriteStringValue(value);
     }
 }
