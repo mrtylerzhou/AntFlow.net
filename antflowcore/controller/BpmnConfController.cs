@@ -97,7 +97,13 @@ public class BpmnConfController
         taskMgmtVO.Type=type;
         return _processApprovalService.FindPcProcessList(pageDto, taskMgmtVO);
     }
-   
+
+    [AcceptVerbs("GET", "POST")]
+    [Route("detail/{id}")]
+    public Result<BpmnConfVo> Detail([FromRoute] long id)
+    {
+        return Result<BpmnConfVo>.Succ(_bpmnConfBizService.Detail(id));
+    }
     [HttpGet("effectiveBpmn/{id}")]
     public Result<bool> EffectiveBpmn( int id) {
         _bpmnConfService.EffectiveBpmnConf(id);

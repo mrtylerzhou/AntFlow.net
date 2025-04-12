@@ -256,7 +256,14 @@ public class BpmnConfBizService
         }
         return _bpmnConfService.ReCheckBpmnCode(bpmnFirstLetters, bpmnFirstLetters);
     }
-    
+    public BpmnConfVo Detail(long id)
+    {
+        BpmnConf bpmnConf = _bpmnConfService.baseRepo.Where(a => a.Id == id).ToOne();
+        return FormatConfVo(GetBpmnConfVo(bpmnConf));
+    }
+
+   
+
     public BpmnConfVo Detail(String bpmnCode)
     {
         BpmnConf bpmnConf = _bpmnConfService.baseRepo.Where(a => a.BpmnCode.Equals(bpmnCode)).ToOne();
@@ -679,5 +686,24 @@ public class BpmnConfBizService
             throw new AFBizException("can not get a bpmnConf by provided formCode");
         }
         return GetBpmnConfVo(bpmnConf);
+    }
+    private BpmnConfVo FormatConfVo(BpmnConfVo confVo)
+    {
+        if(confVo==null){
+            throw new AFBizException("has not confVo");
+        }
+        List<BpmnNodeVo> nodes = confVo.Nodes;
+        if(nodes==null||!nodes.Any()){
+            throw new AFBizException("confVo has empty nodes");
+        }
+        foreach (BpmnNodeVo node in nodes)
+        {
+            BpmnNodePropertysVo property = node.Property;
+            if(property!=null)
+            {
+                property.ConditionsConf = null;
+            }
+        }
+        return confVo;
     }
 }
