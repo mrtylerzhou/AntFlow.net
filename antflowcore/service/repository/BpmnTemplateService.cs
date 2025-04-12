@@ -3,7 +3,7 @@ using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.util;
 using antflowcore.vo;
-using AutoMapper;
+
 
 namespace antflowcore.service.repository;
 
@@ -45,8 +45,7 @@ public class BpmnTemplateService: AFBaseCurdRepositoryService<BpmnTemplate>
         string logInEmpNameSafe = SecurityUtils.GetLogInEmpNameSafe();
         foreach (BpmnTemplateVo bpmnTemplateVo in templateVos)
         {
-            BpmnTemplate bpmnTemplate = new BpmnTemplate();
-            GlobalConstant.Mapper.Map(bpmnTemplateVo, bpmnTemplate);
+            BpmnTemplate bpmnTemplate = bpmnTemplateVo.MapToEntity();
             bpmnTemplate.ConfId = confId;
             bpmnTemplate.Informs=string.Join(",",bpmnTemplateVo.InformList);
             bpmnTemplate.Emps=string.Join(",", bpmnTemplateVo.EmpList);

@@ -15,8 +15,7 @@ public class BpmnApproveRemindService: AFBaseCurdRepositoryService<BpmnApproveRe
             return;
         }
 
-        BpmnApproveRemind bpmnApproveRemind = new BpmnApproveRemind();
-        mapper.Map(o,bpmnApproveRemind);
+        BpmnApproveRemind bpmnApproveRemind = o.MapToEntity();
         bpmnApproveRemind.ConfId=bpmnNodeVo.ConfId;
         bpmnApproveRemind.NodeId=(bpmnNodeVo.Id);
         if (o.IsInuse!=null) {

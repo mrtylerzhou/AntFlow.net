@@ -13,7 +13,6 @@ using antflowcore.util;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 using AntOffice.Base.Util;
-using AutoMapper;
 
 namespace antflowcore.service.biz;
 
@@ -36,7 +35,7 @@ public class BpmnConfBizService
     private readonly BpmnNodeLfFormdataFieldControlService _lfFormdataFieldControlService;
     private readonly BpmnViewPageButtonService _viewPageButtonService;
     private readonly TaskMgmtService _taskMgmtService;
-    private readonly IMapper _mapper;
+  
 
     public BpmnConfBizService(
         BpmnConfService bpmnConfService,
@@ -55,8 +54,7 @@ public class BpmnConfBizService
         InformationTemplateService informationTemplateService,
         BpmnNodeLfFormdataFieldControlService lfFormdataFieldControlService,
         BpmnViewPageButtonService viewPageButtonService,
-        TaskMgmtService taskMgmtService,
-        IMapper mapper
+        TaskMgmtService taskMgmtService
         )
     {
         _bpmnConfService = bpmnConfService;
@@ -76,7 +74,7 @@ public class BpmnConfBizService
         _lfFormdataFieldControlService = lfFormdataFieldControlService;
         _viewPageButtonService = viewPageButtonService;
         _taskMgmtService = taskMgmtService;
-        _mapper = mapper;
+     
     }
     private const String LinkMark = "_";
 
@@ -85,9 +83,9 @@ public class BpmnConfBizService
         String bpmnName = bpmnConfVo.BpmnName;
         String bpmnCode = GetBpmnCode(bpmnName);
         String formCode = bpmnConfVo.FormCode;
-        BpmnConf bpmnConf = new BpmnConf();
         //todo 注意查看映射效果
-        _mapper.Map(bpmnConfVo, bpmnConf);
+        BpmnConf bpmnConf = bpmnConfVo.MapToEntity();
+       
         bpmnConf.BpmnCode=bpmnCode;
         bpmnConf.FormCode = formCode;
         bpmnConf.CreateUser=SecurityUtils.GetLogInEmpNameSafe();
@@ -120,8 +118,7 @@ public class BpmnConfBizService
 
             //if the node has no property,the node property default is "1-no property"
             bpmnNodeVo.NodeProperty=bpmnNodeVo.NodeProperty ?? 1;
-            BpmnNode bpmnNode = new BpmnNode();
-            _mapper.Map(bpmnNodeVo, bpmnNode);
+            BpmnNode bpmnNode = bpmnNodeVo.MapToEntity();
             bpmnNode.ConfId=confId;
             bpmnNode.CreateTime=DateTime.Now;
             bpmnNode.CreateUser=SecurityUtils.GetLogInEmpNameSafe();
@@ -277,8 +274,8 @@ public class BpmnConfBizService
         {
             return new BpmnConfVo();
         }
-        BpmnConfVo bpmnConfVo = new BpmnConfVo();
-        _mapper.Map(bpmnConf, bpmnConfVo);
+
+        BpmnConfVo bpmnConfVo = bpmnConf.MapToVo();
         String conditionsUrl = "";
         if (bpmnConfVo.IsOutSideProcess != null && bpmnConf.IsOutSideProcess == 1)
         {
@@ -347,8 +344,7 @@ public class BpmnConfBizService
             .Where(a => a.ConfId == bpmnConfVo.Id && a.IsDel == 0 && a.NodeId == null).ToList();
         bpmnConfVo.TemplateVos  = bpmnTemplates.Select(o =>
         {
-            BpmnTemplateVo vo = new BpmnTemplateVo();
-            _mapper.Map(o, vo);
+            BpmnTemplateVo vo = o.MapToVo();
             BuildBpmnTemplateVo(vo);
             return vo;
         }).ToList();
@@ -422,12 +418,9 @@ public class BpmnConfBizService
                 o => o.NodeId,
                 o =>
                 {
-                    var vo = new BpmnApproveRemindVo
-                    {
-                        IsInuse = false
-                    };
-
-                    _mapper.Map(o, vo);
+                    BpmnApproveRemindVo vo = o.MapToVo();
+                    vo.IsInuse = false;
+                    
                     var template = _informationTemplateService.baseRepo.Where(a => a.Id == o.TemplateId).ToOne();
                     vo.TemplateName = template.Name;
                     
@@ -460,10 +453,9 @@ public class BpmnConfBizService
             .GroupBy(x => x.NodeId.Value)
             .ToDictionary(
                 g => g.Key,
-                g => g.Select(o => 
+                g => g.Select(o =>
                 {
-                    var vo = new BpmnTemplateVo();
-                    _mapper.Map(o, vo);
+                    var vo = o.MapToVo();
                     BuildBpmnTemplateVo(vo);
                     return vo;
                 }).ToList()
@@ -526,8 +518,8 @@ public class BpmnConfBizService
         Dictionary<long, List<BpmnNodeLfFormdataFieldControl>> lfFieldControlMap,
         String conditionsUrl)
     {
-        BpmnNodeVo bpmnNodeVo = new BpmnNodeVo();
-        _mapper.Map(bpmnNode, bpmnNodeVo);
+        BpmnNodeVo bpmnNodeVo = bpmnNode.MapToVo();
+      
         long bpmnNodeId = bpmnNode.Id;
         //set nodeto
         bpmnNodeVo.NodeTo=bpmnNodeToMap.ContainsKey(bpmnNodeId)?bpmnNodeToMap[bpmnNodeId]:null;

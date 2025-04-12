@@ -9,7 +9,6 @@ using antflowcore.service.repository;
 using antflowcore.util;
 using antflowcore.vo;
 using AntFlowCore.Vo;
-using AutoMapper;
 
 namespace antflowcore.aop;
 
@@ -53,8 +52,8 @@ public class BpmnSendMessageAspect<T> : DispatchProxy
             outSideBpmBusinessParty=new OutSideBpmBusinessParty();
         }
 
-        IMapper mapper = ServiceProviderUtils.GetService<IMapper>();
-        BpmnConfVo bpmnConfVo = mapper.Map<BpmnConfVo>(bpmnConf);
+
+        BpmnConfVo bpmnConfVo = bpmnConf.MapToVo();
         businessDataVo.BpmnConfVo=bpmnConfVo;
         
         //is form data is not null then set form data

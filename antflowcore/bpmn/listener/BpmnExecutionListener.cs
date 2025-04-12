@@ -5,6 +5,7 @@ using antflowcore.entity;
 using antflowcore.exception;
 using antflowcore.factory;
 using antflowcore.service.repository;
+using antflowcore.util;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
@@ -77,8 +78,7 @@ public class BpmnExecutionListener: IExecutionListener
             businessDataVo.FormCode=formCode;
             if(bpmnConf.IsLowCodeFlow==1){
                 businessDataVo.IsLowCodeFlow=1;
-                BpmnConfVo confVo=new BpmnConfVo();
-                GlobalConstant.Mapper.Map(bpmnConf,confVo);
+                BpmnConfVo confVo = bpmnConf.MapToVo();
                 businessDataVo.BpmnConfVo=confVo;
             }
 

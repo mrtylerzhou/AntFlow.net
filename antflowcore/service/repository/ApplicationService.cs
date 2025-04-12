@@ -25,8 +25,8 @@ public class ApplicationService: AFBaseCurdRepositoryService<BpmProcessAppApplic
         }
         
         BpmProcessAppApplication application = list[0];
-        BpmProcessAppApplicationVo vo = new BpmProcessAppApplicationVo();
-        mapper.Map(application, vo);
+        BpmProcessAppApplicationVo vo = application.MapToVo();
+      
         if (!string.IsNullOrEmpty(vo.LookUrl)) {
             vo.LookUrl=HttpUtility.HtmlDecode(vo.LookUrl);
         }

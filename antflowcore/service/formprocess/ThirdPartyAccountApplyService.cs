@@ -3,9 +3,10 @@ using antflowcore.constant.enus;
 using antflowcore.entity;
 using antflowcore.factory;
 using antflowcore.service.repository;
+using antflowcore.util;
 using antflowcore.vo;
 using AntFlowCore.Vo;
-using AutoMapper;
+
 
 namespace antflowcore.service.formprocess;
 [AfFormServiceAnno(SvcName = "DSFZH_WMA",Desc = "三方账号申请")]
@@ -47,13 +48,15 @@ public class ThirdPartyAccountApplyService : AFBaseCurdRepositoryService<ThirdPa
     public void OnQueryData(ThirdPartyAccountApplyVo vo)
     {
         ThirdPartyAccountApply accountApply=baseRepo.Where(a=>a.Id==Convert.ToInt32(vo.BusinessId)).First();
-        mapper.Map(accountApply,vo);
+        vo.AccountType = accountApply.AccountType;
+        vo.AccountOwnerName = accountApply.AccountOwnerName;
+        vo.Remark = accountApply.Remark;
     }
 
     public void OnSubmitData(ThirdPartyAccountApplyVo vo)
     {
-        ThirdPartyAccountApply thirdPartyAccountApply=new ThirdPartyAccountApply();
-        mapper.Map(vo,thirdPartyAccountApply);
+        ThirdPartyAccountApply thirdPartyAccountApply = vo.MapToEntity();
+        
         baseRepo.Insert(thirdPartyAccountApply);
         vo.BusinessId=(thirdPartyAccountApply.Id.ToString());
         vo.ProcessTitle="第三方账号申请";
@@ -63,9 +66,9 @@ public class ThirdPartyAccountApplyService : AFBaseCurdRepositoryService<ThirdPa
 
     public void OnConsentData(ThirdPartyAccountApplyVo vo)
     {
-        if (vo.OperationType==(int)ButtonTypeEnum.BUTTON_TYPE_RESUBMIT){
-            ThirdPartyAccountApply thirdPartyAccountApply=new ThirdPartyAccountApply();
-            mapper.Map(vo,thirdPartyAccountApply);
+        if (vo.OperationType==(int)ButtonTypeEnum.BUTTON_TYPE_RESUBMIT)
+        {
+            ThirdPartyAccountApply thirdPartyAccountApply = vo.MapToEntity();
             int id = Convert.ToInt32(vo.BusinessId);
             thirdPartyAccountApply.Id=id;
             baseRepo.Update(thirdPartyAccountApply);

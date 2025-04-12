@@ -9,8 +9,6 @@
     </PropertyGroup>
     <ItemGroup>
 	  <FrameworkReference Include="Microsoft.AspNetCore.App" />
-	  <PackageReference Include="AutoMapper" Version="12.0.1" />
-	  <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
 	  <PackageReference Include="DotNetCore.Natasha.CSharp.Compiler" Version="9.0.0.4" />
 	  <PackageReference Include="DotNetCore.Natasha.CSharp.Compiler.Domain" Version="9.0.0.1" />
 	  <PackageReference Include="DotNetCore.Natasha.CSharp.Extension.MethodCreator" Version="9.0.0.4" />
