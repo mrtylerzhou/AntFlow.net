@@ -227,8 +227,8 @@ public class BpmnConfCommonService
         bpmnStartConditionsVo.StartUserId = startUserId;
         bpmnStartConditionsVo.IsPreview = true;
 
-        var bpmnConfVo = GetBpmnConfVo(bpmnStartConditionsVo, detail);
-        var previewNode = new PreviewNode
+        BpmnConfVo bpmnConfVo = GetBpmnConfVo(bpmnStartConditionsVo, detail);
+        PreviewNode previewNode = new PreviewNode
         {
             BpmnName = detail.BpmnName,
             FormCode = detail.FormCode,
@@ -243,12 +243,12 @@ public class BpmnConfCommonService
         List<string> currentNodeIds = currentNodeIdStr.Split(',').ToList();
         var bpmnNodeVoMap = previewNode.BpmnNodeList.ToDictionary(n => n.NodeId, n => n);
 
-        List<string> nodeToResults = new();
+        List<string> nodeToResults = new List<string>();
         ProcessNodeToRecursively(currentNodeIds, bpmnNodeVoMap, nodeToResults);
         previewNode.AfterNodeIds = nodeToResults;
 
-        List<string> nodeFromResults = new();
-        var allNodeIds = new HashSet<string>(bpmnNodeVoMap.Keys);
+        List<string> nodeFromResults = new List<string>();
+        HashSet<string> allNodeIds = new HashSet<string>(bpmnNodeVoMap.Keys);
         nodeFromResults.AddRange(allNodeIds.Where(o => !nodeToResults.Contains(o) && !currentNodeIds.Contains(o)));
 
         previewNode.BeforeNodeIds = nodeFromResults;
