@@ -138,6 +138,10 @@ public class ConfigFlowButtonContantService
 
     public bool IsMoreNode(string procInstId, string elementId)
     {
+        if (string.IsNullOrEmpty(elementId))
+        {
+            return false;
+        }
         BpmAfTaskInst bpmAfTaskInst = _afTaskInstService.baseRepo.Where(a=>a.ProcInstId==procInstId).First();
         BpmAfDeployment bpmAfDeployment = _afDeploymentService.baseRepo.Where(a=>a.Id==bpmAfTaskInst.ProcDefId).First();
         if (bpmAfDeployment == null)
@@ -150,7 +154,7 @@ public class ConfigFlowButtonContantService
         {
             throw new AFBizException($"deployment with id {procInstId} not found");
         }
-        BpmnConfCommonElementVo element = elements.Where(a => a.ElementId == elementId).First();
+        BpmnConfCommonElementVo element = elements.Where(a => a.ElementId == elementId).FirstOrDefault();
         if (element == null)
         {
             throw new AFBizException($"element with id {elementId} not found");
