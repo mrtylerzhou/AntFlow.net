@@ -114,14 +114,14 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
     public List<BpmVerifyInfoVo> FindTaskInfo(BpmBusinessProcess bpmBusinessProcess)
     {
         string procInstId = bpmBusinessProcess.ProcInstId;
-        var tasks = this.FindTaskInfo(procInstId);
+        List<BpmVerifyInfoVo> tasks = this.FindTaskInfo(procInstId);
 
         if (!tasks.Any())
         {
             return new List<BpmVerifyInfoVo>();
         }
 
-        var verifyUserIds = tasks.Select(t => t.VerifyUserId).ToList();
+        List<string> verifyUserIds = tasks.Select(t => t.VerifyUserId).ToList();
         int? isOutSideProcess = bpmBusinessProcess.IsOutSideProcess;
         Dictionary<string, string> stringStringMap = null;
 
@@ -142,23 +142,28 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
             }
         }
 
-        var taskInfors = new List<BpmVerifyInfoVo>();
+        List<BpmVerifyInfoVo> taskInfors = new List<BpmVerifyInfoVo>();
 
         if (tasks.Count > 1)
         {
             string verifyUserName = string.Join(",", tasks.Select(t => t.VerifyUserName));
             string taskName = string.Empty;
-            var strs = tasks.Select(t => t.TaskName).Where(t => t != null).ToList();
+            List<string> strs = tasks.Select(t => t.TaskName).Where(t => t != null).Distinct().ToList();
 
-            if (strs.Any())
+            if (strs.Count>1)
             {
                 taskName = string.Join("||", strs);
+            }
+            else
+            {
+                taskName = strs.FirstOrDefault();
             }
 
             string elementId = string.Join(",", tasks.Select(t => t.ElementId));
 
             taskInfors.Add(new BpmVerifyInfoVo
             {
+                Id = procInstId,
                 VerifyUserIds = verifyUserIds,
                 VerifyUserName = verifyUserName,
                 TaskName = taskName,
