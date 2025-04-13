@@ -173,7 +173,7 @@ public class BpmnConfCommonService
             : _bpmnConfBizService.Detail(dataVo.BpmnCode);
 
         BusinessDataVo tempVo = new BusinessDataVo();
-        tempVo.FormCode = dataVo.FormCode;
+        tempVo.FormCode = detail.FormCode;
         var vo = _formFactory.DataFormConversion(JsonSerializer.Serialize(tempVo), null);
         vo.IsOutSideAccessProc = detail.IsOutSideProcess == 1;
         vo.IsLowCodeFlow = detail.IsLowCodeFlow;
@@ -196,7 +196,7 @@ public class BpmnConfCommonService
             startUserId = vo.StartUserId;
             if (string.IsNullOrEmpty(startUserId))
             {
-                vo.StartUserId = SecurityUtils.GetLogInEmpNameSafe();
+                vo.StartUserId = SecurityUtils.GetLogInEmpIdSafe();
             }
         }
 
@@ -224,7 +224,7 @@ public class BpmnConfCommonService
         }
 
         bpmnStartConditionsVo.ApproversList = dataVo.ApproversList;
-        bpmnStartConditionsVo.StartUserId = startUserId;
+        bpmnStartConditionsVo.StartUserId = vo.StartUserId;
         bpmnStartConditionsVo.IsPreview = true;
 
         BpmnConfVo bpmnConfVo = GetBpmnConfVo(bpmnStartConditionsVo, detail);
