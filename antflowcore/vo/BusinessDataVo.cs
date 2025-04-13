@@ -122,9 +122,7 @@ namespace AntFlowCore.Vo
 
         [JsonPropertyName("bpmnConfVo")]
         public BpmnConfVo BpmnConfVo { get; set; }
-
-        [JsonPropertyName("accountType")]
-        public int? AccountType { get; set; }
+        
 
         [JsonPropertyName("jobLevelVo")]
         public BaseIdTranStruVo JobLevelVo { get; set; }
