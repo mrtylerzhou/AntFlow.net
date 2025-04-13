@@ -12,7 +12,7 @@ namespace AntFlowCore.Vo
         // End time
         public DateTime? EndTime { get; set; }
 
-        public int Sender { get; set; }
+        public string Sender { get; set; }
 
         // Entrust name
         public string Name { get; set; }

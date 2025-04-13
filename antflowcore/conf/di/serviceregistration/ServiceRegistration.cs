@@ -114,7 +114,7 @@ public static class ServiceRegistration
         services.AddSingleton<ActivitiAdditionalInfoService>();
         services.AddSingleton<UserMessageService>();
         services.AddSingleton<ConfigFlowButtonContantService>();
-        
+        services.AddSingleton<UserEntrustService>();
         
         services.AddSingleton<AbstractOrderedSignNodeAdp, BpmnLoopSignNodeAdp>();
         services.AddSingleton<AbstractOrderedSignNodeAdp, OutSideOrderedSignNodeAdp>();

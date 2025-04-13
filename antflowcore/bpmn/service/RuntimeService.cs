@@ -86,7 +86,7 @@ public class RuntimeService
                tasks.Add(bpmAfTask);
                historyTaskInsts.Add(bpmAfTask.ToInst());
           }
-          _taskService.baseRepo.Insert(tasks);
+          _taskService.InsertTasks(tasks);
           _taskInstService.baseRepo.Insert(historyTaskInsts);
           ExecutionEntity executionEntity = new ExecutionEntity()
           {

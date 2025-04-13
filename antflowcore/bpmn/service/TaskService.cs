@@ -134,7 +134,7 @@ public class TaskService
             bpmAfTaskInst.EndTime=nowTime;
             historyTaskInsts.Add(bpmAfTaskInst);
         }
-        _afTaskService.baseRepo.Insert(tasks);
+        _afTaskService.InsertTasks(tasks);
         _afTaskInstService.baseRepo.Insert(historyTaskInsts);
     }
 }
