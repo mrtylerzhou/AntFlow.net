@@ -115,7 +115,7 @@ using System.Text.RegularExpressions;
         /// <summary>
         /// update time
         /// </summary>
-        [Column(Name = "update_time",IsIgnore = true)]
+        [Column(Name = "update_time")]
         public DateTime? UpdateTime { get; set; }
         [Column(Name = "extra_flags")]
         public int? ExtraFlags { get; set; }

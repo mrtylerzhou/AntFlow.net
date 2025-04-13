@@ -57,6 +57,13 @@ public class BpmnConfController
         return Result<BusinessDataVo>.Succ(dataVo);
     }
 
+    [HttpPost("listPage")]
+    public Result<ResultAndPage<BpmnConfVo>> ListPage([FromBody] PageRequestDto<BpmnConfVo> dto)
+    {
+        PageDto page = dto.PageDto;
+        BpmnConfVo vo = dto.Entity;
+        return Result<ResultAndPage<BpmnConfVo>>.Succ(_bpmnConfBizService.SelectPage(page, vo));
+    }
     [HttpPost("preview")]
     public Result<PreviewNode> Preview([FromServices] IHttpContextAccessor accessor)
     {
