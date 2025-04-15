@@ -85,12 +85,14 @@ namespace AntFlowCore.Entity
         /// </summary>
         public static Result<object> NewFailureResult(string errCode, string errMsg, bool needRetry, Exception exp)
         {
-            var result = new Result<object>();
-            result.ErrCode = errCode;
-            result.ErrMsg = errMsg;
-            result.Success = false;
-            result.NeedRetry = needRetry;
-            result.RequestId = MDCLogUtil.GetLogId(logger: _logger);
+            var result = new Result<object>
+            {
+                ErrCode = errCode,
+                ErrMsg = errMsg,
+                Success = false,
+                NeedRetry = needRetry,
+                RequestId = MDCLogUtil.GetLogId(logger: _logger)
+            };
             return result;
         }
 
@@ -99,17 +101,19 @@ namespace AntFlowCore.Entity
         /// </summary>
         private static Result<T> NewSuccessResult(T data)
         {
-            var result = new Result<T>();
-            result.Success = true;
-            result.Data = data;
-            result.Code = 200;
-            result.RequestId = MDCLogUtil.GetLogId(logger: _logger);
+            var result = new Result<T>
+            {
+                Success = true,
+                Data = data,
+                Code = 200,
+                RequestId = MDCLogUtil.GetLogId(logger: _logger)
+            };
             return result;
         }
 
-        public static Result<T> Succ(T obj)
+        public static Result<T> Succ(T data)
         {
-            return NewSuccessResult(obj);
+            return NewSuccessResult(data);
         }
         /// <summary>
         /// 新建成功的 Result，数据为空

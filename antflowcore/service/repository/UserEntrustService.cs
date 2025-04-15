@@ -134,4 +134,10 @@ public class UserEntrustService :AFBaseCurdRepositoryService<UserEntrust>
             });
         return entrusts;
     }
+
+    public UserEntrust GetEntrustDetail(int id)
+    {
+        UserEntrust userEntrust = this.baseRepo.Where(a=>a.Id == id).ToOne();
+        return userEntrust;
+    }
 }
