@@ -159,7 +159,18 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
                 taskName = strs.FirstOrDefault();
             }
 
-            string elementId = string.Join(",", tasks.Select(t => t.ElementId));
+            string elementId=string.Empty;
+            List<string> elementIdList = tasks.Select(t => t.ElementId).Distinct().ToList();
+            if (elementIdList.Count > 1)
+            {
+                elementId= string.Join(",",elementIdList );
+            }
+            else
+            {
+                //本段代码包在(tasks.Count > 1,至少有一个元素
+                elementId = elementIdList.FirstOrDefault()??string.Empty;
+            }
+          
 
             taskInfors.Add(new BpmVerifyInfoVo
             {
