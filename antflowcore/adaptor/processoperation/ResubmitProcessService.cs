@@ -77,7 +77,7 @@ public class ResubmitProcessService: IProcessOperationAdaptor
                 _formFactory.GetFormAdaptor(vo).OnConsentData(vo);
             }
 
-            var bpmVerifyInfo = new BpmVerifyInfo
+            BpmVerifyInfo bpmVerifyInfo = new BpmVerifyInfo
             {
                 VerifyDate = DateTime.Now,
                 TaskName = task.Name,
@@ -85,6 +85,7 @@ public class ResubmitProcessService: IProcessOperationAdaptor
                 RunInfoId = bpmBusinessProcess.ProcInstId,
                 VerifyUserId = SecurityUtils.GetLogInEmpIdStr(),
                 VerifyUserName = SecurityUtils.GetLogInEmpName(),
+                TaskDefKey = task.TaskDefKey,
                 VerifyStatus = (int)ProcessSubmitStateEnum.PROCESS_AGRESS_TYPE,
                 VerifyDesc = string.IsNullOrEmpty(vo.ApprovalComment) ? "同意" : vo.ApprovalComment,
                 ProcessCode = vo.ProcessNumber

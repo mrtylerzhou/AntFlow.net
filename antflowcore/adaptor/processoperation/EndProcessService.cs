@@ -111,6 +111,7 @@ namespace antflowcore.adaptor.processoperation;
                 VerifyDesc = vo.ApprovalComment,
                 TaskName = taskData.Name,
                 TaskId = taskData.Id,
+                TaskDefKey = taskData.TaskDefKey,
                 RunInfoId = bpmBusinessProcess.ProcInstId
             });
 

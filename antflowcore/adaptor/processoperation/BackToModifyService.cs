@@ -108,7 +108,8 @@ using System.Linq;
                 RunInfoId = bpmBusinessProcess.ProcInstId,
                 VerifyDesc = vo.ApprovalComment,
                 TaskName = taskData.Name,
-                TaskId = taskData.Id
+                TaskId = taskData.Id,
+                TaskDefKey = taskData.TaskDefKey
             });
 
             // 添加回退节点

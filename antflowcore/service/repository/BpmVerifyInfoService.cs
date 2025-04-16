@@ -43,6 +43,11 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
     public void AddVerifyInfo(BpmVerifyInfo verifyInfo)
     {
         BpmFlowrunEntrust entrustByTaskId = _bpmFlowrunEntrustService.GetEntrustByTaskId(SecurityUtils.GetLogInEmpIdStr(), verifyInfo.RunInfoId, verifyInfo.TaskId);
+        if (entrustByTaskId != null)
+        {
+            verifyInfo.OriginalId = entrustByTaskId.Original;
+        }
+        this.baseRepo.Insert(verifyInfo);
     }
 
     public string FindCurrentNodeIds(string processNumber)
@@ -242,6 +247,7 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
                 VerifyDate = w.VerifyDate,
                 VerifyDesc = w.VerifyDesc,
                 OriginalId = w.OriginalId,
+                ElementId = w.TaskDefKey
             }).OrderByDescending(a => a.VerifyDate)
             .ToList();
         return bpmVerifyInfoVos;

@@ -63,6 +63,8 @@ namespace AntFlowCore.Entity
         /// </summary>
         [Column(Name = "task_id")]
         public string TaskId { get; set; }
+        [Column(Name = "task_def_key")]
+        public String TaskDefKey { get; set; }
 
         /// <summary>
         /// Business type.

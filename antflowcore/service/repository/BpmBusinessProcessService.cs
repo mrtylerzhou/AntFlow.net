@@ -21,6 +21,9 @@ public class BpmBusinessProcessService: AFBaseCurdRepositoryService<BpmBusinessP
         if (bpmBusinessProcesses.Count > 1)
         {
             throw new AFBizException($"get more than one bpm business process by processNumber:{processNumber}");
+        }else if (bpmBusinessProcesses.Count < 1)
+        {
+            throw new AFBizException($"can not get bpm business process by processNumber:{processNumber},most of the times it means that the process does not in exists");
         }
         return bpmBusinessProcesses[0];
     }
