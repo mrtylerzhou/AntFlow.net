@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace antflowcore.controller;
 
-[Route("BpmnConf")]
+[Route("bpmnBusiness")]
 public class BpmBusinessController
 {
     private readonly TaskMgmtService _taskMgmtService;
@@ -26,12 +26,23 @@ public class BpmBusinessController
         _userEntrustService = userEntrustService;
         _bpmnNodeService = bpmnNodeService;
     }
+    
+    /// <summary>
+    /// 获取自定义表单DIY FormCode List
+    /// </summary>
+    /// <param name="desc"></param>
+    /// <returns></returns>
     [HttpGet("GetDIYFormCodeList")]
     public Result<List<DIYProcessInfoDTO>> GetDIYFormCodeList(String desc) {
         List<DIYProcessInfoDTO> diyProcessInfoDTOS = _taskMgmtService.ViewProcessInfo(desc);
         return ResultHelper.Success(diyProcessInfoDTOS);
     }
-   
+   /// <summary>
+   /// 获取委托列表
+   /// </summary>
+   /// <param name="requestDto"></param>
+   /// <param name="type"></param>
+   /// <returns></returns>
     [HttpPost("entrustlist/{type}")]
     public ResultAndPage<Entrust> EntrustList([FromBody] DetailRequestDto requestDto, [FromRoute] int type) {
 
@@ -39,17 +50,36 @@ public class BpmBusinessController
         Entrust vo = new Entrust();
         return _userEntrustService.GetEntrustPageList(pageDto, vo, type);
     }
+   
+   /// <summary>
+   /// 获取委托详情
+   /// </summary>
+   /// <param name="id"></param>
+   /// <returns></returns>
     [HttpGet("entrustDetail/{id}")]
     public Result<UserEntrust> EntrustDetail([FromRoute] int id) {
         UserEntrust detail = _userEntrustService.GetEntrustDetail(id);
         return ResultHelper.Success(detail);
     }
+   
+   /// <summary>
+   /// 编辑委托
+   /// </summary>
+   /// <param name="dataVo"></param>
+   /// <returns></returns>
     [HttpPost("editEntrust")]
     public Result<string> EditEntrust([FromBody] DataVo dataVo)
     {
         _userEntrustService.UpdateEntrustList(dataVo);
         return ResultHelper.Success("ok");
     }
+   
+   /// <summary>
+   /// 获取流程自选审批人节点
+   /// </summary>
+   /// <param name="formCode"></param>
+   /// <returns></returns>
+   /// <exception cref="AFBizException"></exception>
     [HttpGet("getStartUserChooseModules")]
     public Result<List<BpmnNodeVo>> GetStartUserChooseModules([FromQuery] string formCode)
     {
@@ -57,13 +87,10 @@ public class BpmBusinessController
         {
             throw new AFBizException("参数formCode不能为空!");
         }
-
-        
         List<BpmnNode> nodes = _bpmnNodeService.GetNodesByFormCodeAndProperty(
             formCode, (int)NodePropertyEnum.NODE_PROPERTY_CUSTOMIZE
         );
-
-        var nodeVos = nodes.Select(a => new BpmnNodeVo
+        List<BpmnNodeVo> nodeVos = nodes.Select(a => new BpmnNodeVo
         {
             Id = a.Id,
             NodeName = a.NodeName
