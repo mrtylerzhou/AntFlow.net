@@ -1,7 +1,10 @@
-﻿using AntFlowCore.Entity;
+﻿using antflowcore.dto;
+using AntFlowCore.Entity;
 using antflowcore.service.biz;
 using antflowcore.service.repository;
+using antflowcore.util;
 using antflowcore.vo;
+using AntFlowCore.Vo;
 using Microsoft.AspNetCore.Mvc;
 
 namespace antflowcore.controller;
@@ -22,4 +25,16 @@ public class LowCodeFlowController
         return Result<int>.Succ(_dictService.AddFormCode(vo));
     }
     
+    [HttpGet("getLowCodeFlowFormCodes")]
+    public Result<List<BaseKeyValueStruVo>> GetLowCodeFormCodes()
+    {
+        List<BaseKeyValueStruVo> lowCodeFlowFormCodes = _dictService.GetLowCodeFlowFormCodes();
+        return ResultHelper.Success(lowCodeFlowFormCodes);
+    }
+    [HttpPost("getLFFormCodePageList")]
+    public ResultAndPage<BaseKeyValueStruVo> GetLFFormCodePageList(DetailRequestDto requestDto) {
+        PageDto pageDto = requestDto.PageDto;
+        TaskMgmtVO taskMgmtVO = requestDto.TaskMgmtVO;
+        return _dictService.SelectLFFormCodePageList(pageDto, taskMgmtVO);
+    }
 }
