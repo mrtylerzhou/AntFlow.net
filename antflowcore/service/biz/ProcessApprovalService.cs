@@ -30,6 +30,8 @@ public class ProcessApprovalService
     private readonly IFreeSql _freeSql;
     private readonly BpmProcessNameService _bpmProcessNameService;
     private readonly BpmnConfCommonService _bpmnConfCommonService;
+    private readonly AFTaskService _taskService;
+    private readonly AfTaskInstService _afTaskInstService;
     private readonly ILogger _logger;
 
     public ProcessApprovalService(
@@ -45,6 +47,8 @@ public class ProcessApprovalService
         IFreeSql freeSql,
         BpmProcessNameService bpmProcessNameService,
         BpmnConfCommonService bpmnConfCommonService,
+        AFTaskService taskService,
+        AfTaskInstService afTaskInstService,
         ILogger<ProcessApprovalService> logger
     )
     {
@@ -60,6 +64,8 @@ public class ProcessApprovalService
         _freeSql = freeSql;
         _bpmProcessNameService = bpmProcessNameService;
         _bpmnConfCommonService = bpmnConfCommonService;
+        _taskService = taskService;
+        _afTaskInstService = afTaskInstService;
         _logger = logger;
     }
 
@@ -543,6 +549,23 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
         }
 
         return exp;
+    }
+
+    public TaskMgmtVO ProcessStatistics()
+    {
+        string logInEmpIdStr = SecurityUtils.GetLogInEmpIdStr();
+        List<BpmAfTask> taskList = _taskService.baseRepo
+            .Where(a=>a.Assignee==logInEmpIdStr)
+            .ToList();
+        int doneTodayProcess = _afTaskInstService.DoneTodayProcess(logInEmpIdStr);
+        int doneCreateProcess = _afTaskInstService.DoneCreateProcess(logInEmpIdStr);
+        TaskMgmtVO taskMgmtVo = new TaskMgmtVO()
+        {
+            TodoCount = taskList.Count(),
+            DoneTodayCount = doneTodayProcess,
+            DoneCreateCount = doneCreateProcess,
+        };
+        return taskMgmtVo;
     }
 }
 

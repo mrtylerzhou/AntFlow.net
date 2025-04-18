@@ -170,4 +170,13 @@ public class BpmnConfController
         _bpmnConfService.EffectiveBpmnConf(id);
         return Result<bool>.Succ(true);
     }
+    /// <summary>
+    /// 通用用于办公界面首页流程相关的统计信息,用户非必须使用,可以酌情考虑
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("todoList")]
+    public Result<TaskMgmtVO> TodoList() {
+        TaskMgmtVO taskMgmtVO = _processApprovalService.ProcessStatistics();
+        return ResultHelper.Success(taskMgmtVO);
+    }
 }
