@@ -39,6 +39,8 @@ namespace antflowcore.vo;
         /// </summary>
         [JsonPropertyName("appId")]
         public int? AppId { get; set; }
+        [JsonPropertyName("applicationId")]
+        public int? ApplicationId { get; set; }
 
         [JsonPropertyName("deduplicationType")]
         public int? DeduplicationType { get; set; }
@@ -59,7 +61,7 @@ namespace antflowcore.vo;
         /// process's business party
         /// </summary>
         [JsonPropertyName("businessPartyId")]
-        public int? BusinessPartyId { get; set; }
+        public long? BusinessPartyId { get; set; }
 
         [JsonPropertyName("remark")]
         public string Remark { get; set; }

@@ -17,23 +17,17 @@ namespace antflowcore.constant.enus;
         /**
          * process type
          */
-        public static readonly ProcessItem HostType = new(1, "承办类型");
-        public static readonly ProcessItem RevokeType = new(2, "撤销类型");
-        public static readonly ProcessItem WithdrawType = new(3, "撤回类型");
-        public static readonly ProcessItem NoticeType = new(4, "通知类型");
-        public static readonly ProcessItem CirculateStartType = new(5, "传阅类型");
+        public static readonly ProcessItem HostType = new(7, "承办类型");
+        public static readonly ProcessItem RevokeType = new(8, "撤销类型");
+        public static readonly ProcessItem WithdrawType = new(9, "撤回类型");
+        public static readonly ProcessItem NoticeType = new(10, "通知类型");
+        public static readonly ProcessItem CirculateStartType = new(11, "传阅类型");
 
-        /**
-         * process handle state
-         */
-        public static readonly ProcessItem HandleState = new(2, "审批通过");
-        public static readonly ProcessItem CompleteState = new(1, "审批中");
-        public static readonly ProcessItem CancelState = new(3, "已取消");
+      
 
         /**
          * process node
          */
-        public static readonly ProcessItem StartTask = new(71, "START_TASK_KEY");
         public static readonly ProcessItem StartTaskKey = new(71, "task1418018332271");
         public static readonly ProcessItem TowTaskKey = new(72, "task1418018332272");
         public static readonly ProcessItem ThreeTaskKey = new(73, "task1418018332273");
@@ -49,13 +43,7 @@ namespace antflowcore.constant.enus;
         public static readonly ProcessItem FifteenTaskKey = new(83, "task1418018332283");
         public static readonly ProcessItem ElevenTaskKey = new(90, "task14180183322");
         public static readonly ProcessItem TwelveTaskKey = new(93, "task14180183322");
-
-        // node key
-        public static readonly ProcessItem NodeKey = new(73, "task14180183322");
-
-        // process manager
-        public static readonly ProcessItem ProcMan = new(81, "process_manager");
-
+        
         private static readonly Dictionary<int, string> CodeToDescMap =
             GetAll().ToDictionary(e => e.Code, e => e.Desc);
 

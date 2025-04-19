@@ -121,6 +121,7 @@ public static class ServiceRegistration
         services.AddSingleton<AbstractOrderedSignNodeAdp, TestOrderedSignNodeAdp>();
         
         services.AddSingleton<CustomizePersonnelProvider>();
+        services.AddSingleton<DefaultTemplateService>();
         
         #region IBpmnPersonnelProviderService with different register ways
         

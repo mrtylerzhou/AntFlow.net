@@ -25,7 +25,7 @@ namespace AntFlowCore.Entity
         /// Template ID.
         /// </summary>
         [Column(Name = "template_id")]
-        public long TemplateId { get; set; }
+        public long? TemplateId { get; set; }
 
         /// <summary>
         /// Indicates whether the template is deleted (0 - no, 1 - yes).

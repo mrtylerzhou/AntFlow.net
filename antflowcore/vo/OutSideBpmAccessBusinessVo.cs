@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using antflowcore.vo;
 
 namespace AntFlowCore.Vo
 {
@@ -16,13 +17,13 @@ namespace AntFlowCore.Vo
         /// Gets or sets the business party id.
         /// </summary>
         [JsonPropertyName("businessPartyId")]
-        public long BusinessPartyId { get; set; }
+        public long? BusinessPartyId { get; set; }
 
         /// <summary>
         /// Gets or sets the BPMN config id.
         /// </summary>
         [JsonPropertyName("bpmnConfId")]
-        public long BpmnConfId { get; set; }
+        public long? BpmnConfId { get; set; }
 
         /// <summary>
         /// Gets or sets the form code.
@@ -53,6 +54,8 @@ namespace AntFlowCore.Vo
         /// </summary>
         [JsonPropertyName("templateMark")]
         public string TemplateMark { get; set; }
+        [JsonPropertyName("TemplateMarks")]
+        public List<String> TemplateMarks { get; set; }
 
         /// <summary>
         /// Gets or sets the start user id.
@@ -151,5 +154,14 @@ namespace AntFlowCore.Vo
         /// </summary>
         [JsonPropertyName("outSideLevelNodes")]
         public List<OutSideLevelNodeVo> OutSideLevelNodes { get; set; }
+        [JsonPropertyName("lfConditions")]
+        public Dictionary<String,Object> LfConditions { get; set; }
+        [JsonPropertyName("isLowCodeFlow")]
+        public bool IsLowCodeFlow { get; set; }
+        [JsonPropertyName("lfFields")]
+        public Dictionary<String,Object> LfFields { get; set; }
+        
+        [JsonPropertyName("approversList")]
+        public Dictionary<String,List<BaseIdTranStruVo>> ApproversList { get; set; }
     }
 }

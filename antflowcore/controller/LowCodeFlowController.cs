@@ -1,5 +1,7 @@
 ﻿using antflowcore.dto;
+using antflowcore.entity;
 using AntFlowCore.Entity;
+using antflowcore.exception;
 using antflowcore.service.biz;
 using antflowcore.service.repository;
 using antflowcore.util;
@@ -36,5 +38,23 @@ public class LowCodeFlowController
         PageDto pageDto = requestDto.PageDto;
         TaskMgmtVO taskMgmtVO = requestDto.TaskMgmtVO;
         return _dictService.SelectLFFormCodePageList(pageDto, taskMgmtVO);
+    }
+    [HttpPost("getLFActiveFormCodePageList")]
+    public ResultAndPage<BaseKeyValueStruVo> GetLFActiveFormCodePageList([FromBody] DetailRequestDto requestDto)
+    {
+        var pageDto = requestDto.PageDto;
+        var taskMgmtVO = requestDto.TaskMgmtVO;
+        ResultAndPage<BaseKeyValueStruVo> resultAndPage = _dictService.SelectLFActiveFormCodePageList(pageDto, taskMgmtVO);
+        return resultAndPage;
+    }
+    [HttpGet("getformDataByFormCode")]
+    public Result<string> GetLFFormDataByFormCode(string formCode)
+    {
+        if (string.IsNullOrEmpty(formCode))
+        {
+            throw new AFBizException("请传入formcode"); 
+        }
+        BpmnConfLfFormdata lfFormDataByFormCode = _lfformDataBizService.GetLFFormDataByFormCode(formCode);
+        return ResultHelper.Success(lfFormDataByFormCode.Formdata);
     }
 }

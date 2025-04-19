@@ -40,7 +40,7 @@ public class BpmnSendMessageAspect<T> : DispatchProxy
         
         
         //query business party info
-        int? businessPartyId = bpmnConf.BusinessPartyId;
+        long? businessPartyId = bpmnConf.BusinessPartyId;
         OutSideBpmBusinessParty outSideBpmBusinessParty=null;
         if(businessPartyId!=null&&businessPartyId>0){
             OutSideBpmBusinessPartyService outSideBpmBusinessPartyService = ServiceProviderUtils.GetService<OutSideBpmBusinessPartyService>();

@@ -83,7 +83,15 @@ public class DictService
             List<DictData> dictDataList = this.SelectLFFormCodePageList(page,taskMgmtVo);
             return HandleLFFormCodePageList(page, dictDataList);
         }
-        List<DictData> SelectLFActiveFormCodePageList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
+
+        public ResultAndPage<BaseKeyValueStruVo> SelectLFActiveFormCodePageList(PageDto pageDto, TaskMgmtVO taskMgmtVO)
+        {
+            Page<BaseKeyValueStruVo> page = PageUtils.GetPageByPageDto<BaseKeyValueStruVo>(pageDto);
+            List<DictData> dictDataList = this.SelectLFActiveFormCodePageList(page, taskMgmtVO);
+            return HandleLFFormCodePageList(page, dictDataList);
+        }
+
+        private List<DictData> SelectLFActiveFormCodePageList(Page<BaseKeyValueStruVo> page, TaskMgmtVO taskMgmtVO)
         {
 
             Expression<Func<DictData, BpmnConf,bool>> expression = (a, b) => a.DictType == "lowcodeflow";

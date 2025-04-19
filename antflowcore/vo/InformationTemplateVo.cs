@@ -7,7 +7,7 @@ namespace AntFlowCore.Vo
     public class InformationTemplateVo
     {
         [JsonPropertyName("id")]
-        public long Id { get; set; }
+        public long? Id { get; set; }
 
         [JsonPropertyName("name")]
         public string Name { get; set; }

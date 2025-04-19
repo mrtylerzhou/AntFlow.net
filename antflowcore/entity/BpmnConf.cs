@@ -80,7 +80,7 @@ using System.Text.RegularExpressions;
         /// business party mark
         /// </summary>
         [Column(Name = "business_party_id")]
-        public int? BusinessPartyId { get; set; }
+        public long? BusinessPartyId { get; set; }
 
         /// <summary>
         /// remark

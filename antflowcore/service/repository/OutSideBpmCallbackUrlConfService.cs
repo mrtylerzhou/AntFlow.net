@@ -8,7 +8,7 @@ public class OutSideBpmCallbackUrlConfService: AFBaseCurdRepositoryService<OutSi
     public OutSideBpmCallbackUrlConfService(IFreeSql freeSql) : base(freeSql)
     {
     }
-    public OutSideBpmCallbackUrlConf GetOutSideBpmCallbackUrlConf(int businessPartyId) {
+    public OutSideBpmCallbackUrlConf GetOutSideBpmCallbackUrlConf(long businessPartyId) {
 
         OutSideBpmCallbackUrlConf outSideBpmCallbackUrlConf = baseRepo.Where(a=>a.BusinessPartyId == businessPartyId&&a.Status==1).First();
         

@@ -13,7 +13,7 @@ namespace AntFlowCore.Vo
         public string EventValue { get; set; }
 
         // Template ID
-        public long TemplateId { get; set; }
+        public long? TemplateId { get; set; }
 
         public string TemplateName { get; set; }
 
