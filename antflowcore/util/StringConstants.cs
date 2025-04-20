@@ -46,5 +46,6 @@ namespace AntFlowCore.Constants
         public const string DEFAULT_TASK_DELETE_REASON ="completed";
         public const string TASK_FINISH_REASON="finished";
         public const string BACK_TO_MODIFY_DESC = "打回修改";
+        public const string ADMIN_RIGHTS = "3060101";
     }
 }

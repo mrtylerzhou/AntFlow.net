@@ -1123,11 +1123,11 @@ CREATE TABLE IF NOT EXISTS  t_out_side_bpm_callback_url_conf
 -- ----------------------------
 DROP TABLE IF EXISTS `t_out_side_bpm_approve_template`;
 CREATE TABLE IF NOT EXISTS  `t_out_side_bpm_approve_template` (
-                                                                  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'auto increment id',
-                                                                  `business_party_id` BIGINT NULL COMMENT '业务方项目 Id',
-                                                                  `application_id` INT NULL COMMENT '项目下业务表单 id',
-                                                                  `approve_type_id` INT NULL COMMENT '审批人类型 id',
-                                                                  `approve_type_name` VARCHAR(50) NULL COMMENT '审批人类型名称',
+     `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'auto increment id',
+     `business_party_id` BIGINT NULL COMMENT '业务方项目 Id',
+     `application_id` INT NULL COMMENT '项目下业务表单 id',
+     `approve_type_id` INT NULL COMMENT '审批人类型 id',
+     `approve_type_name` VARCHAR(50) NULL COMMENT '审批人类型名称',
     `api_client_id` VARCHAR(50) NULL COMMENT 'api_client_id',
     `api_client_secret` VARCHAR(50) NULL COMMENT 'api_client_secret',
     `api_token` VARCHAR(50) NULL COMMENT 'api_token',
@@ -1147,9 +1147,9 @@ CREATE TABLE IF NOT EXISTS  `t_out_side_bpm_approve_template` (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_out_side_bpm_conditions_template`;
 CREATE TABLE IF NOT EXISTS  `t_out_side_bpm_conditions_template` (
-                                                                     `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'auto increment id',
-                                                                     `business_party_id` BIGINT NULL COMMENT 'business party Id',
-                                                                     `template_mark` VARCHAR(50) NULL COMMENT 'template mark',
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'auto increment id',
+    `business_party_id` BIGINT NULL COMMENT 'business party Id',
+    `template_mark` VARCHAR(50) NULL COMMENT 'template mark',
     `template_name` VARCHAR(50) NULL COMMENT 'template name',
     `application_id` INT NULL COMMENT 'application id',
     `remark` varchar(255) NULL COMMENT 'remark',
@@ -1163,9 +1163,9 @@ CREATE TABLE IF NOT EXISTS  `t_out_side_bpm_conditions_template` (
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='outside access process,condition template config';
 
 CREATE TABLE IF NOT EXISTS  `t_out_side_bpmn_node_conditions_conf` (
-                                                                       `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'auto increment id',
-                                                                       `bpmn_node_id` BIGINT NULL COMMENT 'node id',
-                                                                       `out_side_id` VARCHAR(50) NULL COMMENT 'outSide Conditions id',
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'auto increment id',
+    `bpmn_node_id` BIGINT NULL COMMENT 'node id',
+    `out_side_id` VARCHAR(50) NULL COMMENT 'outSide Conditions id',
     `remark` varchar(255) NULL COMMENT 'remark',
     `is_del` INT NULL COMMENT '0 for normal,1 for delete',
     `create_user` VARCHAR(50) NULL COMMENT 'as its name says',
@@ -1176,8 +1176,8 @@ CREATE TABLE IF NOT EXISTS  `t_out_side_bpmn_node_conditions_conf` (
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='outside access process,business party,s conditions configs';
 
 CREATE TABLE IF NOT EXISTS  `t_out_side_bpm_call_back_record` (
-                                                                  `id` INT NOT NULL AUTO_INCREMENT COMMENT 'auto increment id',
-                                                                  `process_number` VARCHAR(50) NULL COMMENT 'process number',
+    `id` INT NOT NULL AUTO_INCREMENT COMMENT 'auto increment id',
+    `process_number` VARCHAR(50) NULL COMMENT 'process number',
     `status` tinyint NULL COMMENT 'push status 0 for success,1 for fail',
     `retry_times` tinyint NULL COMMENT 'retry times',
     `button_operation_type` tinyint NULL COMMENT 'operation type (see MsgProcessEventEnum)',
@@ -1193,8 +1193,8 @@ CREATE TABLE IF NOT EXISTS  `t_out_side_bpm_call_back_record` (
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Table for storing callback records';
 
 CREATE TABLE IF NOT EXISTS  `t_quick_entry` (
-                                                `id` INT AUTO_INCREMENT PRIMARY KEY,
-                                                `title` VARCHAR(100) NOT NULL,
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `title` VARCHAR(100) NOT NULL,
     `effective_source` VARCHAR(255),
     `is_del` TINYINT DEFAULT 0,
     `route` VARCHAR(500) NOT NULL,
@@ -1206,22 +1206,22 @@ CREATE TABLE IF NOT EXISTS  `t_quick_entry` (
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE  IF NOT EXISTS `t_quick_entry_type` (
-                                                     `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
-                                                     `quick_entry_id` BIGINT NOT NULL,
-                                                     `type` INT NOT NULL COMMENT 'Type 1 for PC and 2 for app',
-                                                     `is_del` TINYINT DEFAULT 0 COMMENT 'Delete flag',
-                                                     `create_time` timestamp DEFAULT CURRENT_TIMESTAMP,
-                                                     `type_name` VARCHAR(255) NOT NULL COMMENT 'Type name',
+   `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+   `quick_entry_id` BIGINT NOT NULL,
+   `type` INT NOT NULL COMMENT 'Type 1 for PC and 2 for app',
+   `is_del` TINYINT DEFAULT 0 COMMENT 'Delete flag',
+   `create_time` timestamp DEFAULT CURRENT_TIMESTAMP,
+   `type_name` VARCHAR(255) NOT NULL COMMENT 'Type name',
     INDEX `idx_quick_entry_id` (`quick_entry_id`)
 
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='quick entry type config';
 
 CREATE TABLE IF NOT EXISTS  `t_sys_version` (
-                                                `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
-                                                `create_time` timestamp DEFAULT CURRENT_TIMESTAMP,
-                                                `update_time` timestamp not null default current_timestamp on update current_timestamp,
-                                                `is_del` TINYINT DEFAULT 0 COMMENT '0 for normal, 1 for deleted',
-                                                `version` VARCHAR(100) NOT NULL COMMENT 'Version',
+    `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `create_time` timestamp DEFAULT CURRENT_TIMESTAMP,
+    `update_time` timestamp not null default current_timestamp on update current_timestamp,
+    `is_del` TINYINT DEFAULT 0 COMMENT '0 for normal, 1 for deleted',
+    `version` VARCHAR(100) NOT NULL COMMENT 'Version',
     `description` varchar(255) COMMENT 'Version description',
     `index` INT COMMENT 'Index',
     `is_force` TINYINT COMMENT 'Force update 0 for no, 1 for yes',
@@ -1236,7 +1236,7 @@ CREATE TABLE IF NOT EXISTS  `t_sys_version` (
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='sys version control';
 
 CREATE TABLE IF NOT EXISTS `t_bpmn_node_role_conf` (
-                                                       `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'auto incr id',
+    `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'auto incr id',
     `bpmn_node_id` BIGINT(20) NOT NULL COMMENT 'node id',
     `role_id` varchar(64) NOT NULL COMMENT 'role id',
     `role_name` varchar(64) NOT NULL COMMENT 'role name',
@@ -1268,7 +1268,7 @@ create table if NOT EXISTS t_bpmn_node_role_outside_emp_conf
 
 
 CREATE TABLE IF NOT EXISTS  `t_bpmn_node_loop_conf` (
-                                                        `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'auto incr id',
+    `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'auto incr id',
     `bpmn_node_id` BIGINT(20) NULL COMMENT 'node id',
     `loop_end_type` INT(11) NULL COMMENT 'loop type 1 for organizational line; 2 for reporting line',
     `loop_number_plies` INT(11) NULL COMMENT 'how many levels',
@@ -1299,16 +1299,16 @@ CREATE TABLE IF NOT EXISTS `t_bpmn_node_assign_level_conf` (
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='specified level approvement config';
 
 CREATE TABLE `t_bpmn_node_hrbp_conf` (
-                                         `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'auto incr id',
-                                         `bpmn_node_id` BIGINT(20) NULL COMMENT 'node id',
-                                         `hrbp_conf_type` INT(11) NULL COMMENT 'hrbp type 1-hrbp,2-hrbp leader,this is only for extensibility purpose,if your system do not have hrbp leader,you can ignore this field if your system have other concept,for example hrbp manager,you can use this field to store hrbp manager(eg 3 for hrbp manager)',
-                                         `remark` VARCHAR(255) NULL COMMENT 'remark',
-                                         `is_del` INT(11) NULL COMMENT '0 for normal,1 for deleted',
-                                         `create_user` VARCHAR(255) NULL COMMENT 'create user',
-                                         `create_time` DATETIME NULL COMMENT 'create time',
-                                         `update_user` VARCHAR(255) NULL COMMENT 'update user',
-                                         `update_time` DATETIME NULL COMMENT 'update time',
-                                         PRIMARY KEY (`id`)
+  `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'auto incr id',
+  `bpmn_node_id` BIGINT(20) NULL COMMENT 'node id',
+  `hrbp_conf_type` INT(11) NULL COMMENT 'hrbp type 1-hrbp,2-hrbp leader,this is only for extensibility purpose,if your system do not have hrbp leader,you can ignore this field if your system have other concept,for example hrbp manager,you can use this field to store hrbp manager(eg 3 for hrbp manager)',
+  `remark` VARCHAR(255) NULL COMMENT 'remark',
+  `is_del` INT(11) NULL COMMENT '0 for normal,1 for deleted',
+  `create_user` VARCHAR(255) NULL COMMENT 'create user',
+  `create_time` DATETIME NULL COMMENT 'create time',
+  `update_user` VARCHAR(255) NULL COMMENT 'update user',
+  `update_time` DATETIME NULL COMMENT 'update time',
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='hrpb config entity';
 
 create table t_department
@@ -1377,9 +1377,9 @@ INSERT INTO `t_user`(`id`, `user_name`) VALUES (1001, 'test');
 
 DROP TABLE IF EXISTS `t_role`;
 CREATE TABLE `t_role`  (
-                           `id` int(11) NOT NULL AUTO_INCREMENT,
-                           `role_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-                           PRIMARY KEY (`id`) USING BTREE
+   `id` int(11) NOT NULL AUTO_INCREMENT,
+   `role_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -1401,19 +1401,19 @@ INSERT INTO `t_role` VALUES (8, '测试审批角色');
 -- ----------------------------
 DROP TABLE IF EXISTS `t_biz_leavetime`;
 CREATE TABLE `t_biz_leavetime`  (
-                                    `id` int(11) NOT NULL AUTO_INCREMENT,
-                                    `leave_user_id` int(11) NOT NULL,
-                                    `leave_user_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-                                    `leave_type` int(11) NOT NULL,
-                                    `begin_time` datetime NULL,
-                                    `end_time` datetime NULL,
-                                    `leavehour` double NOT NULL,
-                                    `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-                                    `create_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-                                    `create_time` timestamp default current_timestamp,
-                                    `update_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-                                    `update_time` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                                    PRIMARY KEY (`id`) USING BTREE
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `leave_user_id` int(11) NOT NULL,
+  `leave_user_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `leave_type` int(11) NOT NULL,
+  `begin_time` datetime NULL,
+  `end_time` datetime NULL,
+  `leavehour` double NOT NULL,
+  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `create_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `create_time` timestamp default current_timestamp,
+  `update_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `update_time` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 36 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -1421,18 +1421,18 @@ CREATE TABLE `t_biz_leavetime`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_biz_purchase`;
 CREATE TABLE `t_biz_purchase`  (
-                                   `id` int(11) NOT NULL AUTO_INCREMENT,
-                                   `purchase_user_id` int(11) NOT NULL,
-                                   `purchase_user_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-                                   `purchase_type` int(11) NOT NULL default 1,
-                                   `purchase_time` timestamp default current_timestamp,
-                                   `plan_procurement_total_money` double NOT NULL default 0,
-                                   `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-                                   `create_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-                                   `create_time` timestamp default current_timestamp,
-                                   `update_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-                                   `update_time` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                                   PRIMARY KEY (`id`) USING BTREE
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `purchase_user_id` int(11) NOT NULL,
+  `purchase_user_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `purchase_type` int(11) NOT NULL default 1,
+  `purchase_time` timestamp default current_timestamp,
+  `plan_procurement_total_money` double NOT NULL default 0,
+  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `create_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `create_time` timestamp default current_timestamp,
+  `update_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `update_time` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -1440,15 +1440,15 @@ CREATE TABLE `t_biz_purchase`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_biz_ucar_refuel`;
 CREATE TABLE `t_biz_ucar_refuel` (
-                                     `id` int(11) NOT NULL AUTO_INCREMENT,
-                                     `license_plate_number` varchar(32) DEFAULT NULL COMMENT '车牌号',
-                                     `refuel_time` datetime DEFAULT NULL COMMENT '加油日期',
-                                     `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-                                     `create_user` varchar(50) DEFAULT NULL COMMENT '创建人',
-                                     `create_time` datetime DEFAULT NULL COMMENT '创建日期',
-                                     `update_user` varchar(50) DEFAULT NULL COMMENT '更新人',
-                                     `update_time` datetime DEFAULT NULL COMMENT '更新日期',
-                                     PRIMARY KEY (`id`)
+   `id` int(11) NOT NULL AUTO_INCREMENT,
+   `license_plate_number` varchar(32) DEFAULT NULL COMMENT '车牌号',
+   `refuel_time` datetime DEFAULT NULL COMMENT '加油日期',
+   `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+   `create_user` varchar(50) DEFAULT NULL COMMENT '创建人',
+   `create_time` datetime DEFAULT NULL COMMENT '创建日期',
+   `update_user` varchar(50) DEFAULT NULL COMMENT '更新人',
+   `update_time` datetime DEFAULT NULL COMMENT '更新日期',
+   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='加油表';
 
 -- ----------------------------
@@ -1456,18 +1456,18 @@ CREATE TABLE `t_biz_ucar_refuel` (
 -- ----------------------------
 DROP TABLE IF EXISTS `t_biz_refund`;
 CREATE TABLE `t_biz_refund`  (
-                                 `id` int(11) NOT NULL AUTO_INCREMENT,
-                                 `refund_user_id` int(11) NOT NULL,
-                                 `refund_user_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-                                 `refund_type` int(11) NOT NULL default 1,
-                                 `refund_date` timestamp NOT NULL,
-                                 `refund_money` double NOT NULL default 0,
-                                 `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-                                 `create_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-                                 `create_time` timestamp default current_timestamp,
-                                 `update_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-                                 `update_time` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                                 PRIMARY KEY (`id`) USING BTREE
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `refund_user_id` int(11) NOT NULL,
+  `refund_user_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `refund_type` int(11) NOT NULL default 1,
+  `refund_date` timestamp NOT NULL,
+  `refund_money` double NOT NULL default 0,
+  `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `create_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `create_time` timestamp default current_timestamp,
+  `update_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `update_time` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 create table t_bpmn_conf_lf_formdata
@@ -1607,15 +1607,15 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- ----------------------------
 DROP TABLE IF EXISTS `t_bpmn_conf_lf_formdata`;
 CREATE TABLE `t_bpmn_conf_lf_formdata`  (
-                                            `id` bigint(20) NOT NULL AUTO_INCREMENT,
-                                            `bpmn_conf_id` bigint(20) NOT NULL,
-                                            `formdata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
-                                            `is_del` tinyint(4) NOT NULL DEFAULT 0,
-                                            `create_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-                                            `create_time` timestamp DEFAULT CURRENT_TIMESTAMP,
-                                            `update_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-                                            `update_time` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                                            PRIMARY KEY (`id`) USING BTREE
+   `id` bigint(20) NOT NULL AUTO_INCREMENT,
+   `bpmn_conf_id` bigint(20) NOT NULL,
+   `formdata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
+   `is_del` tinyint(4) NOT NULL DEFAULT 0,
+   `create_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+   `create_time` timestamp DEFAULT CURRENT_TIMESTAMP,
+   `update_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+   `update_time` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 32 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;
@@ -1627,19 +1627,19 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- ----------------------------
 DROP TABLE IF EXISTS `t_bpmn_conf_lf_formdata_field`;
 CREATE TABLE `t_bpmn_conf_lf_formdata_field`  (
-                                                  `id` bigint(20) NOT NULL AUTO_INCREMENT,
-                                                  `bpmn_conf_id` bigint(20) NULL DEFAULT NULL,
-                                                  `formdata_id` bigint(20) NULL DEFAULT NULL,
-                                                  `field_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-                                                  `field_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-                                                  `field_type` tinyint(4) NULL DEFAULT NULL,
-                                                  `is_condition` tinyint(4) NULL DEFAULT 0 COMMENT '是否是流程条件,0否,1是',
-                                                  `is_del` tinyint(4) NOT NULL DEFAULT 0,
-                                                  `create_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-                                                  `create_time` timestamp DEFAULT CURRENT_TIMESTAMP,
-                                                  `update_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-                                                  `update_time` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP(0),
-                                                  PRIMARY KEY (`id`) USING BTREE
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `bpmn_conf_id` bigint(20) NULL DEFAULT NULL,
+  `formdata_id` bigint(20) NULL DEFAULT NULL,
+  `field_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `field_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `field_type` tinyint(4) NULL DEFAULT NULL,
+  `is_condition` tinyint(4) NULL DEFAULT 0 COMMENT '是否是流程条件,0否,1是',
+  `is_del` tinyint(4) NOT NULL DEFAULT 0,
+  `create_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `create_time` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `update_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
+  `update_time` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP(0),
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 28 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '低代码配置字段明细表' ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;
@@ -1650,10 +1650,10 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- ----------------------------
 DROP TABLE IF EXISTS `t_user_role`;
 CREATE TABLE `t_user_role`  (
-                                `id` int(11) NOT NULL AUTO_INCREMENT,
-                                `user_id` int(11) NULL DEFAULT NULL COMMENT ' user id ',
-                                `role_id` int(11) NULL DEFAULT NULL COMMENT 'role id',
-                                PRIMARY KEY (`id`) USING BTREE
+   `id` int(11) NOT NULL AUTO_INCREMENT,
+   `user_id` int(11) NULL DEFAULT NULL COMMENT ' user id ',
+   `role_id` int(11) NULL DEFAULT NULL COMMENT 'role id',
+   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 19 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户角色关联表' ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;

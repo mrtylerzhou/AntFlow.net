@@ -70,7 +70,7 @@ public static class ServiceRegistration
         services.AddSingleton<BpmBusinessProcessService>();
         services.AddSingleton<BpmProcessNameService>();
         services.AddSingleton<BpmProcessNameRelevancyService>();
-        services.AddSingleton<ApplicationService>();
+        services.AddSingleton<BpmProcessAppApplicationService>();
         services.AddSingleton<BpmnNodeButtonConfService>();
         services.AddSingleton<InformationTemplateService>();
         services.AddSingleton<BpmnViewPageButtonService>();
@@ -122,6 +122,10 @@ public static class ServiceRegistration
         
         services.AddSingleton<CustomizePersonnelProvider>();
         services.AddSingleton<DefaultTemplateService>();
+        services.AddSingleton<OutSideBpmApproveTemplateService>();
+        services.AddSingleton<OutSideBpmAdminPersonnelService>();
+        services.AddSingleton<EmployeeService>();
+        services.AddSingleton<OutSideBpmBaseService>();
         
         #region IBpmnPersonnelProviderService with different register ways
         

@@ -10,7 +10,7 @@ namespace AntFlowCore.Vo
         /// auto incr id
         /// </summary>
         [JsonPropertyName("id")]
-        public long Id { get; set; }
+        public long? Id { get; set; }
 
         /// <summary>
         /// business party's id
@@ -128,6 +128,6 @@ namespace AntFlowCore.Vo
         /// 登录人所属业务方列表
         /// </summary>
         [JsonPropertyName("businessPartyIds")]
-        public List<long> BusinessPartyIds { get; set; }
+        public List<long?> BusinessPartyIds { get; set; }
     }
 }

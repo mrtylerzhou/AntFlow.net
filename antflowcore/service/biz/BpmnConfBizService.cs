@@ -28,7 +28,7 @@ public class BpmnConfBizService
     private readonly IAdaptorFactory _adaptorFactory;
     private readonly OutSideBpmCallbackUrlConfService _outSideBpmCallbackUrlConfService;
     private readonly OutSideBpmBusinessPartyService _outSideBpmBusinessPartyService;
-    private readonly ApplicationService _applicationService;
+    private readonly BpmProcessAppApplicationService _bpmProcessAppApplicationService;
     private readonly BpmnNodeButtonConfService _bpmnNodeButtonConfService;
     private readonly IBpmnEmployeeInfoProviderService _employeeInfoProviderService;
     private readonly InformationTemplateService _informationTemplateService;
@@ -48,7 +48,7 @@ public class BpmnConfBizService
         IAdaptorFactory adaptorFactory,
         OutSideBpmCallbackUrlConfService outSideBpmCallbackUrlConfService,
         OutSideBpmBusinessPartyService outSideBpmBusinessPartyService,
-        ApplicationService applicationService,
+        BpmProcessAppApplicationService bpmProcessAppApplicationService,
         BpmnNodeButtonConfService bpmnNodeButtonConfService,
         IBpmnEmployeeInfoProviderService employeeInfoProviderService,
         InformationTemplateService informationTemplateService,
@@ -67,7 +67,7 @@ public class BpmnConfBizService
         _adaptorFactory = adaptorFactory;
         _outSideBpmCallbackUrlConfService = outSideBpmCallbackUrlConfService;
         _outSideBpmBusinessPartyService = outSideBpmBusinessPartyService;
-        _applicationService = applicationService;
+        _bpmProcessAppApplicationService = bpmProcessAppApplicationService;
         _bpmnNodeButtonConfService = bpmnNodeButtonConfService;
         _employeeInfoProviderService = employeeInfoProviderService;
         _informationTemplateService = informationTemplateService;
@@ -167,7 +167,7 @@ public class BpmnConfBizService
     
         if (vo.IsOutSideProcess == 1)
         {
-            List<BpmProcessAppApplication> bizAppList = _applicationService.SelectApplicationList();
+            List<BpmProcessAppApplication> bizAppList = _bpmProcessAppApplicationService.SelectApplicationList();
             var bizAppMap = bizAppList.ToDictionary(p => p.ProcessKey, p => p.Title);
         
             foreach (var record in bpmnConfVos)
@@ -302,7 +302,7 @@ public class BpmnConfBizService
             bpmnConfVo.Type=outSideBpmBusinessParty.Type;
 
             //query business application url
-            BpmProcessAppApplicationVo applicationUrl = _applicationService.GetApplicationUrl(outSideBpmBusinessParty.BusinessPartyMark, formCode);
+            BpmProcessAppApplicationVo applicationUrl = _bpmProcessAppApplicationService.GetApplicationUrl(outSideBpmBusinessParty.BusinessPartyMark, formCode);
             
             //set view url,submit url and condition url
             if (applicationUrl!=null) {

@@ -40,7 +40,7 @@ public static class MapperUtil
 
         return new BpmnConf
         {
-            Id = vo.Id,
+           
             BpmnCode = vo.BpmnCode,
             BpmnName = vo.BpmnName,
             BpmnType = vo.BpmnType,
@@ -131,6 +131,7 @@ public static class MapperUtil
 
         return new BpmnTemplateVo
         {
+            Id = template.Id,
             ConfId = template.ConfId,
             NodeId = template.NodeId ?? 0,
             Event = template.Event,
@@ -176,6 +177,7 @@ public static class MapperUtil
 
         return new BpmProcessAppApplicationVo
         {
+            Id = app.Id,
             BusinessCode = app.BusinessCode,
             Title = app.Title,
             ApplyType = app.ApplyType,
@@ -241,6 +243,7 @@ public static class MapperUtil
 
         return new BpmnApproveRemindVo
         {
+            Id = remind.Id,
             ConfId = remind.ConfId,
             NodeId = remind.NodeId,
             TemplateId = remind.TemplateId,
@@ -302,7 +305,7 @@ public static class MapperUtil
     {
         return new InformationTemplateVo
         {
-           
+           Id = template.Id,
             Name = template.Name,
             Num = template.Num,
             SystemTitle = template.SystemTitle,
@@ -436,7 +439,7 @@ public static class MapperUtil
     {
         return new OutSideBpmAccessBusinessVo
         {
-           
+           Id = business.Id,
             BusinessPartyId = business.BusinessPartyId,
             BpmnConfId = business.BpmnConfId, // 使用修正后的字段名称
             FormCode = business.FormCode,
@@ -553,5 +556,171 @@ public static class MapperUtil
         {
             business.UpdateTime = vo.UpdateTime.Value;
         }
+    }
+    public static OutSideBpmApproveTemplateVo MapToVo(this OutSideBpmApproveTemplate entity)
+    {
+        if (entity == null) return null;
+
+        return new OutSideBpmApproveTemplateVo
+        {
+            Id = entity.Id,
+            BusinessPartyId = entity.BusinessPartyId,
+            ApplicationId = entity.ApplicationId,
+            ApproveTypeId = entity.ApproveTypeId,
+            ApproveTypeName = entity.ApproveTypeName,
+            ApiClientId = entity.ApiClientId,
+            ApiClientSecret = entity.ApiClientSecret,
+            ApiToken = entity.ApiToken,
+            ApiUrl = entity.ApiUrl,
+            Remark = entity.Remark,
+            IsDel = entity.IsDel,
+            CreateUser = entity.CreateUser,
+            CreateTime = entity.CreateTime,
+            UpdateUser = entity.UpdateUser,
+            UpdateTime = entity.UpdateTime,
+            CreateUserId = entity.CreateUserId
+        };
+    }
+
+    public static OutSideBpmApproveTemplate MapToEntity(this OutSideBpmApproveTemplateVo vo)
+    {
+        if (vo == null) return null;
+
+        return new OutSideBpmApproveTemplate
+        {
+           
+            BusinessPartyId = vo.BusinessPartyId,
+            ApplicationId = vo.ApplicationId,
+            ApproveTypeId = vo.ApproveTypeId,
+            ApproveTypeName = vo.ApproveTypeName,
+            ApiClientId = vo.ApiClientId,
+            ApiClientSecret = vo.ApiClientSecret,
+            ApiToken = vo.ApiToken,
+            ApiUrl = vo.ApiUrl,
+            Remark = vo.Remark,
+            IsDel = vo.IsDel,
+            CreateUser = vo.CreateUser,
+            CreateTime = vo.CreateTime,
+            UpdateUser = vo.UpdateUser,
+            UpdateTime = vo.UpdateTime,
+            CreateUserId = vo.CreateUserId
+        };
+    }
+    public static void CopyTo(this OutSideBpmApproveTemplateVo vo,OutSideBpmApproveTemplate entity)
+    {
+        if (entity == null || vo == null) return;
+
+        if (entity.BusinessPartyId == default && vo.BusinessPartyId != null)
+            entity.BusinessPartyId = vo.BusinessPartyId.Value;
+
+        if (entity.ApplicationId == default && vo.ApplicationId.HasValue)
+            entity.ApplicationId = vo.ApplicationId.Value;
+
+        if (entity.ApproveTypeId == default && vo.ApproveTypeId.HasValue)
+            entity.ApproveTypeId = vo.ApproveTypeId.Value;
+
+        if (string.IsNullOrWhiteSpace(entity.ApproveTypeName) && !string.IsNullOrWhiteSpace(vo.ApproveTypeName))
+            entity.ApproveTypeName = vo.ApproveTypeName;
+
+        if (string.IsNullOrWhiteSpace(entity.ApiClientId) && !string.IsNullOrWhiteSpace(vo.ApiClientId))
+            entity.ApiClientId = vo.ApiClientId;
+
+        if (string.IsNullOrWhiteSpace(entity.ApiClientSecret) && !string.IsNullOrWhiteSpace(vo.ApiClientSecret))
+            entity.ApiClientSecret = vo.ApiClientSecret;
+
+        if (string.IsNullOrWhiteSpace(entity.ApiToken) && !string.IsNullOrWhiteSpace(vo.ApiToken))
+            entity.ApiToken = vo.ApiToken;
+
+        if (string.IsNullOrWhiteSpace(entity.ApiUrl) && !string.IsNullOrWhiteSpace(vo.ApiUrl))
+            entity.ApiUrl = vo.ApiUrl;
+
+        if (string.IsNullOrWhiteSpace(entity.Remark) && !string.IsNullOrWhiteSpace(vo.Remark))
+            entity.Remark = vo.Remark;
+
+        if (string.IsNullOrWhiteSpace(entity.CreateUser) && !string.IsNullOrWhiteSpace(vo.CreateUser))
+            entity.CreateUser = vo.CreateUser;
+
+        if (string.IsNullOrWhiteSpace(entity.CreateUserId) && !string.IsNullOrWhiteSpace(vo.CreateUserId))
+            entity.CreateUserId = vo.CreateUserId;
+
+        if (entity.CreateTime == default && vo.CreateTime.HasValue)
+            entity.CreateTime = vo.CreateTime.Value;
+
+        if (string.IsNullOrWhiteSpace(entity.UpdateUser) && !string.IsNullOrWhiteSpace(vo.UpdateUser))
+            entity.UpdateUser = vo.UpdateUser;
+
+        if (entity.UpdateTime == default && vo.UpdateTime.HasValue)
+            entity.UpdateTime = vo.UpdateTime.Value;
+    }
+    #region Entity -> VO 转换
+    public static OutSideBpmBusinessPartyVo MapToVo(this OutSideBpmBusinessParty entity)
+    {
+        if (entity == null) return null;
+ 
+        return new OutSideBpmBusinessPartyVo
+        {
+            Id = entity.Id,
+            BusinessPartyMark = entity.BusinessPartyMark,
+            Name = entity.Name,
+            Type = entity.Type,
+            Remark = entity.Remark,
+            IsDel = entity.IsDel,
+            CreateUser = entity.CreateUser,
+            CreateTime = entity.CreateTime,
+            UpdateUser = entity.UpdateUser,
+            UpdateTime = entity.UpdateTime,
+            
+        };
+    }
+    #endregion
+ 
+    #region VO -> Entity 转换
+    public static OutSideBpmBusinessParty MapToEntity(this OutSideBpmBusinessPartyVo vo)
+    {
+        if (vo == null) return null;
+ 
+        return new OutSideBpmBusinessParty
+        {
+            BusinessPartyMark = vo.BusinessPartyMark,
+            Name = vo.Name,
+            Type = vo.Type??0,
+            Remark = vo.Remark,
+            IsDel = vo.IsDel,
+            CreateUser = vo.CreateUser,
+            CreateTime = vo.CreateTime,
+            UpdateUser = vo.UpdateUser,
+            UpdateTime = vo.UpdateTime,
+        };
+    }
+    #endregion
+
+    public static void CopyTo(this OutSideBpmBusinessPartyVo vo, OutSideBpmBusinessParty entity)
+    {
+        if (string.IsNullOrEmpty(entity.BusinessPartyMark) && !string.IsNullOrEmpty(vo.BusinessPartyMark))
+            entity.BusinessPartyMark = vo.BusinessPartyMark;
+
+        if (string.IsNullOrEmpty(entity.Name) && !string.IsNullOrEmpty(vo.Name))
+            entity.Name = vo.Name;
+
+        if (entity.Type == 0 && vo.Type.HasValue && vo.Type.Value != 0)
+            entity.Type = vo.Type.Value;
+
+        if (string.IsNullOrEmpty(entity.Remark) && !string.IsNullOrEmpty(vo.Remark))
+            entity.Remark = vo.Remark;
+
+        if (entity.IsDel == 0 && vo.IsDel != 0)
+            entity.IsDel = vo.IsDel;
+
+        if (string.IsNullOrEmpty(entity.CreateUser) && !string.IsNullOrEmpty(vo.CreateUser))
+            entity.CreateUser = vo.CreateUser;
+
+        if (entity.CreateTime == default && vo.CreateTime != default)
+            entity.CreateTime = vo.CreateTime;
+
+        if (string.IsNullOrEmpty(entity.UpdateUser) && !string.IsNullOrEmpty(vo.UpdateUser))
+            entity.UpdateUser = vo.UpdateUser;
+
+        if (entity.UpdateTime == default && vo.UpdateTime != default)
+            entity.UpdateTime = vo.UpdateTime;
     }
 }

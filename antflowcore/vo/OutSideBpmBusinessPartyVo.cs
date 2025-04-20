@@ -11,7 +11,7 @@ namespace AntFlowCore.Vo
         /// auto incr id
         /// </summary>
         [JsonPropertyName("id")]
-        public long Id { get; set; }
+        public long? Id { get; set; }
 
         /// <summary>
         /// business party mark
@@ -29,7 +29,7 @@ namespace AntFlowCore.Vo
         /// 业务方类型（1-嵌入式；2-接入式）
         /// </summary>
         [JsonPropertyName("accessType")]
-        public int Type { get; set; }
+        public int? Type { get; set; }
 
         /// <summary>
         /// remark
