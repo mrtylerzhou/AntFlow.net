@@ -723,4 +723,100 @@ public static class MapperUtil
         if (entity.UpdateTime == default && vo.UpdateTime != default)
             entity.UpdateTime = vo.UpdateTime;
     }
+    public static OutSideBpmCallbackUrlConfVo MapToVo(this OutSideBpmCallbackUrlConf entity)
+    {
+        if (entity == null) return null;
+
+        return new OutSideBpmCallbackUrlConfVo
+        {
+            Id = entity.Id,
+            BusinessPartyId = entity.BusinessPartyId,
+            BpmnConfId = entity.BpmnConfId,
+            FormCode = entity.FormCode,
+            BpmConfCallbackUrl = entity.BpmConfCallbackUrl,
+            BpmFlowCallbackUrl = entity.BpmFlowCallbackUrl,
+            ApiClientId = entity.ApiClientId,
+            ApiClientSecrent = entity.ApiClientSecret,
+            Status = entity.Status,
+            Remark = entity.Remark,
+            IsDel = entity.IsDel,
+            CreateUser = entity.CreateUser,
+            CreateTime = entity.CreateTime,
+            UpdateUser = entity.UpdateUser,
+            UpdateTime = entity.UpdateTime,
+        };
+    }
+    public static OutSideBpmCallbackUrlConf MapToEntity(this OutSideBpmCallbackUrlConfVo vo)
+    {
+        if (vo == null) return null;
+        OutSideBpmCallbackUrlConf entity = new OutSideBpmCallbackUrlConf
+        {
+            
+            BusinessPartyId = vo.BusinessPartyId??0,
+            BpmnConfId = vo.BpmnConfId??0,
+            FormCode = vo.FormCode,
+            BpmConfCallbackUrl = vo.BpmConfCallbackUrl,
+            BpmFlowCallbackUrl = vo.BpmFlowCallbackUrl,
+            ApiClientId = vo.ApiClientId,
+            ApiClientSecret = vo.ApiClientSecrent,
+            Status = vo.Status??0,
+            Remark = vo.Remark,
+            IsDel = vo.IsDel??0,
+            CreateUser = vo.CreateUser,
+            CreateTime = vo.CreateTime,
+            UpdateUser = vo.UpdateUser,
+            UpdateTime = vo.UpdateTime
+        };
+        return entity;
+    }
+    public static void CopyToEntity(this OutSideBpmCallbackUrlConfVo vo, OutSideBpmCallbackUrlConf entity)
+    {
+        if (vo == null || entity == null) return;
+
+        if (string.IsNullOrEmpty(entity.FormCode) && !string.IsNullOrEmpty(vo.FormCode))
+            entity.FormCode = vo.FormCode;
+
+        if (entity.Id == 0 && vo.Id != null)
+            entity.Id = vo.Id.Value;
+
+        if (entity.BusinessPartyId == 0 && vo.BusinessPartyId != null)
+            entity.BusinessPartyId = vo.BusinessPartyId.Value;
+
+        if ((entity.BpmnConfId == null||entity.BpmnConfId==0) && vo.BpmnConfId != null&&vo.BpmnConfId!=0)
+            entity.BpmnConfId = vo.BpmnConfId.Value;
+
+        if (string.IsNullOrEmpty(entity.BpmConfCallbackUrl) && !string.IsNullOrEmpty(vo.BpmConfCallbackUrl))
+            entity.BpmConfCallbackUrl = vo.BpmConfCallbackUrl;
+
+        if (string.IsNullOrEmpty(entity.BpmFlowCallbackUrl) && !string.IsNullOrEmpty(vo.BpmFlowCallbackUrl))
+            entity.BpmFlowCallbackUrl = vo.BpmFlowCallbackUrl;
+
+        if (string.IsNullOrEmpty(entity.ApiClientId) && !string.IsNullOrEmpty(vo.ApiClientId))
+            entity.ApiClientId = vo.ApiClientId;
+
+        if (string.IsNullOrEmpty(entity.ApiClientSecret) && !string.IsNullOrEmpty(vo.ApiClientSecrent))
+            entity.ApiClientSecret = vo.ApiClientSecrent;
+
+        if (entity.Status == 0 && vo.Status != null)
+            entity.Status = vo.Status.Value;
+
+        if (string.IsNullOrEmpty(entity.Remark) && !string.IsNullOrEmpty(vo.Remark))
+            entity.Remark = vo.Remark;
+
+        if (entity.IsDel == 0 && vo.IsDel != null)
+            entity.IsDel = vo.IsDel.Value;
+
+        if (string.IsNullOrEmpty(entity.CreateUser) && !string.IsNullOrEmpty(vo.CreateUser))
+            entity.CreateUser = vo.CreateUser;
+
+        if (entity.CreateTime == default && vo.CreateTime != null)
+            entity.CreateTime = vo.CreateTime;
+
+        if (string.IsNullOrEmpty(entity.UpdateUser) && !string.IsNullOrEmpty(vo.UpdateUser))
+            entity.UpdateUser = vo.UpdateUser;
+
+        if (entity.UpdateTime == default && vo.UpdateTime != null)
+            entity.UpdateTime = vo.UpdateTime;
+    }
+
 }

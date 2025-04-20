@@ -11,19 +11,19 @@ namespace AntFlowCore.Vo
         /// auto incr id
         /// </summary>
         [JsonPropertyName("id")]
-        public long Id { get; set; }
+        public long? Id { get; set; }
 
         /// <summary>
         /// business party id
         /// </summary>
         [JsonPropertyName("businessPartyId")]
-        public long BusinessPartyId { get; set; }
+        public long? BusinessPartyId { get; set; }
 
         /// <summary>
         /// conf id
         /// </summary>
         [JsonPropertyName("bpmnConfId")]
-        public long BpmnConfId { get; set; }
+        public long? BpmnConfId { get; set; }
 
         /// <summary>
         /// conf call back url
@@ -53,7 +53,7 @@ namespace AntFlowCore.Vo
         /// status 1 for enabled, 2 for disabled
         /// </summary>
         [JsonPropertyName("status")]
-        public int Status { get; set; }
+        public int? Status { get; set; }
 
         /// <summary>
         /// create user id
@@ -77,7 +77,7 @@ namespace AntFlowCore.Vo
         /// 0 for normal, 1 for deleted
         /// </summary>
         [JsonPropertyName("isDel")]
-        public int IsDel { get; set; }
+        public int? IsDel { get; set; }
 
         /// <summary>
         /// create user
@@ -148,5 +148,7 @@ namespace AntFlowCore.Vo
         /// </summary>
         [JsonPropertyName("businessPartyIds")]
         public List<long> BusinessPartyIds { get; set; }
+        [JsonPropertyName("formCode")]
+        public string FormCode { get; set; }
     }
 }
