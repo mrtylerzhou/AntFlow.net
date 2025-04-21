@@ -89,8 +89,7 @@ public class RuntimeService
                };
                tasks.Add(bpmAfTask);
                historyTaskInsts.Add(bpmAfTask.ToInst());
-               if (signType == SignTypeEnum.SIGN_TYPE_OR_SIGN.GetCode() ||
-                   signType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode())
+               if (signType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode())
                {
                     break;
                }

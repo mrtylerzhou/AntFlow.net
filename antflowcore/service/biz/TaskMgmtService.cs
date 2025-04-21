@@ -69,7 +69,7 @@ public class TaskMgmtService
     {
         IEnumerable<string> taskDefKeys = _taskService.baseRepo.Where(a=>a.Id==taskId).ToList().Select(a=>a.TaskDefKey);
         List<BpmAfTask> bpmAfTasks = _taskService.baseRepo.Where(a=>taskDefKeys.Contains(a.TaskDefKey)&&a.ProcInstId==taskProcInstId).ToList();
-        List<BpmAfTask> afTasks = bpmAfTasks.Where(a=>a.TaskDefKey!=taskId).ToList();
+        List<BpmAfTask> afTasks = bpmAfTasks.Where(a=>a.Id!=taskId).ToList();
         return afTasks;
     }
 

@@ -129,14 +129,14 @@ public class ConfigFlowButtonContantService
         }
 
         // 添加处理后的按钮列表到字典
-        buttonMap[ButtonPageTypeEnumExtensions.GetName(ButtonPageTypeEnum.INITIATE)] = ButtonsSort(RepeatFilter(initiateButtons));
-        buttonMap[ButtonPageTypeEnumExtensions.GetName(ButtonPageTypeEnum.AUDIT)] = ButtonsSort(RepeatFilter(auditButtons));
-        buttonMap[ButtonPageTypeEnumExtensions.GetName(ButtonPageTypeEnum.TOVIEW)] = ButtonsSort(RepeatFilter(toViewButtons));
+        buttonMap[ButtonPageTypeEnum.INITIATE.GetName()] = ButtonsSort(RepeatFilter(initiateButtons));
+        buttonMap[ButtonPageTypeEnum.AUDIT.GetName()] = ButtonsSort(RepeatFilter(auditButtons));
+        buttonMap[ButtonPageTypeEnum.TOVIEW.GetName()] = ButtonsSort(RepeatFilter(toViewButtons));
 
         return buttonMap;
     }
 
-    public bool IsMoreNode(string procInstId, string elementId)
+    private bool IsMoreNode(string procInstId, string elementId)
     {
         if (string.IsNullOrEmpty(elementId))
         {
@@ -160,10 +160,11 @@ public class ConfigFlowButtonContantService
             throw new AFBizException($"element with id {elementId} not found");
         }
 
-        return element.SignUpType == 3;
+        return element.SignType == 2;
     }
 
-    public List<ProcessActionButtonVo> GetButtons(List<BpmVariableButton> bpmVariableButtons, ButtonPageTypeEnum buttonPageTypeEnum)
+
+    private List<ProcessActionButtonVo> GetButtons(List<BpmVariableButton> bpmVariableButtons, ButtonPageTypeEnum buttonPageTypeEnum)
     {
         List<ProcessActionButtonVo> buttonList = new List<ProcessActionButtonVo>();
     
@@ -235,7 +236,8 @@ public class ConfigFlowButtonContantService
 
         return buttons;
     }
-    public List<ProcessActionButtonVo> RepeatFilter(List<ProcessActionButtonVo> initiateButtons)
+
+    private List<ProcessActionButtonVo> RepeatFilter(List<ProcessActionButtonVo> initiateButtons)
     {
         if (initiateButtons == null || !initiateButtons.Any())
         {
