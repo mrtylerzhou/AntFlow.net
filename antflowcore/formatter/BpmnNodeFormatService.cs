@@ -30,7 +30,7 @@ public class BpmnNodeFormatService
         string startElementId = ProcessNodeEnum.START_TASK_KEY.Description; // Start element
 
         // Process diagram element list
-        var bpmnConfCommonElementVos = new List<BpmnConfCommonElementVo>();
+        List<BpmnConfCommonElementVo> bpmnConfCommonElementVos = new List<BpmnConfCommonElementVo>();
 
         // Set start element
         string startEventElementId = $"{bpmnConfCommonVo.ProcessNum}_{ElementTypeEnum.ELEMENT_TYPE_START_EVENT.Desc}";
@@ -38,19 +38,19 @@ public class BpmnNodeFormatService
         bpmnConfCommonElementVos.Add(startEventElement);
 
         // Rebuild nodes recursively
-        var rebuildNodesList = new List<BpmnNodeVo>();
-        var startNode = GetStartUserNode(nodes);
+        List<BpmnNodeVo> rebuildNodesList = new List<BpmnNodeVo>();
+        BpmnNodeVo startNode = GetStartUserNode(nodes);
         rebuildNodesList.Add(startNode); // Set start node
         TreatNodesRecursively(rebuildNodesList, nodes, startNode);
 
         // Set start user node
-        var startUserNode = GetStartUserNode(rebuildNodesList);
+        BpmnNodeVo startUserNode = GetStartUserNode(rebuildNodesList);
         string startUserId = bpmnStartConditions.StartUserId?.ToString() ?? "";
-        var singleAssigneeMap = new Dictionary<string, string>
+        Dictionary<string, string> singleAssigneeMap = new Dictionary<string, string>
         {
             { startUserId, bpmnStartConditions.StartUserName }
         };
-        var startNodeElement =
+        BpmnConfCommonElementVo startNodeElement =
             BpmnElementUtils.GetSingleElement(startElementId, "发起人", "startUser", startUserId, singleAssigneeMap);
 
         // Set start user node buttons
@@ -146,7 +146,7 @@ public class BpmnNodeFormatService
 
         do
         {
-            var nextNodeVo = GetNextNodeVo(rebuildNodesList, nodeTo);
+            BpmnNodeVo nextNodeVo = GetNextNodeVo(rebuildNodesList, nodeTo);
 
             if ((int)NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY == nextNodeVo.NodeType)
             {
@@ -427,7 +427,7 @@ public class BpmnNodeFormatService
 
     private BpmnNodeVo GetNextNodeVo(List<BpmnNodeVo> nodes, string nodeTo)
     {
-        var nextNodeVo = nodes
+        List<BpmnNodeVo> nextNodeVo = nodes
             .Where(o => o.NodeId == nodeTo)
             .ToList();
 

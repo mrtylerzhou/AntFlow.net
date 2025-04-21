@@ -28,12 +28,16 @@ using System.Linq;
         {
             string elementId = ProcessNodeEnum.GetDescByCode(nodeCode + 1);
             nodeVo.ElementId = elementId;
+            
+            BpmnNodePropertysVo property = nodeVo.Property??new BpmnNodePropertysVo();
+            int signType = property.SignType ?? 1;
 
-            var elementVo = GetElementVo(nodeVo.Property, nodeVo.Params, nodeCode + 1, elementId);
+            BpmnConfCommonElementVo elementVo = GetElementVo(nodeVo.Property, nodeVo.Params, nodeCode + 1, elementId);
             SetElementButtons(nodeVo, elementVo);
 
             elementVo.TemplateVos = nodeVo.TemplateVos;
             elementVo.ApproveRemindVo = nodeVo.ApproveRemindVo;
+            elementVo.SignType = signType;
             SetSignUpProperty(nodeVo, elementVo);
 
             bpmnConfCommonElementVos.Add(elementVo);

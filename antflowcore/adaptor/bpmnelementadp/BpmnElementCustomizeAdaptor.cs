@@ -28,10 +28,12 @@ using Microsoft.Extensions.Logging;
 
         public new void DoFormatNodesToElements(List<BpmnConfCommonElementVo> bpmnConfCommonElementVos, BpmnNodeVo nodeVo, int nodeCode, int sequenceFlowNum, Dictionary<string, int> numMap)
         {
-            var paramsVo = nodeVo.Params;
+            BpmnNodeParamsVo paramsVo = nodeVo.Params;
+            BpmnNodePropertysVo property = nodeVo.Property??new BpmnNodePropertysVo();
+            int signType = property.SignType ?? 1;
 
             // Filter already deduplicated assignees
-            var paramsAssigneeVos = paramsVo.AssigneeList
+            List<BpmnNodeParamsAssigneeVo> paramsAssigneeVos = paramsVo.AssigneeList
                 .Where(o => o.IsDeduplication == 0)
                 .ToList();
 
@@ -46,15 +48,16 @@ using Microsoft.Extensions.Logging;
                     { bpmnNodeParamsAssigneeVo.Assignee, bpmnNodeParamsAssigneeVo.AssigneeName }
                 };
 
-                var elementVo = BpmnElementUtils.GetSingleElement(elementId, bpmnNodeParamsAssigneeVo.ElementName,
+                BpmnConfCommonElementVo elementVo = BpmnElementUtils.GetSingleElement(elementId, bpmnNodeParamsAssigneeVo.ElementName,
                     $"customizeUser{elementCodeIncremented}", bpmnNodeParamsAssigneeVo.Assignee, singleAssigneeMap);
 
                 // Set node id and buttons
                 elementVo.NodeId = nodeVo.Id.ToString();
+                elementVo.SignType = signType;
                 base.SetElementButtons(nodeVo, elementVo);
                 bpmnConfCommonElementVos.Add(elementVo);
 
-                var sequenceFlowElement = BpmnElementUtils.GetSequenceFlow(elementSequenceFlowNum,
+                BpmnConfCommonElementVo sequenceFlowElement = BpmnElementUtils.GetSequenceFlow(elementSequenceFlowNum,
                     ProcessNodeEnum.GetDescByCode(nodeCode), elementVo.ElementId);
 
                 bpmnConfCommonElementVos.Add(sequenceFlowElement);

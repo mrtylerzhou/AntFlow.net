@@ -78,5 +78,7 @@ namespace AntFlowCore.Vo
 
         [JsonPropertyName("approveRemindVo")]
         public BpmnApproveRemindVo ApproveRemindVo { get; set; }
+        [JsonPropertyName("signType")]
+        public int SignType { get; set; }
     }
 }
