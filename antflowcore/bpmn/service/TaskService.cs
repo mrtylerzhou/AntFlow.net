@@ -4,6 +4,7 @@ using antflowcore.bpmn.listener;
 using antflowcore.constant.enus;
 using AntFlowCore.Constants;
 using antflowcore.entity;
+using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.service.repository;
 using antflowcore.util;
@@ -88,6 +89,7 @@ public class TaskService
         string content = bpmAfDeployment.Content;
         List<BpmnConfCommonElementVo> elements = JsonSerializer.Deserialize<List<BpmnConfCommonElementVo>>(content);
         BpmnConfCommonElementVo elementToDeal = null;
+        List<string> signUserIds = new List<string>();
         if (currentSignType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode())
         {
             BpmnConfCommonElementVo currentElement = BpmnFlowUtil.GetCurrentTaskElement(elements,taskDefKey);
@@ -96,6 +98,16 @@ public class TaskService
                 throw new AFBizException($"can not get current element by element id: {currentElement}");
             }
 
+            BpmVerifyInfoService bpmVerifyInfoService = ServiceProviderUtils.GetService<BpmVerifyInfoService>();
+            List<BpmVerifyInfo> bpmVerifyInfos = bpmVerifyInfoService.baseRepo
+                .Where(a=>a.RunInfoId==procInstId&&a.TaskDefKey==taskDefKey)
+                .ToList();
+            List<string> verifyUserIds = bpmVerifyInfos.Select(a=>a.VerifyUserId).ToList();
+            int currentNodeAssigneesCount = currentElement.AssigneeMap.Count;
+            if (verifyUserIds.Count == currentNodeAssigneesCount)
+            {
+                return;
+            }
             elementToDeal = currentElement;
         }
         else
