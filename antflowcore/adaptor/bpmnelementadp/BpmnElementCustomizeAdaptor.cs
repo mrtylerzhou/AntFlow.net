@@ -26,7 +26,7 @@ using Microsoft.Extensions.Logging;
             return null;
         }
 
-        public new void DoFormatNodesToElements(List<BpmnConfCommonElementVo> bpmnConfCommonElementVos, BpmnNodeVo nodeVo, int nodeCode, int sequenceFlowNum, Dictionary<string, int> numMap)
+        public override void DoFormatNodesToElements(List<BpmnConfCommonElementVo> bpmnConfCommonElementVos, BpmnNodeVo nodeVo, int nodeCode, int sequenceFlowNum, Dictionary<string, int> numMap)
         {
             BpmnNodeParamsVo paramsVo = nodeVo.Params;
             BpmnNodePropertysVo property = nodeVo.Property??new BpmnNodePropertysVo();

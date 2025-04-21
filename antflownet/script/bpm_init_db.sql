@@ -1799,7 +1799,8 @@ create table bpm_af_execution
     is_count_enabled     tinyint                 null,
     evt_subscr_count     int                     null,
     task_count           int                     null,
-    var_count            int                     null
+    var_count            int                     null,
+    sign_type            int                     null
 );
 
 create index AF_IDX_EXEC_PROCINSTID

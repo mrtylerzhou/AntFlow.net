@@ -15,7 +15,7 @@ using System.Linq;
         protected abstract BpmnConfCommonElementVo GetElementVo(BpmnNodePropertysVo property, BpmnNodeParamsVo paramsVo, int elementCode, string elementId);
 
         // 格式化 BpmnNodeVo 为 BpmnConfCommonElementVo 列表
-        public void DoFormatNodesToElements(List<BpmnConfCommonElementVo> bpmnConfCommonElementVos, BpmnNodeVo nodeVo, int nodeCode, int sequenceFlowNum, Dictionary<string, int> numMap)
+        public  virtual void DoFormatNodesToElements(List<BpmnConfCommonElementVo> bpmnConfCommonElementVos, BpmnNodeVo nodeVo, int nodeCode, int sequenceFlowNum, Dictionary<string, int> numMap)
         {
             var elementVo = FormatNodesToElements(bpmnConfCommonElementVos, nodeVo, nodeCode, sequenceFlowNum, numMap);
             elementVo.NodeId = nodeVo.Id.ToString();

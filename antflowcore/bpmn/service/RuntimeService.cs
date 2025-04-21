@@ -33,20 +33,23 @@ public class RuntimeService
           List<BpmnConfCommonElementVo> bpmnConfCommonElementVos = bpmnConfCommonVo.ElementList;
           string procInstId = StrongUuidGenerator.GetNextId();
           string executionId= StrongUuidGenerator.GetNextId();
-          BpmnConfCommonElementVo firtFirstAssigneeNode = BpmnFlowUtil.GetFirstAssigneeNode(bpmnConfCommonElementVos);
-          Dictionary<string,string> assigneeMap = firtFirstAssigneeNode.AssigneeMap;
+          BpmnConfCommonElementVo firstAssigneeNode = BpmnFlowUtil.GetFirstAssigneeNode(bpmnConfCommonElementVos);
+          Dictionary<string,string> assigneeMap = firstAssigneeNode.AssigneeMap;
           DateTime nowTime = DateTime.Now;
+          int signType = firstAssigneeNode.SignType;
+          int taskCount=signType==SignTypeEnum.SIGN_TYPE_OR_SIGN.GetCode()||signType==SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode()?1:assigneeMap.Count;
           BpmAfExecution execution = new BpmAfExecution
           {
                Id = executionId,
                ProcInstId = procInstId,
                BusinessKey = bpmnConfCommonVo.FormCode,
                ProcDefId = deploymentId,
-               ActId = firtFirstAssigneeNode.ElementId,
-               Name = firtFirstAssigneeNode.ElementName,
+               ActId = firstAssigneeNode.ElementId,
+               Name = firstAssigneeNode.ElementName,
                StartTime = nowTime,
                StartUserId = SecurityUtils.GetLogInEmpId(),
-               TaskCount = assigneeMap.Count,
+               TaskCount = taskCount,
+               SignType = signType
                
           };
           _executionService.baseRepo.Insert(execution);
@@ -67,16 +70,17 @@ public class RuntimeService
                FormKey = bpmnConfCommonVo.FormCode,
           };
           historyTaskInsts.Add(startTask);
-          foreach (var (key, value) in assigneeMap)
+          for (var i = 0; i < assigneeMap.Count; i++)
           {
+              var (key, value) = assigneeMap.ElementAt(i);
                BpmAfTask bpmAfTask = new BpmAfTask()
                {
                     Id = StrongUuidGenerator.GetNextId(),
                     ProcInstId = procInstId,
                     ProcDefId = deploymentId,
                     ExecutionId = executionId,
-                    Name = firtFirstAssigneeNode.ElementName,
-                    TaskDefKey = firtFirstAssigneeNode.ElementId,
+                    Name = firstAssigneeNode.ElementName,
+                    TaskDefKey = firstAssigneeNode.ElementId,
                     Owner = bpmnStartConditions.StartUserId,
                     Assignee = key,
                     AssigneeName = value,
@@ -85,7 +89,13 @@ public class RuntimeService
                };
                tasks.Add(bpmAfTask);
                historyTaskInsts.Add(bpmAfTask.ToInst());
+               if (signType == SignTypeEnum.SIGN_TYPE_OR_SIGN.GetCode() ||
+                   signType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode())
+               {
+                    break;
+               }
           }
+         
           _taskService.InsertTasks(tasks);
           _taskInstService.baseRepo.Insert(historyTaskInsts);
           ExecutionEntity executionEntity = new ExecutionEntity()

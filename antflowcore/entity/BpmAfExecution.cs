@@ -123,4 +123,6 @@ namespace antflowcore.entity;
         /// </summary>
         [Column(Name = "var_count")]
         public int? VarCount { get; set; }
+        [Column(Name = "sign_type")]
+        public int? SignType { get; set; }
     }
