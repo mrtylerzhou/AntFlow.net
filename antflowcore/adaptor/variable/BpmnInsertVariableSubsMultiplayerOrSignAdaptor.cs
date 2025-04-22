@@ -1,12 +1,12 @@
-﻿using antflowcore.constant.enus;
-using AntFlowCore.Entities;
+﻿using antflowcore.constant.enums;
+using antflowcore.entity;
 using antflowcore.service.repository;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
 
 namespace antflowcore.adaptor.variable;
 
-public class BpmnInsertVariableSubsMultiplayerOrSignAdaptor: IBpmnInsertVariableSubs
+public class BpmnInsertVariableSubsMultiplayerOrSignAdaptor : IBpmnInsertVariableSubs
 {
     private readonly BpmVariableMultiplayerService _bpmVariableMultiplayerService;
     private readonly BpmVariableMultiplayerPersonnelService _bpmVariableMultiplayerPersonnelService;
@@ -19,7 +19,7 @@ public class BpmnInsertVariableSubsMultiplayerOrSignAdaptor: IBpmnInsertVariable
         _bpmVariableMultiplayerService = bpmVariableMultiplayerService;
         _bpmVariableMultiplayerPersonnelService = bpmVariableMultiplayerPersonnelService;
     }
-   
+
     public void InsertVariableSubs(BpmnConfCommonElementVo elementVo, long variableId)
     {
         var variableMultiplayer = new BpmVariableMultiplayer
@@ -32,7 +32,6 @@ public class BpmnInsertVariableSubsMultiplayerOrSignAdaptor: IBpmnInsertVariable
             SignType = (int)SignTypeEnum.SIGN_TYPE_OR_SIGN
         };
         _bpmVariableMultiplayerService.baseRepo.Insert(variableMultiplayer);
-       
 
         var assigneeMap = elementVo.AssigneeMap;
 
@@ -49,5 +48,4 @@ public class BpmnInsertVariableSubsMultiplayerOrSignAdaptor: IBpmnInsertVariable
             .ToList();
         _bpmVariableMultiplayerPersonnelService.baseRepo.Insert(personnelList);
     }
-
 }

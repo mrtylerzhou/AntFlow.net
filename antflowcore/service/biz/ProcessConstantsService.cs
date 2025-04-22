@@ -1,10 +1,10 @@
-﻿using antflowcore.constant.enus;
+﻿using antflowcore.constant.enums;
 using antflowcore.entity;
-using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.service.repository;
 using antflowcore.util;
 using antflowcore.vo;
+using AntFlowCore.Entity;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
 
@@ -22,9 +22,9 @@ public class ProcessConstantsService
     private readonly AFTaskService _afTaskService;
     private readonly ILogger<ProcessConstantsService> _logger;
 
-    public ProcessConstantsService(AfTaskInstService afTaskInstService, 
+    public ProcessConstantsService(AfTaskInstService afTaskInstService,
         BpmBusinessProcessService bpmBusinessProcessService,
-       
+
         IBpmnEmployeeInfoProviderService employeeInfoProviderService,
         TaskMgmtService taskMgmtService,
         UserMessageService userMessageService,
@@ -81,7 +81,7 @@ public class ProcessConstantsService
         processInfoVo.TaskState = ProcessStateEnumExtensions.GetDescByCode(bpmBusinessProcess.ProcessState);
 
         // 设置审核信息
-        processInfoVo.VerifyInfoList = ServiceProviderUtils.GetService<BpmVerifyInfoService>().VerifyInfoList(bpmBusinessProcess.BusinessNumber,bpmBusinessProcess.ProcInstId);
+        processInfoVo.VerifyInfoList = ServiceProviderUtils.GetService<BpmVerifyInfoService>().VerifyInfoList(bpmBusinessProcess.BusinessNumber, bpmBusinessProcess.ProcInstId);
 
         // 设置流程描述
         processInfoVo.ProcessTitle = bpmBusinessProcess.Description;
@@ -112,7 +112,7 @@ public class ProcessConstantsService
         // 查询当前用户的任务
         var tasks = _afTaskService
             .baseRepo
-            .Where(a=>a.ProcInstId== processInstanceId&&a.Assignee==SecurityUtils.GetLogInEmpId())
+            .Where(a => a.ProcInstId == processInstanceId && a.Assignee == SecurityUtils.GetLogInEmpId())
             .ToList();
         string taskDefKey = "";
 
@@ -147,10 +147,11 @@ public class ProcessConstantsService
 
         return processInfoVo;
     }
+
     public bool ShowProcessData(string processCode)
     {
         var bpmBusinessProcess = _bpmBusinessProcessService.GetBpmBusinessProcess(processCode);
-    
+
         // 监控、查看、流程管理员、超级管理员、历史审批人和转发用户
         if (bpmBusinessProcess != null)
         {
@@ -158,8 +159,6 @@ public class ProcessConstantsService
                 .baseRepo
                 .Where(a => a.ProcInstId == bpmBusinessProcess.ProcInstId)
                 .ToList();
-                
-            
 
             var assigneeList = taskInstanceList
                 .Where(task => task != null)
@@ -177,5 +176,4 @@ public class ProcessConstantsService
 
         return true;
     }
-
 }

@@ -1,9 +1,9 @@
 ﻿using antflowcore.vo;
 using AntFlowCore.Vo;
 
-namespace antflowcore.service.processor.filter;
+namespace antflowcore.formatter.filter;
 
 public interface IConditionService
 {
-    bool CheckMatchCondition(String nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo);
+    bool CheckMatchCondition(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo);
 }

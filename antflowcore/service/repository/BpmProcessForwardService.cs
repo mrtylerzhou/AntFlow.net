@@ -1,10 +1,10 @@
-﻿using System.Collections.Concurrent;
-using antflowcore.entity;
+﻿using antflowcore.entity;
 using AntFlowCore.Entity;
+using System.Collections.Concurrent;
 
 namespace antflowcore.service.repository;
 
-public class BpmProcessForwardService: AFBaseCurdRepositoryService<BpmProcessForward>
+public class BpmProcessForwardService : AFBaseCurdRepositoryService<BpmProcessForward>
 {
     private readonly AFTaskService _taskService;
 
@@ -14,18 +14,20 @@ public class BpmProcessForwardService: AFBaseCurdRepositoryService<BpmProcessFor
     {
         _taskService = taskService;
     }
+
     private static IDictionary<String, BpmProcessForward> processForwardMap = new ConcurrentDictionary<String, BpmProcessForward>();
     private static IDictionary<String, BpmAfTask> taskMap = new ConcurrentDictionary<String, BpmAfTask>();
+
     public void AddProcessForward(BpmProcessForward bpmProcessForward)
     {
         this.baseRepo.Insert(bpmProcessForward);
     }
-    
+
     public void UpdateProcessForward(BpmProcessForward bpmProcessForward)
     {
         List<BpmProcessForward> bpmProcessForwards = this
             .baseRepo.
-            Where(a=>a.ProcessInstanceId==bpmProcessForward.ProcessInstanceId&&a.ForwardUserId==bpmProcessForward.ForwardUserId)
+            Where(a => a.ProcessInstanceId == bpmProcessForward.ProcessInstanceId && a.ForwardUserId == bpmProcessForward.ForwardUserId)
             .ToList();
         foreach (BpmProcessForward processForward in bpmProcessForwards)
         {
@@ -35,9 +37,9 @@ public class BpmProcessForwardService: AFBaseCurdRepositoryService<BpmProcessFor
 
     public void LoadProcessForward(string userId)
     {
-       
         List<BpmProcessForward> list = this.AllBpmProcessForward(userId);
-        if (list == null||!list.Any()) {
+        if (list == null || !list.Any())
+        {
             return;
         }
         foreach (BpmProcessForward next in list)
@@ -47,13 +49,12 @@ public class BpmProcessForwardService: AFBaseCurdRepositoryService<BpmProcessFor
                 processForwardMap.Add(next.ProcessInstanceId, next);
             }
         }
-       
     }
 
     private List<BpmProcessForward> AllBpmProcessForward(string userId)
     {
         List<BpmProcessForward> bpmProcessForwards = this.baseRepo
-            .Where(a=>a.IsDel==0&&a.ForwardUserId==userId)
+            .Where(a => a.IsDel == 0 && a.ForwardUserId == userId)
             .ToList();
         return bpmProcessForwards;
     }
@@ -61,33 +62,40 @@ public class BpmProcessForwardService: AFBaseCurdRepositoryService<BpmProcessFor
     public void LoadTask(string userId)
     {
         List<BpmAfTask> list = _taskService.FindTaskByEmpId(userId);
-        if (list == null||!list.Any()) {
+        if (list == null || !list.Any())
+        {
             return;
         }
         foreach (BpmAfTask next in list)
         {
             if (!taskMap.ContainsKey(next.ProcInstId))
             {
-                taskMap.Add(next.ProcInstId,next);
+                taskMap.Add(next.ProcInstId, next);
             }
         }
     }
+
     public BpmAfTask GetTask(String processInstanceId)
     {
-        if (string.IsNullOrEmpty(processInstanceId)) {
+        if (string.IsNullOrEmpty(processInstanceId))
+        {
             return null;
         }
-        
+
         taskMap.TryGetValue(processInstanceId, out BpmAfTask? task);
         return task;
     }
-    public BpmProcessForward GetProcessForward(String processInstanceId) {
-        if (string.IsNullOrEmpty(processInstanceId)) {
+
+    public BpmProcessForward GetProcessForward(String processInstanceId)
+    {
+        if (string.IsNullOrEmpty(processInstanceId))
+        {
             return null;
         }
-        processForwardMap.TryGetValue(processInstanceId,out BpmProcessForward? forward);
+        processForwardMap.TryGetValue(processInstanceId, out BpmProcessForward? forward);
         return forward;
     }
+
     public bool IsForward(string recordProcessInstanceId)
     {
         BpmAfTask bpmAfTask = GetTask(recordProcessInstanceId);

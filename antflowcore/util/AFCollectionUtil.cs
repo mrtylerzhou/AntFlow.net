@@ -24,7 +24,6 @@ public static class AFCollectionUtil
     {
         return numbers.Select(long.Parse);
     }
-    
 
     public static IEnumerable<int> LongToIntList(IEnumerable<long> numbers)
     {

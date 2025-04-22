@@ -7,6 +7,7 @@ public static class DateUtil
 {
     // Constants for date formats
     public static readonly string YEAR_PATTERN = "yyyy";
+
     public static readonly string MONTH_PATTERN = "yyyy-MM";
     public static readonly string DATE_PATTERN = "yyyy-MM-dd";
     public static readonly string DATETIME_PATTERN_NO_SECOND = "yyyy-MM-dd HH:mm";
@@ -149,7 +150,7 @@ public static class DateUtil
         return ParseWithPattern(dt, DATETIME_PATTERN);
     }
 
-    private static DateTime ParseWithPattern(string dt,string pattern)
+    private static DateTime ParseWithPattern(string dt, string pattern)
     {
         if (DateTime.TryParseExact(dt, pattern, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result))
         {

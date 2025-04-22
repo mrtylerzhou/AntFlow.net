@@ -1,19 +1,18 @@
-﻿using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
-using antflowcore.constant.enus;
+﻿using antflowcore.bpmn.service;
+using antflowcore.constant.enums;
 using antflowcore.entity;
-using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.factory;
+using antflowcore.formatter;
+using antflowcore.formatter.filter;
 using antflowcore.service.biz;
-using antflowcore.service.processor;
-using antflowcore.service.processor.filter;
 using antflowcore.util;
 using antflowcore.vo;
+using AntFlowCore.Entity;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace antflowcore.service.repository;
 
@@ -113,7 +112,6 @@ public class BpmnConfCommonService
         //1. Format the process,filter it by condition
         _bpmnStartFormatFactory.formatBpmnConf(bpmnConfVo, bpmnStartConditions);
 
-
         //2、set consignees information and finally determine the flow's direction
         _personnelFormat.FormatPersonnelsConf(bpmnConfVo, bpmnStartConditions);
         //3. to determine whether it is necessary to deduplication
@@ -173,7 +171,7 @@ public class BpmnConfCommonService
             : _bpmnConfBizService.Detail(dataVo.BpmnCode);
 
         BusinessDataVo tempVo = new BusinessDataVo();
-        tempVo.FormCode = detail.FormCode;
+        tempVo.FormCode = dataVo.FormCode;
         var vo = _formFactory.DataFormConversion(JsonSerializer.Serialize(tempVo), null);
         vo.IsOutSideAccessProc = detail.IsOutSideProcess == 1;
         vo.IsLowCodeFlow = detail.IsLowCodeFlow;
@@ -196,7 +194,7 @@ public class BpmnConfCommonService
             startUserId = vo.StartUserId;
             if (string.IsNullOrEmpty(startUserId))
             {
-                vo.StartUserId = SecurityUtils.GetLogInEmpIdSafe();
+                vo.StartUserId = SecurityUtils.GetLogInEmpNameSafe();
             }
         }
 
@@ -224,11 +222,11 @@ public class BpmnConfCommonService
         }
 
         bpmnStartConditionsVo.ApproversList = dataVo.ApproversList;
-        bpmnStartConditionsVo.StartUserId = vo.StartUserId;
+        bpmnStartConditionsVo.StartUserId = startUserId;
         bpmnStartConditionsVo.IsPreview = true;
 
-        BpmnConfVo bpmnConfVo = GetBpmnConfVo(bpmnStartConditionsVo, detail);
-        PreviewNode previewNode = new PreviewNode
+        var bpmnConfVo = GetBpmnConfVo(bpmnStartConditionsVo, detail);
+        var previewNode = new PreviewNode
         {
             BpmnName = detail.BpmnName,
             FormCode = detail.FormCode,
@@ -236,19 +234,19 @@ public class BpmnConfCommonService
             DeduplicationType = bpmnConfVo.DeduplicationType,
             DeduplicationTypeName = DeduplicationTypeEnumExtensions.GetDescByCode(bpmnConfVo.DeduplicationType.Value)
         };
-        
+
         string currentNodeIdStr = _bpmVerifyInfoBizService.FindCurrentNodeIds(vo.ProcessNumber);
         previewNode.CurrentNodeId = currentNodeIdStr;
 
         List<string> currentNodeIds = currentNodeIdStr.Split(',').ToList();
         var bpmnNodeVoMap = previewNode.BpmnNodeList.ToDictionary(n => n.NodeId, n => n);
 
-        List<string> nodeToResults = new List<string>();
+        List<string> nodeToResults = new();
         ProcessNodeToRecursively(currentNodeIds, bpmnNodeVoMap, nodeToResults);
         previewNode.AfterNodeIds = nodeToResults;
 
-        List<string> nodeFromResults = new List<string>();
-        HashSet<string> allNodeIds = new HashSet<string>(bpmnNodeVoMap.Keys);
+        List<string> nodeFromResults = new();
+        var allNodeIds = new HashSet<string>(bpmnNodeVoMap.Keys);
         nodeFromResults.AddRange(allNodeIds.Where(o => !nodeToResults.Contains(o) && !currentNodeIds.Contains(o)));
 
         previewNode.BeforeNodeIds = nodeFromResults;
@@ -346,7 +344,6 @@ public class BpmnConfCommonService
 
         if (!existEnd)
         {
-           
             throw new AFBizException("has not end node while previewing the process");
         }
 
@@ -458,9 +455,7 @@ public class BpmnConfCommonService
             throw new ArgumentException("processNumber cannot be null or empty");
         }
 
-     
         BpmVariable? bpmnVariable = _bpmVariableService.baseRepo.Where(a => a.ProcessNum == processNumber).First();
-           
 
         if (bpmnVariable == null || string.IsNullOrEmpty(bpmnVariable.ProcessStartConditions))
         {
@@ -483,7 +478,7 @@ public class BpmnConfCommonService
     {
         List<BpmnConf> bpmnConfs = _bpmnConfService
             .baseRepo
-            .Where(a=>formCodes.Contains(a.FormCode)&&a.EffectiveStatus==1)
+            .Where(a => formCodes.Contains(a.FormCode) && a.EffectiveStatus == 1)
             .ToList();
         return bpmnConfs;
     }

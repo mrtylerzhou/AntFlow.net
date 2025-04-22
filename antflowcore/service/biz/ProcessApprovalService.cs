@@ -1,18 +1,15 @@
-﻿using System.Globalization;
-using System.Linq.Expressions;
-using antflowcore.constant.enus;
-using AntFlowCore.Constants;
+﻿using antflowcore.constant.enums;
 using antflowcore.dto;
 using antflowcore.entity;
-using AntFlowCore.Entity;
-using AntFlowCore.Enums;
 using antflowcore.exception;
 using antflowcore.factory;
 using antflowcore.service.repository;
 using antflowcore.util;
+using AntFlowCore.Entity;
 using AntFlowCore.Util;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
+using System.Linq.Expressions;
 
 namespace antflowcore.service.biz;
 
@@ -30,8 +27,6 @@ public class ProcessApprovalService
     private readonly IFreeSql _freeSql;
     private readonly BpmProcessNameService _bpmProcessNameService;
     private readonly BpmnConfCommonService _bpmnConfCommonService;
-    private readonly AFTaskService _taskService;
-    private readonly AfTaskInstService _afTaskInstService;
     private readonly ILogger _logger;
 
     public ProcessApprovalService(
@@ -47,8 +42,6 @@ public class ProcessApprovalService
         IFreeSql freeSql,
         BpmProcessNameService bpmProcessNameService,
         BpmnConfCommonService bpmnConfCommonService,
-        AFTaskService taskService,
-        AfTaskInstService afTaskInstService,
         ILogger<ProcessApprovalService> logger
     )
     {
@@ -64,8 +57,6 @@ public class ProcessApprovalService
         _freeSql = freeSql;
         _bpmProcessNameService = bpmProcessNameService;
         _bpmnConfCommonService = bpmnConfCommonService;
-        _taskService = taskService;
-        _afTaskInstService = afTaskInstService;
         _logger = logger;
     }
 
@@ -104,7 +95,6 @@ public class ProcessApprovalService
         _freeSql.Ado.Transaction(() => { dataVo = _buttonOperationService.ButtonsOperationTransactional(vo); });
 
         return dataVo;
-
     }
 
     public BusinessDataVo GetBusinessInfo(string parameters, string formCode)
@@ -192,7 +182,6 @@ public class ProcessApprovalService
         {
             pcProcButtons.Add(addApproverButton);
         }
-
     }
 
     public ResultAndPage<TaskMgmtVO> FindPcProcessList(PageDto pageDto, TaskMgmtVO vo)
@@ -211,32 +200,35 @@ public class ProcessApprovalService
                 break;
             // mornitor current processes
             case 2:
-                page.Records =this.ViewPcProcessList(page,vo) ;
+                page.Records = this.ViewPcProcessList(page, vo);
                 break;
             // recently build task
             case 3:
-                if (!string.IsNullOrEmpty(vo.ProcessType)) {
-                    vo.ProcessKeyList=_processNameRelevancyService.ProcessKeyList(Convert.ToInt64(vo.ProcessType));
+                if (!string.IsNullOrEmpty(vo.ProcessType))
+                {
+                    vo.ProcessKeyList = _processNameRelevancyService.ProcessKeyList(Convert.ToInt64(vo.ProcessType));
                 }
-                page.Records=(this.ViewPcpNewlyBuildList(page, vo));
+                page.Records = (this.ViewPcpNewlyBuildList(page, vo));
                 break;
             // already finished tasks
             case 4:
-                if (!string.IsNullOrEmpty(vo.ProcessType)) {
-                    vo.ProcessKeyList=_processNameRelevancyService.ProcessKeyList(Convert.ToInt64(vo.ProcessType));
+                if (!string.IsNullOrEmpty(vo.ProcessType))
+                {
+                    vo.ProcessKeyList = _processNameRelevancyService.ProcessKeyList(Convert.ToInt64(vo.ProcessType));
                 }
-                page.Records=(this.ViewPcAlreadyDoneList(page, vo));
+                page.Records = (this.ViewPcAlreadyDoneList(page, vo));
                 break;
             // running tasks
             case 5:
-                if (!string.IsNullOrEmpty(vo.ProcessType)) {
-                    vo.ProcessKeyList=_processNameRelevancyService.ProcessKeyList(Convert.ToInt64(vo.ProcessType));
+                if (!string.IsNullOrEmpty(vo.ProcessType))
+                {
+                    vo.ProcessKeyList = _processNameRelevancyService.ProcessKeyList(Convert.ToInt64(vo.ProcessType));
                 }
-                page.Records=(this.ViewPcToDoList(page, vo));
+                page.Records = (this.ViewPcToDoList(page, vo));
                 break;
             // my draft
             case 6:
-                page.Records=(this.AllProcessList(page, vo));
+                page.Records = (this.AllProcessList(page, vo));
                 break;
             // delegated tasks
             case 7:
@@ -244,16 +236,18 @@ public class ProcessApprovalService
                 break;
             //for administrator to view all the processes
             case 8:
-                page.Records=(this.AllProcessList(page, vo));
+                page.Records = (this.AllProcessList(page, vo));
                 break;
             //转发流程
             case 9:
-                page.Records=(this.ViewPcForwardList(page,vo));
+                page.Records = (this.ViewPcForwardList(page, vo));
                 //todo tobe implemented
                 break;
         }
-        if (page.Records!=null&&page.Records.Any()) {
-            if (vo.Type==(ProcessTypeEnum.ENTRUST_TYPE.Code) || vo.Type==(ProcessTypeEnum.ADMIN_TYPE.Code)) {
+        if (page.Records != null && page.Records.Any())
+        {
+            if (vo.Type == (ProcessTypeEnum.ENTRUST_TYPE.Code) || vo.Type == (ProcessTypeEnum.ADMIN_TYPE.Code))
+            {
                 _bpmProcessForwardService.LoadProcessForward(SecurityUtils.GetLogInEmpId());
                 _bpmProcessForwardService.LoadTask(SecurityUtils.GetLogInEmpId());
             }
@@ -262,88 +256,85 @@ public class ProcessApprovalService
         return PageUtils.GetResultAndPage(page);
     }
 
-   private void GetPcProcessData(Page<TaskMgmtVO>page, int type)
-{
-    var formCodes = page.Records
-        .Select(r => r.ProcessKey)
-        .Where(x => !string.IsNullOrEmpty(x))
-        .Distinct()
-        .ToList();
-
-    List<BpmnConf> bpmnConfs = _bpmnConfCommonService.GetBpmnConfByFormCodeBatch(formCodes);
-    Dictionary<string,BpmnConf> bpmnConfMap = new Dictionary<string, BpmnConf>();
-
-    if (bpmnConfs != null && bpmnConfs.Any())
+    private void GetPcProcessData(Page<TaskMgmtVO> page, int type)
     {
-        bpmnConfMap = bpmnConfs
-            .GroupBy(x => x.FormCode)
-            .ToDictionary(g => g.Key, g => g.Last());
+        var formCodes = page.Records
+            .Select(r => r.ProcessKey)
+            .Where(x => !string.IsNullOrEmpty(x))
+            .Distinct()
+            .ToList();
 
-        foreach (var record in page.Records)
+        List<BpmnConf> bpmnConfs = _bpmnConfCommonService.GetBpmnConfByFormCodeBatch(formCodes);
+        Dictionary<string, BpmnConf> bpmnConfMap = new Dictionary<string, BpmnConf>();
+
+        if (bpmnConfs != null && bpmnConfs.Any())
         {
-            if (bpmnConfMap.TryGetValue(record.ProcessKey, out var bpmnConf))
+            bpmnConfMap = bpmnConfs
+                .GroupBy(x => x.FormCode)
+                .ToDictionary(g => g.Key, g => g.Last());
+
+            foreach (var record in page.Records)
             {
-                record.IsOutSideProcess = bpmnConf.IsOutSideProcess == 1;
-                record.IsLowCodeFlow = bpmnConf.IsLowCodeFlow == 1;
-                record.ConfId = bpmnConf.Id;
-            }
-
-          
-            // TODO: 实际用户信息从 DB 获取
-            record.ActualName = SecurityUtils.GetLogInEmpName();
-
-            // 设置任务状态名称
-            record.TaskState = ProcessStateEnumExtensions.GetDescByCode(record.ProcessState ?? 0);
-
-            if (type == ProcessTypeEnum.ENTRUST_TYPE.Code)
-            {
-                
-                record.IsForward = _bpmProcessForwardService.IsForward(record.ProcessInstanceId);
-
-                if (!string.IsNullOrEmpty(record.TaskName))
+                if (bpmnConfMap.TryGetValue(record.ProcessKey, out var bpmnConf))
                 {
-                    record.IsBatchSubmit = IsOperatable(new TaskMgmtVO
+                    record.IsOutSideProcess = bpmnConf.IsOutSideProcess == 1;
+                    record.IsLowCodeFlow = bpmnConf.IsLowCodeFlow == 1;
+                    record.ConfId = bpmnConf.Id;
+                }
+
+                // TODO: 实际用户信息从 DB 获取
+                record.ActualName = SecurityUtils.GetLogInEmpName();
+
+                // 设置任务状态名称
+                record.TaskState = ProcessStateEnumExtensions.GetDescByCode(record.ProcessState ?? 0);
+
+                if (type == ProcessTypeEnum.ENTRUST_TYPE.Code)
+                {
+                    record.IsForward = _bpmProcessForwardService.IsForward(record.ProcessInstanceId);
+
+                    if (!string.IsNullOrEmpty(record.TaskName))
                     {
-                        ProcessKey = record.ProcessKey,
-                        TaskName = record.TaskName,
-                        Type = ProcessButtonEnum.VIEW_TYPE.Code
-                    });
+                        record.IsBatchSubmit = IsOperatable(new TaskMgmtVO
+                        {
+                            ProcessKey = record.ProcessKey,
+                            TaskName = record.TaskName,
+                            Type = ProcessButtonEnum.VIEW_TYPE.Code
+                        });
 
-                    record.NodeType = ProcessNodeEnum.GetCodeByDesc(record.TaskName)??0;
+                        record.NodeType = ProcessNodeEnum.GetCodeByDesc(record.TaskName) ?? 0;
+                    }
                 }
-            }
 
-            if (type == ProcessTypeEnum.ADMIN_TYPE.Code)
-            {
-                if (!string.IsNullOrEmpty(record.TaskName))
+                if (type == ProcessTypeEnum.ADMIN_TYPE.Code)
                 {
-                    record.NodeType = ProcessNodeEnum.GetCodeByDesc(record.TaskName)??0;
+                    if (!string.IsNullOrEmpty(record.TaskName))
+                    {
+                        record.NodeType = ProcessNodeEnum.GetCodeByDesc(record.TaskName) ?? 0;
+                    }
                 }
-            }
 
-            if (!string.IsNullOrEmpty(record.ProcessKey))
-            {
-                var bpmProcessVo = _bpmProcessNameService.Get(record.ProcessKey);
-                if (bpmProcessVo != null && !string.IsNullOrEmpty(bpmProcessVo.ProcessKey))
+                if (!string.IsNullOrEmpty(record.ProcessKey))
                 {
-                    record.ProcessTypeName = bpmProcessVo.ProcessName;
-                    record.ProcessCode = bpmProcessVo.ProcessKey;
+                    var bpmProcessVo = _bpmProcessNameService.Get(record.ProcessKey);
+                    if (bpmProcessVo != null && !string.IsNullOrEmpty(bpmProcessVo.ProcessKey))
+                    {
+                        record.ProcessTypeName = bpmProcessVo.ProcessName;
+                        record.ProcessCode = bpmProcessVo.ProcessKey;
+                    }
                 }
             }
         }
     }
-}
 
-private bool IsOperatable(TaskMgmtVO taskMgmtVo)
-{
-    long count = _freeSql.Select<BpmProcessOperation>()
-        .Where(a=>a.ProcessNode==taskMgmtVo.TaskName&&a.ProcessKey==taskMgmtVo.ProcessKey&&a.Type==taskMgmtVo.Type)
-        .Count();
-    return count <= 0;
-}
+    private bool IsOperatable(TaskMgmtVO taskMgmtVo)
+    {
+        long count = _freeSql.Select<BpmProcessOperation>()
+            .Where(a => a.ProcessNode == taskMgmtVo.TaskName && a.ProcessKey == taskMgmtVo.ProcessKey && a.Type == taskMgmtVo.Type)
+            .Count();
+        return count <= 0;
+    }
 
-
-List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
+    private List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
     {
         List<TaskMgmtVO> taskMgmtVos = _freeSql
             .Select<BpmAfTaskInst, BpmBusinessProcess>()
@@ -365,13 +356,14 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
             .Page(page.Current, page.Size).ToList();
         return taskMgmtVos;
     }
-    
-    List<TaskMgmtVO> ViewPcpNewlyBuildList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO){
+
+    private List<TaskMgmtVO> ViewPcpNewlyBuildList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
+    {
         List<TaskMgmtVO> taskMgmtVos = _freeSql
             .Select<BpmAfTaskInst, BpmBusinessProcess>()
             .LeftJoin((h, b) => h.ProcInstId == b.ProcInstId)
-            .Where((a,b)=>b.CreateUser==taskMgmtVO.ApplyUser&&b.IsDel==0)
-            .WithTempQuery(a=>new TaskMgmtVO
+            .Where((a, b) => b.CreateUser == taskMgmtVO.ApplyUser && b.IsDel == 0)
+            .WithTempQuery(a => new TaskMgmtVO
             {
                 ProcessInstanceId = a.t1.ProcInstId,
                 ProcessId = a.t1.ProcDefId,
@@ -391,12 +383,14 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
             .ToList();
         return taskMgmtVos;
     }
-    List<TaskMgmtVO> ViewPcAlreadyDoneList(Page<TaskMgmtVO> page,  TaskMgmtVO taskMgmtVO){
+
+    private List<TaskMgmtVO> ViewPcAlreadyDoneList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
+    {
         List<TaskMgmtVO> taskMgmtVos = _freeSql
             .Select<BpmAfTaskInst, BpmBusinessProcess>()
             .LeftJoin((h, b) => h.ProcInstId == b.ProcInstId)
-            .Where((a,b)=>a.Assignee==taskMgmtVO.ApplyUser&&b.IsDel==0&&a.EndTime!=null&&a.TaskDefKey!="task1418018332271")
-            .WithTempQuery(a=>new TaskMgmtVO
+            .Where((a, b) => a.Assignee == taskMgmtVO.ApplyUser && b.IsDel == 0 && a.EndTime != null && a.TaskDefKey != "task1418018332271")
+            .WithTempQuery(a => new TaskMgmtVO
             {
                 ProcessInstanceId = a.t2.ProcInstId,
                 ProcessKey = a.t2.ProcessinessKey,
@@ -413,19 +407,20 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
             .ToList();
         return taskMgmtVos;
     }
-    List<TaskMgmtVO> ViewPcToDoList(Page<TaskMgmtVO> page,TaskMgmtVO taskMgmtVO)
+
+    private List<TaskMgmtVO> ViewPcToDoList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
     {
         List<TaskMgmtVO> taskMgmtVos = _freeSql
             .Select<BpmAfTask, BpmBusinessProcess>()
             .LeftJoin((a, b) => a.ProcInstId == b.ProcInstId)
-            .Where((a,b)=>a.Assignee==taskMgmtVO.ApplyUser&&b.IsDel==0)
-            .WithTempQuery(a=>new TaskMgmtVO()
+            .Where((a, b) => a.Assignee == taskMgmtVO.ApplyUser && b.IsDel == 0)
+            .WithTempQuery(a => new TaskMgmtVO()
             {
                 ProcessInstanceId = a.t1.ProcInstId,
                 ProcessKey = a.t2.ProcessinessKey,
                 UserId = a.t2.CreateUser,
                 CreateTime = a.t2.CreateTime,
-                BusinessId= a.t2.BusinessId,
+                BusinessId = a.t2.BusinessId,
                 Description = a.t2.Description,
                 ProcessNumber = a.t2.BusinessNumber,
                 TaskStype = a.t2.ProcessState,
@@ -439,17 +434,19 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
             .ToList();
         return taskMgmtVos;
     }
-    List<TaskMgmtVO> AllProcessList(Page<TaskMgmtVO> page,TaskMgmtVO taskMgmtVO){
+
+    private List<TaskMgmtVO> AllProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
+    {
         List<TaskMgmtVO> taskMgmtVos = _freeSql
             .Select<BpmAfTask, BpmBusinessProcess>()
             .LeftJoin((a, b) => a.ProcInstId == b.ProcInstId)
-            .Where((a,b)=>b.IsDel==0)
-            .WithTempQuery(a=>new TaskMgmtVO()
+            .Where((a, b) => b.IsDel == 0)
+            .WithTempQuery(a => new TaskMgmtVO()
             {
                 ProcessInstanceId = a.t1.ProcInstId,
                 ProcessKey = a.t2.ProcessinessKey,
                 UserId = a.t2.CreateUser,
-                BusinessId= a.t2.BusinessId,
+                BusinessId = a.t2.BusinessId,
                 Description = a.t2.Description,
                 TaskStype = a.t2.ProcessState,
                 ProcessNumber = a.t2.BusinessNumber,
@@ -466,13 +463,15 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
             .ToList();
         return taskMgmtVos;
     }
-    List<TaskMgmtVO> ViewPcForwardList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO){
+
+    private List<TaskMgmtVO> ViewPcForwardList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
+    {
         List<TaskMgmtVO> taskMgmtVos = _freeSql
-            .Select<BpmAfTaskInst, BpmBusinessProcess,BpmProcessForward>()
-            .LeftJoin((a,b,c)=>a.ProcInstId == b.ProcInstId)
-            .LeftJoin((a,b,c)=>a.ProcInstId==c.ProcessInstanceId)
-            .Where((a,b,c)=>c.ForwardUserId==taskMgmtVO.ApplyUser&&b.IsDel==0&&c.IsDel==0)
-            .WithTempQuery(a=>new TaskMgmtVO()
+            .Select<BpmAfTaskInst, BpmBusinessProcess, BpmProcessForward>()
+            .LeftJoin((a, b, c) => a.ProcInstId == b.ProcInstId)
+            .LeftJoin((a, b, c) => a.ProcInstId == c.ProcessInstanceId)
+            .Where((a, b, c) => c.ForwardUserId == taskMgmtVO.ApplyUser && b.IsDel == 0 && c.IsDel == 0)
+            .WithTempQuery(a => new TaskMgmtVO()
             {
                 ProcessInstanceId = a.t1.ProcInstId,
                 ProcessKey = a.t2.ProcessinessKey,
@@ -493,9 +492,10 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
 
         return taskMgmtVos;
     }
+
     private Expression<Func<TaskMgmtVO, bool>> CommonCond(TaskMgmtVO paramVo)
     {
-        Expression<Func<TaskMgmtVO, bool>> exp = a => 1==1;
+        Expression<Func<TaskMgmtVO, bool>> exp = a => 1 == 1;
         if (!string.IsNullOrEmpty(paramVo.Search))
         {
             exp.And(a => a.Search.Contains(paramVo.Search));
@@ -550,22 +550,4 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
 
         return exp;
     }
-
-    public TaskMgmtVO ProcessStatistics()
-    {
-        string logInEmpIdStr = SecurityUtils.GetLogInEmpIdStr();
-        List<BpmAfTask> taskList = _taskService.baseRepo
-            .Where(a=>a.Assignee==logInEmpIdStr)
-            .ToList();
-        int doneTodayProcess = _afTaskInstService.DoneTodayProcess(logInEmpIdStr);
-        int doneCreateProcess = _afTaskInstService.DoneCreateProcess(logInEmpIdStr);
-        TaskMgmtVO taskMgmtVo = new TaskMgmtVO()
-        {
-            TodoCount = taskList.Count(),
-            DoneTodayCount = doneTodayProcess,
-            DoneCreateCount = doneCreateProcess,
-        };
-        return taskMgmtVo;
-    }
 }
-

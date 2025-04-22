@@ -2,7 +2,7 @@
 
 namespace antflowcore.service.repository;
 
-public class DicDataSerivce: AFBaseCurdRepositoryService<DictData>
+public class DicDataSerivce : AFBaseCurdRepositoryService<DictData>
 {
     public DicDataSerivce(IFreeSql freeSql) : base(freeSql)
     {

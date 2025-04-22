@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace AntFlowCore.Vo
 {
@@ -30,5 +29,4 @@ namespace AntFlowCore.Vo
         [JsonPropertyName("value")]
         public object Value { get; set; }
     }
-    
 }

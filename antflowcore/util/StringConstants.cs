@@ -1,5 +1,4 @@
-﻿
-namespace AntFlowCore.Constants
+﻿namespace antflowcore.util
 {
     public interface StringConstants
     {
@@ -33,19 +32,18 @@ namespace AntFlowCore.Constants
 
         public const string TENANT_USER = "tenantUser";
         public const string LOWCODE_FLOW_DICT_TYPE = "lowcodeflow";
-        
-    
-        public  const String outSideMarker = "outSide";
-       
-        public const  String outSideAccessmarker = "outSideAccess";
-        
-        public const String NUM_OPERATOR="numberOperator";
+
+        public const string outSideMarker = "outSide";
+
+        public const string outSideAccessmarker = "outSideAccess";
+
+        public const string NUM_OPERATOR = "numberOperator";
 
         public const string START_USER_NODE_NAME = "发起人";
-        
-        public const string DEFAULT_TASK_DELETE_REASON ="completed";
-        public const string TASK_FINISH_REASON="finished";
+
+        public const string DEFAULT_TASK_DELETE_REASON = "completed";
+        public const string TASK_FINISH_REASON = "finished";
         public const string BACK_TO_MODIFY_DESC = "打回修改";
-        public const string ADMIN_RIGHTS = "3060101";
+        public const string ADMIN_RIGHTS = "admin_rights";
     }
 }

@@ -1,13 +1,13 @@
-﻿using System.Linq.Expressions;
-using antflowcore.entity;
-using AntFlowCore.Entity;
+﻿using antflowcore.entity;
 using antflowcore.service.biz;
 using antflowcore.util;
+using AntFlowCore.Entity;
 using AntFlowCore.Vo;
+using System.Linq.Expressions;
 
 namespace antflowcore.service.repository;
 
-public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
+public class BpmVerifyInfoService : AFBaseCurdRepositoryService<BpmVerifyInfo>
 {
     private readonly BpmFlowrunEntrustService _bpmFlowrunEntrustService;
     private readonly BpmBusinessProcessService _bpmBusinessProcessService;
@@ -55,7 +55,7 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
         // 查询业务流程信息
         BpmBusinessProcess bpmBusinessProcess =
             _bpmBusinessProcessService.baseRepo.Where(a => a.BusinessNumber == processNumber).First();
-        
+
         if (bpmBusinessProcess == null)
         {
             return string.Empty;
@@ -89,7 +89,6 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
             return string.Empty;
         }
 
-
         List<BpmnNode> bpmnNodes = _nodeService.baseRepo.Where(a => bpmnNodeIds.Contains(a.Id.ToString())).ToList();
         if (bpmnNodes == null || bpmnNodes.Count == 0)
         {
@@ -103,19 +102,20 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
     public List<BpmVerifyInfoVo> FindTaskInfo(String procInstId)
     {
         List<BpmVerifyInfoVo> bpmVerifyInfos = _afTaskService.baseRepo.Where(a => a.ProcInstId == procInstId).ToList().Select(t => new BpmVerifyInfoVo()
-            {
-                Id = t.Id,
-                TaskName = t.Name,
-                VerifyUserId = t.Assignee,
-                VerifyUserName = t.AssigneeName,
-                VerifyStatusName = "处理中" ,
-                ElementId = t.TaskDefKey,
-                VerifyDesc = "",
-                VerifyDate = null,
-            }
+        {
+            Id = t.Id,
+            TaskName = t.Name,
+            VerifyUserId = t.Assignee,
+            VerifyUserName = t.AssigneeName,
+            VerifyStatusName = "处理中",
+            ElementId = t.TaskDefKey,
+            VerifyDesc = "",
+            VerifyDate = null,
+        }
         ).ToList();
         return bpmVerifyInfos;
     }
+
     public List<BpmVerifyInfoVo> FindTaskInfo(BpmBusinessProcess bpmBusinessProcess)
     {
         string procInstId = bpmBusinessProcess.ProcInstId;
@@ -132,7 +132,7 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
 
         if (isOutSideProcess == 1)
         {
-            stringStringMap = tasks.ToDictionary(t => t.VerifyUserId, t => t.VerifyUserName,StringComparer.Ordinal);
+            stringStringMap = tasks.ToDictionary(t => t.VerifyUserId, t => t.VerifyUserName, StringComparer.Ordinal);
         }
         else
         {
@@ -155,7 +155,7 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
             string taskName = string.Empty;
             List<string> strs = tasks.Select(t => t.TaskName).Where(t => t != null).Distinct().ToList();
 
-            if (strs.Count>1)
+            if (strs.Count > 1)
             {
                 taskName = string.Join("||", strs);
             }
@@ -164,18 +164,17 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
                 taskName = strs.FirstOrDefault();
             }
 
-            string elementId=string.Empty;
+            string elementId = string.Empty;
             List<string> elementIdList = tasks.Select(t => t.ElementId).Distinct().ToList();
             if (elementIdList.Count > 1)
             {
-                elementId= string.Join(",",elementIdList );
+                elementId = string.Join(",", elementIdList);
             }
             else
             {
                 //本段代码包在(tasks.Count > 1,至少有一个元素
-                elementId = elementIdList.FirstOrDefault()??string.Empty;
+                elementId = elementIdList.FirstOrDefault() ?? string.Empty;
             }
-          
 
             taskInfors.Add(new BpmVerifyInfoVo
             {
@@ -195,7 +194,7 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
         return taskInfors;
     }
 
-    public List<BpmVerifyInfoVo> VerifyInfoList(String processNumber,String procInstId)
+    public List<BpmVerifyInfoVo> VerifyInfoList(String processNumber, String procInstId)
     {
         BpmVerifyInfoVo vo = new BpmVerifyInfoVo()
         {
@@ -207,8 +206,7 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
 
     private List<BpmVerifyInfoVo> GetVerifyInfo(BpmVerifyInfoVo vo)
     {
-       
-        Expression<Func<BpmVerifyInfo, bool>> expression = a => 1==1;
+        Expression<Func<BpmVerifyInfo, bool>> expression = a => 1 == 1;
         if (!string.IsNullOrEmpty(vo.ProcessCode))
         {
             expression = expression.And(a => a.ProcessCode == vo.ProcessCode);
@@ -224,7 +222,6 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
             expression = expression.And(a => a.BusinessId == vo.BusinessId);
         }
 
-
         List<BpmVerifyInfoVo> bpmVerifyInfoVos = baseRepo
             .Where(expression)
             .ToList<BpmVerifyInfoVo>(w => new BpmVerifyInfoVo
@@ -234,7 +231,7 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
                 VerifyUserName = w.VerifyUserName,
                 TaskName = w.TaskName,
                 VerifyStatus = w.VerifyStatus,
-                VerifyStatusName = 
+                VerifyStatusName =
                     w.VerifyStatus == 1 ? "提交" :
                     w.VerifyStatus == 2 ? "同意" :
                     w.VerifyStatus == 3 ? "不同意" :
@@ -252,7 +249,7 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
             .ToList();
         return bpmVerifyInfoVos;
     }
-    
+
     public List<BpmVerifyInfoVo> GetBpmVerifyInfoVoList(List<BpmVerifyInfoVo> list, string procInstId)
     {
         var infoVoList = new List<BpmVerifyInfoVo>();
@@ -265,7 +262,7 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
                 {
                     List<BpmFlowrunEntrust> bpmFlowrunEntrusts = _bpmFlowrunEntrustService
                         .baseRepo
-                        .Where(a=>a.Original==o.OriginalId&&a.RunInfoId==o.RunInfoId)
+                        .Where(a => a.Original == o.OriginalId && a.RunInfoId == o.RunInfoId)
                         .ToList();
 
                     if (bpmFlowrunEntrusts != null && bpmFlowrunEntrusts.Any())
@@ -289,5 +286,4 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
 
         return infoVoList;
     }
-
 }

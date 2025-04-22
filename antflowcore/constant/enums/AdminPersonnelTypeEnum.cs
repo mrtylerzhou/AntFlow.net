@@ -1,6 +1,5 @@
-﻿namespace antflowcore.constant.enus;
+﻿namespace antflowcore.constant.enums;
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -15,12 +14,12 @@ public class AdminPersonnelTypeEnum
 
     private AdminPersonnelTypeEnum(int code, string desc, string strField, string listField, string idsField, string permCode)
     {
-        this.Code = code;
-        this.Desc = desc;
-        this.StrField = strField;
-        this.ListField = listField;
-        this.IdsField = idsField;
-        this.PermCode = permCode;
+        Code = code;
+        Desc = desc;
+        StrField = strField;
+        ListField = listField;
+        IdsField = idsField;
+        PermCode = permCode;
     }
 
     public static readonly AdminPersonnelTypeEnum ADMIN_PERSONNEL_TYPE_PROCESS = new AdminPersonnelTypeEnum(

@@ -1,4 +1,4 @@
-﻿namespace antflowcore.constant.enus;
+﻿namespace antflowcore.constant.enums;
 
 public enum DeduplicationTypeEnum
 {
@@ -15,10 +15,13 @@ public static class DeduplicationTypeEnumExtensions
         {
             case DeduplicationTypeEnum.DEDUPLICATION_TYPE_NULL:
                 return "不去重";
+
             case DeduplicationTypeEnum.DEDUPLICATION_TYPE_FORWARD:
                 return "当一个审批人重复出现时，只在最后一次审批（前去重）";
+
             case DeduplicationTypeEnum.DEDUPLICATION_TYPE_BACKWARD:
                 return "当一个审批人重复出现时，只在第一次审批（后去重）";
+
             default:
                 return null;
         }

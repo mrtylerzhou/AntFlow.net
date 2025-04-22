@@ -1,10 +1,8 @@
-﻿using System.Net;
-using AntFlowCore.Entities;
-using antflowcore.service.repository;
-using AntFlowCore.Util;
+﻿using antflowcore.service.repository;
 using antflowcore.vo;
+using AntFlowCore.Util;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace antflowcore.conf.middleware;
 
@@ -17,11 +15,10 @@ public class HeaderMiddleware
         _next = next;
     }
 
-    public async Task InvokeAsync(HttpContext context,UserService userService)
+    public async Task InvokeAsync(HttpContext context, UserService userService)
     {
         if (context.Request.Method != HttpMethod.Options.Method)
         {
-            
         }
         if (context.Request.Headers.TryGetValue("userId", out var userIdValue))
         {

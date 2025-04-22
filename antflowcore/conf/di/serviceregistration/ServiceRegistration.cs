@@ -1,31 +1,32 @@
 ﻿using antflowcore.adaptor;
 using antflowcore.adaptor.bpmnelementadp;
+using antflowcore.adaptor.bpmnnodeadp;
+using antflowcore.adaptor.formoperation;
 using antflowcore.adaptor.nodetypecondition;
 using antflowcore.adaptor.nodetypecondition.judge;
 using antflowcore.adaptor.personnel;
-using antflowcore.adaptor.personnel.businesstableadp;
+using antflowcore.adaptor.personnel.loopsign;
 using antflowcore.adaptor.personnel.provider;
+using antflowcore.adaptor.personnel.provideradp;
+using antflowcore.adaptor.personnel.provideradp.businesstableadp;
 using antflowcore.adaptor.processoperation;
 using antflowcore.adaptor.variable;
-using antflowcore.aop;
 using antflowcore.bpmn.listener;
 using antflowcore.bpmn.service;
 using antflowcore.factory;
+using antflowcore.formatter;
+using antflowcore.formatter.filter;
+using antflowcore.formatter.personnel;
 using antflowcore.service;
 using antflowcore.service.biz;
-using antflowcore.service.repository;
 using antflowcore.service.formprocess;
 using antflowcore.service.processor;
-using antflowcore.service.processor.filter;
 using antflowcore.service.processor.lowcodeflow;
-using antflowcore.service.processor.personnel;
-using antflowcore.util;
+using antflowcore.service.repository;
 using antflowcore.vo;
-using AntFlowCore.Vo;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace antflowcore.conf.serviceregistration;
+namespace antflowcore.conf.di.serviceregistration;
 
 public static class ServiceRegistration
 {
@@ -46,13 +47,13 @@ public static class ServiceRegistration
         services.AddSingleton<UserService>();
         services.AddSingleton<BpmnConfLfFormdataService>();
         services.AddSingleton<BpmnConfLfFormdataFieldService>();
-        services.AddSingleton<IAntFlowOrderPreProcessor<BpmnConfVo>,LFFormDataPreProcessor>();
+        services.AddSingleton<IAntFlowOrderPreProcessor<BpmnConfVo>, LFFormDataPreProcessor>();
         services.AddSingleton<IAntFlowOrderPostProcessor<BpmnConfVo>, LFFieldControlPostProcessor>();
         services.AddSingleton<BpmnNodeLfFormdataFieldControlService>();
         services.AddSingleton<LFFieldControlPostProcessor>();
         services.AddSingleton<ProcessApprovalService>();
         services.AddSingleton<IFormOperationAdaptor<ThirdPartyAccountApplyVo>, ThirdPartyAccountApplyService>();
-        services.AddSingleton<IFormOperationAdaptor<UDLFApplyVo>,LowFlowApprovalService>();
+        services.AddSingleton<IFormOperationAdaptor<UDLFApplyVo>, LowFlowApprovalService>();
         services.AddSingleton<LowFlowApprovalService>();
         services.AddSingleton<OutSideBpmAccessBusinessService>();
         services.AddSingleton<FormFactory>();
@@ -99,8 +100,8 @@ public static class ServiceRegistration
         services.AddSingleton<BpmnNodeConditionsConfService>();
         services.AddSingleton<BpmnNodeConditionsParamConfService>();
         services.AddSingleton<BpmnInsertVariablesService>();
-        services.AddSingleton<ITaskListener,BpmnTaskListener>();
-        services.AddSingleton<IExecutionListener,BpmnExecutionListener>();
+        services.AddSingleton<ITaskListener, BpmnTaskListener>();
+        services.AddSingleton<IExecutionListener, BpmnExecutionListener>();
         services.AddSingleton<ProcessNodeJumpService>();
         services.AddSingleton<BpmnConfLFFormDataBizService>();
         services.AddSingleton<DicMainService>();
@@ -114,21 +115,15 @@ public static class ServiceRegistration
         services.AddSingleton<ActivitiAdditionalInfoService>();
         services.AddSingleton<UserMessageService>();
         services.AddSingleton<ConfigFlowButtonContantService>();
-        services.AddSingleton<UserEntrustService>();
-        
+
         services.AddSingleton<AbstractOrderedSignNodeAdp, BpmnLoopSignNodeAdp>();
         services.AddSingleton<AbstractOrderedSignNodeAdp, OutSideOrderedSignNodeAdp>();
         services.AddSingleton<AbstractOrderedSignNodeAdp, TestOrderedSignNodeAdp>();
-        
+
         services.AddSingleton<CustomizePersonnelProvider>();
-        services.AddSingleton<DefaultTemplateService>();
-        services.AddSingleton<OutSideBpmApproveTemplateService>();
-        services.AddSingleton<OutSideBpmAdminPersonnelService>();
-        services.AddSingleton<EmployeeService>();
-        services.AddSingleton<OutSideBpmBaseService>();
-        
+
         #region IBpmnPersonnelProviderService with different register ways
-        
+
         services.AddSingleton<DirectLeaderPersonnelProvider>();
         services.AddSingleton<CustomizePersonnelProvider>();
         services.AddSingleton<HrbpPersonnelProvider>();
@@ -139,8 +134,7 @@ public static class ServiceRegistration
         services.AddSingleton<StartUserPersonnelProvider>();
         services.AddSingleton<UserPointedPersonnelProvider>();
         services.AddSingleton<BusinessTablePersonnelProvider>();
-        
-        
+
         services.AddSingleton<IBpmnPersonnelProviderService, DirectLeaderPersonnelProvider>();
         services.AddSingleton<IBpmnPersonnelProviderService, CustomizePersonnelProvider>();
         services.AddSingleton<IBpmnPersonnelProviderService, HrbpPersonnelProvider>();
@@ -151,10 +145,8 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmnPersonnelProviderService, StartUserPersonnelProvider>();
         services.AddSingleton<IBpmnPersonnelProviderService, UserPointedPersonnelProvider>();
         services.AddSingleton<IBpmnPersonnelProviderService, BusinessTablePersonnelProvider>();
-        #endregion
-        
-        
-        
+        #endregion IBpmnPersonnelProviderService with different register ways
+
         services.AddSingleton<AbstractBpmnPersonnelAdaptor, CustomizablePersonnelAdaptor>();
         services.AddSingleton<AbstractBpmnPersonnelAdaptor, DirectLeaderPersonnelAdaptor>();
         services.AddSingleton<AbstractBpmnPersonnelAdaptor, HrbpPersonnelAdaptor>();
@@ -166,12 +158,10 @@ public static class ServiceRegistration
         services.AddSingleton<AbstractBpmnPersonnelAdaptor, UserPointedPersonnelAdaptor>();
         services.AddSingleton<AbstractBpmnPersonnelAdaptor, BusinessTablePersonnelAdaptor>();
 
-
         services.AddSingleton<IBpmnNodeConditionsAdaptor, BpmnNodeConditionsAccountTypeAdaptor>();
         services.AddSingleton<IBpmnNodeConditionsAdaptor, BpmnNodeConditionsEmptyAdaptor>();
         services.AddSingleton<IBpmnNodeConditionsAdaptor, BpmnNodeConditionsPurchaseTypeAdaptor>();
         services.AddSingleton<IBpmnNodeConditionsAdaptor, BpmnTemplateMarkAdaptor>();
-        
 
         services.AddSingleton<IConditionJudge, ThirdAccountJudgeService>();
         services.AddSingleton<IConditionJudge, AskLeaveJudgeService>();
@@ -189,11 +179,9 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmnRemoveFormat, BpmnRemoveFormatService>();
         services.AddSingleton<IBpmnRemoveFormat, BpmnRemoveCopyFormatService>();
 
-
         services.AddSingleton<BpmnRemoveConfFormatFactory>();
 
-
-        services.AddSingleton<IAdaptorService,NodePropertyPersonnelAdaptor>();
+        services.AddSingleton<IAdaptorService, NodePropertyPersonnelAdaptor>();
         services.AddSingleton<IAdaptorService, NodePropertyBusinessTableAdaptor>();
         services.AddSingleton<IAdaptorService, NodePropertyDirectLeaderAdaptor>();
         services.AddSingleton<IAdaptorService, NodePropertyHrbpAdaptor>();
@@ -202,11 +190,7 @@ public static class ServiceRegistration
         services.AddSingleton<IAdaptorService, NodePropertyOutSideAccessAdaptor>();
         services.AddSingleton<IAdaptorService, NodePropertyRoleAdaptor>();
         services.AddSingleton<IAdaptorService, NodePropertyStartUserAdaptor>();
-        
-        
-        
-        
-        
+
         services.AddSingleton<IAdaptorService, BpmnElementBusinessTableAdaptor>();
         services.AddSingleton<IAdaptorService, BpmnElementCustomizeAdaptor>();
         services.AddSingleton<IAdaptorService, BpmnElementDirectLeaderAdaptor>();
@@ -225,28 +209,25 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmnAddFlowElementAdaptor, BpmnAddFlowElementMultSignAdaptor>();
 
         services.AddSingleton<BpmnNodeFormatService>();
-        
+
         services.AddSingleton<BpmVariableMultiplayerPersonnelService>();
         services.AddSingleton<BpmVariableMultiplayerService>();
         services.AddSingleton<BpmVariableSingleService>();
 
-
         services.AddSingleton<BpmnInsertVariableSubsMultiplayerOrSignAdaptor>();
         services.AddSingleton<BpmnInsertVariableSubsMultiplayerSignAdaptor>();
         services.AddSingleton<BpmnInsertVariableSubsSingleAdaptor>();
-        
+
         services.AddSingleton<IBpmnInsertVariableSubs, BpmnInsertVariableSubsMultiplayerOrSignAdaptor>();
         services.AddSingleton<IBpmnInsertVariableSubs, BpmnInsertVariableSubsMultiplayerSignAdaptor>();
         services.AddSingleton<IBpmnInsertVariableSubs, BpmnInsertVariableSubsSingleAdaptor>();
 
-        
-        
-        services.AddSingleton<IProcessOperationAdaptor,EndProcessService>();
-        services.AddSingleton<IProcessOperationAdaptor,SubmitProcessService>();
+        services.AddSingleton<IProcessOperationAdaptor, EndProcessService>();
+        services.AddSingleton<IProcessOperationAdaptor, SubmitProcessService>();
         services.AddSingleton<IProcessOperationAdaptor, ResubmitProcessService>();
         services.AddSingleton<IProcessOperationAdaptor, OutSideAccessSubmitProcessService>();
         services.AddSingleton<IProcessOperationAdaptor, ChangeAssigneeProcessService>();
-        services.AddSingleton<IProcessOperationAdaptor,TransferAssigneeProcessService>();
+        services.AddSingleton<IProcessOperationAdaptor, TransferAssigneeProcessService>();
         services.AddSingleton<IProcessOperationAdaptor, UndertakeProcessService>();
         services.AddSingleton<IProcessOperationAdaptor, BackToModifyService>();
         services.AddSingleton<IProcessOperationAdaptor, ProcessForwardService>();
@@ -257,10 +238,9 @@ public static class ServiceRegistration
         services.AddSingleton<AFExecutionService>();
         services.AddSingleton<RepositoryService>();
         services.AddSingleton<RuntimeService>();
-        
+
         services.AddSingleton<BpmnCreateAndStartService>();
-        
-        
+
         //=================================不可越过的三八线==============================
         IAdaptorFactory adaptorFactory = AdaptorFactoryProxy.GetProxyInstance();
         services.AddSingleton(adaptorFactory);

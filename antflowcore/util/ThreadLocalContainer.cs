@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 
 namespace AntFlowCore.Util
 {
     public static class ThreadLocalContainer
     {
         // 使用 ThreadLocal 来存储线程局部数据
-        private static ThreadLocal<ConcurrentDictionary<string, object>> _cache = 
+        private static ThreadLocal<ConcurrentDictionary<string, object>> _cache =
             new ThreadLocal<ConcurrentDictionary<string, object>>(() => new ConcurrentDictionary<string, object>());
 
         /// <summary>

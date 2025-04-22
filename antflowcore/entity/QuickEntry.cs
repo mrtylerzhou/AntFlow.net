@@ -1,6 +1,4 @@
-﻿using FreeSql;
-using System;
-using FreeSql.DataAnnotations;
+﻿using FreeSql.DataAnnotations;
 
 namespace AntFlowCore.Entity
 {
@@ -56,7 +54,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// Creation time
         /// </summary>
-        [Column(Name = "create_time",IsIgnore = true)]
+        [Column(Name = "create_time", IsIgnore = true)]
         public DateTime? CreateTime { get; set; }
 
         /// <summary>
@@ -72,6 +70,7 @@ namespace AntFlowCore.Entity
         public int VariableUrlFlag { get; set; }
 
         // Default constructor for FreeSQL
-        public QuickEntry() { }
+        public QuickEntry()
+        { }
     }
 }

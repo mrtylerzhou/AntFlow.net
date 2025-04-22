@@ -1,11 +1,11 @@
-﻿using antflowcore.constant.enus;
-using AntFlowCore.Entities;
+﻿using antflowcore.constant.enums;
+using antflowcore.entity;
 using antflowcore.service.repository;
 using AntFlowCore.Vo;
 
 namespace antflowcore.adaptor.variable;
 
-public class BpmnInsertVariableSubsMultiplayerSignAdaptor: IBpmnInsertVariableSubs
+public class BpmnInsertVariableSubsMultiplayerSignAdaptor : IBpmnInsertVariableSubs
 {
     private readonly BpmVariableMultiplayerService _bpmVariableMultiplayerService;
     private readonly BpmVariableMultiplayerPersonnelService _bpmVariableMultiplayerPersonnelService;
@@ -16,6 +16,7 @@ public class BpmnInsertVariableSubsMultiplayerSignAdaptor: IBpmnInsertVariableSu
         _bpmVariableMultiplayerService = bpmVariableMultiplayerService;
         _bpmVariableMultiplayerPersonnelService = bpmVariableMultiplayerPersonnelService;
     }
+
     public void InsertVariableSubs(BpmnConfCommonElementVo elementVo, long variableId)
     {
         var variableMultiplayer = new BpmVariableMultiplayer
@@ -45,5 +46,4 @@ public class BpmnInsertVariableSubsMultiplayerSignAdaptor: IBpmnInsertVariableSu
 
         _bpmVariableMultiplayerPersonnelService.baseRepo.Insert(personnelList);
     }
-
 }

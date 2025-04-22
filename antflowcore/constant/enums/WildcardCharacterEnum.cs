@@ -1,4 +1,4 @@
-﻿namespace antflowcore.constant.enus;
+﻿namespace antflowcore.constant.enums;
 
 public class WildcardCharacterEnum
 {
@@ -10,11 +10,11 @@ public class WildcardCharacterEnum
 
     private WildcardCharacterEnum(int code, string desc, string filName, bool isSearchEmpl, string transfDesc)
     {
-        this.Code = code;
-        this.Desc = desc;
-        this.FilName = filName;
-        this.IsSearchEmpl = isSearchEmpl;
-        this.TransfDesc = transfDesc;
+        Code = code;
+        Desc = desc;
+        FilName = filName;
+        IsSearchEmpl = isSearchEmpl;
+        TransfDesc = transfDesc;
     }
 
     public static readonly WildcardCharacterEnum ONE_CHARACTER = new WildcardCharacterEnum(1, "{工作流名称}", "bpmnName", false, "\\{工作流名称\\}");

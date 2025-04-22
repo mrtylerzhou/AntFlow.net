@@ -1,8 +1,8 @@
-﻿using antflowcore.constant.enus;
+﻿using antflowcore.constant.enums;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 
-namespace antflowcore.adaptor.personnel;
+namespace antflowcore.adaptor.personnel.loopsign;
 
 public class TestOrderedSignNodeAdp : AbstractOrderedSignNodeAdp
 {

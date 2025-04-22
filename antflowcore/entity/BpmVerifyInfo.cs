@@ -1,6 +1,4 @@
-﻿using FreeSql;
-using System;
-using FreeSql.DataAnnotations;
+﻿using FreeSql.DataAnnotations;
 
 namespace AntFlowCore.Entity
 {
@@ -63,6 +61,7 @@ namespace AntFlowCore.Entity
         /// </summary>
         [Column(Name = "task_id")]
         public string TaskId { get; set; }
+
         [Column(Name = "task_def_key")]
         public String TaskDefKey { get; set; }
 

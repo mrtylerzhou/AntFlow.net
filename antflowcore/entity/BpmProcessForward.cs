@@ -1,6 +1,4 @@
-﻿using System;
-using FreeSql;
-using FreeSql.DataAnnotations;
+﻿using FreeSql.DataAnnotations;
 
 namespace AntFlowCore.Entity
 {
@@ -10,7 +8,6 @@ namespace AntFlowCore.Entity
     [Table(Name = "bpm_process_forward")]
     public class BpmProcessForward
     {
-
         /// <summary>
         /// Auto-increment ID.
         /// </summary>
@@ -38,7 +35,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// Create time.
         /// </summary>
-        [Column(Name = "create_time",IsIgnore = true)]
+        [Column(Name = "create_time", IsIgnore = true)]
         public DateTime? CreateTime { get; set; }
 
         /// <summary>

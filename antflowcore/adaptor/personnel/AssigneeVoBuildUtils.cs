@@ -4,10 +4,9 @@ using antflowcore.vo;
 
 namespace antflowcore.adaptor.personnel;
 
-using System;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Logging;
 
 public class AssigneeVoBuildUtils
 {

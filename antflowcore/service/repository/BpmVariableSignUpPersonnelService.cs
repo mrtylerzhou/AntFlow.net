@@ -1,10 +1,10 @@
 ﻿using antflowcore.bpmn.service;
-using AntFlowCore.Entity;
 using antflowcore.vo;
+using AntFlowCore.Entity;
 
 namespace antflowcore.service.repository;
 
-public class BpmVariableSignUpPersonnelService: AFBaseCurdRepositoryService<BpmVariableSignUpPersonnel>
+public class BpmVariableSignUpPersonnelService : AFBaseCurdRepositoryService<BpmVariableSignUpPersonnel>
 {
     public BpmVariableSignUpPersonnelService(IFreeSql freeSql) : base(freeSql)
     {

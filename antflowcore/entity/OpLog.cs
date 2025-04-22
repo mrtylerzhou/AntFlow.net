@@ -1,6 +1,4 @@
-﻿using FreeSql;
-using System;
-using FreeSql.DataAnnotations;
+﻿using FreeSql.DataAnnotations;
 
 namespace AntFlowCore.Entity
 {
@@ -10,7 +8,6 @@ namespace AntFlowCore.Entity
     [Table(Name = "t_op_log")]
     public class OpLog
     {
-
         /// <summary>
         /// Primary key
         /// </summary>
@@ -101,6 +98,7 @@ namespace AntFlowCore.Entity
         public string Remark { get; set; }
 
         // Default constructor for FreeSQL
-        public OpLog() { }
+        public OpLog()
+        { }
     }
 }

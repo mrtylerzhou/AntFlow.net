@@ -4,11 +4,11 @@ using AntFlowCore.Vo;
 
 namespace antflowcore.adaptor.nodetypecondition.judge;
 
-public abstract class AbstractLFConditionJudge: AbstractComparableJudge
+public abstract class AbstractLFConditionJudge : AbstractComparableJudge
 {
     protected bool LfCommonJudge(
-        BpmnNodeConditionsConfBaseVo conditionsConf, 
-        BpmnStartConditionsVo bpmnStartConditionsVo, 
+        BpmnNodeConditionsConfBaseVo conditionsConf,
+        BpmnStartConditionsVo bpmnStartConditionsVo,
         Func<object, object, bool> predicate)
     {
         var lfConditionsFromDb = conditionsConf.LfConditions;

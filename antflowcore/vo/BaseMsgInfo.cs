@@ -1,5 +1,5 @@
-﻿using System.Text.Json.Serialization;
-using AntFlowCore.Entities;
+﻿using antflowcore.entity;
+using System.Text.Json.Serialization;
 
 namespace AntFlowCore.Vo
 {
@@ -20,5 +20,4 @@ namespace AntFlowCore.Vo
         [JsonPropertyName("user_message_status")]
         public UserMessageStatus UserMessageStatus { get; set; }
     }
-    
 }

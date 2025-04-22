@@ -1,16 +1,14 @@
-﻿using System.Linq.Expressions;
-using antflowcore.constant.enus;
-using antflowcore.dto;
-using AntFlowCore.Entity;
+﻿using antflowcore.dto;
 using antflowcore.service.repository;
 using antflowcore.util;
+using AntFlowCore.Entity;
 using AntFlowCore.Vo;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp;
-
+using System.Linq.Expressions;
 
 namespace antflowcore.controller;
 
+using antflowcore.constant.enums;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,7 +18,7 @@ public class InformationTemplateController
     private readonly InformationTemplateService _informationTemplateService;
     private readonly BpmVariableApproveRemindService _bpmVariableApproveRemindService;
 
-    public InformationTemplateController(InformationTemplateService informationTemplateService, 
+    public InformationTemplateController(InformationTemplateService informationTemplateService,
         BpmVariableApproveRemindService bpmVariableApproveRemindService)
     {
         _informationTemplateService = informationTemplateService;
@@ -62,7 +60,6 @@ public class InformationTemplateController
     [HttpGet("listByName")]
     public Result<List<InformationTemplate>> ListByName([FromQuery] string name = null)
     {
-       
         Expression<Func<InformationTemplate, bool>> expression = a => a.IsDel == 0 && a.Status == 0;
         if (!string.IsNullOrEmpty(name))
         {
@@ -105,5 +102,4 @@ public class InformationTemplateController
 
         return ResultHelper.Success(results);
     }
-    
 }

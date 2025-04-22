@@ -1,7 +1,6 @@
-﻿using System;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
-namespace AntFlowCore.Entities
+namespace antflowcore.entity
 {
     public class Role
     {
@@ -15,6 +14,5 @@ namespace AntFlowCore.Entities
         /// </summary>
         [JsonPropertyName("roleName")]
         public string RoleName { get; set; }
-        
     }
 }

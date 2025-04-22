@@ -1,12 +1,12 @@
-﻿using System.Collections;
-using antflowcore.constant.enus;
+﻿using antflowcore.constant.enums;
 using antflowcore.exception;
 using antflowcore.util;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
+using System.Collections;
 
-namespace antflowcore.service.processor.filter;
+namespace antflowcore.formatter.filter;
 
 public class ConditionService : IConditionService
 {
@@ -16,18 +16,21 @@ public class ConditionService : IConditionService
     {
         _logger = logger;
     }
+
     public bool CheckMatchCondition(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf,
         BpmnStartConditionsVo bpmnStartConditionsVo)
     {
         List<int> conditionParamTypeList = conditionsConf.ConditionParamTypes;
-        if (ObjectUtils.IsEmpty(conditionParamTypeList)) {
+        if (ObjectUtils.IsEmpty(conditionParamTypeList))
+        {
             return false;
         }
         bool result = true;
         foreach (int conditionParam in conditionParamTypeList)
         {
             ConditionTypeEnum? conditionTypeEnum = ConditionTypeEnumExtensions.GetEnumByCode(conditionParam);
-            if (conditionTypeEnum == null) {
+            if (conditionTypeEnum == null)
+            {
                 _logger.LogInformation("condition type is null,type:{}", conditionParam);
                 result = false;
                 break;
@@ -44,36 +47,36 @@ public class ConditionService : IConditionService
             IConditionJudge conditionJudge = null;
             int count = 0;
             //in fact each time one can only get one
-           foreach (object conditionJudgeService in conditionJudgeServices)
-           {
-               if (count > 1)
-               {
-                   throw new AFBizException("there should be only condition judge service!");
-               }
-                conditionJudge= (IConditionJudge)conditionJudgeService;
-               count++;
-           }
+            foreach (object conditionJudgeService in conditionJudgeServices)
+            {
+                if (count > 1)
+                {
+                    throw new AFBizException("there should be only condition judge service!");
+                }
+                conditionJudge = (IConditionJudge)conditionJudgeService;
+                count++;
+            }
 
-           if (conditionJudge == null)
-           {
-               throw new AFBizException(
-                   $"can not find a condition judge service by provided type:{conditionJudgeClassType}");
-           }
+            if (conditionJudge == null)
+            {
+                throw new AFBizException(
+                    $"can not find a condition judge service by provided type:{conditionJudgeClassType}");
+            }
 
-           try
-           {
-               if (!conditionJudge.Judge(nodeId, conditionsConf, bpmnStartConditionsVo))
-               {
-                   //if any condition judge service judge failed,then the whole result is failed
-                   result = false;
-                   break;
-               }
-           }
-           catch (Exception e)
-           {
-              _logger.LogInformation("conditionjudge error:{}",e);
-               throw;
-           }
+            try
+            {
+                if (!conditionJudge.Judge(nodeId, conditionsConf, bpmnStartConditionsVo))
+                {
+                    //if any condition judge service judge failed,then the whole result is failed
+                    result = false;
+                    break;
+                }
+            }
+            catch (Exception e)
+            {
+                _logger.LogInformation("conditionjudge error:{}", e);
+                throw;
+            }
         }
 
         return result;

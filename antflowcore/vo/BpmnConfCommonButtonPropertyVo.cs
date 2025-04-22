@@ -10,5 +10,5 @@ public class BpmnConfCommonButtonPropertyVo
     /// <summary>
     /// button name
     /// </summary>
-    public String ButtonName{get;set;}
+    public String ButtonName { get; set; }
 }

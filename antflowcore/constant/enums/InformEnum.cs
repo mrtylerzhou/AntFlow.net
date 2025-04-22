@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace AntFlowCore.Enums
+﻿namespace antflowcore.constant.enums
 {
     public enum InformEnum
     {
@@ -20,12 +17,16 @@ namespace AntFlowCore.Enums
             {
                 case InformEnum.APPLICANT:
                     return "申请人";
+
                 case InformEnum.ALL_APPROVER:
                     return "所有已审批人";
+
                 case InformEnum.AT_APPROVER:
                     return "当前节点审批人";
+
                 case InformEnum.BY_TRANSPOND:
                     return "被转发人";
+
                 default:
                     return null;
             }
@@ -38,12 +39,16 @@ namespace AntFlowCore.Enums
             {
                 case InformEnum.APPLICANT:
                     return "startUser";
+
                 case InformEnum.ALL_APPROVER:
                     return "approveds";
+
                 case InformEnum.AT_APPROVER:
                     return "assignee";
+
                 case InformEnum.BY_TRANSPOND:
                     return "forwardUsers";
+
                 default:
                     return null;
             }

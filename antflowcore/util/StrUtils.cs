@@ -1,20 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using hyjiacan.py4n;
 using System.ComponentModel;
-using System.Linq;
 using System.Text.RegularExpressions;
-using AntFlowCore.Constants;
-using antflowcore.util;
-using hyjiacan.py4n;
 
-
-namespace AntOffice.Base.Util
+namespace antflowcore.util
 {
     /// <summary>
     /// StrUtils
     /// String utility class
     /// </summary>
-    public static  class StrUtils
+    public static class StrUtils
     {
         public const int BPMN_CODE_LEN = 5;
 
@@ -53,7 +47,7 @@ namespace AntOffice.Base.Util
                 defaultNum = int.Parse(maxNumStr) + 1;
             }
 
-            string stringWithRawFormat = bpmncodePart + StringConstants.BPMN_CODE_SPLITMARK +"{"+ BPMNCONF_FORMATMARK+"}";
+            string stringWithRawFormat = bpmncodePart + StringConstants.BPMN_CODE_SPLITMARK + "{" + BPMNCONF_FORMATMARK + "}";
             return string.Format(stringWithRawFormat, defaultNum);
         }
 

@@ -6,14 +6,14 @@ using AntFlowCore.Vo;
 
 namespace antflowcore.adaptor.personnel.provider;
 
-using System;
 using System.Collections.Generic;
+
 [NamedService(nameof(LevelPersonnelProvider))]
 public class LevelPersonnelProvider : AbstractNodeAssigneeVoProvider
 {
     private readonly UserService _userService;
 
-    public LevelPersonnelProvider(UserService userService,AssigneeVoBuildUtils assigneeVoBuildUtils) : base(assigneeVoBuildUtils)
+    public LevelPersonnelProvider(UserService userService, AssigneeVoBuildUtils assigneeVoBuildUtils) : base(assigneeVoBuildUtils)
     {
         _userService = userService;
     }

@@ -1,6 +1,6 @@
 ﻿using antflowcore.exception;
-using AntFlowCore.Util;
 using antflowcore.vo;
+using AntFlowCore.Util;
 
 namespace antflowcore.util
 {
@@ -26,7 +26,6 @@ namespace antflowcore.util
         // 获取当前登录用户的 ID (可以返回 null 或 "-999")
         public static string GetLogInEmpIdStr()
         {
-           
             var currentuser = (BaseIdTranStruVo)ThreadLocalContainer.Get("currentuser");
             if (currentuser == null)
             {
@@ -38,7 +37,6 @@ namespace antflowcore.util
         // 获取当前登录用户的姓名
         public static string GetLogInEmpName()
         {
-           
             var currentuser = (BaseIdTranStruVo)ThreadLocalContainer.Get("currentuser");
             if (currentuser == null)
             {
@@ -50,7 +48,6 @@ namespace antflowcore.util
         // 安全地获取当前登录用户的姓名，如果未登录则返回空字符串
         public static string GetLogInEmpNameSafe()
         {
-           
             var currentuser = (BaseIdTranStruVo)ThreadLocalContainer.Get("currentuser");
             if (currentuser == null)
             {
@@ -62,7 +59,6 @@ namespace antflowcore.util
         // 安全地获取当前登录用户的 ID，如果未登录则返回 "-999"
         public static string GetLogInEmpIdSafe()
         {
-          
             var currentuser = (BaseIdTranStruVo)ThreadLocalContainer.Get("currentuser");
             if (currentuser == null)
             {
@@ -71,5 +67,4 @@ namespace antflowcore.util
             return currentuser.Id;
         }
     }
-    
 }

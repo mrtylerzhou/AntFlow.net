@@ -1,14 +1,15 @@
 ﻿using antflowcore.adaptor.nodetypecondition;
 using antflowcore.adaptor.nodetypecondition.judge;
-using AntFlowCore.Constants;
-using antflowcore.service.processor.filter;
+using antflowcore.util;
 using AntFlowCore.Vo;
 
-namespace antflowcore.constant.enus;
+namespace antflowcore.constant.enums;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using static StringConstants;
+
 public enum ConditionTypeEnum
 {
     CONDITION_THIRD_ACCOUNT_TYPE = 1,         // 三方账户
@@ -20,8 +21,7 @@ public enum ConditionTypeEnum
     CONDITION_TYPE_NUMBER_OPERATOR = 7,           // 数字运算符
     CONDITION_THIRD_PARK_AREA = 37,           // 园区面积
     CONDITION_TYPE_TOTAL_MONEY = 38,              // 总金额
-    
-    
+
     CONDITION_TEMPLATEMARK = 9999,          // 条件模板标识
     CONDITION_TYPE_LF_STR_CONDITION = 10000,       // 无代码字符串流程条件
     CONDITION_TYPE_LF_NUM_CONDITION = 10001,       // 无代码数字流程条件
@@ -30,8 +30,8 @@ public enum ConditionTypeEnum
     CONDITION_TYPE_LF_COLLECTION_CONDITION = 10004 // 无代码集合流程条件
 }
 
-public class ConditionTypeAttributes 
-   
+public class ConditionTypeAttributes
+
 {
     public string Description { get; set; }       // 条件描述
     public string FieldName { get; set; }         // 条件字段名称
@@ -45,7 +45,7 @@ public class ConditionTypeAttributes
 
 public static class ConditionTypeEnumExtensions
 {
-    private static readonly Dictionary<ConditionTypeEnum, ConditionTypeAttributes> _attributes = 
+    private static readonly Dictionary<ConditionTypeEnum, ConditionTypeAttributes> _attributes =
         new Dictionary<ConditionTypeEnum, ConditionTypeAttributes>()
     {
         {

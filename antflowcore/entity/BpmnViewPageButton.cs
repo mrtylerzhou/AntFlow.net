@@ -1,7 +1,5 @@
-﻿using System;
-using antflowcore.constant.enus;
+﻿using antflowcore.constant.enums;
 using antflowcore.util;
-using FreeSql;
 using FreeSql.DataAnnotations;
 
 namespace AntFlowCore.Entity
@@ -31,8 +29,8 @@ namespace AntFlowCore.Entity
         public int ViewType { get; set; }
 
         /// <summary>
-        /// Gets or sets the button type: 
-        /// 1-submit, 2-reSubmit, 3-agree, 4-disagree, 5-back, 
+        /// Gets or sets the button type:
+        /// 1-submit, 2-reSubmit, 3-agree, 4-disagree, 5-back,
         /// 6-backToPrevNode, 7-cancel, 8-print, 9-forward.
         /// </summary>
         [Column(Name = "button_type")]
@@ -64,7 +62,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// Gets or sets the time the button was created.
         /// </summary>
-        [Column(Name = "create_time",IsIgnore = true)]
+        [Column(Name = "create_time", IsIgnore = true)]
         public DateTime? CreateTime { get; set; }
 
         /// <summary>
@@ -76,7 +74,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// Gets or sets the time the button was last updated.
         /// </summary>
-        [Column(Name = "update_time",IsIgnore = true)]
+        [Column(Name = "update_time", IsIgnore = true)]
         public DateTime? UpdateTime { get; set; }
 
         /// <summary>

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace antflowcore.vo
 {
@@ -76,6 +74,7 @@ namespace antflowcore.vo
         public string UpdateUser { get; set; }
 
         // 默认构造函数
-        public BpmnTemplateVo() { }
+        public BpmnTemplateVo()
+        { }
     }
 }

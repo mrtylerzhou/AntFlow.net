@@ -1,11 +1,11 @@
-﻿using antflowcore.constant.enus;
+﻿using antflowcore.constant.enums;
 using antflowcore.dto;
-using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.service.biz;
 using antflowcore.service.repository;
 using antflowcore.util;
 using antflowcore.vo;
+using AntFlowCore.Entity;
 using AntFlowCore.Vo;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +18,7 @@ public class BpmBusinessController
     private readonly UserEntrustService _userEntrustService;
     private readonly BpmnNodeService _bpmnNodeService;
 
-    BpmBusinessController(TaskMgmtService taskMgmtService,
+    private BpmBusinessController(TaskMgmtService taskMgmtService,
         UserEntrustService userEntrustService,
         BpmnNodeService bpmnNodeService)
     {
@@ -26,60 +26,63 @@ public class BpmBusinessController
         _userEntrustService = userEntrustService;
         _bpmnNodeService = bpmnNodeService;
     }
-    
+
     /// <summary>
     /// 获取自定义表单DIY FormCode List
     /// </summary>
     /// <param name="desc"></param>
     /// <returns></returns>
     [HttpGet("GetDIYFormCodeList")]
-    public Result<List<DIYProcessInfoDTO>> GetDIYFormCodeList(String desc) {
+    public Result<List<DIYProcessInfoDTO>> GetDIYFormCodeList(String desc)
+    {
         List<DIYProcessInfoDTO> diyProcessInfoDTOS = _taskMgmtService.ViewProcessInfo(desc);
         return ResultHelper.Success(diyProcessInfoDTOS);
     }
-   /// <summary>
-   /// 获取委托列表
-   /// </summary>
-   /// <param name="requestDto"></param>
-   /// <param name="type"></param>
-   /// <returns></returns>
-    [HttpPost("entrustlist/{type}")]
-    public ResultAndPage<Entrust> EntrustList([FromBody] DetailRequestDto requestDto, [FromRoute] int type) {
 
+    /// <summary>
+    /// 获取委托列表
+    /// </summary>
+    /// <param name="requestDto"></param>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    [HttpPost("entrustlist/{type}")]
+    public ResultAndPage<Entrust> EntrustList([FromBody] DetailRequestDto requestDto, [FromRoute] int type)
+    {
         PageDto pageDto = requestDto.PageDto;
         Entrust vo = new Entrust();
         return _userEntrustService.GetEntrustPageList(pageDto, vo, type);
     }
-   
-   /// <summary>
-   /// 获取委托详情
-   /// </summary>
-   /// <param name="id"></param>
-   /// <returns></returns>
+
+    /// <summary>
+    /// 获取委托详情
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet("entrustDetail/{id}")]
-    public Result<UserEntrust> EntrustDetail([FromRoute] int id) {
+    public Result<UserEntrust> EntrustDetail([FromRoute] int id)
+    {
         UserEntrust detail = _userEntrustService.GetEntrustDetail(id);
         return ResultHelper.Success(detail);
     }
-   
-   /// <summary>
-   /// 编辑委托
-   /// </summary>
-   /// <param name="dataVo"></param>
-   /// <returns></returns>
+
+    /// <summary>
+    /// 编辑委托
+    /// </summary>
+    /// <param name="dataVo"></param>
+    /// <returns></returns>
     [HttpPost("editEntrust")]
     public Result<string> EditEntrust([FromBody] DataVo dataVo)
     {
         _userEntrustService.UpdateEntrustList(dataVo);
         return ResultHelper.Success("ok");
     }
-   
-   /// <summary>
-   /// 获取流程自选审批人节点
-   /// </summary>
-   /// <param name="formCode"></param>
-   /// <returns></returns>
-   /// <exception cref="AFBizException"></exception>
+
+    /// <summary>
+    /// 获取流程自选审批人节点
+    /// </summary>
+    /// <param name="formCode"></param>
+    /// <returns></returns>
+    /// <exception cref="AFBizException"></exception>
     [HttpGet("getStartUserChooseModules")]
     public Result<List<BpmnNodeVo>> GetStartUserChooseModules([FromQuery] string formCode)
     {

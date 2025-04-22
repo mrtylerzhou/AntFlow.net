@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using antflowcore.vo;
 using System.Text.Json.Serialization;
-using antflowcore.vo;
 
 namespace AntFlowCore.Vo
 {

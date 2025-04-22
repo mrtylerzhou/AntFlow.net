@@ -1,10 +1,10 @@
-﻿using AntFlowCore.Entities;
+﻿using antflowcore.entity;
 using antflowcore.service.repository;
 using AntFlowCore.Vo;
 
 namespace antflowcore.adaptor.variable;
 
-public class BpmnInsertVariableSubsSingleAdaptor: IBpmnInsertVariableSubs
+public class BpmnInsertVariableSubsSingleAdaptor : IBpmnInsertVariableSubs
 {
     private readonly BpmVariableSingleService _bpmVariableSingleService;
 
@@ -12,6 +12,7 @@ public class BpmnInsertVariableSubsSingleAdaptor: IBpmnInsertVariableSubs
     {
         _bpmVariableSingleService = bpmVariableSingleService;
     }
+
     public void InsertVariableSubs(BpmnConfCommonElementVo elementVo, long variableId)
     {
         var assigneeMap = elementVo.AssigneeMap;
@@ -25,11 +26,10 @@ public class BpmnInsertVariableSubsSingleAdaptor: IBpmnInsertVariableSubs
             AssigneeParamName = elementVo.AssigneeParamName,
             Assignee = elementVo.AssigneeParamValue,
             AssigneeName = assigneeMap != null && assigneeMap.ContainsKey(elementVo.AssigneeParamValue)
-                ? assigneeMap[elementVo.AssigneeParamValue]??""
+                ? assigneeMap[elementVo.AssigneeParamValue] ?? ""
                 : ""
         };
 
         _bpmVariableSingleService.baseRepo.Insert(variableSingle);
     }
-
 }

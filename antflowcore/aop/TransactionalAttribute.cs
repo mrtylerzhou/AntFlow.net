@@ -1,7 +1,6 @@
-﻿
-using System.Data;
-using FreeSql;
+﻿using FreeSql;
 using Rougamo.Context;
+using System.Data;
 
 namespace antflowcore.aop;
 
@@ -10,18 +9,20 @@ public class TransactionalAttribute : Rougamo.MoAttribute
 {
     public Propagation Propagation { get; set; } = Propagation.Required;
     public IsolationLevel IsolationLevel { get => m_IsolationLevel.Value; set => m_IsolationLevel = value; }
-    IsolationLevel? m_IsolationLevel;
+    private IsolationLevel? m_IsolationLevel;
 
-    static AsyncLocal<IServiceProvider> m_ServiceProvider = new AsyncLocal<IServiceProvider>();
+    private static AsyncLocal<IServiceProvider> m_ServiceProvider = new AsyncLocal<IServiceProvider>();
+
     public static void SetServiceProvider(IServiceProvider serviceProvider) => m_ServiceProvider.Value = serviceProvider;
 
-    IUnitOfWork _uow;
+    private IUnitOfWork _uow;
+
     public override void OnEntry(MethodContext context)
     {
-       
         UnitOfWorkManager uowManager = (UnitOfWorkManager)m_ServiceProvider.Value.GetService(typeof(UnitOfWorkManager));
         _uow = uowManager.Begin(this.Propagation, this.m_IsolationLevel);
     }
+
     public override void OnExit(MethodContext context)
     {
         if (typeof(Task).IsAssignableFrom(context.ReturnType))

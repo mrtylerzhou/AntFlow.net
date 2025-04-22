@@ -1,19 +1,23 @@
-﻿namespace antflowcore.bpmn;
+﻿namespace antflowcore.bpmn.model;
 
-public class AFSequenceFlow: AbstractFlowElement
+public class AFSequenceFlow : AbstractFlowElement
 {
-    public AFSequenceFlow(){}
-    public AFSequenceFlow(String sourceRef, String targetRef) {
-        this.SourceRef = sourceRef;
-        this.TargetRef = targetRef;
+    public AFSequenceFlow()
+    { }
+
+    public AFSequenceFlow(string sourceRef, string targetRef)
+    {
+        SourceRef = sourceRef;
+        TargetRef = targetRef;
     }
-    public String SourceRef { get; set; }
-    public String TargetRef{ get; set; }
+
+    public string SourceRef { get; set; }
+    public string TargetRef { get; set; }
     public string ConditionExpression { get; set; }
 
     public AFSequenceFlow Clone()
     {
-        AFSequenceFlow self = (AFSequenceFlow)this.MemberwiseClone();
+        AFSequenceFlow self = (AFSequenceFlow)MemberwiseClone();
         return self;
     }
 }
