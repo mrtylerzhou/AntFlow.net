@@ -1,6 +1,8 @@
-﻿using AntFlowCore.Enums;
+﻿using antflowcore.entity;
+using AntFlowCore.Enums;
 using antflowcore.service.biz;
 using antflowcore.service.repository;
+using antflowcore.vo;
 using AntFlowCore.Vo;
 
 namespace antflowcore.adaptor.processoperation;
@@ -26,21 +28,21 @@ public class ChangeAssigneeProcessService: IProcessOperationAdaptor
     }
     public void DoProcessButton(BusinessDataVo vo)
     {
-        var bpmBusinessProcess =_bpmBusinessProcessService.GetBpmBusinessProcess(vo.ProcessNumber);
-        var taskList = _taskService.baseRepo
+        BpmBusinessProcess bpmBusinessProcess =_bpmBusinessProcessService.GetBpmBusinessProcess(vo.ProcessNumber);
+        List<BpmAfTask> taskList = _taskService.baseRepo
             .Where(t => t.ProcInstId == bpmBusinessProcess.ProcInstId)
             .ToList();
 
-        var userInfos = vo.UserInfos;
-        var userIds = userInfos.Select(ui => ui.Id).ToList();
+        List<BaseIdTranStruVo> userInfos = vo.UserInfos;
+        List<string> userIds = userInfos.Select(ui => ui.Id).ToList();
 
         for (int i = 0; i < taskList.Count; i++)
         {
-            var task = taskList[i];
-            var user = userInfos[i].Id;
-            var userName = userInfos[i].Name;
-            var assignee = task.Assignee;
-            var assigneeName = task.Description;
+            BpmAfTask task = taskList[i];
+            string user = userInfos[i].Id;
+            string userName = userInfos[i].Name;
+            string assignee = task.Assignee;
+            string assigneeName = task.Description;
 
             if (!userIds.Contains(assignee))
             {
@@ -48,7 +50,7 @@ public class ChangeAssigneeProcessService: IProcessOperationAdaptor
                     bpmBusinessProcess.ProcInstId, vo.ProcessKey);
             }
 
-            var taskMgmtVo = new TaskMgmtVO
+            TaskMgmtVO taskMgmtVo = new TaskMgmtVO
             {
                 ApplyUser = user,
                 ApplyUserName = userName,
