@@ -13,9 +13,9 @@ public class StringOrArrayConverter : JsonConverter<string[]>
             string stringValue = reader.GetString();
             if (stringValue == "")
             {
-                return Array.Empty<string>(); 
+                return Array.Empty<string>();
             }
-           
+
             throw new JsonException("Expected an array or an empty string.");
         }
         else if (reader.TokenType == JsonTokenType.StartArray)
@@ -28,7 +28,6 @@ public class StringOrArrayConverter : JsonConverter<string[]>
 
     public override void Write(Utf8JsonWriter writer, string[] value, JsonSerializerOptions options)
     {
-        
         JsonSerializer.Serialize(writer, value);
     }
 }

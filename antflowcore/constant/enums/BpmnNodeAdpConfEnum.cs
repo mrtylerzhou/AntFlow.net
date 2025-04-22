@@ -1,4 +1,4 @@
-﻿namespace antflowcore.constant.enus;
+﻿namespace antflowcore.constant.enums;
 
 public enum BpmnNodeAdpConfEnum
 {
@@ -35,8 +35,6 @@ public static class BpmnNodeAdpConfEnumExtensions
         { BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_DIRECT_LEADER, NodePropertyEnum.NODE_PROPERTY_DIRECT_LEADER },
     };
 
-    
-
     // 根据 Enum 获取对应的 BpmnNodeAdpConfEnum
     public static BpmnNodeAdpConfEnum? GetBpmnNodeAdpConfEnumByEnum(Enum? enumValue)
     {
@@ -51,7 +49,7 @@ public static class BpmnNodeAdpConfEnumExtensions
     public static List<BpmnNodeAdpConfEnum> GetBpmnNodeAdpConfWithPersonnels()
     {
         List<BpmnNodeAdpConfEnum> bpmnNodeAdpConfEnums = MappingsDictionary
-            .Where(x => x.Value is NodePropertyEnum prop && prop.GetHasPropertyTable()==1)
+            .Where(x => x.Value is NodePropertyEnum prop && prop.GetHasPropertyTable() == 1)
             .Select(x => x.Key)
             .ToList();
         return bpmnNodeAdpConfEnums;

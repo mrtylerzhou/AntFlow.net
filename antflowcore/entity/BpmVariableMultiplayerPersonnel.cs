@@ -1,8 +1,6 @@
-﻿using System;
-using FreeSql;
-using FreeSql.DataAnnotations;
+﻿using FreeSql.DataAnnotations;
 
-namespace AntFlowCore.Entities
+namespace antflowcore.entity
 {
     [Table(Name = "t_bpm_variable_multiplayer_personnel")]
     public class BpmVariableMultiplayerPersonnel
@@ -56,7 +54,7 @@ namespace AntFlowCore.Entities
         /// <summary>
         /// 创建时间
         /// </summary>
-        [Column(Name = "create_time",IsIgnore = true)]
+        [Column(Name = "create_time", IsIgnore = true)]
         public DateTime? CreateTime { get; set; }
 
         /// <summary>
@@ -68,8 +66,7 @@ namespace AntFlowCore.Entities
         /// <summary>
         /// 更新时间
         /// </summary>
-        [Column(Name = "update_time",IsIgnore = true)]
+        [Column(Name = "update_time", IsIgnore = true)]
         public DateTime? UpdateTime { get; set; }
-        
     }
 }

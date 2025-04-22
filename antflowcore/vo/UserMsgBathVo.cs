@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace AntFlowCore.Vo
 {
@@ -78,6 +77,7 @@ namespace AntFlowCore.Vo
         public int Source { get; set; }
 
         // Constructor
-        public UserMsgVo() { }
+        public UserMsgVo()
+        { }
     }
 }

@@ -1,6 +1,5 @@
-﻿namespace antflowcore.bpmn;
+﻿namespace antflowcore.bpmn.model;
 
-public class EndEvent: AbstractEvent
+public class EndEvent : AbstractEvent
 {
-    
 }

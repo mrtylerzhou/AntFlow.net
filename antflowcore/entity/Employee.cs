@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace AntFlowCore.Entity
+﻿namespace AntFlowCore.Entity
 {
     public class Employee
     {

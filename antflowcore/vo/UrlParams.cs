@@ -1,9 +1,8 @@
-﻿using System;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace AntFlowCore.Vo
 {
-    public class UrlParams 
+    public class UrlParams
     {
         [JsonPropertyName("businessId")]
         public string BusinessId { get; set; }

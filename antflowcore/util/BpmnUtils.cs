@@ -1,14 +1,17 @@
-﻿using System.Collections.ObjectModel;
-using antflowcore.vo;
+﻿using antflowcore.vo;
 
 namespace antflowcore.util;
 
-public class BpmnUtils {
-    public static BpmnNodeVo GetAggregationNode(BpmnNodeVo parallelNode, IEnumerable<BpmnNodeVo> bpmnNodeVos){
+public class BpmnUtils
+{
+    public static BpmnNodeVo GetAggregationNode(BpmnNodeVo parallelNode, IEnumerable<BpmnNodeVo> bpmnNodeVos)
+    {
         String parallelNodeNodeId = parallelNode.NodeId;
         List<String> parallelNodeNodeTo = parallelNode.NodeTo;
-        foreach (BpmnNodeVo bpmnNodeVo in bpmnNodeVos) {
-            if(bpmnNodeVo.NodeFrom.Equals(parallelNodeNodeId)&& !parallelNodeNodeTo.Contains(bpmnNodeVo.NodeId)){
+        foreach (BpmnNodeVo bpmnNodeVo in bpmnNodeVos)
+        {
+            if (bpmnNodeVo.NodeFrom.Equals(parallelNodeNodeId) && !parallelNodeNodeTo.Contains(bpmnNodeVo.NodeId))
+            {
                 return bpmnNodeVo;
             }
         }

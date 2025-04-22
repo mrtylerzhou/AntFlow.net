@@ -1,6 +1,4 @@
-﻿using System;
-using FreeSql;
-using FreeSql.DataAnnotations;
+﻿using FreeSql.DataAnnotations;
 
 namespace AntFlowCore.Entity
 {

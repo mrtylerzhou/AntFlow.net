@@ -1,5 +1,4 @@
-﻿using antflowcore.constant.enus;
-using AntFlowCore.Constants;
+﻿using antflowcore.constant.enums;
 using antflowcore.exception;
 using AntFlowCore.Vo;
 
@@ -21,7 +20,7 @@ public static class BpmnFlowUtil
         }
         //skip the first element
         int prevIndex = 0;
-        string startUserElementId=string.Empty;
+        string startUserElementId = string.Empty;
         for (var i = 1; i < commonElements.Count; i++)
         {
             prevIndex = i - 1;
@@ -38,29 +37,18 @@ public static class BpmnFlowUtil
                 if (currentNode.FlowFrom == startUserElementId)
                 {
                     BpmnConfCommonElementVo prevNode = commonElements[prevIndex];
-                    if (prevNode.ElementId != currentNode.FlowTo||prevNode.ElementType!=ElementTypeEnum.ELEMENT_TYPE_USER_TASK.Code)
+                    if (prevNode.ElementId != currentNode.FlowTo || prevNode.ElementType != ElementTypeEnum.ELEMENT_TYPE_USER_TASK.Code)
                     {
                         throw new AFBizException("logic error,please contact the administrator");
                     }
                     return prevNode;
                 }
             }
-        } 
+        }
         throw new AFBizException("can not find  first assignee node,logic error,please contact the administrator");
     }
 
-    public static BpmnConfCommonElementVo GetCurrentTaskElement(List<BpmnConfCommonElementVo> commonElements,string taskDefKey )
-    {
-        foreach (BpmnConfCommonElementVo bpmnConfCommonElementVo in commonElements)
-        {
-            if (taskDefKey == bpmnConfCommonElementVo.ElementId)
-            {
-                return bpmnConfCommonElementVo;
-            }
-        }
-        return null;
-    }
-    public static (BpmnConfCommonElementVo assigneeNode,BpmnConfCommonElementVo flowNode) GetNextAssigneeAndFlowNode(List<BpmnConfCommonElementVo> commonElements,string currentTaskDefKey)
+    public static (BpmnConfCommonElementVo assigneeNode, BpmnConfCommonElementVo flowNode) GetNextAssigneeAndFlowNode(List<BpmnConfCommonElementVo> commonElements, string currentTaskDefKey)
     {
         for (var i = 0; i < commonElements.Count; i++)
         {
@@ -68,7 +56,7 @@ public static class BpmnFlowUtil
             if (elementVo.ElementType.Equals(ElementTypeEnum.ELEMENT_TYPE_SEQUENCE_FLOW.Code) &&
                 elementVo.FlowFrom == currentTaskDefKey)
             {
-                return ( commonElements[i-1],elementVo);
+                return (commonElements[i - 1], elementVo);
             }
         }
 
@@ -77,7 +65,7 @@ public static class BpmnFlowUtil
 
     public static BpmnConfCommonElementVo GetLastSequenceFlow(List<BpmnConfCommonElementVo> commonElements)
     {
-        List<BpmnConfCommonElementVo> lastElementVos = commonElements.Where(a=>a.ElementType==ElementTypeEnum.ELEMENT_TYPE_SEQUENCE_FLOW.Code&&a.IsLastSequenceFlow==1).ToList();
+        List<BpmnConfCommonElementVo> lastElementVos = commonElements.Where(a => a.ElementType == ElementTypeEnum.ELEMENT_TYPE_SEQUENCE_FLOW.Code && a.IsLastSequenceFlow == 1).ToList();
         if (lastElementVos.Count > 1)
         {
             throw new AFBizException("process flow can not have more than 1 end flow!");

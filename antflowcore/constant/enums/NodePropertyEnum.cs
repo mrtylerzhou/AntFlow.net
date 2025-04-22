@@ -1,6 +1,4 @@
-﻿using antflowcore.exception;
-
-namespace antflowcore.constant.enus;
+﻿namespace antflowcore.constant.enums;
 
 public enum NodePropertyEnum
 {
@@ -15,6 +13,7 @@ public enum NodePropertyEnum
     NODE_PROPERTY_START_USER = 12,
     NODE_PROPERTY_DIRECT_LEADER = 13
 }
+
 public static class NodePropertyEnumExtensions
 {
     // 存储每个枚举的附加信息
@@ -37,6 +36,7 @@ public static class NodePropertyEnumExtensions
     {
         return Metadata[property].ParamType;
     }
+
     // 获取描述
     public static string GetDesc(this NodePropertyEnum nodePropertyEnum)
     {
@@ -71,6 +71,7 @@ public static class NodePropertyEnumExtensions
 
         return Metadata[nodePropertyEnum.Value].Desc;
     }
+
     // 根据 Code 获取枚举
     public static NodePropertyEnum? GetByCode(int? code)
     {
@@ -78,8 +79,8 @@ public static class NodePropertyEnumExtensions
         {
             return null;
         }
-        return Enum.IsDefined(typeof(NodePropertyEnum), code) 
-            ? (NodePropertyEnum?)code 
+        return Enum.IsDefined(typeof(NodePropertyEnum), code)
+            ? (NodePropertyEnum?)code
             : null;
     }
 }

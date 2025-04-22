@@ -1,8 +1,9 @@
-﻿namespace antflowcore.bpmn;
+﻿namespace antflowcore.bpmn.model;
 
 public class TaskDefinition
 {
-    public String key { get; set; }
+    public string key { get; set; }
+
     // task listeners
-    public Dictionary<String, List<TaskListener>> taskListeners = new Dictionary<string, List<TaskListener>>();
+    public Dictionary<string, List<TaskListener>> taskListeners = new Dictionary<string, List<TaskListener>>();
 }

@@ -1,8 +1,7 @@
 ﻿using antflowcore.adaptor.processoperation;
-using antflowcore.aop;
 using antflowcore.bpmn.listener;
+using antflowcore.constant.enums;
 using antflowcore.entity;
-using AntFlowCore.Enums;
 using antflowcore.factory;
 using AntFlowCore.Vo;
 
@@ -26,16 +25,14 @@ public class ButtonOperationService
 
     public BusinessDataVo ButtonsOperationTransactional(BusinessDataVo vo)
     {
-        
         //Do button operations
         IProcessOperationAdaptor processOperation = _adaptorFactory.GetProcessOperation(vo);
         try
         {
             processOperation.DoProcessButton(vo);
-           
+
             if (vo.IsOutSideAccessProc == true)
             {//todo outside call back
-                
             }
             else
             {
@@ -50,25 +47,25 @@ public class ButtonOperationService
                 {
                     foreach (BpmAfTask bpmAfTask in bpmAfTasks)
                     {
-                        _taskListener.Notify(bpmAfTask,ITaskListener.EVENTNAME_COMPLETE);
+                        _taskListener.Notify(bpmAfTask, ITaskListener.EVENTNAME_COMPLETE);
                     }
-                }else if (vo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_SUBMIT)
+                }
+                else if (vo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_SUBMIT)
                 {
-                    _taskListener.Notify(new BpmAfTask{ProcessNumber = vo.ProcessNumber},ITaskListener.EVENTNAME_CREATE);
-                }else if (vo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_RESUBMIT)
+                    _taskListener.Notify(new BpmAfTask { ProcessNumber = vo.ProcessNumber }, ITaskListener.EVENTNAME_CREATE);
+                }
+                else if (vo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_RESUBMIT)
                 {
-                    _taskListener.Notify(new BpmAfTask{ProcessNumber = vo.ProcessNumber},ITaskListener.EVENTNAME_RE_SUBMIT);
-                }else if (vo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_DIS_AGREE)
+                    _taskListener.Notify(new BpmAfTask { ProcessNumber = vo.ProcessNumber }, ITaskListener.EVENTNAME_RE_SUBMIT);
+                }
+                else if (vo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_DIS_AGREE)
                 {
-                    _taskListener.Notify(new BpmAfTask{ProcessNumber = vo.ProcessNumber},ITaskListener.EVENTNAME_COMPLETE);
+                    _taskListener.Notify(new BpmAfTask { ProcessNumber = vo.ProcessNumber }, ITaskListener.EVENTNAME_COMPLETE);
                 }
             }
-           
-           
         }
         catch (Exception e)
         {
-            
             throw;
         }
 

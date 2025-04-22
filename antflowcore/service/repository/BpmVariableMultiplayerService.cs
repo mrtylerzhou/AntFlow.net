@@ -1,9 +1,8 @@
-﻿using AntFlowCore.Entities;
-using AntFlowCore.Entity;
+﻿using antflowcore.entity;
 
 namespace antflowcore.service.repository;
 
-public class BpmVariableMultiplayerService: AFBaseCurdRepositoryService<BpmVariableMultiplayer>
+public class BpmVariableMultiplayerService : AFBaseCurdRepositoryService<BpmVariableMultiplayer>
 {
     public BpmVariableMultiplayerService(IFreeSql freeSql) : base(freeSql)
     {

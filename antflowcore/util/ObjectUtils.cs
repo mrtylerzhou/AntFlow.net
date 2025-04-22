@@ -31,7 +31,7 @@ public static class ObjectUtils
         {
             return dictionary.Count == 0;
         }
-       
+
         return false;
     }
 }

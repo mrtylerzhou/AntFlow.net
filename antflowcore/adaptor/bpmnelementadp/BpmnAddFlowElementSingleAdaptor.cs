@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using antflowcore.entity;
+﻿using antflowcore.entity;
 using antflowcore.util;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
@@ -15,7 +14,7 @@ public class BpmnAddFlowElementSingleAdaptor : IBpmnAddFlowElementAdaptor
         _logger = logger;
     }
 
-    public  void AddFlowElement(
+    public void AddFlowElement(
         BpmnConfCommonElementVo elementVo,
         AFProcess process,
         Dictionary<string, object> startParamMap,
@@ -37,5 +36,4 @@ public class BpmnAddFlowElementSingleAdaptor : IBpmnAddFlowElementAdaptor
 
         _logger.LogInformation($"Added user task: {elementVo.ElementId}, Assignee: {elementVo.AssigneeParamName}");
     }
-    
 }

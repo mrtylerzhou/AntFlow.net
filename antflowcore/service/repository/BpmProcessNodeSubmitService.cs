@@ -1,21 +1,18 @@
-﻿using antflowcore.bpmn;
-using antflowcore.bpmn.service;
+﻿using antflowcore.bpmn.service;
 using antflowcore.entity;
-using AntFlowCore.Entity;
 using antflowcore.util;
+using AntFlowCore.Entity;
 
 namespace antflowcore.service.repository;
 
-public class BpmProcessNodeSubmitService: AFBaseCurdRepositoryService<BpmProcessNodeSubmit>
+public class BpmProcessNodeSubmitService : AFBaseCurdRepositoryService<BpmProcessNodeSubmit>
 {
-   
     private readonly TaskService _taskService;
 
     public BpmProcessNodeSubmitService(
         TaskService taskService,
         IFreeSql freeSql) : base(freeSql)
     {
-       
         _taskService = taskService;
     }
 
@@ -32,8 +29,9 @@ public class BpmProcessNodeSubmitService: AFBaseCurdRepositoryService<BpmProcess
                 BackType = 0,
                 CreateUser = SecurityUtils.GetLogInEmpName()
             });
-            if (processNodeSubmit.State==0) {
-               //todo complete task
+            if (processNodeSubmit.State == 0)
+            {
+                //todo complete task
             }
             else
             {
@@ -44,11 +42,13 @@ public class BpmProcessNodeSubmitService: AFBaseCurdRepositoryService<BpmProcess
                     case 3:
                         //todo
                         break;
+
                     case 5:
                         //todo
                         break;
+
                     default:
-                       //todo
+                        //todo
                         break;
                 }
             }
@@ -63,11 +63,13 @@ public class BpmProcessNodeSubmitService: AFBaseCurdRepositoryService<BpmProcess
     {
         BpmProcessNodeSubmit bpmProcessNodeSubmit = this
             .baseRepo
-            .Where(a=>a.ProcessInstanceId.Equals(processInstanceId)).OrderByDescending(a=>a.CreateTime)
+            .Where(a => a.ProcessInstanceId.Equals(processInstanceId)).OrderByDescending(a => a.CreateTime)
             .First();
         return bpmProcessNodeSubmit;
     }
-    public bool AddProcessNode(BpmProcessNodeSubmit processNodeSubmit) {
+
+    public bool AddProcessNode(BpmProcessNodeSubmit processNodeSubmit)
+    {
         this.baseRepo.Delete(a => a.ProcessInstanceId == processNodeSubmit.ProcessInstanceId);
         this.baseRepo.Insert(processNodeSubmit);
         return true;

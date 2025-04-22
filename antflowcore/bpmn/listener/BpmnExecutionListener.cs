@@ -1,6 +1,5 @@
-﻿using antflowcore.adaptor;
-using antflowcore.constant;
-using antflowcore.constant.enus;
+﻿using antflowcore.adaptor.formoperation;
+using antflowcore.constant.enums;
 using antflowcore.entity;
 using antflowcore.exception;
 using antflowcore.factory;
@@ -12,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace antflowcore.bpmn.listener;
 
-public class BpmnExecutionListener: IExecutionListener
+public class BpmnExecutionListener : IExecutionListener
 {
     private readonly BpmBusinessProcessService _bpmBusinessProcessService;
     private readonly BpmnConfService _bpmnConfService;
@@ -23,7 +22,7 @@ public class BpmnExecutionListener: IExecutionListener
         BpmBusinessProcessService bpmBusinessProcessService,
         BpmnConfService bpmnConfService,
         FormFactory formFactory,
-        
+
         ILogger<BpmnExecutionListener> logger)
     {
         _bpmBusinessProcessService = bpmBusinessProcessService;
@@ -31,14 +30,15 @@ public class BpmnExecutionListener: IExecutionListener
         _formFactory = formFactory;
         _logger = logger;
     }
-    public void Notify(BpmAfExecution execution,string eventName)
+
+    public void Notify(BpmAfExecution execution, string eventName)
     {
         string procInstId = execution.ProcInstId;
         List<BpmBusinessProcess> bpmBusinessProcesses = _bpmBusinessProcessService
             .baseRepo
             .Where(a => a.ProcInstId == procInstId)
             .ToList();
-        if (bpmBusinessProcesses==null||bpmBusinessProcesses.Count == 0)
+        if (bpmBusinessProcesses == null || bpmBusinessProcesses.Count == 0)
         {
             throw new AFBizException($"Can not get bpm business process by procInstId:{procInstId}");
         }
@@ -73,13 +73,14 @@ public class BpmnExecutionListener: IExecutionListener
         }
         else
         {
-            BusinessDataVo businessDataVo=new BusinessDataVo();
-            businessDataVo.BusinessId=businessId;
-            businessDataVo.FormCode=formCode;
-            if(bpmnConf.IsLowCodeFlow==1){
-                businessDataVo.IsLowCodeFlow=1;
+            BusinessDataVo businessDataVo = new BusinessDataVo();
+            businessDataVo.BusinessId = businessId;
+            businessDataVo.FormCode = formCode;
+            if (bpmnConf.IsLowCodeFlow == 1)
+            {
+                businessDataVo.IsLowCodeFlow = 1;
                 BpmnConfVo confVo = bpmnConf.MapToVo();
-                businessDataVo.BpmnConfVo=confVo;
+                businessDataVo.BpmnConfVo = confVo;
             }
 
             IFormOperationAdaptor<BusinessDataVo> formOperationAdaptor = _formFactory.GetFormAdaptor(businessDataVo);

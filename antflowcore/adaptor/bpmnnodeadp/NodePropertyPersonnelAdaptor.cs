@@ -1,12 +1,12 @@
-﻿using antflowcore.constant.enus;
-using AntFlowCore.Entity;
+﻿using antflowcore.constant.enums;
 using antflowcore.exception;
 using antflowcore.service;
 using antflowcore.service.repository;
 using antflowcore.util;
 using antflowcore.vo;
+using AntFlowCore.Entity;
 
-namespace antflowcore.adaptor;
+namespace antflowcore.adaptor.bpmnnodeadp;
 
 public class NodePropertyPersonnelAdaptor : BpmnNodeAdaptor
 {
@@ -24,6 +24,7 @@ public class NodePropertyPersonnelAdaptor : BpmnNodeAdaptor
         _bpmnNodePersonnelEmplConfService = bpmnNodePersonnelEmplConfService;
         _bpmnEmployeeInfoProviderService = bpmnEmployeeInfoProviderService;
     }
+
     public override BpmnNodeVo FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
     {
         BpmnNodePersonnelConf bpmnNodePersonnelConf = _bpmnNodePersonnelConfService.baseRepo.Where(a => a.BpmnNodeId == bpmnNodeVo.Id).First();
@@ -31,21 +32,23 @@ public class NodePropertyPersonnelAdaptor : BpmnNodeAdaptor
         {
             throw new AFBizException($"未能根据节点id: {bpmnNodeVo.Id}查到指定人员信息!");
         }
-        List<String> emplIds = new List<string>();
-        List<String> emplNames=new List<string>();
+        List<string> emplIds = new List<string>();
+        List<string> emplNames = new List<string>();
         IEnumerable<BpmnNodePersonnelEmplConf> bpmnNodePersons = _bpmnNodePersonnelEmplConfService
             .baseRepo
             .Where(a => a.BpmnNodePersonneId == bpmnNodePersonnelConf.Id)
             .ToList().Distinct();
-        if(ObjectUtils.IsEmpty(bpmnNodePersons)){
-            throw  new AFBizException("配置错误或者数据被删除,指定员人审批未获取到人员");
+        if (ObjectUtils.IsEmpty(bpmnNodePersons))
+        {
+            throw new AFBizException("配置错误或者数据被删除,指定员人审批未获取到人员");
         }
         foreach (var bpmnNodePersonnelEmplConf in bpmnNodePersons)
         {
-            String emplId = bpmnNodePersonnelEmplConf.EmplId;
-            String emplName = bpmnNodePersonnelEmplConf.EmplName;
+            string emplId = bpmnNodePersonnelEmplConf.EmplId;
+            string emplName = bpmnNodePersonnelEmplConf.EmplName;
             emplIds.Add(emplId);
-            if(!String.IsNullOrEmpty(emplName)){
+            if (!string.IsNullOrEmpty(emplName))
+            {
                 emplNames.Add(emplName);
             }
         }
@@ -56,7 +59,7 @@ public class NodePropertyPersonnelAdaptor : BpmnNodeAdaptor
             EmplIds = emplIds,
             EmplList = GetEmplList(emplIds, emplNames)
         };
-     return bpmnNodeVo;
+        return bpmnNodeVo;
     }
 
     public override void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
@@ -66,7 +69,7 @@ public class NodePropertyPersonnelAdaptor : BpmnNodeAdaptor
         var bpmnNodePersonnelConf = new BpmnNodePersonnelConf
         {
             BpmnNodeId = (int)bpmnNodeVo.Id,
-            SignType = bpmnNodePropertysVo.SignType??0,
+            SignType = bpmnNodePropertysVo.SignType ?? 0,
             CreateTime = DateTime.Now,
             CreateUser = SecurityUtils.GetLogInEmpNameSafe(),
             UpdateTime = DateTime.Now,

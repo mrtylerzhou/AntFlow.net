@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace AntFlowCore.Vo
 {
-    public class DataVo{
+    public class DataVo
+    {
         [JsonPropertyName("ids")]
         public List<IdsVo> Ids { get; set; }
 
@@ -23,5 +22,4 @@ namespace AntFlowCore.Vo
         [JsonPropertyName("endTime")]
         public DateTime? EndTime { get; set; }
     }
-    
 }

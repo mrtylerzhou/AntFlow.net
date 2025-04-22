@@ -2,11 +2,10 @@
 
 public class AFProcess
 {
-    
-        private readonly List<object> _flowElements = new List<object>();
+    private readonly List<object> _flowElements = new List<object>();
 
-        public void AddFlowElement(object flowElement)
-        {
-            _flowElements.Add(flowElement);
-        }
+    public void AddFlowElement(object flowElement)
+    {
+        _flowElements.Add(flowElement);
+    }
 }

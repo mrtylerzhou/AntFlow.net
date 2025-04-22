@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using antflowcore.vo;
 using System.Text.Json.Serialization;
-using antflowcore.vo;
 
 namespace AntFlowCore.Vo
 {
@@ -78,6 +76,7 @@ namespace AntFlowCore.Vo
 
         [JsonPropertyName("approveRemindVo")]
         public BpmnApproveRemindVo ApproveRemindVo { get; set; }
+
         [JsonPropertyName("signType")]
         public int SignType { get; set; }
     }

@@ -1,4 +1,4 @@
-﻿namespace antflowcore.constant.enus;
+﻿namespace antflowcore.constant.enums;
 
 public enum ButtonPageTypeEnum
 {
@@ -6,6 +6,7 @@ public enum ButtonPageTypeEnum
     AUDIT = 2,    // 审批页
     TOVIEW = 3    // 查看页
 }
+
 public static class ButtonPageTypeEnumExtensions
 {
     private static readonly Dictionary<ButtonPageTypeEnum, (string Name, string Desc)> EnumMetadata =

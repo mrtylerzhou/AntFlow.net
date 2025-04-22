@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace antflowcore.adaptor.nodetypecondition.judge;
 
-public class LFDateConditionJudgeService: AbstractLFDateTimeConditionJudge
+public class LFDateConditionJudgeService : AbstractLFDateTimeConditionJudge
 {
     public LFDateConditionJudgeService(ILogger<AbstractLFDateTimeConditionJudge> logger) : base(logger)
     {
@@ -11,6 +11,6 @@ public class LFDateConditionJudgeService: AbstractLFDateTimeConditionJudge
 
     protected override string CurrentDateFormatter()
     {
-       return DateUtil.DATE_PATTERN;
+        return DateUtil.DATE_PATTERN;
     }
 }

@@ -1,12 +1,11 @@
-﻿using System.Text.Json;
-using antflowcore.bpmn.service;
-using antflowcore.constant.enus;
-using AntFlowCore.Constants;
+﻿using antflowcore.bpmn.service;
+using antflowcore.constant.enums;
 using antflowcore.entity;
 using antflowcore.exception;
 using antflowcore.service.repository;
 using antflowcore.util;
 using AntFlowCore.Vo;
+using System.Text.Json;
 
 namespace antflowcore.service.biz;
 
@@ -31,10 +30,12 @@ public class ProcessNodeJumpService
         _afDeploymentService = afDeploymentService;
         _taskService = taskService;
     }
+
     public void CommitProcess(String taskId, Dictionary<String, Object> variables,
         String backNodeKey)
     {
-        if (variables == null) {
+        if (variables == null)
+        {
             variables = new Dictionary<string, object>();
         }
 
@@ -44,7 +45,7 @@ public class ProcessNodeJumpService
         }
         else
         {
-            TurnTransition(taskId, backNodeKey,variables);
+            TurnTransition(taskId, backNodeKey, variables);
         }
     }
 
@@ -55,7 +56,7 @@ public class ProcessNodeJumpService
         {
             throw new AFBizException($"can not find task by id: {taskId}");
         }
-        string verifyComment=variables.ContainsKey(StringConstants.VERIFY_COMMENT)?variables[StringConstants.VERIFY_COMMENT].ToString():"";
+        string verifyComment = variables.ContainsKey(StringConstants.VERIFY_COMMENT) ? variables[StringConstants.VERIFY_COMMENT].ToString() : "";
         DateTime nowTime = DateTime.Now;
         _afTaskInstService.Frsql
             .Update<BpmAfTaskInst>()
@@ -70,7 +71,7 @@ public class ProcessNodeJumpService
         string procInstId = bpmAfTask.ProcInstId;
         string procDefId = bpmAfTask.ProcDefId;
 
-        BpmAfDeployment bpmAfDeployment = _afDeploymentService.baseRepo.Where(a=>a.Id == procDefId).First();
+        BpmAfDeployment bpmAfDeployment = _afDeploymentService.baseRepo.Where(a => a.Id == procDefId).First();
         if (bpmAfDeployment == null)
         {
             throw new AFBizException($"can not find deployment by id: {procDefId}");
@@ -78,8 +79,8 @@ public class ProcessNodeJumpService
 
         string content = bpmAfDeployment.Content;
         List<BpmnConfCommonElementVo> elements = JsonSerializer.Deserialize<List<BpmnConfCommonElementVo>>(content);
-        BpmnConfCommonElementVo turnToElement = elements.First(a => a.ElementId==taskToTurnToNodeKey);
-        Dictionary<string,string> assigneeMap = turnToElement.AssigneeMap;
+        BpmnConfCommonElementVo turnToElement = elements.First(a => a.ElementId == taskToTurnToNodeKey);
+        Dictionary<string, string> assigneeMap = turnToElement.AssigneeMap;
         BpmAfExecution execution = new BpmAfExecution
         {
             Id = bpmAfTask.ExecutionId,
@@ -93,9 +94,9 @@ public class ProcessNodeJumpService
             TaskCount = assigneeMap?.Count,
         };
         _executionService.baseRepo.Update(execution);
-        
+
         List<BpmAfTaskInst> historyTaskInsts = new List<BpmAfTaskInst>();
-        List<BpmAfTask> tasks=new List<BpmAfTask>();
+        List<BpmAfTask> tasks = new List<BpmAfTask>();
         foreach (var (key, value) in assigneeMap)
         {
             BpmAfTask newTask = new BpmAfTask()
@@ -114,9 +115,9 @@ public class ProcessNodeJumpService
             };
             tasks.Add(newTask);
             BpmAfTaskInst bpmAfTaskInst = newTask.ToInst();
-            TimeSpan taskDuration = nowTime-bpmAfTask.CreateTime;
-            bpmAfTaskInst.Duration=taskDuration.Minutes;
-            bpmAfTaskInst.EndTime=nowTime;
+            TimeSpan taskDuration = nowTime - bpmAfTask.CreateTime;
+            bpmAfTaskInst.Duration = taskDuration.Minutes;
+            bpmAfTaskInst.EndTime = nowTime;
             bpmAfTaskInst.Description = StringConstants.BACK_TO_MODIFY_DESC;
             historyTaskInsts.Add(bpmAfTaskInst);
         }

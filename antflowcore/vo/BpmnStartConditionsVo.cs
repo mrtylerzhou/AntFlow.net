@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using antflowcore.vo;
 using System.Text.Json.Serialization;
-using antflowcore.vo;
 
 namespace AntFlowCore.Vo
 {
@@ -79,7 +77,7 @@ namespace AntFlowCore.Vo
         /// Gets or sets the list of approvers.
         /// </summary>
         [JsonPropertyName("approversList")]
-        public Dictionary<String,List<BaseIdTranStruVo>> ApproversList { get; set; }
+        public Dictionary<String, List<BaseIdTranStruVo>> ApproversList { get; set; }
 
         /// <summary>
         /// Gets or sets the entry ID.
@@ -198,11 +196,15 @@ namespace AntFlowCore.Vo
         /// </summary>
         [JsonPropertyName("lfConditions")]
         public Dictionary<string, object> LfConditions { get; set; }
+
         public bool IsLowCodeFlow { get; set; }
+
         [JsonPropertyName("bpmnCode")]
         public String BpmnCode { get; set; }
+
         [JsonPropertyName("templateMarkIds")]
         public List<string> TemplateMarkIds { get; set; }
+
         [JsonPropertyName("isPreview")]
         public bool IsPreview { get; set; }
     }

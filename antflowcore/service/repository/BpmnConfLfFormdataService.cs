@@ -1,10 +1,8 @@
 ﻿using AntFlowCore.Entity;
-using antflowcore.exception;
-using antflowcore.service.biz;
 
 namespace antflowcore.service.repository;
 
-public class BpmnConfLfFormdataService: AFBaseCurdRepositoryService<BpmnConfLfFormdata>
+public class BpmnConfLfFormdataService : AFBaseCurdRepositoryService<BpmnConfLfFormdata>
 {
     public BpmnConfLfFormdataService(IFreeSql freeSql) : base(freeSql)
     {
@@ -12,8 +10,7 @@ public class BpmnConfLfFormdataService: AFBaseCurdRepositoryService<BpmnConfLfFo
 
     public List<BpmnConfLfFormdata> ListByConfId(long confId)
     {
-        List<BpmnConfLfFormdata> lfFormdatas = baseRepo.Select.Where(a=>a.BpmnConfId == confId).ToList();
+        List<BpmnConfLfFormdata> lfFormdatas = baseRepo.Select.Where(a => a.BpmnConfId == confId).ToList();
         return lfFormdatas;
     }
-    
 }

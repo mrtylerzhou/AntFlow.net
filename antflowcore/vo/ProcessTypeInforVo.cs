@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using antflowcore.entity;
+﻿using antflowcore.entity;
 
 namespace AntFlowCore.Vo
 {

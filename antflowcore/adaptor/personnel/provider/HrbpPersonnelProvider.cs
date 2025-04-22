@@ -5,12 +5,13 @@ using antflowcore.vo;
 using AntFlowCore.Vo;
 
 namespace antflowcore.adaptor.personnel.provider;
+
 [NamedService(nameof(HrbpPersonnelProvider))]
 public class HrbpPersonnelProvider : AbstractNodeAssigneeVoProvider
 {
     private readonly UserService _userService;
 
-    public HrbpPersonnelProvider(UserService userService,AssigneeVoBuildUtils assigneeVoBuildUtils) : base(assigneeVoBuildUtils)
+    public HrbpPersonnelProvider(UserService userService, AssigneeVoBuildUtils assigneeVoBuildUtils) : base(assigneeVoBuildUtils)
     {
         _userService = userService;
     }

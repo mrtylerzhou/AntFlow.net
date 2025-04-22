@@ -1,4 +1,4 @@
-﻿namespace antflowcore.constant.enus;
+﻿namespace antflowcore.constant.enums;
 
 public class ElementTypeEnum
 {

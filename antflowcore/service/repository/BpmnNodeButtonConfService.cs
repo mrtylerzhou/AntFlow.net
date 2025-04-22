@@ -1,10 +1,10 @@
-﻿using antflowcore.constant.enus;
-using AntFlowCore.Entity;
+﻿using antflowcore.constant.enums;
 using antflowcore.vo;
+using AntFlowCore.Entity;
 
 namespace antflowcore.service.repository;
 
-public class BpmnNodeButtonConfService: AFBaseCurdRepositoryService<BpmnNodeButtonConf>
+public class BpmnNodeButtonConfService : AFBaseCurdRepositoryService<BpmnNodeButtonConf>
 {
     public BpmnNodeButtonConfService(IFreeSql freeSql) : base(freeSql)
     {
@@ -58,12 +58,13 @@ public class BpmnNodeButtonConfService: AFBaseCurdRepositoryService<BpmnNodeButt
             baseRepo.Insert(new BpmnNodeButtonConf
             {
                 BpmnNodeId = bpmnNodeId,
-                ButtonPageType =(int)ButtonTypeEnum.BUTTON_TYPE_SUBMIT,
+                ButtonPageType = (int)ButtonTypeEnum.BUTTON_TYPE_SUBMIT,
                 ButtonType = (int)ButtonTypeEnum.BUTTON_TYPE_SUBMIT,
                 ButtonName = ButtonTypeEnumExtensions.GetDescByCode((int)ButtonTypeEnum.BUTTON_TYPE_SUBMIT)
             });
         }
     }
+
     private List<BpmnNodeButtonConf> GetBpmnNodeButtonConfs(long bpmnNodeId, List<int> buttons, ButtonPageTypeEnum buttonPageTypeEnum)
     {
         return buttons
@@ -77,5 +78,4 @@ public class BpmnNodeButtonConfService: AFBaseCurdRepositoryService<BpmnNodeButt
             })
             .ToList();
     }
-
 }

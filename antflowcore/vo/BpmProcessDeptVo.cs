@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using antflowcore.vo;
 using System.Text.Json.Serialization;
-using antflowcore.vo;
 
 namespace AntFlowCore.Vo
 {
-    public class BpmProcessDeptVo 
+    public class BpmProcessDeptVo
     {
         [JsonPropertyName("id")]
         public long Id { get; set; }
@@ -124,5 +122,4 @@ namespace AntFlowCore.Vo
         [JsonPropertyName("viewOfficeList")]
         public List<BaseIdTranStruVo> ViewOfficeList { get; set; }
     }
-    
 }

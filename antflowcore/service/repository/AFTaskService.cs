@@ -1,35 +1,36 @@
 ﻿using antflowcore.entity;
-using AntFlowCore.Entity;
 using antflowcore.util;
 using antflowcore.vo;
+using AntFlowCore.Entity;
 
 namespace antflowcore.service.repository;
 
-public class AFTaskService: AFBaseCurdRepositoryService<BpmAfTask>
+public class AFTaskService : AFBaseCurdRepositoryService<BpmAfTask>
 {
     public AFTaskService(IFreeSql freeSql) : base(freeSql)
     {
     }
+
     public List<BpmAfTask> FindTaskByEmpId(String userId)
     {
         List<BpmAfTask> bpmAfTasks = this.baseRepo
-            .Where(a=>a.Assignee==userId)
+            .Where(a => a.Assignee == userId)
             .ToList();
         return bpmAfTasks;
     }
 
-    public void InsertTasks( List<BpmAfTask> tasks)
+    public void InsertTasks(List<BpmAfTask> tasks)
     {
         UserEntrustService userEntrustService = ServiceProviderUtils.GetService<UserEntrustService>();
         foreach (BpmAfTask bpmAfTask in tasks)
         {
             string assignee = bpmAfTask.Assignee;
             string assigneeName = bpmAfTask.AssigneeName;
-            BaseIdTranStruVo entrustEmployee = userEntrustService.GetEntrustEmployee(assignee, assigneeName,bpmAfTask.FormKey);
-            String userId =entrustEmployee.Id;
-            if (!string.IsNullOrEmpty(userId)&&!userId.Equals(assignee))
+            BaseIdTranStruVo entrustEmployee = userEntrustService.GetEntrustEmployee(assignee, assigneeName, bpmAfTask.FormKey);
+            String userId = entrustEmployee.Id;
+            if (!string.IsNullOrEmpty(userId) && !userId.Equals(assignee))
             {
-                String userName=entrustEmployee.Name;
+                String userName = entrustEmployee.Name;
                 bpmAfTask.Assignee = userId;
                 bpmAfTask.AssigneeName = userName;
 

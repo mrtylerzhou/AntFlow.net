@@ -1,5 +1,4 @@
-﻿using System.Runtime.Intrinsics;
-using antflowcore.constant.enus;
+﻿using antflowcore.constant.enums;
 using antflowcore.util;
 using antflowcore.vo;
 using AntFlowCore.Vo;

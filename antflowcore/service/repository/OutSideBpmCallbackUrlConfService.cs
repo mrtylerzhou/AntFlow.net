@@ -1,20 +1,19 @@
-﻿using antflowcore.constant.enus;
-using AntFlowCore.Entity;
+﻿using antflowcore.constant.enums;
 using antflowcore.exception;
 using antflowcore.service.biz;
 using antflowcore.util;
+using AntFlowCore.Entity;
 using AntFlowCore.Vo;
 
 namespace antflowcore.service.repository;
 
 public class OutSideBpmCallbackUrlConfService : AFBaseCurdRepositoryService<OutSideBpmCallbackUrlConf>
 {
-   
     private readonly OutSideBpmAdminPersonnelService _outSideBpmAdminPersonnelService;
     private readonly EmployeeService _employeeService;
 
     public OutSideBpmCallbackUrlConfService(
-       
+
         OutSideBpmAdminPersonnelService outSideBpmAdminPersonnelService,
         EmployeeService employeeService,
         IFreeSql freeSql) : base(freeSql)

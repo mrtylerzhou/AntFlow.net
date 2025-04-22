@@ -1,4 +1,4 @@
-﻿namespace antflowcore.constant.enus;
+﻿namespace antflowcore.constant.enums;
 
 public enum BusinessConfTableFieldEnum
 {
@@ -23,6 +23,7 @@ public static class BusinessConfTableFieldEnumExtensions
             case BusinessConfTableFieldEnum.FINANCE_CASHER_DIRECTOR:
             case BusinessConfTableFieldEnum.FINANCE_CFO:
                 return ConfigurationTableEnum.COMPANY_FINANCE;
+
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -34,16 +35,22 @@ public static class BusinessConfTableFieldEnumExtensions
         {
             case BusinessConfTableFieldEnum.FINANCE_CASHER:
                 return "票据审核";
+
             case BusinessConfTableFieldEnum.FINANCE_CASHER_SUPERVISOR:
                 return "票据复核";
+
             case BusinessConfTableFieldEnum.FINANCE_MANAGER:
                 return "资金主管";
+
             case BusinessConfTableFieldEnum.FINANCE_CASHER_MANAGER:
                 return "查找公司资金经理角色人员";
+
             case BusinessConfTableFieldEnum.FINANCE_CASHER_DIRECTOR:
                 return "查找公司资金总监角色";
+
             case BusinessConfTableFieldEnum.FINANCE_CFO:
                 return "查找公司CFO角色人员";
+
             default:
                 throw new ArgumentOutOfRangeException();
         }

@@ -1,13 +1,12 @@
-﻿using System.Text;
-using System.Text.Json;
-using antflowcore.constant.enus;
-using AntFlowCore.Entities;
+﻿using antflowcore.constant.enums;
 using antflowcore.entity;
-using AntFlowCore.Entity;
 using antflowcore.service.repository;
 using antflowcore.vo;
+using AntFlowCore.Entity;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
+using System.Text;
+using System.Text.Json;
 
 namespace antflowcore.service.biz;
 
@@ -67,7 +66,6 @@ public class BpmVerifyInfoBizService
         BpmBusinessProcess bpmBusinessProcess =
             _bpmBusinessProcessService.baseRepo.Where(a => a.BusinessNumber == processNumber).First();
 
-
         if (bpmBusinessProcess == null)
         {
             return bpmVerifyInfoVos;
@@ -96,14 +94,12 @@ public class BpmVerifyInfoBizService
             .Where(a => a.ProcInstId == bpmBusinessProcess.ProcInstId)
             .First();
 
-
         // 获取最后一个审批记录
         BpmAfTaskInst lastHistoricTaskInstance = _afTaskInstService
             .baseRepo
             .Where(a => a.ProcInstId == bpmBusinessProcess.ProcInstId)
             .OrderByDescending(a => a.EndTime)
             .First();
-
 
         int sort = 0;
         var bpmVerifyInfoSortVos = new List<BpmVerifyInfoVo>();
@@ -169,7 +165,6 @@ public class BpmVerifyInfoBizService
             List<BpmFlowrunEntrust> flowrunEntrustList = _bpmFlowrunEntrustService
                 .baseRepo
                 .Where(a => a.RunInfoId == taskVo.Id).ToList();
-
 
             if (flowrunEntrustList.Any())
             {
@@ -256,7 +251,6 @@ public class BpmVerifyInfoBizService
         // Get signup node's element id and collection name
         var signUpNodeCollectionNameMap = GetSignUpNodeCollectionNameMap(bpmVariable.Id);
 
-       
         Dictionary<string, List<BpmAfTaskInst>> variableInstanceMap = _actitiAdditionalInfoService.GetVariableInstanceMap(historicProcessInstance.Id);
 
         // Perform the final append operation
@@ -269,10 +263,9 @@ public class BpmVerifyInfoBizService
         var nodeApprovedsMap = new Dictionary<string, List<BaseIdTranStruVo>>();
 
         // 查询单人审批变量
-        List<BpmVariableSingle> variableSingles = _bpmVariableSingleService.baseRepo.Where(a=>a.VariableId == variableId).ToList();
-        if (variableSingles.Count >0)
+        List<BpmVariableSingle> variableSingles = _bpmVariableSingleService.baseRepo.Where(a => a.VariableId == variableId).ToList();
+        if (variableSingles.Count > 0)
         {
-            
             foreach (var bpmVariableSingle in variableSingles)
             {
                 nodeApprovedsMap[bpmVariableSingle.ElementId] = new List<BaseIdTranStruVo>
@@ -287,15 +280,14 @@ public class BpmVerifyInfoBizService
         }
 
         // 查询多人审批变量
-        List<BpmVariableMultiplayer> variableMultiplayers = _bpmVariableMultiplayerService.baseRepo.Where(a=>a.VariableId==variableId).ToList();
-        if (variableMultiplayers.Count>0)
+        List<BpmVariableMultiplayer> variableMultiplayers = _bpmVariableMultiplayerService.baseRepo.Where(a => a.VariableId == variableId).ToList();
+        if (variableMultiplayers.Count > 0)
         {
             foreach (var bpmVariableMultiplayer in variableMultiplayers)
             {
                 List<BpmVariableMultiplayerPersonnel> bpmVariableMultiplayerPersonnels = _bpmVariableMultiplayerPersonnelService
-                    .baseRepo.Where(a=>a.VariableMultiplayerId ==bpmVariableMultiplayer.VariableId)
+                    .baseRepo.Where(a => a.VariableMultiplayerId == bpmVariableMultiplayer.VariableId)
                     .ToList();
-                
 
                 if (bpmVariableMultiplayerPersonnels.Any())
                 {
@@ -311,87 +303,85 @@ public class BpmVerifyInfoBizService
 
         return nodeApprovedsMap;
     }
-    
+
     private void DoAddBpmVerifyInfoVo(
     int sort, string elementId, List<BpmnConfCommonElementVo> activitiList,
     Dictionary<string, List<BaseIdTranStruVo>> nodeApproveds,
     List<BpmVerifyInfoVo> bpmVerifyInfoVos,
     long variableId)
-{
-    
-    List<BpmnConfCommonElementVo> nextElements = ActivitiAdditionalInfoService.GetNextElementList(elementId, activitiList);
-
-    if (nextElements == null || !nextElements.Any())
     {
-        return;
-    }
+        List<BpmnConfCommonElementVo> nextElements = ActivitiAdditionalInfoService.GetNextElementList(elementId, activitiList);
 
-    var empIds = new List<string>();
-    var emplNames = new List<string>();
-
-    foreach (var nextElement in nextElements)
-    {
-        Dictionary<string,string> nextElementAssigneeMap = nextElement.AssigneeMap;
-        foreach (KeyValuePair<string,string> keyValuePair in nextElementAssigneeMap)
+        if (nextElements == null || !nextElements.Any())
         {
-            empIds.Add(keyValuePair.Key);
-            emplNames.Add(keyValuePair.Value);
+            return;
         }
-       
-    }
 
-    // 组装审批人信息
-    string verifyUserName = emplNames.Any()
-        ? string.Join(",", emplNames)
-        : "nothingplaceholder";
+        var empIds = new List<string>();
+        var emplNames = new List<string>();
 
-    var nameSb = new StringBuilder();
-    var elementIdSb = new StringBuilder();
-
-    for (int i = 0; i < nextElements.Count; i++)
-    {
-        var currElement = nextElements[i];
-
-        if (i != nextElements.Count - 1)
+        foreach (var nextElement in nextElements)
         {
-            nameSb.Append(currElement.ElementName).Append("||");
-            elementIdSb.Append(currElement.ElementId).Append(",");
+            Dictionary<string, string> nextElementAssigneeMap = nextElement.AssigneeMap;
+            foreach (KeyValuePair<string, string> keyValuePair in nextElementAssigneeMap)
+            {
+                empIds.Add(keyValuePair.Key);
+                emplNames.Add(keyValuePair.Value);
+            }
         }
-        else
+
+        // 组装审批人信息
+        string verifyUserName = emplNames.Any()
+            ? string.Join(",", emplNames)
+            : "nothingplaceholder";
+
+        var nameSb = new StringBuilder();
+        var elementIdSb = new StringBuilder();
+
+        for (int i = 0; i < nextElements.Count; i++)
         {
-            nameSb.Append(currElement.ElementName);
-            elementIdSb.Append(currElement.ElementId);
+            var currElement = nextElements[i];
+
+            if (i != nextElements.Count - 1)
+            {
+                nameSb.Append(currElement.ElementName).Append("||");
+                elementIdSb.Append(currElement.ElementId).Append(",");
+            }
+            else
+            {
+                nameSb.Append(currElement.ElementName);
+                elementIdSb.Append(currElement.ElementId);
+            }
         }
-    }
 
-    var bpmVerifyInfoVo = new BpmVerifyInfoVo
-    {
-        ElementId = elementIdSb.ToString(),
-        TaskName = nameSb.ToString(),
-        VerifyDesc = string.Empty,
-        VerifyStatus = 0,
-        VerifyUserIds = empIds,
-        VerifyUserName = verifyUserName,
-        Sort = sort
-    };
-
-    // 添加到审批信息列表
-    if (!string.IsNullOrEmpty(bpmVerifyInfoVo.VerifyUserName) && bpmVerifyInfoVo.TaskName != "EndEvent")
-    {
-        bpmVerifyInfoVos.Add(bpmVerifyInfoVo);
-        sort++;
-    }
-
-    foreach (var nextElement in nextElements)
-    {
-        // 递归处理下一个节点
-        var nextNextElement = ActivitiAdditionalInfoService.GetNextElementList(nextElement.ElementId, activitiList);
-        if (nextNextElement != null)
+        var bpmVerifyInfoVo = new BpmVerifyInfoVo
         {
-            DoAddBpmVerifyInfoVo(sort, nextElement.ElementId, activitiList, nodeApproveds, bpmVerifyInfoVos, variableId);
+            ElementId = elementIdSb.ToString(),
+            TaskName = nameSb.ToString(),
+            VerifyDesc = string.Empty,
+            VerifyStatus = 0,
+            VerifyUserIds = empIds,
+            VerifyUserName = verifyUserName,
+            Sort = sort
+        };
+
+        // 添加到审批信息列表
+        if (!string.IsNullOrEmpty(bpmVerifyInfoVo.VerifyUserName) && bpmVerifyInfoVo.TaskName != "EndEvent")
+        {
+            bpmVerifyInfoVos.Add(bpmVerifyInfoVo);
+            sort++;
+        }
+
+        foreach (var nextElement in nextElements)
+        {
+            // 递归处理下一个节点
+            var nextNextElement = ActivitiAdditionalInfoService.GetNextElementList(nextElement.ElementId, activitiList);
+            if (nextNextElement != null)
+            {
+                DoAddBpmVerifyInfoVo(sort, nextElement.ElementId, activitiList, nodeApproveds, bpmVerifyInfoVos, variableId);
+            }
         }
     }
-}
 
     public Dictionary<string, string> GetSignUpNodeCollectionNameMap(long variableId)
     {
@@ -399,10 +389,8 @@ public class BpmVerifyInfoBizService
 
         List<BpmVariableSignUp> bpmVariableSignUps = _bpmVariableSignUpService
             .baseRepo
-            .Where(a=>a.VariableId==variableId)
+            .Where(a => a.VariableId == variableId)
             .ToList();
-            
-        
 
         foreach (var variableSignUp in bpmVariableSignUps)
         {
@@ -421,5 +409,4 @@ public class BpmVerifyInfoBizService
 
         return signUpNodeCollectionNameMap;
     }
-
 }

@@ -11,7 +11,8 @@ public class BpmnViewPageButtonBaseVo
     public List<int> ViewPageOther { get; set; }
 
     // 默认构造函数
-    public BpmnViewPageButtonBaseVo() { }
+    public BpmnViewPageButtonBaseVo()
+    { }
 
     // 带参数的构造函数
 }

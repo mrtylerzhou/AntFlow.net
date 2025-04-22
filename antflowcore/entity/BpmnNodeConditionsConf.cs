@@ -1,6 +1,4 @@
-﻿using System;
-using FreeSql;
-using FreeSql.DataAnnotations;
+﻿using FreeSql.DataAnnotations;
 
 namespace AntFlowCore.Entity
 {
@@ -59,7 +57,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// Creation time.
         /// </summary>
-        [Column(Name = "create_time",IsIgnore = true)]
+        [Column(Name = "create_time", IsIgnore = true)]
         public DateTime? CreateTime { get; set; }
 
         /// <summary>
@@ -71,7 +69,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// Update time.
         /// </summary>
-        [Column(Name = "update_time",IsIgnore = true)]
+        [Column(Name = "update_time", IsIgnore = true)]
         public DateTime? UpdateTime { get; set; }
     }
 }

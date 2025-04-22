@@ -3,15 +3,15 @@ using System.Text.Json.Serialization;
 
 namespace antflowcore.conf.json;
 
-public class IntToStringConverter: JsonConverter<string>
+public class IntToStringConverter : JsonConverter<string>
 {
     public override string? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-       
         if (reader.TokenType == JsonTokenType.Number)
         {
             return reader.GetInt64().ToString();
-        }else if (reader.TokenType == JsonTokenType.String)
+        }
+        else if (reader.TokenType == JsonTokenType.String)
         {
             return reader.GetString();
         }

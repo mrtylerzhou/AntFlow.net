@@ -23,7 +23,7 @@ namespace AntFlowCore.Vo
         public string TaskId { get; set; }
 
         // Constructor
-        public ContansDataVo() { }
-        
+        public ContansDataVo()
+        { }
     }
 }

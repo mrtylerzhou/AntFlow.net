@@ -1,6 +1,6 @@
 ﻿using antflowcore.exception;
 
-namespace antflowcore.constant.enus;
+namespace antflowcore.constant.enums;
 
 public class JudgeOperatorEnum
 {

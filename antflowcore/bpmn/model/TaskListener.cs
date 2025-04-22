@@ -1,11 +1,12 @@
-﻿namespace antflowcore.bpmn;
+﻿namespace antflowcore.bpmn.model;
 
 public abstract class TaskListener
 {
-    public String EVENTNAME_CREATE = "create";
-    public String EVENTNAME_ASSIGNMENT = "assignment";
-    public String EVENTNAME_COMPLETE = "complete";
-    public String EVENTNAME_DELETE = "delete";
-    public String EVENTNAME_ALL_EVENTS = "all";
+    public string EVENTNAME_CREATE = "create";
+    public string EVENTNAME_ASSIGNMENT = "assignment";
+    public string EVENTNAME_COMPLETE = "complete";
+    public string EVENTNAME_DELETE = "delete";
+    public string EVENTNAME_ALL_EVENTS = "all";
+
     public abstract void Notify(TaskEntity delegateTask);
 }

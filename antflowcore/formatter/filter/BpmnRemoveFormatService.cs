@@ -1,9 +1,9 @@
 ﻿using antflowcore.vo;
 using AntFlowCore.Vo;
 
-namespace antflowcore.service.processor.filter;
+namespace antflowcore.formatter.filter;
 
-public class BpmnRemoveFormatService: AbstractBpmnRemoveFormat
+public class BpmnRemoveFormatService : AbstractBpmnRemoveFormat
 {
     public new void RemoveBpmnConf(BpmnConfVo bpmnConfVo, BpmnStartConditionsVo bpmnStartConditions)
     {

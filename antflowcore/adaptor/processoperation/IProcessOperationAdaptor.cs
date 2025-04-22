@@ -2,8 +2,7 @@
 
 namespace antflowcore.adaptor.processoperation;
 
-public interface IProcessOperationAdaptor: IAdaptorService{
-
-     void DoProcessButton(BusinessDataVo vo);
-
+public interface IProcessOperationAdaptor : IAdaptorService
+{
+    void DoProcessButton(BusinessDataVo vo);
 }

@@ -1,15 +1,17 @@
 ﻿using antflowcore.adaptor.personnel.provider;
-using antflowcore.constant.enus;
+using antflowcore.constant.enums;
 using antflowcore.service;
 
-namespace antflowcore.adaptor.personnel.businesstableadp;
+namespace antflowcore.adaptor.personnel.provideradp.businesstableadp;
 
-public class BusinessTablePersonnelAdaptor : AbstractBpmnPersonnelAdaptor {
-        public BusinessTablePersonnelAdaptor(BusinessTablePersonnelProvider bpmnPersonnelProviderService, IBpmnEmployeeInfoProviderService bpmnEmployeeInfoProviderService) : base(bpmnPersonnelProviderService, bpmnEmployeeInfoProviderService)
-        {
-        }
-        
-        public override void SetSupportBusinessObjects() {
-            ((IAdaptorService)this).AddSupportBusinessObjects(PersonnelEnum.BUSINESS_TABLE_PERSONNEL);
-        }
+public class BusinessTablePersonnelAdaptor : AbstractBpmnPersonnelAdaptor
+{
+    public BusinessTablePersonnelAdaptor(BusinessTablePersonnelProvider bpmnPersonnelProviderService, IBpmnEmployeeInfoProviderService bpmnEmployeeInfoProviderService) : base(bpmnPersonnelProviderService, bpmnEmployeeInfoProviderService)
+    {
+    }
+
+    public override void SetSupportBusinessObjects()
+    {
+        ((IAdaptorService)this).AddSupportBusinessObjects(PersonnelEnum.BUSINESS_TABLE_PERSONNEL);
+    }
 }
