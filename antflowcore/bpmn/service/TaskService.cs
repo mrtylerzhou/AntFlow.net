@@ -89,11 +89,11 @@ public class TaskService
         string content = bpmAfDeployment.Content;
         List<BpmnConfCommonElementVo> elements = JsonSerializer.Deserialize<List<BpmnConfCommonElementVo>>(content);
         BpmnConfCommonElementVo elementToDeal = null;
-        List<string> signUserIds = new List<string>();
+        List<string> verifyUserIds = new List<string>();
         if (currentSignType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode())
         {
             BpmnConfCommonElementVo currentElement = BpmnFlowUtil.GetCurrentTaskElement(elements,taskDefKey);
-            if (currentElement != null)
+            if (currentElement == null)
             {
                 throw new AFBizException($"can not get current element by element id: {currentElement}");
             }
@@ -102,13 +102,18 @@ public class TaskService
             List<BpmVerifyInfo> bpmVerifyInfos = bpmVerifyInfoService.baseRepo
                 .Where(a=>a.RunInfoId==procInstId&&a.TaskDefKey==taskDefKey)
                 .ToList();
-            List<string> verifyUserIds = bpmVerifyInfos.Select(a=>a.VerifyUserId).ToList();
+            verifyUserIds= bpmVerifyInfos.Select(a=>a.VerifyUserId).ToList();
             int currentNodeAssigneesCount = currentElement.AssigneeMap.Count;
-            if (verifyUserIds.Count == currentNodeAssigneesCount)
+            if (verifyUserIds.Count != currentNodeAssigneesCount)
             {
-                return;
+                elementToDeal = currentElement;
             }
-            elementToDeal = currentElement;
+            else
+            {
+                var (nextUserElement, nextFlowElement) = BpmnFlowUtil.GetNextAssigneeAndFlowNode(elements,taskDefKey);
+                elementToDeal=nextUserElement;
+            }
+           
         }
         else
         {
@@ -117,6 +122,7 @@ public class TaskService
         }
       
         Dictionary<string,string> assigneeMap = elementToDeal.AssigneeMap;
+        int taskCount=currentSignType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode()?1:assigneeMap?.Count??0;
         BpmAfExecution execution = new BpmAfExecution
         {
             Id = bpmAfTask.ExecutionId,
@@ -127,7 +133,7 @@ public class TaskService
             Name = elementToDeal.ElementName,
             StartTime = nowTime,
             StartUserId = SecurityUtils.GetLogInEmpId(),
-            TaskCount = assigneeMap?.Count,
+            TaskCount =taskCount,
         };
        
         _afExecutionService.baseRepo.Update(execution);
@@ -150,6 +156,10 @@ public class TaskService
         List<BpmAfTask> tasks=new List<BpmAfTask>();
         foreach (var (key, value) in assigneeMap)
         {
+            if (verifyUserIds.Contains(key))
+            {
+                continue;
+            }
             BpmAfTask newTask = new BpmAfTask()
             {
                 Id = StrongUuidGenerator.GetNextId(),
