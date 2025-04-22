@@ -20,9 +20,5 @@
       <PackageReference Include="Rougamo.Fody" Version="5.0.0" />
      
     </ItemGroup>
-    <ItemGroup>
-      <Folder Include="filter&amp;interceptor\" />
-      <Folder Include="interf\" />
-    </ItemGroup>
 
 </Project>
