@@ -59,7 +59,10 @@ public class UndertakeProcessService : IProcessOperationAdaptor
                 TaskCount = 1,
                 Id = task.ExecutionId
             };
-            _afExecutionService.baseRepo.Update(execution);
+            _afExecutionService.Frsql.Update<BpmAfExecution>()
+                .Set(a => a.TaskCount == 1)
+                .Where(a => a.Id == task.ExecutionId)
+                .ExecuteAffrows();
         }
 
         public void SetSupportBusinessObjects()
