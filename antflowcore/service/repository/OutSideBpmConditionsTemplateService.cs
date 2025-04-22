@@ -1,13 +1,13 @@
-﻿using antflowcore.constant.enums;
+﻿using System.Linq.Expressions;
+using System.Text.Json;
+using antflowcore.constant.enus;
 using antflowcore.dto;
 using antflowcore.entity;
+using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.service.biz;
 using antflowcore.util;
-using AntFlowCore.Entity;
 using AntFlowCore.Vo;
-using System.Linq.Expressions;
-using System.Text.Json;
 
 namespace antflowcore.service.repository;
 
@@ -106,7 +106,7 @@ public class OutSideBpmConditionsTemplateService : AFBaseCurdRepositoryService<O
         return PageUtils.GetResultAndPage(page);
     }
 
-    private List<OutSideBpmConditionsTemplateVo> SelectPageList(Page<OutSideBpmConditionsTemplateVo> page,
+    List<OutSideBpmConditionsTemplateVo> SelectPageList(Page<OutSideBpmConditionsTemplateVo> page,
         OutSideBpmConditionsTemplateVo vo)
     {
         Expression<Func<OutSideBpmConditionsTemplate, bool>> expression = x => x.IsDel == 0;
@@ -251,8 +251,10 @@ public class OutSideBpmConditionsTemplateService : AFBaseCurdRepositoryService<O
     {
         OutSideBpmConditionsTemplate outSideBpmConditionsTemplate = this.baseRepo.Where(a => a.Id == id).ToOne();
 
+
         OutSideBpmBusinessParty outSideBpmBusinessParty = _outSideBpmBusinessPartyService
             .baseRepo.Where(a => a.Id == outSideBpmConditionsTemplate.BusinessPartyId).ToOne();
+
 
         if (TemplateIsUsed(id, outSideBpmBusinessParty))
         {

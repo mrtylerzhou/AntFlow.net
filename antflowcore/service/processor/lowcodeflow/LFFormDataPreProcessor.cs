@@ -1,148 +1,152 @@
-﻿using antflowcore.exception;
+﻿using System.Text.Json;
+using antflowcore.constant.enus;
+using AntFlowCore.Constants;
+using AntFlowCore.Entity;
+using antflowcore.exception;
 using antflowcore.service.repository;
 using antflowcore.util;
 using antflowcore.vo;
-using AntFlowCore.Entity;
 using AntFlowCore.Vo;
-using System.Text.Json;
 
 namespace antflowcore.service.processor.lowcodeflow;
 
-using antflowcore.constant.enums;
 using System.Collections.Generic;
 using System.Linq;
 
 public class LFFormDataPreProcessor : IAntFlowOrderPreProcessor<BpmnConfVo>
-{
-    private readonly BpmnConfLfFormdataService _lfFormdataService;
-    private readonly BpmnConfLfFormdataFieldService _lfFormdataFieldService;
-
-    public LFFormDataPreProcessor(BpmnConfLfFormdataService lfFormdataService, BpmnConfLfFormdataFieldService lfFormdataFieldService)
     {
-        _lfFormdataService = lfFormdataService;
-        _lfFormdataFieldService = lfFormdataFieldService;
-    }
+        private readonly BpmnConfLfFormdataService _lfFormdataService;
+        private readonly BpmnConfLfFormdataFieldService _lfFormdataFieldService;
 
-    public void PreWriteProcess(BpmnConfVo confVo)
-    {
-        if (confVo == null) return;
-
-        var isLowCodeFlow = confVo.IsLowCodeFlow == 1;
-        if (!isLowCodeFlow) return;
-
-        var confId = confVo.Id;
-        var lfForm = confVo.LfFormData;
-
-        var lfFormdata = new BpmnConfLfFormdata
+        public LFFormDataPreProcessor(BpmnConfLfFormdataService lfFormdataService, BpmnConfLfFormdataFieldService lfFormdataFieldService)
         {
-            BpmnConfId = confId,
-            Formdata = lfForm,
-            CreateUser = SecurityUtils.GetLogInEmpName()
-        };
-        _lfFormdataService.baseRepo.Insert(lfFormdata);
-        confVo.LfFormDataId = lfFormdata.Id;
-
-        FormConfigWrapper formConfigWrapper = JsonSerializer.Deserialize<FormConfigWrapper>(lfForm);
-        var lfWidgetList = formConfigWrapper.WidgetList;
-
-        if (lfWidgetList == null || !lfWidgetList.Any())
-        {
-            throw new AFBizException($"Low-code form has no widget, confId: {confId}, formCode: {confVo.FormCode}");
+            _lfFormdataService = lfFormdataService;
+            _lfFormdataFieldService = lfFormdataFieldService;
         }
 
-        var formdataFields = new List<BpmnConfLfFormdataField>();
-        ParseWidgetListRecursively(lfWidgetList, confId, lfFormdata.Id, formdataFields);
-
-        if (!formdataFields.Any())
+        public void PreWriteProcess(BpmnConfVo confVo)
         {
-            throw new AFBizException($"Low-code form fields cannot be empty, confId: {confId}, formCode: {confVo.FormCode}");
-        }
+            if (confVo == null) return;
 
-        int affrows = _lfFormdataFieldService.Frsql.Insert(formdataFields).ExecuteAffrows();
-        if (affrows <= 0)
-        {
-            throw new AFBizException("数据插入失败!");
-        }
-    }
+            var isLowCodeFlow = confVo.IsLowCodeFlow == 1;
+            if (!isLowCodeFlow) return;
 
-    public void PreReadProcess(BpmnConfVo confVo)
-    {
-        if (confVo == null) return;
+            var confId = confVo.Id;
+            var lfForm = confVo.LfFormData;
 
-        var isLowCodeFlow = confVo.IsLowCodeFlow == 1;
-        if (!isLowCodeFlow) return;
-
-        var confId = confVo.Id;
-
-        var bpmnConfLfFormdataList = _lfFormdataService.ListByConfId(confId);
-
-        if (bpmnConfLfFormdataList == null || !bpmnConfLfFormdataList.Any())
-        {
-            throw new AFBizException($"Cannot get low-code flow formdata by confId: {confId}");
-        }
-
-        var lfFormdata = bpmnConfLfFormdataList.First();
-        confVo.LfFormData = lfFormdata.Formdata;
-        confVo.LfFormDataId = lfFormdata.Id;
-    }
-
-    private void ParseWidgetListRecursively(
-        IEnumerable<FormConfigWrapper.LFWidget> widgetList,
-        long confId,
-        long formDataId,
-        List<BpmnConfLfFormdataField> result)
-    {
-        foreach (var lfWidget in widgetList)
-        {
-            if (!StringConstants.LOWFLOW_FORM_CONTAINER_TYPE.Equals(lfWidget.Category))
+            var lfFormdata = new BpmnConfLfFormdata
             {
-                var lfOption = lfWidget.Options;
-                var formdataField = new BpmnConfLfFormdataField
-                {
-                    BpmnConfId = confId,
-                    FormDataId = formDataId,
-                    FieldType = lfOption.FieldType,
-                    FieldId = lfWidget.Id,
-                    FieldName = lfOption.Label
-                };
-                result.Add(formdataField);
+                BpmnConfId = confId,
+                Formdata = lfForm,
+                CreateUser = SecurityUtils.GetLogInEmpName()
+            };
+            _lfFormdataService.baseRepo.Insert(lfFormdata);
+            confVo.LfFormDataId = lfFormdata.Id;
+
+            FormConfigWrapper formConfigWrapper = JsonSerializer.Deserialize<FormConfigWrapper>(lfForm);
+            var lfWidgetList = formConfigWrapper.WidgetList;
+
+            if (lfWidgetList == null || !lfWidgetList.Any())
+            {
+                throw new AFBizException($"Low-code form has no widget, confId: {confId}, formCode: {confVo.FormCode}");
             }
-            else
-            {
-                var containerTypeEnum = VariantFormContainerTypeEnumExtensions.GetByTypeName(lfWidget.Type);
-                if (containerTypeEnum == null)
-                {
-                    throw new AFBizException("Undefined container type!");
-                }
 
-                if (containerTypeEnum == VariantFormContainerTypeEnum.CARD)
+            var formdataFields = new List<BpmnConfLfFormdataField>();
+            ParseWidgetListRecursively(lfWidgetList, confId, lfFormdata.Id, formdataFields);
+
+            if (!formdataFields.Any())
+            {
+                throw new AFBizException($"Low-code form fields cannot be empty, confId: {confId}, formCode: {confVo.FormCode}");
+            }
+
+            int affrows = _lfFormdataFieldService.Frsql.Insert(formdataFields).ExecuteAffrows();
+            if (affrows <= 0)
+            {
+                throw new AFBizException("数据插入失败!");
+            }
+           
+        }
+
+        public void PreReadProcess(BpmnConfVo confVo)
+        {
+            if (confVo == null) return;
+
+            var isLowCodeFlow = confVo.IsLowCodeFlow == 1;
+            if (!isLowCodeFlow) return;
+
+            var confId = confVo.Id;
+
+            var bpmnConfLfFormdataList = _lfFormdataService.ListByConfId(confId);
+
+            if (bpmnConfLfFormdataList == null || !bpmnConfLfFormdataList.Any())
+            {
+                throw new AFBizException($"Cannot get low-code flow formdata by confId: {confId}");
+            }
+
+            var lfFormdata = bpmnConfLfFormdataList.First();
+            confVo.LfFormData = lfFormdata.Formdata;
+            confVo.LfFormDataId = lfFormdata.Id;
+        }
+
+        private void ParseWidgetListRecursively(
+            IEnumerable<FormConfigWrapper.LFWidget> widgetList,
+            long confId,
+            long formDataId,
+            List<BpmnConfLfFormdataField> result)
+        {
+            foreach (var lfWidget in widgetList)
+            {
+                if (!StringConstants.LOWFLOW_FORM_CONTAINER_TYPE.Equals(lfWidget.Category))
                 {
-                    ParseWidgetListRecursively(lfWidget.WidgetList, confId, formDataId, result);
-                }
-                else if (containerTypeEnum == VariantFormContainerTypeEnum.TAB)
-                {
-                    foreach (var tab in lfWidget.Tabs)
+                    var lfOption = lfWidget.Options;
+                    var formdataField = new BpmnConfLfFormdataField
                     {
-                        ParseWidgetListRecursively(tab.WidgetList, confId, formDataId, result);
-                    }
+                        BpmnConfId = confId,
+                        FormDataId = formDataId,
+                        FieldType = lfOption.FieldType,
+                        FieldId = lfWidget.Id,
+                        FieldName = lfOption.Label
+                    };
+                    result.Add(formdataField);
                 }
                 else
                 {
-                    var rows = lfWidget.Rows ?? new List<FormConfigWrapper.TableRow>();
-                    foreach (var row in rows)
+                    var containerTypeEnum = VariantFormContainerTypeEnumExtensions.GetByTypeName(lfWidget.Type);
+                    if (containerTypeEnum == null)
                     {
-                        foreach (var col in row.Cols)
+                        throw new AFBizException("Undefined container type!");
+                    }
+
+                    if (containerTypeEnum == VariantFormContainerTypeEnum.CARD)
+                    {
+                        ParseWidgetListRecursively(lfWidget.WidgetList, confId, formDataId, result);
+                    }
+                    else if (containerTypeEnum == VariantFormContainerTypeEnum.TAB)
+                    {
+                        foreach (var tab in lfWidget.Tabs)
                         {
-                            ParseWidgetListRecursively(col.WidgetList, confId, formDataId, result);
+                            ParseWidgetListRecursively(tab.WidgetList, confId, formDataId, result);
+                        }
+                    }
+                    else
+                    {
+                        var rows = lfWidget.Rows ?? new List<FormConfigWrapper.TableRow>();
+                        foreach (var row in rows)
+                        {
+                            foreach (var col in row.Cols)
+                            {
+                                ParseWidgetListRecursively(col.WidgetList, confId, formDataId, result);
+                            }
                         }
                     }
                 }
             }
         }
+
+        public int Order()
+        {
+            return 0;
+        }
     }
 
-    public int Order()
-    {
-        return 0;
-    }
-}
+

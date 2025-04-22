@@ -1,6 +1,6 @@
-﻿namespace antflowcore.bpmn.model;
+﻿namespace antflowcore.bpmn;
 
 public abstract class AFAbstractBaseElement
 {
-    public string Id { get; set; }
+    public String Id { get; set; }
 }

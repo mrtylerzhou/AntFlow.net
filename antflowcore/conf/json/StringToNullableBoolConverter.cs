@@ -7,12 +7,14 @@ public class StringToNullableBoolConverter : JsonConverter<bool?>
 {
     public override bool? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
+       
         if (reader.TokenType == JsonTokenType.True)
             return true;
 
         if (reader.TokenType == JsonTokenType.False)
             return false;
 
+       
         if (reader.TokenType == JsonTokenType.String)
         {
             var str = reader.GetString();
@@ -21,6 +23,7 @@ public class StringToNullableBoolConverter : JsonConverter<bool?>
             return null;
         }
 
+      
         if (reader.TokenType == JsonTokenType.Null)
             return null;
 

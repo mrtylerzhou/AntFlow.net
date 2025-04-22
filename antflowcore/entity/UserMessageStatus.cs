@@ -1,6 +1,8 @@
-﻿using FreeSql.DataAnnotations;
+﻿using System;
+using FreeSql;
+using FreeSql.DataAnnotations;
 
-namespace antflowcore.entity
+namespace AntFlowCore.Entities
 {
     /// <summary>
     /// 用户消息状态实体类
@@ -68,13 +70,13 @@ namespace antflowcore.entity
         /// <summary>
         /// 创建时间
         /// </summary>
-        [Column(Name = "create_time", IsIgnore = true)]
+        [Column(Name = "create_time",IsIgnore = true)]
         public DateTime? CreateTime { get; set; }
 
         /// <summary>
         /// 更新时间
         /// </summary>
-        [Column(Name = "update_time", IsIgnore = true)]
+        [Column(Name = "update_time",IsIgnore = true)]
         public DateTime? UpdateTime { get; set; }
 
         /// <summary>

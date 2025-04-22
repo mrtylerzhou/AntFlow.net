@@ -1,15 +1,15 @@
-﻿using antflowcore.adaptor.formoperation;
-using antflowcore.constant.enums;
+﻿using System.Text.Json;
+using antflowcore.adaptor;
+using antflowcore.constant.enus;
 using antflowcore.entity;
+using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.factory;
 using antflowcore.service.repository;
 using antflowcore.util;
 using antflowcore.vo;
-using AntFlowCore.Entity;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 
 namespace antflowcore.service.processor.lowcodeflow;
 
@@ -231,7 +231,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
 
         if (!allFieldConfMap.TryGetValue(confId, out var lfFormdataFieldMap) || lfFormdataFieldMap == null || lfFormdataFieldMap.Count == 0)
         {
-            Dictionary<string, BpmnConfLfFormdataField> name2SelfMap = _lfformdataFieldService.QryFormDataFieldMap(confId);
+            Dictionary<string,BpmnConfLfFormdataField> name2SelfMap = _lfformdataFieldService.QryFormDataFieldMap(confId);
             allFieldConfMap[confId] = name2SelfMap;
         }
 
@@ -252,7 +252,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
     {
         if (vo.OperationType != (int)ButtonTypeEnum.BUTTON_TYPE_RESUBMIT)
         {
-            return;
+            return ;
         }
 
         var lfFields = vo.lfFields;
@@ -272,7 +272,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         string formCode = vo.FormCode;
         long confId = vo.BpmnConfVo.Id;
 
-        List<LFMainField> lfMainFields = _lfMainFieldService.baseRepo.Where(a => a.MainId == mainId).ToList();
+        List<LFMainField> lfMainFields = _lfMainFieldService.baseRepo.Where(a=>a.MainId==mainId).ToList();
         if (lfMainFields == null || lfMainFields.Count == 0)
         {
             throw new AFBizException($"lowcode form with formcode:{formCode}, confId:{confId} has no formdata");

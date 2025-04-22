@@ -1,4 +1,4 @@
-﻿namespace antflowcore.constant.enums
+﻿namespace antflowcore.constant.enus
 {
     public enum ButtonTypeEnum
     {
@@ -28,55 +28,40 @@
             {
                 case (int)ButtonTypeEnum.BUTTON_TYPE_PREVIEW:
                     return "预览";
-
                 case (int)ButtonTypeEnum.BUTTON_TYPE_SUBMIT:
                     return "提交";
-
                 case (int)ButtonTypeEnum.BUTTON_TYPE_RESUBMIT:
                     return "重新提交";
-
                 case (int)ButtonTypeEnum.BUTTON_TYPE_AGREE:
                     return "同意";
-
                 case (int)ButtonTypeEnum.BUTTON_TYPE_DISAGREE:
                     return "不同意";
-
                 case (int)ButtonTypeEnum.BUTTON_TYPE_BACK_TO_PREV_MODIFY:
                     return "打回上节点修改";
-
                 case (int)ButtonTypeEnum.BUTTON_TYPE_ABANDONED:
                     return "作废";
-
                 case (int)ButtonTypeEnum.BUTTON_TYPE_PRINT:
                     return "打印";
-
                 case (int)ButtonTypeEnum.BUTTON_TYPE_UNDERTAKE:
                     return "承办";
-
                 case (int)ButtonTypeEnum.BUTTON_TYPE_CHANGE_ASSIGNEE:
                     return "变更处理人";
-
                 case (int)ButtonTypeEnum.BUTTON_TYPE_STOP:
                     return "终止";
-
                 case (int)ButtonTypeEnum.BUTTON_TYPE_ADD_ASSIGNEE:
                     return "添加审批人";
-
                 case (int)ButtonTypeEnum.BUTTON_TYPE_FORWARD:
                     return "转发";
-
                 case (int)ButtonTypeEnum.BUTTON_TYPE_BACK_TO_MODIFY:
                     return "打回修改";
-
                 case (int)ButtonTypeEnum.BUTTON_TYPE_JP:
                     return "加批";
-
                 case (int)ButtonTypeEnum.BUTTON_TYPE_ZB:
                     return "转办";
-
                 default:
                     return null;
             }
         }
     }
+    
 }

@@ -1,7 +1,8 @@
-﻿using antflowcore.entity;
+﻿using AntFlowCore.Constants;
+using antflowcore.entity;
+using AntFlowCore.Entity;
 using antflowcore.service.repository;
 using antflowcore.util;
-using AntFlowCore.Entity;
 using AntFlowCore.Vo;
 
 namespace antflowcore.service.biz;
@@ -18,9 +19,9 @@ public class OutSideBpmBaseService
         _outSideBpmAdminPersonnelService = outSideBpmAdminPersonnelService;
         _outSideBpmBusinessPartyService = outSideBpmBusinessPartyService;
     }
-
     public List<OutSideBpmBusinessPartyVo> GetEmplBusinessPartys(string name, params string[] permCodes)
     {
+        
         GenericEmployee loginEmployee = new GenericEmployee
         {
             UserId = SecurityUtils.GetLogInEmpId(),
@@ -32,6 +33,7 @@ public class OutSideBpmBaseService
         // TODO: 权限判断逻辑可根据实际权限系统调整
         if (loginEmployee.Permissions.Contains(StringConstants.ADMIN_RIGHTS))
         {
+           
             // 有全部权限，查询全部业务方
             outSideBpmBusinessPartys = _outSideBpmBusinessPartyService.baseRepo.Where(a => 1 == 1).ToList();
         }
@@ -72,4 +74,5 @@ public class OutSideBpmBaseService
 
         return result;
     }
+
 }

@@ -1,6 +1,9 @@
-﻿using antflowcore.exception;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using antflowcore.exception;
 
-namespace antflowcore.constant.enums
+namespace AntFlowCore.Enums
 {
     public enum EventTypeEnum
     {
@@ -29,7 +32,6 @@ namespace antflowcore.constant.enums
             { EventTypeEnum.PROCESS_TRANSPOND, new EventTypeProperties(false, "转发操作", (int)ProcessOperationEnum.BUTTON_TYPE_FORWARD, 0, new List<int> { (int)InformEnum.BY_TRANSPOND }) },
             { EventTypeEnum.PROCESS_END, new EventTypeProperties(false, "流程结束", 0, 0, new List<int> { (int)InformEnum.APPLICANT }) }
         };
-
         // 获取描述
         public static string GetDescription(this EventTypeEnum eventType)
         {
@@ -41,7 +43,6 @@ namespace antflowcore.constant.enums
             string description = EventTypeMappings[(EventTypeEnum)code].Description;
             return description;
         }
-
         // 根据操作类型获取枚举
         public static EventTypeEnum? GetEnumByOperationType(int operationType)
         {
@@ -53,7 +54,6 @@ namespace antflowcore.constant.enums
         {
             return EventTypeMappings[eventTypeEnum].InformIdList;
         }
-
         public static bool IsInNode(this EventTypeEnum? eventType)
         {
             if (eventType == null)
@@ -64,8 +64,7 @@ namespace antflowcore.constant.enums
         }
     }
 }
-
-internal class EventTypeProperties
+ class EventTypeProperties
 {
     public bool IsInNode { get; }
     public string Description { get; }
@@ -82,3 +81,4 @@ internal class EventTypeProperties
         InformIdList = informIdList;
     }
 }
+

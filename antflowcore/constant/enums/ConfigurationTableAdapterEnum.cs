@@ -1,4 +1,4 @@
-﻿namespace antflowcore.constant.enums;
+﻿namespace antflowcore.constant.enus;
 
 public enum ConfigurationTableAdapterEnum
 {
@@ -12,6 +12,7 @@ public enum ConfigurationTableAdapterEnum
 
 public static class ConfigurationTableAdapterEnumExtensions
 {
+
     private static readonly Dictionary<ConfigurationTableAdapterEnum, BusinessConfTableFieldEnum> AdapterToFieldMap =
         new()
         {

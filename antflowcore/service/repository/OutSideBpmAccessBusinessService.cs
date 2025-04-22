@@ -1,12 +1,13 @@
-﻿using antflowcore.constant.enums;
+﻿using antflowcore.constant.enus;
 using antflowcore.dto;
 using antflowcore.entity;
+using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.service.biz;
 using antflowcore.util;
 using antflowcore.vo;
-using AntFlowCore.Entity;
 using AntFlowCore.Vo;
+using Microsoft.VisualBasic;
 
 namespace antflowcore.service.repository;
 
@@ -43,6 +44,7 @@ public class OutSideBpmAccessBusinessService : AFBaseCurdRepositoryService<OutSi
                 .Where(a => a.FormCode == formCode && a.EffectiveStatus == 1 && a.IsDel == 0)
                 .ToOne();
 
+
             if (effectiveConfByFormCode == null)
             {
                 throw new AFBizException($"未能根据流程编号{formCode}找到有效的流程配置,请检查同业入参");
@@ -50,6 +52,7 @@ public class OutSideBpmAccessBusinessService : AFBaseCurdRepositoryService<OutSi
 
             vo.BpmnConfId = effectiveConfByFormCode.Id;
             outSideBpmAccessBusiness = vo.MapToEntity();
+
 
             if (vo.TemplateMarks != null && vo.TemplateMarks.Any())
             {
@@ -133,8 +136,7 @@ public class OutSideBpmAccessBusinessService : AFBaseCurdRepositoryService<OutSi
 
         return result;
     }
-    public ResultAndPage<BpmnConfVo> SelectOutSideFormCodePageList(PageDto pageDto, BpmnConfVo vo)
-    {
+    public ResultAndPage<BpmnConfVo> SelectOutSideFormCodePageList(PageDto pageDto, BpmnConfVo vo) {
         Page<BpmnConfVo> page = PageUtils.GetPageByPageDto<BpmnConfVo>(pageDto);
         BpmnConfService bpmnConfService = ServiceProviderUtils.GetService<BpmnConfService>();
         List<BpmnConfVo> bpmnConfVos = this.Frsql
@@ -154,12 +156,11 @@ public class OutSideBpmAccessBusinessService : AFBaseCurdRepositoryService<OutSi
                 UpdateTime = a.UpdateTime,
                 Remark = a.Remark
             });
-
-        if (bpmnConfVos == null || !bpmnConfVos.Any())
-        {
+            
+        if (bpmnConfVos==null||!bpmnConfVos.Any()) {
             return PageUtils.GetResultAndPage(page);
         }
-        page.Records = bpmnConfVos;
+        page.Records=bpmnConfVos;
         return PageUtils.GetResultAndPage(page);
     }
 
@@ -203,23 +204,20 @@ public class OutSideBpmAccessBusinessService : AFBaseCurdRepositoryService<OutSi
         ButtonOperationService buttonOperationService = ServiceProviderUtils.GetService<ButtonOperationService>();
         buttonOperationService.ButtonsOperationTransactional(businessDataVo);
     }
-    private Employee GetEmployeeByUserId(String userName)
-    {
+    private Employee GetEmployeeByUserId(String userName) {
         BpmnEmployeeInfoProviderService bpmnEmployeeInfoProviderService = ServiceProviderUtils.GetService<BpmnEmployeeInfoProviderService>();
-        Dictionary<String, String> stringStringMap = bpmnEmployeeInfoProviderService.ProvideEmployeeInfo(new List<string>() { userName });
-        if (!stringStringMap.Any())
-        {
+        Dictionary<String, String> stringStringMap = bpmnEmployeeInfoProviderService.ProvideEmployeeInfo(new List<string>(){userName});
+        if(!stringStringMap.Any()){
             return null;
         }
-        Employee employee = new Employee();
-        employee.Id = userName;
-        stringStringMap.TryGetValue(userName, out string? uname);
-        employee.Username = uname ?? "";
+        Employee employee=new Employee();
+        employee.Id=userName;
+        stringStringMap.TryGetValue(userName,out string? uname);
+        employee.Username = uname??"";
         return employee;
     }
 
-    public List<OutSideBpmAccessProcessRecordVo> OutSideProcessRecord(String processNumber)
-    {
+    public List<OutSideBpmAccessProcessRecordVo> OutSideProcessRecord(String processNumber) {
         return GetProcessRecord(processNumber);
     }
 }

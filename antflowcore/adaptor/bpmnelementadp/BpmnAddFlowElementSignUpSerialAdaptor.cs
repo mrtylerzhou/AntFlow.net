@@ -1,4 +1,5 @@
-﻿using antflowcore.entity;
+﻿using System.Diagnostics;
+using antflowcore.entity;
 using antflowcore.util;
 using AntFlowCore.Vo;
 
@@ -6,7 +7,7 @@ namespace antflowcore.adaptor.bpmnelementadp;
 
 public class BpmnAddFlowElementSignUpSerialAdaptor : IBpmnAddFlowElementAdaptor
 {
-    public void AddFlowElement(BpmnConfCommonElementVo elementVo, AFProcess process,
+    public  void AddFlowElement(BpmnConfCommonElementVo elementVo, AFProcess process, 
         Dictionary<string, object> startParamMap, BpmnStartConditionsVo bpmnStartConditions)
     {
         // 获取集合值

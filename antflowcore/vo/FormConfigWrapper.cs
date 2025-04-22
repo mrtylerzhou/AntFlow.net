@@ -1,5 +1,7 @@
-﻿using antflowcore.conf.json;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using antflowcore.conf.json;
 
 namespace AntFlowCore.Vo
 {
@@ -7,7 +9,7 @@ namespace AntFlowCore.Vo
     {
         [JsonPropertyName("widgetList")]
         public List<LFWidget> WidgetList { get; set; }
-
+        
         [JsonPropertyName("formConfig")]
         public FormConfig formConfig { get; set; }
 
@@ -60,10 +62,10 @@ namespace AntFlowCore.Vo
                 [JsonPropertyName("type")]
                 public string Type { get; set; }
 
-                [JsonPropertyName("fieldType"), JsonConverter(typeof(StringToIntConverter))]
+                [JsonPropertyName("fieldType"),JsonConverter(typeof(StringToIntConverter))]
                 public int FieldType { get; set; }
 
-                [JsonPropertyName("defaultValue"), JsonConverter(typeof(IntToStringConverter))]
+                [JsonPropertyName("defaultValue"),JsonConverter(typeof(IntToStringConverter))]
                 public string DefaultValue { get; set; }
 
                 [JsonPropertyName("startPlaceholder")]
@@ -120,7 +122,7 @@ namespace AntFlowCore.Vo
                 [JsonPropertyName("validationHint")]
                 public string ValidationHint { get; set; }
 
-                [JsonPropertyName("customClass"), JsonConverter(typeof(StringOrArrayConverter))]
+                [JsonPropertyName("customClass"),JsonConverter(typeof(StringOrArrayConverter))]
                 public string[] CustomClass { get; set; }
 
                 [JsonPropertyName("labelIconClass")]
@@ -184,7 +186,7 @@ namespace AntFlowCore.Vo
             [JsonPropertyName("cssCode")]
             public string CssCode { get; set; }
 
-            [JsonPropertyName("customClass"), JsonConverter(typeof(StringOrArrayConverter))]
+            [JsonPropertyName("customClass"),JsonConverter(typeof(StringOrArrayConverter))]
             public string[] CustomClass { get; set; }
 
             [JsonPropertyName("functions")]

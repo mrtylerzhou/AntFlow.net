@@ -1,13 +1,13 @@
-﻿using antflowcore.constant.enums;
+﻿using System.Linq.Expressions;
+using antflowcore.constant.enus;
 using antflowcore.dto;
 using antflowcore.entity;
+using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.service.biz;
 using antflowcore.util;
 using antflowcore.vo;
-using AntFlowCore.Entity;
 using AntFlowCore.Vo;
-using System.Linq.Expressions;
 
 namespace antflowcore.service.repository;
 
@@ -51,6 +51,7 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
         List<OutSideBpmAdminPersonnel> outSideBpmAdminPersonnels = _outSideBpmAdminPersonnelService.baseRepo
             .Where(a => businessPartyIds.Contains(a.Id))
             .ToList();
+
 
         // 如果没有找到管理员人员，直接返回结果
         if (outSideBpmAdminPersonnels == null || !outSideBpmAdminPersonnels.Any())
@@ -161,11 +162,13 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
 
         OutSideBpmBusinessPartyVo vo = outSideBpmBusinessParty.MapToVo();
 
+
         //querying all associated business party admin
         List<OutSideBpmAdminPersonnel> outSideBpmAdminPersonnels = _outSideBpmAdminPersonnelService
             .baseRepo
             .Where(a => a.BusinessPartyId == outSideBpmBusinessParty.Id)
             .ToList();
+
 
         //if the result is empty then return
         if (outSideBpmAdminPersonnels == null || !outSideBpmAdminPersonnels.Any())
@@ -250,7 +253,7 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
         }
     }
 
-    private long CheckData(OutSideBpmBusinessPartyVo vo)
+    long CheckData(OutSideBpmBusinessPartyVo vo)
     {
         Expression<Func<OutSideBpmBusinessParty, bool>> expression = a =>
             a.BusinessPartyMark == vo.BusinessPartyMark || a.Name == vo.Name;

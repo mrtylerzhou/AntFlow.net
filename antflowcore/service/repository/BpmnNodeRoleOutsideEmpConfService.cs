@@ -2,7 +2,7 @@
 
 namespace antflowcore.service.repository;
 
-public class BpmnNodeRoleOutsideEmpConfService : AFBaseCurdRepositoryService<BpmnNodeRoleOutsideEmpConf>
+public class BpmnNodeRoleOutsideEmpConfService: AFBaseCurdRepositoryService<BpmnNodeRoleOutsideEmpConf>
 {
     public BpmnNodeRoleOutsideEmpConfService(IFreeSql freeSql) : base(freeSql)
     {

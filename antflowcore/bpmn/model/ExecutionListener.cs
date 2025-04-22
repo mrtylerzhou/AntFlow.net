@@ -1,10 +1,10 @@
-﻿namespace antflowcore.bpmn.model;
+﻿namespace antflowcore.bpmn;
 
 public abstract class ExecutionListener
 {
-    private string EVENTNAME_START = "start";
-    private string EVENTNAME_END = "end";
-    private string EVENTNAME_TAKE = "take";
+    String EVENTNAME_START = "start";
+    String EVENTNAME_END = "end";
+    String EVENTNAME_TAKE = "take";
 
     public abstract void Notify(ExecutionEntity execution);
 }

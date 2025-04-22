@@ -1,7 +1,10 @@
-﻿using antflowcore.conf.json;
-using antflowcore.constant.enums;
-using antflowcore.vo;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using antflowcore.conf.json;
+using antflowcore.vo;
+using YourNamespace;
 
 namespace AntFlowCore.Vo
 {
@@ -52,14 +55,14 @@ namespace AntFlowCore.Vo
         [JsonPropertyName("operationType")]
         public int? OperationType { get; set; }
 
-        [JsonPropertyName("userIds")]
+        [JsonPropertyName("userIds")] 
         public List<string> UserIds { get; set; } = new List<string>();
 
         [JsonPropertyName("userInfos")]
         public List<BaseIdTranStruVo> UserInfos { get; set; }
 
-        [JsonPropertyName("approversList")]
-        public Dictionary<String, List<BaseIdTranStruVo>> ApproversList { get; set; } = new Dictionary<string, List<BaseIdTranStruVo>>();
+        [JsonPropertyName("approversList")] 
+        public Dictionary<String,List<BaseIdTranStruVo>> ApproversList { get; set; } = new Dictionary<string, List<BaseIdTranStruVo>>();
 
         [JsonPropertyName("flag")]
         public bool? Flag { get; set; }
@@ -101,17 +104,15 @@ namespace AntFlowCore.Vo
         public bool? IsSignUpNode { get; set; }
 
         [JsonPropertyName("signUpUsers")]
-        public List<BaseIdTranStruVo> SignUpUsers { get; set; } = new List<BaseIdTranStruVo>();
+        public List<BaseIdTranStruVo> SignUpUsers { get; set; }=new List<BaseIdTranStruVo>();
 
         [JsonPropertyName("isStartPagePreview")]
         public bool? IsStartPagePreview { get; set; }
 
         [JsonPropertyName("backToEmployeeId")]
         public string BackToEmployeeId { get; set; }
-
         [JsonPropertyName("backToEmployeeName")]
         public string BackToEmployeeName { get; set; }
-
         [JsonPropertyName("backToModifyType")]
         public int? BackToModifyType { get; set; }
 
@@ -121,9 +122,7 @@ namespace AntFlowCore.Vo
 
         [JsonPropertyName("bpmnConfVo")]
         public BpmnConfVo BpmnConfVo { get; set; }
-
-        [JsonPropertyName("accountType")]
-        public int? AccountType { get; set; }
+        
 
         [JsonPropertyName("jobLevelVo")]
         public BaseIdTranStruVo JobLevelVo { get; set; }
@@ -131,13 +130,13 @@ namespace AntFlowCore.Vo
         [JsonPropertyName("assignee")]
         public string Assignee { get; set; }
 
-        [JsonPropertyName("isOutSideAccessProc"), JsonConverter(typeof(StringToNullableBoolConverter))]
+        [JsonPropertyName("isOutSideAccessProc"),JsonConverter(typeof(StringToNullableBoolConverter))]
         public bool? IsOutSideAccessProc { get; set; } = false;
 
         [JsonPropertyName("isOutSideChecked")]
         public bool IsOutSideChecked { get; set; } = false;
 
-        [JsonPropertyName("isLowCodeFlow"), JsonConverter(typeof(BooleanToNullableIntJsonConverter))]
+        [JsonPropertyName("isLowCodeFlow"),JsonConverter(typeof(BooleanToNullableIntJsonConverter))]
         public int? IsLowCodeFlow { get; set; } = 0;
 
         [JsonPropertyName("bpmFlowCallbackUrl")]
@@ -177,6 +176,6 @@ namespace AntFlowCore.Vo
         public List<string> TemplateMarkIds { get; set; }
 
         [JsonPropertyName("lfConditions")]
-        public Dictionary<String, Object> LfConditions;
+        public Dictionary<String,Object> LfConditions;
     }
 }

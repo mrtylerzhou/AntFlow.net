@@ -1,4 +1,4 @@
-﻿namespace antflowcore.bpmn.model;
+﻿namespace antflowcore.bpmn;
 
 public interface IAFExecutionListeners
 {

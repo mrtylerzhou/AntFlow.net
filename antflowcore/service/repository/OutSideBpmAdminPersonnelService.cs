@@ -1,10 +1,10 @@
-﻿using antflowcore.constant.enums;
+﻿using System.Linq.Expressions;
+using antflowcore.constant.enus;
 using AntFlowCore.Entity;
-using System.Linq.Expressions;
 
 namespace antflowcore.service.repository;
 
-public class OutSideBpmAdminPersonnelService : AFBaseCurdRepositoryService<OutSideBpmAdminPersonnel>
+public class OutSideBpmAdminPersonnelService: AFBaseCurdRepositoryService<OutSideBpmAdminPersonnel>
 {
     public OutSideBpmAdminPersonnelService(IFreeSql freeSql) : base(freeSql)
     {
@@ -12,9 +12,9 @@ public class OutSideBpmAdminPersonnelService : AFBaseCurdRepositoryService<OutSi
 
     public List<long> GetBusinessPartyIdByEmployeeId(String employeeId, params string[] permCodes)
     {
+
         List<int> types = new List<int>();
-        if (permCodes.Length > 0)
-        {
+        if(permCodes.Length>0){
             foreach (string permCode in permCodes)
             {
                 AdminPersonnelTypeEnum enumByPermCode = AdminPersonnelTypeEnum.getEnumByPermCode(permCode);
@@ -25,12 +25,12 @@ public class OutSideBpmAdminPersonnelService : AFBaseCurdRepositoryService<OutSi
         return GetBusinessPartyIdByEmployeeId(employeeId, types);
     }
 
-    private List<long> GetBusinessPartyIdByEmployeeId(String employeeId, List<int> types)
+    List<long> GetBusinessPartyIdByEmployeeId(String employeeId, List<int> types)
     {
-        Expression<Func<OutSideBpmAdminPersonnel, bool>> expression = x => x.EmployeeId == employeeId;
+        Expression<Func<OutSideBpmAdminPersonnel,bool>> expression= x => x.EmployeeId == employeeId;
         if (types.Count > 0)
         {
-            expression = expression.And(x => types.Contains(x.Type));
+            expression = expression.And(x=>types.Contains(x.Type));
         }
 
         List<long> businessPartyIds = this
@@ -38,7 +38,7 @@ public class OutSideBpmAdminPersonnelService : AFBaseCurdRepositoryService<OutSi
             .Where(expression)
             .Distinct()
             .ToList(x => x.BusinessPartyId);
-
+        
         return businessPartyIds;
     }
 }

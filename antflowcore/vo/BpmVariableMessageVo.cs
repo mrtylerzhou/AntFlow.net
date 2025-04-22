@@ -1,5 +1,8 @@
-﻿using antflowcore.constant.enums;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using AntFlowCore.Enums;
+using AntFlowCore.Vo;
 
 namespace AntFlowCore.Vo
 {
@@ -198,5 +201,6 @@ namespace AntFlowCore.Vo
         /// </summary>
         [JsonPropertyName("isOutside")]
         public bool IsOutside { get; set; } = false;
+        
     }
 }

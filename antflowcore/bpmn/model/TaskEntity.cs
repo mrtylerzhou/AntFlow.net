@@ -1,4 +1,4 @@
-﻿namespace antflowcore.bpmn.model;
+﻿namespace antflowcore.bpmn;
 
 public class TaskEntity
 {
@@ -21,7 +21,7 @@ public class TaskEntity
     public string Description { get; set; }
     public string LocalizedDescription { get; set; }
     public int Priority { get; set; } = DEFAULT_PRIORITY;
-    public DateTime? CreateTime { get; set; }
+    public DateTime? CreateTime { get; set; } 
     public DateTime? DueDate { get; set; }
     public int SuspensionState { get; set; }
     public string Category { get; set; }

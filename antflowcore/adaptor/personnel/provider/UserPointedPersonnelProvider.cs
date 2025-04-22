@@ -4,7 +4,6 @@ using antflowcore.vo;
 using AntFlowCore.Vo;
 
 namespace antflowcore.adaptor.personnel.provider;
-
 [NamedService(nameof(UserPointedPersonnelProvider))]
 public class UserPointedPersonnelProvider : IBpmnPersonnelProviderService
 {

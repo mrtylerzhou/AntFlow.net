@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace antflowcore.adaptor.nodetypecondition.judge;
 
-public class PurchaseTotalMoneyJudge : AbstractComparableJudge
+public class PurchaseTotalMoneyJudge: AbstractComparableJudge
 {
     private readonly ILogger<PurchaseTotalMoneyJudge> _logger;
 
@@ -13,11 +13,10 @@ public class PurchaseTotalMoneyJudge : AbstractComparableJudge
     {
         _logger = logger;
     }
-
     public override bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo)
     {
-        if (conditionsConf.PlanProcurementTotalMoney == null || bpmnStartConditionsVo.PlanProcurementTotalMoney == null)
-        {
+        if (conditionsConf.PlanProcurementTotalMoney==null ||bpmnStartConditionsVo.PlanProcurementTotalMoney==null) {
+
             _logger.LogInformation("process's Plan Procurement Total money is empty");
             throw new AFBizException("999", "process's Plan Procurement Total is empty");
         }
@@ -30,6 +29,6 @@ public class PurchaseTotalMoneyJudge : AbstractComparableJudge
         {
             throw new AFBizException("999", "number operator is empty");
         }
-        return base.CompareJudge(purchaseInDb, purchaseActual, theOperatorType.Value);
+        return base.CompareJudge(purchaseInDb,purchaseActual,theOperatorType.Value);
     }
 }

@@ -1,11 +1,11 @@
-﻿using antflowcore.entity;
+﻿using AntFlowCore.Entities;
+using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.util;
-using AntFlowCore.Entity;
 
 namespace antflowcore.service.repository;
 
-public class BpmVariableMultiplayerPersonnelService : AFBaseCurdRepositoryService<BpmVariableMultiplayerPersonnel>
+public class BpmVariableMultiplayerPersonnelService: AFBaseCurdRepositoryService<BpmVariableMultiplayerPersonnel>
 {
     public BpmVariableMultiplayerPersonnelService(IFreeSql freeSql) : base(freeSql)
     {
@@ -15,18 +15,17 @@ public class BpmVariableMultiplayerPersonnelService : AFBaseCurdRepositoryServic
     {
         List<BpmVariableMultiplayer> bpmVariableMultiplayers = Frsql.Select<BpmVariableMultiplayer>()
             .From<BpmVariable, BpmVariableMultiplayerPersonnel>(
-                (a, b, c) =>
-                    a.LeftJoin(x => x.VariableId == b.Id)
-                        .LeftJoin(x => x.Id == c.VariableMultiplayerId)
+                (a,b,c)=>
+                    a.LeftJoin(x=>x.VariableId==b.Id)
+                        .LeftJoin(x=>x.Id==c.VariableMultiplayerId)
             )
-            .Where(a => (a.t1.ElementId == taskTaskDefKey) && (a.t2.ProcessNum == processNumber) && (a.t3.UndertakeStatus == 0))
+            .Where(a=>(a.t1.ElementId==taskTaskDefKey)&&(a.t2.ProcessNum==processNumber)&&(a.t3.UndertakeStatus==0))
             .ToList();
         if (bpmVariableMultiplayers != null && bpmVariableMultiplayers.Count > 0 &&
             bpmVariableMultiplayers[0].SignType == 2)
         {
             String logInEmpId = SecurityUtils.GetLogInEmpId();
-            if (string.IsNullOrEmpty(logInEmpId))
-            {
+            if (string.IsNullOrEmpty(logInEmpId)) {
                 throw new AFBizException("current user is not login");
             }
 

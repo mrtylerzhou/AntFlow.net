@@ -1,11 +1,12 @@
-﻿using antflowcore.constant.enums;
+﻿using System.Web;
+using antflowcore.constant.enus;
 using antflowcore.dto;
 using antflowcore.entity;
+using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.util;
-using AntFlowCore.Entity;
 using AntFlowCore.Vo;
-using System.Web;
+using AntOffice.Base.Util;
 
 namespace antflowcore.service.repository;
 
@@ -64,9 +65,8 @@ public class BpmProcessAppApplicationService : AFBaseCurdRepositoryService<BpmPr
 
     public ResultAndPage<BpmProcessAppApplicationVo> ApplicationsPageList(PageDto page, BpmProcessAppApplicationVo vo)
     {
-        return ApplicationsNewList(page, vo);
+        return ApplicationsNewList(page,vo);
     }
-
     public ResultAndPage<BpmProcessAppApplicationVo> ApplicationsNewList(PageDto pageDto, BpmProcessAppApplicationVo vo)
     {
         //排序字段链表
@@ -174,7 +174,7 @@ public class BpmProcessAppApplicationService : AFBaseCurdRepositoryService<BpmPr
         if (vo.Id != null && vo.Id > 0)
         {
             entity.EffectiveSource = vo.EffectiveSource;
-            return this.baseRepo.Update(entity) > 0;
+            return this.baseRepo.Update(entity)>0;
         }
         else
         {
@@ -198,4 +198,5 @@ public class BpmProcessAppApplicationService : AFBaseCurdRepositoryService<BpmPr
             return this.baseRepo.Insert(entity) != null;
         }
     }
+
 }

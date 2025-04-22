@@ -1,4 +1,4 @@
-﻿namespace antflowcore.constant.enums;
+﻿namespace antflowcore.constant.enus;
 
 using System;
 
@@ -15,7 +15,6 @@ public static class ConfigurationTableEnumExtensions
         {
             case ConfigurationTableEnum.COMPANY_FINANCE:
                 return "财务审核流程配置表";
-
             default:
                 throw new ArgumentOutOfRangeException();
         }

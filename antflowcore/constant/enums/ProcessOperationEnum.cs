@@ -1,4 +1,7 @@
-﻿namespace antflowcore.constant.enums
+﻿using System;
+using System.Collections.Generic;
+
+namespace AntFlowCore.Enums
 {
     public enum ProcessOperationEnum
     {
@@ -26,43 +29,30 @@
             {
                 case ProcessOperationEnum.BUTTON_TYPE_SUBMIT:
                     return "流程提交";
-
                 case ProcessOperationEnum.BUTTON_TYPE_RESUBMIT:
                     return "重新提交";
-
                 case ProcessOperationEnum.BUTTON_TYPE_AGREE:
                     return "同意";
-
                 case ProcessOperationEnum.BUTTON_TYPE_DIS_AGREE:
                     return "不同意";
-
                 case ProcessOperationEnum.BUTTON_TYPE_VIEW_BUSINESS_PROCESS:
                     return "查看流程详情";
-
                 case ProcessOperationEnum.BUTTON_TYPE_ABANDON:
                     return "作废";
-
                 case ProcessOperationEnum.BUTTON_TYPE_UNDERTAKE:
                     return "承办";
-
                 case ProcessOperationEnum.BUTTON_TYPE_CHANGE_ASSIGNEE:
                     return "变更处理人";
-
                 case ProcessOperationEnum.BUTTON_TYPE_STOP:
                     return "终止";
-
                 case ProcessOperationEnum.BUTTON_TYPE_FORWARD:
                     return "转发";
-
                 case ProcessOperationEnum.BUTTON_TYPE_BACK_TO_MODIFY:
                     return "打回修改";
-
                 case ProcessOperationEnum.BUTTON_TYPE_JP:
                     return "加批";
-
                 case ProcessOperationEnum.BUTTON_TYPE_ZB:
                     return "转办";
-
                 default:
                     return null;
             }

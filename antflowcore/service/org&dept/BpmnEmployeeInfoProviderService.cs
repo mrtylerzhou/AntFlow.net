@@ -1,13 +1,12 @@
 ﻿using antflowcore.conf.di;
+using AntFlowCore.Entity;
 using antflowcore.service.repository;
 using antflowcore.util;
 using antflowcore.vo;
-using AntFlowCore.Entity;
 
 namespace antflowcore.service;
-
 [NamedService(nameof(BpmnEmployeeInfoProviderService))]
-public class BpmnEmployeeInfoProviderService : IBpmnEmployeeInfoProviderService
+public class BpmnEmployeeInfoProviderService: IBpmnEmployeeInfoProviderService
 {
     private readonly UserService _userService;
 
@@ -15,15 +14,14 @@ public class BpmnEmployeeInfoProviderService : IBpmnEmployeeInfoProviderService
     {
         _userService = userService;
     }
-
     public Dictionary<string, string> ProvideEmployeeInfo(IEnumerable<string> empIds)
     {
+        
         List<BaseIdTranStruVo> users = _userService.QueryUserByIds(empIds);
-        if (ObjectUtils.IsEmpty(users))
-        {
+        if(ObjectUtils.IsEmpty(users)){
             return new Dictionary<string, string>();
         }
-        Dictionary<String, String> empIdAndNameMap = users
+        Dictionary<String,String>empIdAndNameMap =  users
             .ToDictionary(user => user.Id, user => user.Name, StringComparer.OrdinalIgnoreCase);
 
         return empIdAndNameMap;

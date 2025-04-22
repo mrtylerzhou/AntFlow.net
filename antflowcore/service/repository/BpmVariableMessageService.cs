@@ -1,12 +1,14 @@
-﻿using antflowcore.constant.enums;
+﻿using System.Runtime.InteropServices.JavaScript;
+using System.Text.Json;
 using antflowcore.entity;
+using AntFlowCore.Entity;
+using AntFlowCore.Enums;
 using antflowcore.exception;
 using antflowcore.util;
 using antflowcore.vo;
-using AntFlowCore.Entity;
 using AntFlowCore.Vo;
 using Microsoft.CodeAnalysis;
-using System.Text.Json;
+using Microsoft.VisualBasic;
 
 namespace antflowcore.service.repository;
 
@@ -47,13 +49,14 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
         EventTypeEnum? eventTypeEnum =
             EventTypeEnumExtensions.GetEnumByOperationType(businessDataVo.OperationType.Value);
 
-        if (eventTypeEnum == null || eventTypeEnum == 0)
+        if (eventTypeEnum == null||eventTypeEnum==0)
         {
             return null;
         }
 
         //default link type is process type
         int type = 2;
+
 
         //if event type is cancel operation then link type is view type
         if (eventTypeEnum == EventTypeEnum.PROCESS_CANCELLATION)
@@ -67,8 +70,8 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
             FormCode = businessDataVo.FormCode,
             EventType = (int)eventTypeEnum,
             ForwardUsers = businessDataVo.UserIds,
-            SignUpUsers = businessDataVo.SignUpUsers.Select(a => a.Id).ToList(),
-            MessageType = eventTypeEnum.IsInNode() ? 2 : 1,
+            SignUpUsers = businessDataVo.SignUpUsers.Select(a=>a.Id).ToList(),
+            MessageType =eventTypeEnum.IsInNode()?2:1,
             EventTypeEnum = eventTypeEnum.Value,
             Type = type,
         };
@@ -87,6 +90,7 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
             return null;
         }
 
+
         BpmVariable bpmVariable = null;
         List<BpmVariable> bpmVariables =
             _variableService.baseRepo.Where(a => a.ProcessNum.Equals(vo.ProcessNumber)).ToList();
@@ -101,8 +105,10 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
             return null;
         }
 
+
         //set variable id
         vo.VariableId = bpmVariable.Id;
+
 
         //get bpmn conf
         BpmnConf bpmnConf = _bpmnConfService.baseRepo.Where(a => a.BpmnCode.Equals(bpmVariable.BpmnCode)).ToOne();
@@ -135,16 +141,19 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
             vo.ApprovalEmplId = bpmnStartConditionsVo.ApprovalEmplId ?? "0";
         }
 
+
         //query bpmn business process by process number
         BpmBusinessProcess businessProcess = _bpmBusinessProcessService.baseRepo
             .Where(a => a.BusinessNumber.Equals(vo.ProcessNumber)).ToOne();
+
 
         if (businessProcess == null)
         {
             throw new AFBizException($"can not get BpmBusinessProcess by process Numbeer:{vo.ProcessNumber}");
         }
 
-        //todo
+
+        //todo 
 
         return vo;
     }
@@ -213,4 +222,5 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
             })
             .ToList();
     }
+
 }

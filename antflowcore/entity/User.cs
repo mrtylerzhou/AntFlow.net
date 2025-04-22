@@ -1,8 +1,9 @@
-﻿using antflowcore.vo;
-using FreeSql.DataAnnotations;
+﻿using System;
 using System.Text.Json.Serialization;
+using antflowcore.vo;
+using FreeSql.DataAnnotations;
 
-namespace antflowcore.entity
+namespace AntFlowCore.Entities
 {
     [Table(Name = "t_user")]
     public class User

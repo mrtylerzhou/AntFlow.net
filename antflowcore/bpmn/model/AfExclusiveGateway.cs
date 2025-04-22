@@ -1,5 +1,6 @@
-﻿namespace antflowcore.bpmn.model;
+﻿namespace antflowcore.bpmn;
 
-public class AfExclusiveGateway : AfAbstractGateway
+public class AfExclusiveGateway: AfAbstractGateway
 {
+    
 }

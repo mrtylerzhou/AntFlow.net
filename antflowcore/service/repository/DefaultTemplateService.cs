@@ -2,12 +2,11 @@
 
 namespace antflowcore.service.repository;
 
-public class DefaultTemplateService : AFBaseCurdRepositoryService<DefaultTemplate>
+public class DefaultTemplateService: AFBaseCurdRepositoryService<DefaultTemplate>
 {
     public DefaultTemplateService(IFreeSql freeSql) : base(freeSql)
     {
     }
-
     public void InsertOrUpdateAllColumnBatch(List<DefaultTemplate> list)
     {
         if (list == null || list.Count == 0)
@@ -21,8 +20,7 @@ public class DefaultTemplateService : AFBaseCurdRepositoryService<DefaultTemplat
             if (item.Id == null || item.Id == 0)
             {
                 inserts.Add(item);
-            }
-            else
+            }else
             {
                 updates.Add(item);
             }
@@ -38,4 +36,5 @@ public class DefaultTemplateService : AFBaseCurdRepositoryService<DefaultTemplat
             this.baseRepo.Insert(inserts);
         }
     }
+
 }

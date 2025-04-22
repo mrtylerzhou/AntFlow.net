@@ -1,5 +1,7 @@
-﻿using antflowcore.vo;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using antflowcore.vo;
 
 namespace AntFlowCore.Vo
 {
@@ -25,14 +27,11 @@ namespace AntFlowCore.Vo
 
         [JsonPropertyName("deduplicationTypeName")]
         public string DeduplicationTypeName { get; set; }
-
         [JsonPropertyName("currentNodeId")]
         public String CurrentNodeId { get; set; }
-
         [JsonPropertyName("beforeNodeIds")]
-        public List<String> BeforeNodeIds { get; set; }
-
+        public  List<String>  BeforeNodeIds { get; set; }
         [JsonPropertyName("afterNodeIds")]
-        public List<String> AfterNodeIds { get; set; }
+        public  List<String>  AfterNodeIds { get; set; }
     }
 }

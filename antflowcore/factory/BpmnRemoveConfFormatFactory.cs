@@ -1,4 +1,4 @@
-﻿using antflowcore.formatter.filter;
+﻿using antflowcore.service.processor.filter;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 
@@ -12,12 +12,9 @@ public class BpmnRemoveConfFormatFactory
     {
         _bpmnRemoveFormats = bpmnRemoveFormats;
     }
-
-    public void RemoveBpmnConf(BpmnConfVo bpmnConfVo, BpmnStartConditionsVo bpmnStartConditions)
-    {
-        foreach (IBpmnRemoveFormat bpmnRemoveFormat in _bpmnRemoveFormats)
-        {
-            bpmnRemoveFormat.RemoveBpmnConf(bpmnConfVo, bpmnStartConditions);
+    public void RemoveBpmnConf (BpmnConfVo bpmnConfVo, BpmnStartConditionsVo bpmnStartConditions){
+        foreach (IBpmnRemoveFormat bpmnRemoveFormat in _bpmnRemoveFormats) {
+            bpmnRemoveFormat.RemoveBpmnConf(bpmnConfVo,bpmnStartConditions);
         }
     }
 }

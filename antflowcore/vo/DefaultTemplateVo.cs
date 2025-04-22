@@ -1,4 +1,7 @@
-﻿namespace AntFlowCore.Vo
+﻿using System;
+using System.Runtime.Serialization;
+
+namespace AntFlowCore.Vo
 {
     public class DefaultTemplateVo
     {

@@ -1,8 +1,8 @@
-﻿using AntFlowCore.Vo;
+﻿using antflowcore.constant.enus;
+using AntFlowCore.Vo;
 
 namespace antflowcore.util;
 
-using antflowcore.constant.enums;
 using System.Collections.Generic;
 
 public static class BpmnElementUtils

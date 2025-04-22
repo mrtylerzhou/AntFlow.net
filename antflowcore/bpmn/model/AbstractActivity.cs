@@ -1,8 +1,8 @@
-﻿namespace antflowcore.bpmn.model;
+﻿namespace antflowcore.bpmn;
 
-public class AbstractActivity : AbstractFlowNode
+public class AbstractActivity: AbstractFlowNode
 {
-    public string DefaultFlow { get; set; }
-    public bool ForCompensation { get; set; }
-    public MultiInstanceLoopCharacteristics LoopCharacteristics { get; set; }
+    public String DefaultFlow { get; set; }
+    public bool ForCompensation{ get; set; }
+    public MultiInstanceLoopCharacteristics LoopCharacteristics{ get; set; }
 }

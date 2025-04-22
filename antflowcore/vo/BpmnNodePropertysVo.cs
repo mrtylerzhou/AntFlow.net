@@ -1,5 +1,7 @@
-﻿using Antflowcore.Vo;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using Antflowcore.Vo;
 
 namespace antflowcore.vo
 {
@@ -87,7 +89,7 @@ namespace antflowcore.vo
         public int? Sort { get; set; }
 
         // 默认构造函数
-        public BpmnNodePropertysVo()
-        { }
+        public BpmnNodePropertysVo() { }
+        
     }
 }

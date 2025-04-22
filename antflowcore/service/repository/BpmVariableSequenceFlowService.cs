@@ -2,7 +2,7 @@
 
 namespace antflowcore.service.repository;
 
-public class BpmVariableSequenceFlowService : AFBaseCurdRepositoryService<BpmVariableSequenceFlow>
+public class BpmVariableSequenceFlowService: AFBaseCurdRepositoryService<BpmVariableSequenceFlow>
 {
     public BpmVariableSequenceFlowService(IFreeSql freeSql) : base(freeSql)
     {

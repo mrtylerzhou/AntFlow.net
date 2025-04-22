@@ -1,11 +1,10 @@
-﻿namespace antflowcore.bpmn.model;
+﻿namespace antflowcore.bpmn;
 
-public abstract class AbstractFlowElement : AFAbstractBaseElement, IAFExecutionListeners
+public abstract class AbstractFlowElement: AFAbstractBaseElement,IAFExecutionListeners
 {
-    public string Name { get; set; }
-    public string Documentation { get; set; }
-    public List<AFActivitiListener> ExecutionListeners = new List<AFActivitiListener>();
-
+   public String Name { get; set; }
+   public String Documentation { get; set; }
+   public List<AFActivitiListener> ExecutionListeners = new List<AFActivitiListener>();
     public List<AFActivitiListener> GetExecutionListeners()
     {
         return ExecutionListeners;

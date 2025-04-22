@@ -1,5 +1,6 @@
-﻿namespace antflowcore.constant.enums;
+﻿namespace antflowcore.constant.enus;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -16,6 +17,7 @@ public class ConfigFlowButtonSortEnum
         Sort = sort;
     }
 
+   
     public static readonly ConfigFlowButtonSortEnum SUBMIT = new ConfigFlowButtonSortEnum(1, "提交", 1);
     public static readonly ConfigFlowButtonSortEnum AGAIN_SUBMIT = new ConfigFlowButtonSortEnum(2, "重新提交", 2);
     public static readonly ConfigFlowButtonSortEnum AGREED = new ConfigFlowButtonSortEnum(3, "同意", 10);
@@ -57,6 +59,6 @@ public class ConfigFlowButtonSortEnum
     public static int? GetCodeByDesc(string desc)
     {
         var item = AllValues.FirstOrDefault(v => v.Desc == desc);
-        return item != null ? item.Code : null;
+        return item != null ? (int?)item.Code : null;
     }
 }

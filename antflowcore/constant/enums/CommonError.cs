@@ -1,4 +1,4 @@
-﻿namespace antflowcore.constant.enums
+﻿namespace AntFlowCore.Entity
 {
     /// <summary>
     /// 常见错误枚举

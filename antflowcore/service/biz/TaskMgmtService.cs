@@ -1,13 +1,13 @@
-﻿using antflowcore.adaptor.formoperation;
-using antflowcore.constant.enums;
+﻿using System.Collections;
+using System.Reflection;
+using antflowcore.adaptor;
+using antflowcore.constant.enus;
 using antflowcore.dto;
 using antflowcore.entity;
 using antflowcore.factory;
 using antflowcore.service.repository;
 using antflowcore.util;
 using AntFlowCore.Vo;
-using System.Collections;
-using System.Reflection;
 
 namespace antflowcore.service.biz;
 
@@ -17,7 +17,6 @@ public class TaskMgmtService
     private readonly AfTaskInstService _taskInstService;
     private readonly BpmnConfService _bpmnConfService;
     private IEnumerable services = ServiceProviderUtils.GetServicesByOpenGenericType(typeof(IFormOperationAdaptor<>));
-
     public TaskMgmtService(
         AFTaskService taskService,
         AfTaskInstService taskInstService,
@@ -41,8 +40,8 @@ public class TaskMgmtService
             .Update<BpmAfTaskInst>()
             .Set(a => a.Assignee, taskMgmtVO.ApplyUser)
             .Set(a => a.AssigneeName, taskMgmtVO.ApplyUserName)
-            .Set(a => a.Description, "变更处理人")
-            .Set(a => a.UpdateUser, SecurityUtils.GetLogInEmpId())
+            .Set(a=>a.Description,"变更处理人")
+            .Set(a=>a.UpdateUser,SecurityUtils.GetLogInEmpId())
             .Where(a => a.Id == taskMgmtVO.TaskId)
             .ExecuteAffrows();
         return affrows;
@@ -62,21 +61,21 @@ public class TaskMgmtService
             .Set(a => a.AssigneeName, taskMgmtVO.ApplyUserName)
             .Where(a => a.Id == taskMgmtVO.TaskId)
             .ExecuteAffrows();
-
+       
         return affrows;
     }
 
     public List<BpmAfTask> GetAgencyList(string taskId, int code, string taskProcInstId)
     {
-        IEnumerable<string> taskDefKeys = _taskService.baseRepo.Where(a => a.Id == taskId).ToList().Select(a => a.TaskDefKey);
-        List<BpmAfTask> bpmAfTasks = _taskService.baseRepo.Where(a => taskDefKeys.Contains(a.TaskDefKey) && a.ProcInstId == taskProcInstId).ToList();
-        List<BpmAfTask> afTasks = bpmAfTasks.Where(a => a.TaskDefKey != taskId).ToList();
+        IEnumerable<string> taskDefKeys = _taskService.baseRepo.Where(a=>a.Id==taskId).ToList().Select(a=>a.TaskDefKey);
+        List<BpmAfTask> bpmAfTasks = _taskService.baseRepo.Where(a=>taskDefKeys.Contains(a.TaskDefKey)&&a.ProcInstId==taskProcInstId).ToList();
+        List<BpmAfTask> afTasks = bpmAfTasks.Where(a=>a.Id!=taskId).ToList();
         return afTasks;
     }
 
     public void DeleteTask(string taskId)
     {
-        _taskService.baseRepo.Delete(a => a.Id == taskId);
+       _taskService.baseRepo.Delete(a=>a.Id==taskId);
     }
 
     public List<DIYProcessInfoDTO> ViewProcessInfo(string desc)
@@ -95,7 +94,7 @@ public class TaskMgmtService
 
         if (bpmnConfs.Count > 0)
         {
-            Dictionary<string, int?> formCode2Flags = bpmnConfs.ToDictionary(b => b.FormCode, x => x.ExtraFlags, StringComparer.Ordinal);
+            Dictionary<string, int?> formCode2Flags = bpmnConfs.ToDictionary(b => b.FormCode, x => x.ExtraFlags,StringComparer.Ordinal);
 
             foreach (var diyProcessInfoDTO in diyProcessInfoDTOS)
             {
@@ -109,12 +108,13 @@ public class TaskMgmtService
 
         return diyProcessInfoDTOS;
     }
-
+   
     private List<DIYProcessInfoDTO> BaseFormInfo(string desc)
     {
         List<DIYProcessInfoDTO> results = new List<DIYProcessInfoDTO>();
         foreach (object service in services)
         {
+           
             var annotation = service.GetType().GetCustomAttribute<AfFormServiceAnnoAttribute>();
             if (string.IsNullOrEmpty(annotation?.Desc))
             {
@@ -144,4 +144,6 @@ public class TaskMgmtService
         }
         return results;
     }
+
+  
 }

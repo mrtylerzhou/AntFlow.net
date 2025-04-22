@@ -1,5 +1,6 @@
-﻿namespace antflowcore.bpmn.model;
+﻿namespace antflowcore.bpmn;
 
-public class AfUserTask : AbstractTask
+public class AfUserTask: AbstractTask
 {
+    
 }

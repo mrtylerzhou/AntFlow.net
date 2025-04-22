@@ -1,8 +1,10 @@
-﻿using antflowcore.entity;
+﻿using System.Collections;
+using System.Diagnostics;
+using System.Text.Json;
+using antflowcore.entity;
 using antflowcore.service.repository;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 
 namespace antflowcore.service.biz;
 
@@ -20,15 +22,14 @@ public class ActivitiAdditionalInfoService
         _afTaskInstService = afTaskInstService;
         _logger = logger;
     }
+    public List<BpmnConfCommonElementVo> GetActivitiList(BpmAfTaskInst historicProcessInstance) {
 
-    public List<BpmnConfCommonElementVo> GetActivitiList(BpmAfTaskInst historicProcessInstance)
-    {
+        
         return GetActivitiList(historicProcessInstance.ProcDefId);
-    }
 
-    public List<BpmnConfCommonElementVo> GetActivitiList(String procDefId)
-    {
-        BpmAfDeployment bpmAfDeployment = _afDeploymentService.baseRepo.Where(a => a.Id == procDefId).First();
+    }
+    public List<BpmnConfCommonElementVo> GetActivitiList(String procDefId){
+        BpmAfDeployment bpmAfDeployment = _afDeploymentService.baseRepo.Where(a=>a.Id==procDefId).First();
         if (bpmAfDeployment == null)
         {
             throw new ApplicationException($"deployment with id {procDefId} not found");
@@ -37,10 +38,10 @@ public class ActivitiAdditionalInfoService
         List<BpmnConfCommonElementVo> elements = JsonSerializer.Deserialize<List<BpmnConfCommonElementVo>>(content);
         return elements;
     }
-
     public Dictionary<string, List<BpmAfTaskInst>> GetVariableInstanceMap(string procInstId)
     {
         List<BpmAfTaskInst> bpmAfTaskInsts = _afTaskInstService.baseRepo.Where(a => a.ProcInstId == procInstId).ToList();
+        
 
         var variableInstanceMap = new Dictionary<string, List<BpmAfTaskInst>>();
 
@@ -58,9 +59,9 @@ public class ActivitiAdditionalInfoService
 
     public static List<BpmnConfCommonElementVo> GetNextElementList(string elementId, List<BpmnConfCommonElementVo> activitiList)
     {
-        IEnumerable<BpmnConfCommonElementVo> bpmnConfCommonElementVos = activitiList.Where(a => a.ElementId == elementId);
-        IEnumerable<string> flowToElementIds = bpmnConfCommonElementVos.Select(a => a.FlowTo);
-        List<BpmnConfCommonElementVo> flowTos = bpmnConfCommonElementVos.Where(a => flowToElementIds.Contains(a.ElementId)).ToList();
+        IEnumerable<BpmnConfCommonElementVo> bpmnConfCommonElementVos = activitiList.Where(a=>a.ElementId==elementId);
+        IEnumerable<string> flowToElementIds = bpmnConfCommonElementVos.Select(a=>a.FlowTo);
+        List<BpmnConfCommonElementVo> flowTos = bpmnConfCommonElementVos.Where(a=>flowToElementIds.Contains(a.ElementId)).ToList();
         return flowTos;
     }
 }

@@ -14,17 +14,13 @@ public class StringOrIntConverter : JsonConverter<string>
         {
             case JsonTokenType.Number:
                 return reader.GetDouble().ToString();
-
             case JsonTokenType.String:
                 return reader.GetString();
-
             case JsonTokenType.Null:
                 return "";
-
             case JsonTokenType.True:
             case JsonTokenType.False:
                 return reader.GetBoolean().ToString();
-
             default:
                 try
                 {
@@ -39,6 +35,7 @@ public class StringOrIntConverter : JsonConverter<string>
 
     public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options)
     {
+        
         writer.WriteStringValue(value);
     }
 }

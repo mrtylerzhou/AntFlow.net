@@ -1,8 +1,8 @@
-﻿using antflowcore.conf.di;
+﻿using System.Collections;
+using System.Collections.Concurrent;
+using antflowcore.conf.di;
 using antflowcore.service;
 using Microsoft.Extensions.DependencyInjection;
-using System.Collections;
-using System.Collections.Concurrent;
 
 namespace antflowcore.util;
 
@@ -46,12 +46,12 @@ public static class ServiceProviderUtils
         throw new Exception($"No service with name '{serviceName}' found.");
     }
 
+
     public static Object GetService(Type serviceType)
     {
         var service = _serviceProvider.GetService(serviceType);
         return service ?? throw new Exception($"No service with type '{serviceType.Name}' found.");
     }
-
     /// <summary>
     /// 获取一个服务实例（通过类型）。
     /// </summary>
@@ -109,6 +109,7 @@ public static class ServiceProviderUtils
 
     public static IEnumerable<object> GetServicesByOpenGenericType(Type openGenericType)
     {
+        
         var serviceCollection = ServiceCollectionHolder.Services;
 
         // 筛选出所有符合开放泛型定义的服务

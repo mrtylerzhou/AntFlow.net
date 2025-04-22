@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace antflowcore.constant.enums;
+namespace antflowcore.constant.enus;
 
 public abstract class EnumBase<T> where T : EnumBase<T>
 {
@@ -11,26 +11,26 @@ public abstract class EnumBase<T> where T : EnumBase<T>
     {
         Type = type;
         Description = description;
-        if (_values.ContainsKey(GetType().FullName))
+        if (_values.ContainsKey(this.GetType().FullName))
         {
-            _values[GetType().FullName].Add((T)this);
+            _values[this.GetType().FullName].Add((T)this);
         }
         else
         {
-            List<T> lst = new List<T>();
+            List<T> lst=new List<T>();
             lst.Add((T)this);
-            _values.Add(GetType().FullName, lst);
+            _values.Add(this.GetType().FullName, lst);
         }
     }
 
-    private static readonly Dictionary<string, List<T>> _values = new Dictionary<string, List<T>>();
+    private static readonly Dictionary<string,List<T>> _values = new Dictionary<string, List<T>>();
 
-    public static IReadOnlyDictionary<string, List<T>> Values => _values.AsReadOnly();
+    public static IReadOnlyDictionary<string,List<T>> Values => _values.AsReadOnly();
 
     public static T? GetByType(int type) => _values[typeof(T).FullName].FirstOrDefault(e => e.Type == type);
 
-    public override string ToString() => Type + Description;
-
+    public override string ToString() =>Type+ Description;
+    
     public override bool Equals(object? obj)
     {
         if (obj is EnumBase<T> other)
@@ -39,9 +39,8 @@ public abstract class EnumBase<T> where T : EnumBase<T>
         }
         return false;
     }
-
     public override int GetHashCode() => Type.GetHashCode();
-
+    
     public static bool operator ==(EnumBase<T>? left, EnumBase<T>? right)
     {
         if (ReferenceEquals(left, right)) return true;
@@ -50,9 +49,9 @@ public abstract class EnumBase<T> where T : EnumBase<T>
     }
 
     public static bool operator !=(EnumBase<T>? left, EnumBase<T>? right) => !(left == right);
-
     public static void InitializeEnumBaseTypes()
     {
+        
         var assembly = Assembly.GetExecutingAssembly();
         IEnumerable<Type> enumBaseTypes = assembly.GetTypes()
             .Where(t => t.BaseType != null &&
@@ -61,11 +60,13 @@ public abstract class EnumBase<T> where T : EnumBase<T>
 
         foreach (var type in enumBaseTypes)
         {
+           
             var staticField = type.GetFields(BindingFlags.Public | BindingFlags.Static)
                 .FirstOrDefault(field => field.IsStatic);
 
             if (staticField != null)
             {
+               
                 var value = staticField.GetValue(null);
             }
         }

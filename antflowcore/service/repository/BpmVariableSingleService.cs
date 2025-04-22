@@ -1,8 +1,8 @@
-﻿using antflowcore.entity;
+﻿using AntFlowCore.Entities;
 
 namespace antflowcore.service.repository;
 
-public class BpmVariableSingleService : AFBaseCurdRepositoryService<BpmVariableSingle>
+public class BpmVariableSingleService: AFBaseCurdRepositoryService<BpmVariableSingle>
 {
     public BpmVariableSingleService(IFreeSql freeSql) : base(freeSql)
     {

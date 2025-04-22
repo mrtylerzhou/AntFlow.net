@@ -1,4 +1,4 @@
-﻿namespace antflowcore.constant.enums;
+﻿namespace antflowcore.constant.enus;
 
 using System.Collections.Generic;
 using System.Linq;

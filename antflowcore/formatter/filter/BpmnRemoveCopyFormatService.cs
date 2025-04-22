@@ -1,10 +1,11 @@
-﻿using antflowcore.constant.enums;
+﻿using System.Collections.ObjectModel;
+using antflowcore.constant.enus;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 
-namespace antflowcore.formatter.filter;
+namespace antflowcore.service.processor.filter;
 
-public class BpmnRemoveCopyFormatService : AbstractBpmnRemoveFormat
+public class BpmnRemoveCopyFormatService: AbstractBpmnRemoveFormat
 {
     public new void RemoveBpmnConf(BpmnConfVo bpmnConfVo, BpmnStartConditionsVo bpmnStartConditions)
     {

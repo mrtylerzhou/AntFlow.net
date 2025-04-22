@@ -1,9 +1,9 @@
-﻿using antflowcore.constant.enums;
+﻿using antflowcore.constant.enus;
 using antflowcore.vo;
 
-namespace antflowcore.adaptor.bpmnnodeadp;
+namespace antflowcore.adaptor;
 
-public class NodePropertyStartUserAdaptor : BpmnNodeAdaptor
+public class NodePropertyStartUserAdaptor: BpmnNodeAdaptor
 {
     public override BpmnNodeVo FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
     {
@@ -13,6 +13,7 @@ public class NodePropertyStartUserAdaptor : BpmnNodeAdaptor
 
     public override void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
     {
+       
     }
 
     public override void SetSupportBusinessObjects()

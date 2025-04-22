@@ -1,12 +1,14 @@
-﻿using antflowcore.bpmn.listener;
-using antflowcore.constant.enums;
+﻿using System.Linq.Expressions;
+using System.Text.Json;
+using antflowcore.bpmn.listener;
+using antflowcore.constant.enus;
+using AntFlowCore.Constants;
 using antflowcore.entity;
+using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.service.repository;
 using antflowcore.util;
 using AntFlowCore.Vo;
-using System.Linq.Expressions;
-using System.Text.Json;
 
 namespace antflowcore.bpmn.service;
 
@@ -31,38 +33,49 @@ public class TaskService
         _executionListener = executionListener;
         _afDeploymentService = afDeploymentService;
     }
-
-    public List<BpmAfTask> CreateTaskQuery(Expression<Func<BpmAfTask, bool>> filter)
+    public List<BpmAfTask> CreateTaskQuery(Expression<Func<BpmAfTask,bool>> filter)
     {
         List<BpmAfTask> bpmAfTasks = _afTaskService.baseRepo.Where(filter).ToList();
         return bpmAfTasks;
     }
 
-    public void Complete(string taskId)
+    
+    public void Complete( string taskId)
     {
+       
         DateTime nowTime = DateTime.Now;
         string deleteReason = StringConstants.DEFAULT_TASK_DELETE_REASON;
-        BpmAfTask bpmAfTask = _afTaskService.baseRepo.Where(a => a.Id == taskId).First();
+        BpmAfTask bpmAfTask = _afTaskService.baseRepo.Where(a=>a.Id == taskId).First();
+      
         if (bpmAfTask == null)
         {
             throw new ApplicationException($"Task with id {taskId} not found");
         }
-        string procDefId = bpmAfTask.ProcDefId;
-        string taskDefKey = bpmAfTask.TaskDefKey;
-        string procInstId = bpmAfTask.ProcInstId;
-        _afTaskService.baseRepo.Delete(bpmAfTask);
-        BpmAfDeployment bpmAfDeployment = _afDeploymentService.baseRepo.Where(a => a.Id == procDefId).First();
-        if (bpmAfDeployment == null)
-        {
-            throw new ApplicationException($"deployment with id {procDefId} not found");
-        }
-
-        BpmAfExecution currentExecution = _afExecutionService.baseRepo.Where(a => a.Id == bpmAfTask.ExecutionId).First();
+        BpmAfExecution currentExecution = _afExecutionService.baseRepo.Where(a=>a.Id==bpmAfTask.ExecutionId).First();
         if (currentExecution == null)
         {
             throw new AFBizException("未能找到当前流程执行实例!");
         }
-
+        int? currentSignType = currentExecution.SignType??1;
+        string procDefId = bpmAfTask.ProcDefId;
+        string taskDefKey = bpmAfTask.TaskDefKey;
+        string procInstId = bpmAfTask.ProcInstId;
+        if (currentSignType == 2)
+        {
+            _afTaskService.Frsql.Delete<BpmAfTask>()
+                .Where(a => a.TaskDefKey == taskDefKey)
+                .ExecuteAffrows();
+        }
+        else
+        {
+            _afTaskService.baseRepo.Delete(bpmAfTask);
+        }
+        BpmAfDeployment bpmAfDeployment = _afDeploymentService.baseRepo.Where(a=>a.Id==procDefId).First();
+        if (bpmAfDeployment == null)
+        {
+            throw new ApplicationException($"deployment with id {procDefId} not found");
+        }
+        
         if (currentExecution.TaskCount!.Value >= 2)
         {
             BpmAfExecution afExecution = new BpmAfExecution
@@ -75,27 +88,53 @@ public class TaskService
         }
         string content = bpmAfDeployment.Content;
         List<BpmnConfCommonElementVo> elements = JsonSerializer.Deserialize<List<BpmnConfCommonElementVo>>(content);
-        var (nextUserElement, nextFlowElement) = BpmnFlowUtil.GetNextAssigneeAndFlowNode(elements, taskDefKey);
+        BpmnConfCommonElementVo elementToDeal = null;
+        List<string> signUserIds = new List<string>();
+        if (currentSignType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode())
+        {
+            BpmnConfCommonElementVo currentElement = BpmnFlowUtil.GetCurrentTaskElement(elements,taskDefKey);
+            if (currentElement != null)
+            {
+                throw new AFBizException($"can not get current element by element id: {currentElement}");
+            }
 
-        Dictionary<string, string> assigneeMap = nextUserElement.AssigneeMap;
+            BpmVerifyInfoService bpmVerifyInfoService = ServiceProviderUtils.GetService<BpmVerifyInfoService>();
+            List<BpmVerifyInfo> bpmVerifyInfos = bpmVerifyInfoService.baseRepo
+                .Where(a=>a.RunInfoId==procInstId&&a.TaskDefKey==taskDefKey)
+                .ToList();
+            List<string> verifyUserIds = bpmVerifyInfos.Select(a=>a.VerifyUserId).ToList();
+            int currentNodeAssigneesCount = currentElement.AssigneeMap.Count;
+            if (verifyUserIds.Count == currentNodeAssigneesCount)
+            {
+                return;
+            }
+            elementToDeal = currentElement;
+        }
+        else
+        {
+            var (nextUserElement, nextFlowElement) = BpmnFlowUtil.GetNextAssigneeAndFlowNode(elements,taskDefKey);
+            elementToDeal=nextUserElement;
+        }
+      
+        Dictionary<string,string> assigneeMap = elementToDeal.AssigneeMap;
         BpmAfExecution execution = new BpmAfExecution
         {
             Id = bpmAfTask.ExecutionId,
             ProcInstId = procInstId,
             //BusinessKey = bpmnStartConditions.BusinessId, //todo注意观察此字段更新时是否会丢失
             ProcDefId = procDefId,
-            ActId = nextUserElement.ElementId,
-            Name = nextUserElement.ElementName,
+            ActId = elementToDeal.ElementId,
+            Name = elementToDeal.ElementName,
             StartTime = nowTime,
             StartUserId = SecurityUtils.GetLogInEmpId(),
             TaskCount = assigneeMap?.Count,
         };
-
+       
         _afExecutionService.baseRepo.Update(execution);
-        if (nextUserElement.ElementType == ElementTypeEnum.ELEMENT_TYPE_END_EVENT.Code)
+        if (elementToDeal.ElementType == ElementTypeEnum.ELEMENT_TYPE_END_EVENT.Code)
         {
-            deleteReason = StringConstants.TASK_FINISH_REASON;
-            _executionListener.Notify(execution, IExecutionListener.EVENTNAME_END);
+             deleteReason =StringConstants.TASK_FINISH_REASON;
+            _executionListener.Notify(execution,IExecutionListener.EVENTNAME_END);
         }
         _afTaskInstService.Frsql
             .Update<BpmAfTaskInst>()
@@ -108,7 +147,7 @@ public class TaskService
             return;
         }
         List<BpmAfTaskInst> historyTaskInsts = new List<BpmAfTaskInst>();
-        List<BpmAfTask> tasks = new List<BpmAfTask>();
+        List<BpmAfTask> tasks=new List<BpmAfTask>();
         foreach (var (key, value) in assigneeMap)
         {
             BpmAfTask newTask = new BpmAfTask()
@@ -117,8 +156,8 @@ public class TaskService
                 ProcInstId = procInstId,
                 ProcDefId = procDefId,
                 ExecutionId = bpmAfTask.ExecutionId,
-                Name = nextUserElement.ElementName,
-                TaskDefKey = nextUserElement.ElementId,
+                Name = elementToDeal.ElementName,
+                TaskDefKey = elementToDeal.ElementId,
                 Owner = bpmAfTask.Owner,
                 Assignee = key,
                 AssigneeName = value,
@@ -127,12 +166,12 @@ public class TaskService
             };
             tasks.Add(newTask);
             BpmAfTaskInst bpmAfTaskInst = newTask.ToInst();
-            TimeSpan taskDuration = nowTime - bpmAfTask.CreateTime;
-            bpmAfTaskInst.Duration = taskDuration.Minutes;
-            bpmAfTaskInst.EndTime = nowTime;
+            TimeSpan taskDuration = nowTime-bpmAfTask.CreateTime;
+            bpmAfTaskInst.Duration=taskDuration.Minutes;
+            bpmAfTaskInst.EndTime=nowTime;
             historyTaskInsts.Add(bpmAfTaskInst);
         }
-        _afTaskService.baseRepo.Insert(tasks);
+        _afTaskService.InsertTasks(tasks);
         _afTaskInstService.baseRepo.Insert(historyTaskInsts);
     }
 }

@@ -1,10 +1,10 @@
 ﻿using antflowcore.adaptor.personnel.provider;
-using antflowcore.constant.enums;
+using antflowcore.constant.enus;
 using antflowcore.service;
 
-namespace antflowcore.adaptor.personnel.provideradp;
+namespace antflowcore.adaptor.personnel;
 
-public class StartUserPersonnelAdaptor : AbstractBpmnPersonnelAdaptor
+public class StartUserPersonnelAdaptor: AbstractBpmnPersonnelAdaptor
 {
     public StartUserPersonnelAdaptor(StartUserPersonnelProvider bpmnPersonnelProviderService, IBpmnEmployeeInfoProviderService bpmnEmployeeInfoProviderService) : base(bpmnPersonnelProviderService, bpmnEmployeeInfoProviderService)
     {

@@ -5,7 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
 		  <!-- 忽略CS8618和CS0169警告 -->
-        <NoWarn>CS8618;CS8625;CS8603;CS0169</NoWarn>
+        <NoWarn>CS8618;CS0169</NoWarn>
     </PropertyGroup>
     <ItemGroup>
 	  <FrameworkReference Include="Microsoft.AspNetCore.App" />

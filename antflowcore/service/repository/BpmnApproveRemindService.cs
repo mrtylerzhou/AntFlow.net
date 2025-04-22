@@ -1,35 +1,29 @@
-﻿using antflowcore.util;
+﻿using AntFlowCore.Entity;
+using antflowcore.util;
 using antflowcore.vo;
-using AntFlowCore.Entity;
 
 namespace antflowcore.service.repository;
 
-public class BpmnApproveRemindService : AFBaseCurdRepositoryService<BpmnApproveRemind>
+public class BpmnApproveRemindService: AFBaseCurdRepositoryService<BpmnApproveRemind>
 {
     public BpmnApproveRemindService(IFreeSql freeSql) : base(freeSql)
     {
     }
-
-    public void EditBpmnApproveRemind(BpmnNodeVo bpmnNodeVo)
-    {
+    public void EditBpmnApproveRemind(BpmnNodeVo bpmnNodeVo) {
         BpmnApproveRemindVo o = bpmnNodeVo.ApproveRemindVo;
-        if (o == null)
-        {
+        if (o==null) {
             return;
         }
 
         BpmnApproveRemind bpmnApproveRemind = o.MapToEntity();
-        bpmnApproveRemind.ConfId = bpmnNodeVo.ConfId;
-        bpmnApproveRemind.NodeId = (bpmnNodeVo.Id);
-        if (o.IsInuse != null)
-        {
-            bpmnApproveRemind.Days = (string.Join(",", o.DayList));
+        bpmnApproveRemind.ConfId=bpmnNodeVo.ConfId;
+        bpmnApproveRemind.NodeId=(bpmnNodeVo.Id);
+        if (o.IsInuse!=null) {
+            bpmnApproveRemind.Days=(string.Join(",",o.DayList));
+        } else {
+            bpmnApproveRemind.TemplateId=null;
         }
-        else
-        {
-            bpmnApproveRemind.TemplateId = null;
-        }
-        bpmnApproveRemind.CreateUser = (SecurityUtils.GetLogInEmpNameSafe());
+        bpmnApproveRemind.CreateUser=(SecurityUtils.GetLogInEmpNameSafe());
         baseRepo.Update(bpmnApproveRemind);
     }
 }

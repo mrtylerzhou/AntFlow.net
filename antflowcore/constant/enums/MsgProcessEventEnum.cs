@@ -1,4 +1,7 @@
-﻿namespace antflowcore.constant.enums
+﻿using System;
+using System.Linq;
+
+namespace YourNamespace
 {
     public enum MsgProcessEventEnum
     {
@@ -45,8 +48,8 @@
 
         public static MsgProcessEventEnum OfCode(int code)
         {
-            return Enum.IsDefined(typeof(MsgProcessEventEnum), code)
-                ? (MsgProcessEventEnum)code
+            return Enum.IsDefined(typeof(MsgProcessEventEnum), code) 
+                ? (MsgProcessEventEnum)code 
                 : MsgProcessEventEnum.NULL;
         }
 
@@ -54,9 +57,9 @@
         {
             if (code == null)
                 return MsgProcessEventEnum.NULL;
-
-            return Enum.IsDefined(typeof(MsgProcessEventEnum), code)
-                ? (MsgProcessEventEnum)code
+            
+            return Enum.IsDefined(typeof(MsgProcessEventEnum), code) 
+                ? (MsgProcessEventEnum)code 
                 : MsgProcessEventEnum.NULL;
         }
     }

@@ -1,7 +1,7 @@
 ﻿using antflowcore.vo;
 using AntFlowCore.Vo;
 
-namespace antflowcore.formatter;
+namespace antflowcore.service.processor;
 
 public interface IBpmnPersonnelFormat
 {

@@ -1,5 +1,4 @@
 ﻿namespace antflowcore.factory;
-
 /// <summary>
 /// This is used by the AntFlow framework to build up adaptor factories.
 /// </summary>

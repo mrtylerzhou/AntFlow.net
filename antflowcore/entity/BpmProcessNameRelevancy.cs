@@ -1,4 +1,5 @@
-﻿using FreeSql.DataAnnotations;
+﻿using System;
+using FreeSql.DataAnnotations;
 
 namespace AntFlowCore.Entity
 {
@@ -35,7 +36,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// 创建时间
         /// </summary>
-        [Column(Name = "create_time", IsIgnore = true)]
+        [Column(Name = "create_time",IsIgnore = true)]
         public DateTime? CreateTime { get; set; }
     }
 }

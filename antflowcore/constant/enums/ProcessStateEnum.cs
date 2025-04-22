@@ -1,4 +1,4 @@
-﻿namespace antflowcore.constant.enums;
+﻿namespace antflowcore.constant.enus;
 
 public enum ProcessStateEnum
 {
@@ -7,7 +7,6 @@ public enum ProcessStateEnum
     HANDLE_STATE = 2,   // 审批通过
     REJECT_STATE = 6    // 审批拒绝
 }
-
 public static class ProcessStateEnumExtensions
 {
     // 描述信息字典
@@ -40,20 +39,19 @@ public static class ProcessStateEnumExtensions
     // 根据 Code 获取枚举值
     public static ProcessStateEnum? GetByCode(int code)
     {
-        return Enum.IsDefined(typeof(ProcessStateEnum), code)
-            ? (ProcessStateEnum?)code
+        return Enum.IsDefined(typeof(ProcessStateEnum), code) 
+            ? (ProcessStateEnum?)code 
             : null;
     }
-
     public static string GetDescByCode(int code)
     {
-        ProcessStateEnum? processStateEnum = Enum.IsDefined(typeof(ProcessStateEnum), code)
+        ProcessStateEnum? processStateEnum=Enum.IsDefined(typeof(ProcessStateEnum), code)
             ? (ProcessStateEnum?)code
             : null;
         if (processStateEnum == null)
         {
             return "";
         }
-        return processStateEnum.Value.GetDescription();
+        return GetDescription(processStateEnum.Value);
     }
 }

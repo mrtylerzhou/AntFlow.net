@@ -1,9 +1,9 @@
-﻿namespace antflowcore.bpmn.model;
+﻿namespace antflowcore.bpmn;
 
 public class AFActivitiListener
 {
-    public string Evt { get; set; }
-    public string ImplementationType { get; set; }
-    public string Implementation { get; set; }
+    public String Evt { get; set; }
+    public String ImplementationType{ get; set; }
+    public String Implementation{ get; set; }
     public List<AFFieldExtension> FieldExtensions { get; set; } = new List<AFFieldExtension>();
 }

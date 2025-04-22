@@ -4,18 +4,14 @@ namespace antflowcore.vo;
 
 public class BaseKeyValueStruVo
 {
-    [JsonPropertyName("key")]
+    [JsonPropertyName("key")] 
     public string Key { get; set; }
-
-    [JsonPropertyName("value")]
+    [JsonPropertyName("value")] 
     public string Value { get; set; }
-
     [JsonPropertyName("type")] public string Type { get; set; }
-
-    [JsonPropertyName("remark")]
+    [JsonPropertyName("remark")] 
     public string Remark { get; set; }
-
-    [JsonPropertyName("createTime")]
+    [JsonPropertyName("createTime")] 
     public DateTime CreateTime { get; set; }
 
     [JsonPropertyName("hasStarUserChooseModule")]

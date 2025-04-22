@@ -1,12 +1,12 @@
-﻿using antflowcore.constant.enums;
+﻿using System.Diagnostics;
+using System.Text.Json;
+using antflowcore.constant.enus;
 using antflowcore.entity;
+using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.service.repository;
-using AntFlowCore.Entity;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
-using System.Text.Json;
 
 namespace antflowcore.service.biz;
 
@@ -33,7 +33,6 @@ public class ConfigFlowButtonContantService
         _afTaskInstService = afTaskInstService;
         _logger = logger;
     }
-
     public Dictionary<string, List<ProcessActionButtonVo>> GetButtons(string processNum, string elementId,
         bool? isJurisdiction, bool? isInitiate)
     {
@@ -80,7 +79,7 @@ public class ConfigFlowButtonContantService
                 var end = new ProcessActionButtonVo
                 {
                     ButtonType = (int)ButtonTypeEnum.BUTTON_TYPE_STOP,
-                    Name = ButtonTypeEnumExtensions.GetDescByCode((int)ButtonTypeEnum.BUTTON_TYPE_STOP),
+                    Name =ButtonTypeEnumExtensions.GetDescByCode((int) ButtonTypeEnum.BUTTON_TYPE_STOP),
                     Show = ProcessButtonEnum.DEAL_WITH_TYPE.Code,
                     Type = ProcessButtonEnum.DEFAULT_COLOR.Desc
                 };
@@ -97,7 +96,7 @@ public class ConfigFlowButtonContantService
                 var undertake = new ProcessActionButtonVo
                 {
                     ButtonType = (int)ButtonTypeEnum.BUTTON_TYPE_UNDERTAKE,
-                    Name = ButtonTypeEnumExtensions.GetDescByCode((int)ButtonTypeEnum.BUTTON_TYPE_UNDERTAKE),
+                    Name =ButtonTypeEnumExtensions.GetDescByCode((int)ButtonTypeEnum.BUTTON_TYPE_UNDERTAKE),
                     Show = ProcessButtonEnum.DEAL_WITH_TYPE.Code,
                     Type = ProcessButtonEnum.DEFAULT_COLOR.Desc
                 };
@@ -130,40 +129,45 @@ public class ConfigFlowButtonContantService
         }
 
         // 添加处理后的按钮列表到字典
-        buttonMap[ButtonPageTypeEnumExtensions.GetName(ButtonPageTypeEnum.INITIATE)] = ButtonsSort(RepeatFilter(initiateButtons));
-        buttonMap[ButtonPageTypeEnumExtensions.GetName(ButtonPageTypeEnum.AUDIT)] = ButtonsSort(RepeatFilter(auditButtons));
-        buttonMap[ButtonPageTypeEnumExtensions.GetName(ButtonPageTypeEnum.TOVIEW)] = ButtonsSort(RepeatFilter(toViewButtons));
+        buttonMap[ButtonPageTypeEnum.INITIATE.GetName()] = ButtonsSort(RepeatFilter(initiateButtons));
+        buttonMap[ButtonPageTypeEnum.AUDIT.GetName()] = ButtonsSort(RepeatFilter(auditButtons));
+        buttonMap[ButtonPageTypeEnum.TOVIEW.GetName()] = ButtonsSort(RepeatFilter(toViewButtons));
 
         return buttonMap;
     }
 
-    public bool IsMoreNode(string procInstId, string elementId)
+    private bool IsMoreNode(string procInstId, string elementId)
     {
-        BpmAfTaskInst bpmAfTaskInst = _afTaskInstService.baseRepo.Where(a => a.ProcInstId == procInstId).First();
-        BpmAfDeployment bpmAfDeployment = _afDeploymentService.baseRepo.Where(a => a.Id == bpmAfTaskInst.ProcDefId).First();
+        if (string.IsNullOrEmpty(elementId))
+        {
+            return false;
+        }
+        BpmAfTaskInst bpmAfTaskInst = _afTaskInstService.baseRepo.Where(a=>a.ProcInstId==procInstId).First();
+        BpmAfDeployment bpmAfDeployment = _afDeploymentService.baseRepo.Where(a=>a.Id==bpmAfTaskInst.ProcDefId).First();
         if (bpmAfDeployment == null)
         {
             throw new ApplicationException($"deployment with id {procInstId} not found");
         }
-        string content = bpmAfDeployment.Content;
+        string content=bpmAfDeployment.Content;
         List<BpmnConfCommonElementVo> elements = JsonSerializer.Deserialize<List<BpmnConfCommonElementVo>>(content);
         if (elements == null || elements.Count == 0)
         {
             throw new AFBizException($"deployment with id {procInstId} not found");
         }
-        BpmnConfCommonElementVo element = elements.Where(a => a.ElementId == elementId).First();
+        BpmnConfCommonElementVo element = elements.Where(a => a.ElementId == elementId).FirstOrDefault();
         if (element == null)
         {
             throw new AFBizException($"element with id {elementId} not found");
         }
 
-        return element.SignUpType == 3;
+        return element.SignType == 2;
     }
 
-    public List<ProcessActionButtonVo> GetButtons(List<BpmVariableButton> bpmVariableButtons, ButtonPageTypeEnum buttonPageTypeEnum)
+
+    private List<ProcessActionButtonVo> GetButtons(List<BpmVariableButton> bpmVariableButtons, ButtonPageTypeEnum buttonPageTypeEnum)
     {
         List<ProcessActionButtonVo> buttonList = new List<ProcessActionButtonVo>();
-
+    
         foreach (BpmVariableButton button in bpmVariableButtons)
         {
             // 假设 ButtonPageTypeEnum 的 Code 属性对应按钮页面类型值
@@ -178,14 +182,13 @@ public class ConfigFlowButtonContantService
                 });
             }
         }
-
+    
         return buttonList;
     }
-
     private List<ProcessActionButtonVo> ToViewButtons(List<BpmVariableViewPageButton> btnVarList, bool isInitiate)
     {
         List<ProcessActionButtonVo> buttonList = new List<ProcessActionButtonVo>();
-
+    
         foreach (var item in btnVarList)
         {
             if (isInitiate)
@@ -215,17 +218,16 @@ public class ConfigFlowButtonContantService
                 }
             }
         }
-
+    
         return buttonList;
     }
-
     private List<ProcessActionButtonVo> ButtonsSort(List<ProcessActionButtonVo> buttons)
     {
         buttons.Sort((o1, o2) =>
         {
             var sort1 = ConfigFlowButtonSortEnum.GetEnumByCode(o1.ButtonType);
             var sort2 = ConfigFlowButtonSortEnum.GetEnumByCode(o2.ButtonType);
-
+            
             Debug.Assert(sort1 != null, "sort1 should not be null");
             Debug.Assert(sort2 != null, "sort2 should not be null");
 
@@ -235,17 +237,17 @@ public class ConfigFlowButtonContantService
         return buttons;
     }
 
-    public List<ProcessActionButtonVo> RepeatFilter(List<ProcessActionButtonVo> initiateButtons)
+    private List<ProcessActionButtonVo> RepeatFilter(List<ProcessActionButtonVo> initiateButtons)
     {
         if (initiateButtons == null || !initiateButtons.Any())
         {
             return new List<ProcessActionButtonVo>();
         }
-
+ 
         var lists = initiateButtons
-            .DistinctBy(a => a.ButtonType)
+            .DistinctBy(a=>a.ButtonType)
             .ToList();
-
+ 
         return lists;
     }
 }

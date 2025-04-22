@@ -1,15 +1,16 @@
-﻿using antflowcore.dto;
+﻿using antflowcore.constant.enus;
+using antflowcore.dto;
 using antflowcore.entity;
 using antflowcore.exception;
 using antflowcore.vo;
 
 namespace antflowcore.util;
 
-using antflowcore.constant.enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json; // Using System.Text.Json for JSON serialization
+
 
 public static class PageUtils
 {
@@ -17,7 +18,7 @@ public static class PageUtils
     {
         var pageDto = new PageDto
         {
-            Page = (int)page.Current,
+            Page =(int) page.Current,
             PageSize = (int)page.Size,
             TotalCount = (int)page.Total,
             PageCount = (int)page.GetPages()
@@ -106,6 +107,8 @@ public static class PageUtils
     {
         return new ResultAndPage<T>(page.Records, GetPageDto(page), statistics, sortColumnMap);
     }
+
+
 
     public static PageDto GetPageDtoByVo(object obj)
     {

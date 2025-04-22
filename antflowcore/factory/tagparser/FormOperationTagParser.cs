@@ -1,33 +1,30 @@
 ﻿using antflowcore.adaptor.processoperation;
 using antflowcore.aop;
-using antflowcore.constant.enums;
+using AntFlowCore.Enums;
 using antflowcore.exception;
 using antflowcore.util;
 using AntFlowCore.Vo;
 
 namespace antflowcore.factory.tagparser;
 
-public class FormOperationTagParser : TagParser<IProcessOperationAdaptor, BusinessDataVo>
+public class FormOperationTagParser: TagParser<IProcessOperationAdaptor,BusinessDataVo>
 {
     private static Dictionary<Type, IProcessOperationAdaptor> dynamicProxyMap =
         new Dictionary<Type, IProcessOperationAdaptor>();
-
     public IProcessOperationAdaptor ParseTag(BusinessDataVo data)
     {
-        if (data == null)
-        {
+        
+        if(data==null){
             throw new AFBizException("provided data to find a processing method is null");
         }
         int? operationType = data.OperationType;
         bool? isOutSideAccessProc = data.IsOutSideAccessProc;
-        if (operationType == null)
-        {
+        if(operationType==null){
             throw new AFBizException("provided data has no property of operationType!");
         }
         ProcessOperationEnum? poEnum = ProcessOperationEnumExtensions.GetEnumByCode(operationType);
-        if (poEnum == null)
-        {
-            throw new AFBizException("can not find a processing method by providing data with your given operationType of" + operationType);
+        if(poEnum==null){
+            throw new AFBizException("can not find a processing method by providing data with your given operationType of"+operationType);
         }
 
         IEnumerable<IProcessOperationAdaptor> processOperationAdaptors = ServiceProviderUtils.GetServices<IProcessOperationAdaptor>();
@@ -41,24 +38,19 @@ public class FormOperationTagParser : TagParser<IProcessOperationAdaptor, Busine
             }
             else
             {
-                processOperationProxy = BpmnSendMessageAspect<IProcessOperationAdaptor>.Create(processOperationAdaptor);
+                processOperationProxy= BpmnSendMessageAspect<IProcessOperationAdaptor>.Create(processOperationAdaptor);
                 dynamicProxyMap[adaptorType] = processOperationProxy;
             }
-
-            if (!isOutSideAccessProc.HasValue || isOutSideAccessProc.Value == false)
-            {
-                if (processOperationAdaptor.IsSupportBusinessObject(poEnum))
-                {
+           
+            if(!isOutSideAccessProc.HasValue||isOutSideAccessProc.Value==false){
+                if(processOperationAdaptor.IsSupportBusinessObject(poEnum)){
                     return processOperationProxy;
                 }
-            }
-            else
-            {
+            }else{
                 int? outSideType = data.OutSideType;
-
-                String outSideMarker = outSideType == 0 ? "outSide" : "outSideAccess";
-                if (processOperationAdaptor.IsSupportBusinessObject(outSideMarker, poEnum))
-                {
+              
+                String outSideMarker=outSideType==0?"outSide":"outSideAccess";
+                if(processOperationAdaptor.IsSupportBusinessObject(outSideMarker,poEnum)){
                     return processOperationProxy;
                 }
             }

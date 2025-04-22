@@ -1,4 +1,6 @@
-﻿using FreeSql.DataAnnotations;
+﻿using FreeSql;
+using System;
+using FreeSql.DataAnnotations;
 
 namespace AntFlowCore.Entity
 {
@@ -58,7 +60,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// Creation time
         /// </summary>
-        [Column(Name = "create_time", IsIgnore = true)]
+        [Column(Name = "create_time",IsIgnore = true)]
         public DateTime? CreateTime { get; set; }
 
         /// <summary>
@@ -70,7 +72,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// Update time
         /// </summary>
-        [Column(Name = "update_time", IsIgnore = true)]
+        [Column(Name = "update_time",IsIgnore = true)]
         public DateTime? UpdateTime { get; set; }
 
         /// <summary>
@@ -80,7 +82,6 @@ namespace AntFlowCore.Entity
         public string CreateUserId { get; set; }
 
         // Default constructor for FreeSQL
-        public OutSideBpmConditionsTemplate()
-        { }
+        public OutSideBpmConditionsTemplate() { }
     }
 }

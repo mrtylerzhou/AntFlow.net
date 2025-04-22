@@ -1,4 +1,5 @@
-﻿using antflowcore.entity;
+﻿using System.Diagnostics;
+using antflowcore.entity;
 using antflowcore.util;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
@@ -14,14 +15,14 @@ public class BpmnAddFlowElementMultOrSignAaptor : IBpmnAddFlowElementAdaptor
         _logger = logger;
     }
 
-    public void AddFlowElement(BpmnConfCommonElementVo elementVo, AFProcess process,
+    public  void AddFlowElement(BpmnConfCommonElementVo elementVo, AFProcess process, 
         Dictionary<string, object> startParamMap, BpmnStartConditionsVo bpmnStartConditions)
     {
         // 添加多用户会签任务
         process.AddFlowElement(BpmnBuildUtils.CreateOrSignUserTask(
-            elementVo.ElementId,
-            elementVo.ElementName,
-            elementVo.CollectionName,
+            elementVo.ElementId, 
+            elementVo.ElementName, 
+            elementVo.CollectionName, 
             $"{elementVo.CollectionName.Replace("List", "")}s"));
 
         // 设置流程启动参数

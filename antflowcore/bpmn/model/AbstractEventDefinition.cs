@@ -1,6 +1,6 @@
-﻿namespace antflowcore.bpmn.model;
+﻿namespace antflowcore.bpmn;
 
 public abstract class AbstractEventDefinition
 {
-    public abstract AbstractEventDefinition Clone();
+   public abstract AbstractEventDefinition Clone();
 }

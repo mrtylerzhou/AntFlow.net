@@ -1,6 +1,5 @@
-﻿namespace antflowcore.factory.tagparser;
+﻿namespace antflowcore.factory;
 
-public interface TagParser<out TService, in TParam>
-{
+public interface TagParser<out TService, in TParam> {
     TService ParseTag(TParam data);
 }

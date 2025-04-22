@@ -1,6 +1,6 @@
 ﻿using antflowcore.entity;
-using antflowcore.vo;
 using AntFlowCore.Entity;
+using antflowcore.vo;
 using AntFlowCore.Vo;
 
 namespace antflowcore.util;
@@ -40,6 +40,7 @@ public static class MapperUtil
 
         return new BpmnConf
         {
+           
             BpmnCode = vo.BpmnCode,
             BpmnName = vo.BpmnName,
             BpmnType = vo.BpmnType,
@@ -59,6 +60,7 @@ public static class MapperUtil
             UpdateTime = vo.UpdateTime
         };
     }
+
 
     public static BpmnNodeVo MapToVo(this BpmnNode node)
     {
@@ -91,6 +93,7 @@ public static class MapperUtil
         };
     }
 
+
     public static BpmnNode MapToEntity(this BpmnNodeVo vo)
     {
         if (vo == null) return null;
@@ -121,6 +124,7 @@ public static class MapperUtil
         };
     }
 
+
     public static BpmnTemplateVo MapToVo(this BpmnTemplate template)
     {
         if (template == null) return null;
@@ -143,6 +147,7 @@ public static class MapperUtil
             UpdateUser = template.UpdateUser
         };
     }
+
 
     public static BpmnTemplate MapToEntity(this BpmnTemplateVo vo)
     {
@@ -199,6 +204,7 @@ public static class MapperUtil
         };
     }
 
+
     public static BpmProcessAppApplication MapToEntity(this BpmProcessAppApplicationVo vo)
     {
         if (vo == null) return null;
@@ -250,6 +256,7 @@ public static class MapperUtil
         };
     }
 
+
     public static BpmnApproveRemind MapToEntity(this BpmnApproveRemindVo vo)
     {
         if (vo == null) return null;
@@ -268,6 +275,7 @@ public static class MapperUtil
         };
     }
 
+
     public static ThirdPartyAccountApplyVo MapToVo(this ThirdPartyAccountApply apply)
     {
         if (apply == null) return null;
@@ -279,6 +287,7 @@ public static class MapperUtil
             Remark = apply.Remark
         };
     }
+
 
     public static ThirdPartyAccountApply MapToEntity(this ThirdPartyAccountApplyVo vo)
     {
@@ -296,7 +305,7 @@ public static class MapperUtil
     {
         return new InformationTemplateVo
         {
-            Id = template.Id,
+           Id = template.Id,
             Name = template.Name,
             Num = template.Num,
             SystemTitle = template.SystemTitle,
@@ -316,10 +325,12 @@ public static class MapperUtil
         };
     }
 
+
     public static InformationTemplate MapToEntity(this InformationTemplateVo vo)
     {
         return new InformationTemplate
         {
+           
             Name = vo.Name,
             Num = vo.Num,
             SystemTitle = vo.SystemTitle,
@@ -428,7 +439,7 @@ public static class MapperUtil
     {
         return new OutSideBpmAccessBusinessVo
         {
-            Id = business.Id,
+           Id = business.Id,
             BusinessPartyId = business.BusinessPartyId,
             BpmnConfId = business.BpmnConfId, // 使用修正后的字段名称
             FormCode = business.FormCode,
@@ -451,8 +462,8 @@ public static class MapperUtil
     {
         return new OutSideBpmAccessBusiness
         {
-            BusinessPartyId = vo.BusinessPartyId ?? 0,
-            BpmnConfId = vo.BpmnConfId ?? 0,
+            BusinessPartyId = vo.BusinessPartyId??0,
+            BpmnConfId = vo.BpmnConfId??0,
             FormCode = vo.FormCode,
             ProcessNumber = vo.ProcessNumber,
             FormDataPc = vo.FormDataPc,
@@ -467,8 +478,7 @@ public static class MapperUtil
             UpdateTime = vo.UpdateTime
         };
     }
-
-    public static void CopyPropertiesTo(this OutSideBpmAccessBusinessVo vo, OutSideBpmAccessBusiness business)
+     public static void CopyPropertiesTo(this OutSideBpmAccessBusinessVo vo, OutSideBpmAccessBusiness business)
     {
         if (vo == null || business == null) return;
 
@@ -477,12 +487,12 @@ public static class MapperUtil
             business.Id = vo.Id;
         }
 
-        if (business.BusinessPartyId == default && vo.BusinessPartyId != null && vo.BusinessPartyId > 0)
+        if (business.BusinessPartyId==default && vo.BusinessPartyId!=null&&vo.BusinessPartyId>0)
         {
             business.BusinessPartyId = vo.BusinessPartyId.Value;
         }
 
-        if (business.BpmnConfId == default && vo.BpmnConfId != null && vo.BpmnConfId > 0)
+        if (business.BpmnConfId==default && vo.BpmnConfId!=null&&vo.BpmnConfId>0)
         {
             business.BpmnConfId = vo.BpmnConfId.Value;
         }
@@ -547,7 +557,6 @@ public static class MapperUtil
             business.UpdateTime = vo.UpdateTime.Value;
         }
     }
-
     public static OutSideBpmApproveTemplateVo MapToVo(this OutSideBpmApproveTemplate entity)
     {
         if (entity == null) return null;
@@ -579,6 +588,7 @@ public static class MapperUtil
 
         return new OutSideBpmApproveTemplate
         {
+           
             BusinessPartyId = vo.BusinessPartyId,
             ApplicationId = vo.ApplicationId,
             ApproveTypeId = vo.ApproveTypeId,
@@ -596,8 +606,7 @@ public static class MapperUtil
             CreateUserId = vo.CreateUserId
         };
     }
-
-    public static void CopyTo(this OutSideBpmApproveTemplateVo vo, OutSideBpmApproveTemplate entity)
+    public static void CopyTo(this OutSideBpmApproveTemplateVo vo,OutSideBpmApproveTemplate entity)
     {
         if (entity == null || vo == null) return;
 
@@ -643,13 +652,11 @@ public static class MapperUtil
         if (entity.UpdateTime == default && vo.UpdateTime.HasValue)
             entity.UpdateTime = vo.UpdateTime.Value;
     }
-
     #region Entity -> VO 转换
-
     public static OutSideBpmBusinessPartyVo MapToVo(this OutSideBpmBusinessParty entity)
     {
         if (entity == null) return null;
-
+ 
         return new OutSideBpmBusinessPartyVo
         {
             Id = entity.Id,
@@ -662,22 +669,21 @@ public static class MapperUtil
             CreateTime = entity.CreateTime,
             UpdateUser = entity.UpdateUser,
             UpdateTime = entity.UpdateTime,
+            
         };
     }
-
-    #endregion Entity -> VO 转换
-
+    #endregion
+ 
     #region VO -> Entity 转换
-
     public static OutSideBpmBusinessParty MapToEntity(this OutSideBpmBusinessPartyVo vo)
     {
         if (vo == null) return null;
-
+ 
         return new OutSideBpmBusinessParty
         {
             BusinessPartyMark = vo.BusinessPartyMark,
             Name = vo.Name,
-            Type = vo.Type ?? 0,
+            Type = vo.Type??0,
             Remark = vo.Remark,
             IsDel = vo.IsDel,
             CreateUser = vo.CreateUser,
@@ -686,8 +692,7 @@ public static class MapperUtil
             UpdateTime = vo.UpdateTime,
         };
     }
-
-    #endregion VO -> Entity 转换
+    #endregion
 
     public static void CopyTo(this OutSideBpmBusinessPartyVo vo, OutSideBpmBusinessParty entity)
     {
@@ -718,7 +723,6 @@ public static class MapperUtil
         if (entity.UpdateTime == default && vo.UpdateTime != default)
             entity.UpdateTime = vo.UpdateTime;
     }
-
     public static OutSideBpmCallbackUrlConfVo MapToVo(this OutSideBpmCallbackUrlConf entity)
     {
         if (entity == null) return null;
@@ -742,22 +746,22 @@ public static class MapperUtil
             UpdateTime = entity.UpdateTime,
         };
     }
-
     public static OutSideBpmCallbackUrlConf MapToEntity(this OutSideBpmCallbackUrlConfVo vo)
     {
         if (vo == null) return null;
         OutSideBpmCallbackUrlConf entity = new OutSideBpmCallbackUrlConf
         {
-            BusinessPartyId = vo.BusinessPartyId ?? 0,
-            BpmnConfId = vo.BpmnConfId ?? 0,
+            
+            BusinessPartyId = vo.BusinessPartyId??0,
+            BpmnConfId = vo.BpmnConfId??0,
             FormCode = vo.FormCode,
             BpmConfCallbackUrl = vo.BpmConfCallbackUrl,
             BpmFlowCallbackUrl = vo.BpmFlowCallbackUrl,
             ApiClientId = vo.ApiClientId,
             ApiClientSecret = vo.ApiClientSecrent,
-            Status = vo.Status ?? 0,
+            Status = vo.Status??0,
             Remark = vo.Remark,
-            IsDel = vo.IsDel ?? 0,
+            IsDel = vo.IsDel??0,
             CreateUser = vo.CreateUser,
             CreateTime = vo.CreateTime,
             UpdateUser = vo.UpdateUser,
@@ -765,7 +769,6 @@ public static class MapperUtil
         };
         return entity;
     }
-
     public static void CopyToEntity(this OutSideBpmCallbackUrlConfVo vo, OutSideBpmCallbackUrlConf entity)
     {
         if (vo == null || entity == null) return;
@@ -779,7 +782,7 @@ public static class MapperUtil
         if (entity.BusinessPartyId == 0 && vo.BusinessPartyId != null)
             entity.BusinessPartyId = vo.BusinessPartyId.Value;
 
-        if ((entity.BpmnConfId == null || entity.BpmnConfId == 0) && vo.BpmnConfId != null && vo.BpmnConfId != 0)
+        if ((entity.BpmnConfId == null||entity.BpmnConfId==0) && vo.BpmnConfId != null&&vo.BpmnConfId!=0)
             entity.BpmnConfId = vo.BpmnConfId.Value;
 
         if (string.IsNullOrEmpty(entity.BpmConfCallbackUrl) && !string.IsNullOrEmpty(vo.BpmConfCallbackUrl))
@@ -815,4 +818,5 @@ public static class MapperUtil
         if (entity.UpdateTime == default && vo.UpdateTime != null)
             entity.UpdateTime = vo.UpdateTime;
     }
+
 }

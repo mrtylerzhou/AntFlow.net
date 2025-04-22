@@ -1,12 +1,12 @@
-﻿using antflowcore.constant.enums;
+﻿using System.Text.Json;
+using antflowcore.constant.enus;
 using antflowcore.exception;
 using antflowcore.util;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
-using System.Text.Json;
 
-namespace antflowcore.formatter.filter;
+namespace antflowcore.service.processor.filter;
 
 //todo
 public class ConditionFilterService
@@ -29,7 +29,7 @@ public class ConditionFilterService
             return;
         }
 
-        Dictionary<string, BpmnNodeVo> nodeIdMapNode = new Dictionary<string, BpmnNodeVo>(16);
+        Dictionary<String, BpmnNodeVo> nodeIdMapNode = new Dictionary<string, BpmnNodeVo>(16);
         BpmnNodeVo startNode = GetNodeMapAndStartNode(nodeList, nodeIdMapNode);
         if (startNode == null)
         {
@@ -42,17 +42,17 @@ public class ConditionFilterService
         bpmnConfVo.Nodes = filterNodes;
     }
 
-    private List<BpmnNodeVo> FilterNode(BpmnNodeVo startNode, Dictionary<string, BpmnNodeVo> nodeIdMapNode,
+    private List<BpmnNodeVo> FilterNode(BpmnNodeVo startNode, Dictionary<String, BpmnNodeVo> nodeIdMapNode,
         BpmnStartConditionsVo bpmnStartConditionsVo)
     {
         List<BpmnNodeVo> nodeList = new List<BpmnNodeVo>();
         BpmnNodeParamsVo parameters = new BpmnNodeParamsVo();
         parameters.NodeTo = startNode.NodeTo[0];
         startNode.Params = parameters;
-        string nextId = parameters.NodeTo;
+        String nextId = parameters.NodeTo;
         do
         {
-            if ((int)NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY == startNode.NodeType)
+            if ((int)NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY == (startNode.NodeType))
             {
                 BpmnNodeVo aggregationNode = BpmnUtils.GetAggregationNode(startNode, nodeIdMapNode.Values);
                 TreatParallelGatewayRecursively(startNode, aggregationNode, nodeIdMapNode, nodeList,
@@ -69,7 +69,7 @@ public class ConditionFilterService
             {
                 startNode = nodeIdMapNode[nextId];
             }
-        } while (!string.IsNullOrEmpty(nextId));
+        } while (!String.IsNullOrEmpty(nextId));
 
         List<BpmnNodeVo> list = DeleteConditionNode(nodeList);
         //check finally nodes
@@ -105,7 +105,7 @@ public class ConditionFilterService
                  nodeVo != null && nodeVo.NodeId != aggregationNodeNodeId;
                  nodeVo = nodeIdMapNode.TryGetValue(nodeVo.Params.NodeTo, out var nextNode) ? nextNode : null)
             {
-                if ((int)NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY == currentNodeVo.NodeType)
+                if ((int)NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY==currentNodeVo.NodeType)
                 {
                     var aggregationNode = BpmnUtils.GetAggregationNode(currentNodeVo, nodeIdMapNode.Values);
                     TreatParallelGatewayRecursively(currentNodeVo, aggregationNode, nodeIdMapNode, nodeList,
@@ -117,7 +117,7 @@ public class ConditionFilterService
         }
     }
 
-    private void RecursionTreate(BpmnNodeVo node, Dictionary<string, BpmnNodeVo> nodeIdMapNode,
+    private void RecursionTreate(BpmnNodeVo node, Dictionary<String, BpmnNodeVo> nodeIdMapNode,
         List<BpmnNodeVo> filterNodeList, BpmnStartConditionsVo bpmnStartConditionsVo)
     {
         if (ObjectUtils.IsEmpty(node.NodeTo))
@@ -177,7 +177,6 @@ public class ConditionFilterService
         }
         //recursionTreate(nextNode, nodeIdMapNode, filterNodeList, bpmnStartConditionsVo);
     }
-
     public List<BpmnNodeVo> DeleteConditionNode(List<BpmnNodeVo> nodeList)
     {
         var notConditionNodeMap = new Dictionary<string, BpmnNodeVo>();
@@ -227,7 +226,6 @@ public class ConditionFilterService
 
         return resultList;
     }
-
     private string FindNext(string nodeId, List<string> addNodeIdList, Dictionary<string, BpmnNodeVo> notConditionNodeMap, Dictionary<string, BpmnNodeVo> conditionNodeMap)
     {
         if (notConditionNodeMap.ContainsKey(nodeId) || string.IsNullOrWhiteSpace(nodeId))
@@ -306,29 +304,22 @@ public class ConditionFilterService
         // Default behavior: No conditions matched, return null
         return null;
     }
-
-    private void CheckNode(List<BpmnNodeVo> list)
-    {
-        if (ObjectUtils.IsEmpty(list))
-        {
+    private void CheckNode(List<BpmnNodeVo> list) {
+        if (ObjectUtils.IsEmpty(list)) {
             return;
         }
         int nodeCustomize = 0;
-        foreach (BpmnNodeVo bpmnNodeVo in list)
-        {
-            if ((int)NodeTypeEnum.NODE_TYPE_APPROVER == bpmnNodeVo.NodeType
-                && (int)NodePropertyEnum.NODE_PROPERTY_CUSTOMIZE == bpmnNodeVo.NodeProperty)
-            {
+        foreach (BpmnNodeVo bpmnNodeVo in list) {
+            if ((int)NodeTypeEnum.NODE_TYPE_APPROVER==bpmnNodeVo.NodeType
+                && (int)NodePropertyEnum.NODE_PROPERTY_CUSTOMIZE==bpmnNodeVo.NodeProperty) {
                 nodeCustomize += 1;
-                if (nodeCustomize > 1)
-                {
+                if (nodeCustomize > 1) {
                     throw new AFBizException("self chose module is greater than 1");
                 }
             }
         }
     }
-
-    private BpmnNodeVo GetNodeMapAndStartNode(List<BpmnNodeVo> nodeList, Dictionary<string, BpmnNodeVo> nodeIdMapNode)
+    private BpmnNodeVo GetNodeMapAndStartNode(List<BpmnNodeVo> nodeList, Dictionary<String, BpmnNodeVo> nodeIdMapNode)
     {
         BpmnNodeVo startNode = null;
         foreach (BpmnNodeVo bpmnNodeVo in nodeList)

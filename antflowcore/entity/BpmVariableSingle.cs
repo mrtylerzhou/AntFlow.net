@@ -1,6 +1,8 @@
-﻿using FreeSql.DataAnnotations;
+﻿using System;
+using FreeSql;
+using FreeSql.DataAnnotations;
 
-namespace antflowcore.entity
+namespace AntFlowCore.Entities
 {
     [Table(Name = "t_bpm_variable_single")]
     public class BpmVariableSingle
@@ -72,7 +74,7 @@ namespace antflowcore.entity
         /// <summary>
         /// 创建时间
         /// </summary>
-        [Column(Name = "create_time", IsIgnore = true)]
+        [Column(Name = "create_time",IsIgnore = true)]
         public DateTime? CreateTime { get; set; }
 
         /// <summary>
@@ -84,12 +86,11 @@ namespace antflowcore.entity
         /// <summary>
         /// 更新时间
         /// </summary>
-        [Column(Name = "update_time", IsIgnore = true)]
+        [Column(Name = "update_time",IsIgnore = true)]
         public DateTime? UpdateTime { get; set; }
 
         // 无参构造函数
-        public BpmVariableSingle()
-        { }
+        public BpmVariableSingle() { }
 
         // 带参构造函数
         public BpmVariableSingle(long id, long variableId, string elementId, string nodeId, string elementName,

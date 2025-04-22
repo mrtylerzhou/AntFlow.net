@@ -15,6 +15,7 @@ public class SnowFlake
     private static readonly long MaxWorkerId = (-1L ^ (-1L << (int)WorkerIdBits)); // 最大机器ID
     private static readonly long MaxDatacenterId = (-1L ^ (-1L << (int)DatacenterIdBits)); // 最大数据中心ID
 
+
     private static readonly long WorkerIdShift = SequenceBits; // 机器ID左移位数
     private static readonly long DatacenterIdShift = SequenceBits + WorkerIdBits; // 数据中心ID左移位数
     private static readonly long TimestampLeftShift = SequenceBits + WorkerIdBits + DatacenterIdBits; // 时间戳左移位数

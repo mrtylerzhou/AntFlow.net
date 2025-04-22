@@ -1,5 +1,6 @@
-﻿namespace antflowcore.constant.enums;
+﻿namespace antflowcore.constant.enus;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,7 +8,6 @@ public class ProcessButtonEnum
 {
     // 定义所有类型实例
     public static readonly ProcessButtonEnum DISAGREE_TYPE = new ProcessButtonEnum(1, "不同意");
-
     public static readonly ProcessButtonEnum AGREE_TYPE = new ProcessButtonEnum(2, "同意");
     public static readonly ProcessButtonEnum WITHDRAW_TYPE = new ProcessButtonEnum(3, "撤回");
     public static readonly ProcessButtonEnum END_TYPE = new ProcessButtonEnum(4, "终止");
@@ -30,7 +30,6 @@ public class ProcessButtonEnum
 
     // 私有字段
     private readonly int code;
-
     private readonly string desc;
 
     // 构造函数
@@ -42,7 +41,6 @@ public class ProcessButtonEnum
 
     // 属性访问器
     public int Code => code;
-
     public string Desc => desc;
 
     // 所有类型集合（用于查询）

@@ -1,15 +1,16 @@
-﻿using antflowcore.constant.enums;
+﻿using System.Linq.Expressions;
+using antflowcore.constant.enus;
 using antflowcore.dto;
 using antflowcore.entity;
+using AntFlowCore.Entity;
+using AntFlowCore.Enums;
 using antflowcore.exception;
 using antflowcore.util;
-using AntFlowCore.Entity;
 using AntFlowCore.Vo;
-using System.Linq.Expressions;
 
 namespace antflowcore.service.repository;
 
-public class InformationTemplateService : AFBaseCurdRepositoryService<InformationTemplate>
+public class InformationTemplateService: AFBaseCurdRepositoryService<InformationTemplate>
 {
     private readonly BpmnApproveRemindService _bpmnApproveRemindService;
     private readonly DefaultTemplateService _defaultTemplateService;
@@ -25,8 +26,7 @@ public class InformationTemplateService : AFBaseCurdRepositoryService<Informatio
         _defaultTemplateService = defaultTemplateService;
         _bpmnTemplateService = bpmnTemplateService;
     }
-    public ResultAndPage<InformationTemplateVo> List(PageDto pageDto, InformationTemplateVo informationTemplateVo)
-    {
+    public ResultAndPage<InformationTemplateVo> List(PageDto pageDto, InformationTemplateVo informationTemplateVo) {
         Page<InformationTemplateVo> page = PageUtils.GetPageByPageDto<InformationTemplateVo>(pageDto);
         Expression<Func<InformationTemplate, bool>> expression = a => a.IsDel == 0;
         if (!string.IsNullOrEmpty(informationTemplateVo.Name))
@@ -36,7 +36,7 @@ public class InformationTemplateService : AFBaseCurdRepositoryService<Informatio
 
         List<InformationTemplate> informationTemplates = this.baseRepo
             .Where(expression)
-            .Page(page.Current, page.Size)
+            .Page(page.Current,page.Size)
             .ToList();
         List<InformationTemplateVo> results = new List<InformationTemplateVo>();
         foreach (InformationTemplate informationTemplate in informationTemplates)
@@ -55,26 +55,24 @@ public class InformationTemplateService : AFBaseCurdRepositoryService<Informatio
     {
         Expression<Func<InformationTemplate, bool>> expression = a =>
             a.IsDel == 0 && a.Name == informationTemplateVo.Name;
-        if (informationTemplateVo.Id != null && informationTemplateVo.Id > 0)
+        if (informationTemplateVo.Id != null&&informationTemplateVo.Id>0)
         {
             expression.And(a => a.Id == informationTemplateVo.Id);
         }
-        //to check whether the template's name is duplicated
+         //to check whether the template's name is duplicated
         List<InformationTemplate> list = this.baseRepo
             .Where(expression)
             .ToList();
-        if (list.Count > 1)
-        {
+        if (list.Count>1) {
             throw new AFBizException("模板名称重复");
         }
 
         InformationTemplate informationTemplate = informationTemplateVo.MapToEntity();
-
-        if (informationTemplate.Id > 0)
-        {
+        
+        if (informationTemplate.Id>0) {
             //modify
-            if (informationTemplate.Status == 1)
-            {
+            if (informationTemplate.Status==1) {
+
                 //to check whether the template is in use,if so then throw exception
                 List<BpmnTemplate> templates = _bpmnTemplateService.baseRepo
                     .Where(a => a.IsDel == 0 && a.TemplateId == informationTemplate.Id)
@@ -87,24 +85,21 @@ public class InformationTemplateService : AFBaseCurdRepositoryService<Informatio
                 List<DefaultTemplate> defaultTemplates = _defaultTemplateService.baseRepo
                     .Where(a => a.IsDel == 0 && a.TemplateId == informationTemplate.Id)
                     .ToList();
-
+                   
                 if (templates.Any()
                     || approveReminds.Any()
-                    || defaultTemplates.Any())
-                {
+                    || defaultTemplates.Any()) {
                     throw new AFBizException("该模板正在使用中，不可禁用！");
                 }
             }
 
             informationTemplate.UpdateUser = SecurityUtils.GetLogInEmpIdSafe();
-        }
-        else
-        {
+        } else {
             //add
-            informationTemplate.CreateUser = SecurityUtils.GetLogInEmpNameSafe();
-            informationTemplate.UpdateUser = SecurityUtils.GetLogInEmpNameSafe();
+            informationTemplate.CreateUser=SecurityUtils.GetLogInEmpNameSafe();
+            informationTemplate.UpdateUser=SecurityUtils.GetLogInEmpNameSafe();
             this.baseRepo.Insert(informationTemplate);
-            informationTemplate.Name = ("LCTZ_" + String.Format("%03d", informationTemplate.Id));
+            informationTemplate.Name=("LCTZ_" + String.Format("%03d", informationTemplate.Id));
         }
 
         this.baseRepo.Update(informationTemplate);
@@ -114,22 +109,24 @@ public class InformationTemplateService : AFBaseCurdRepositoryService<Informatio
     {
         List<DefaultTemplate> defaultTemplates = _defaultTemplateService
             .baseRepo
-            .Where(a => a.IsDel == 0)
+            .Where(a=>a.IsDel==0)
             .ToList();
-        Dictionary<int, long?> map = defaultTemplates
-            .Where(a => a.TemplateId != null && a.TemplateId > 0)
+        Dictionary<int,long?> map =defaultTemplates
+            .Where(a=>a.TemplateId!=null&&a.TemplateId>0)
             .GroupBy(t => t.Event)
             .ToDictionary(
                 g => g.Key,
                 g => g.First().TemplateId
             );
 
+        
         Dictionary<long, string> templateMap = map.Any()
-            ? this.baseRepo
+            ?this.baseRepo
                 .Where(t => map.Values.Contains(t.Id))
                 .ToDictionary(t => t.Id, t => t.Name)
             : new Dictionary<long, string>();
 
+       
         var result = Enum.GetValues(typeof(EventTypeEnum))
             .Cast<EventTypeEnum>()
             .Select(o =>

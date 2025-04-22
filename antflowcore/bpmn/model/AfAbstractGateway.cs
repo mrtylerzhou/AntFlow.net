@@ -1,6 +1,6 @@
-﻿namespace antflowcore.bpmn.model;
+﻿namespace antflowcore.bpmn;
 
-public abstract class AfAbstractGateway : AbstractFlowNode
+public abstract class AfAbstractGateway: AbstractFlowNode
 {
-    public string DefaultFlow { get; set; }
+    public String DefaultFlow { get; set; }
 }

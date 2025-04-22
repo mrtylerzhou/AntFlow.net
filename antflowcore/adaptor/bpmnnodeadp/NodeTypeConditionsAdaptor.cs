@@ -1,15 +1,17 @@
-﻿using antflowcore.adaptor.nodetypecondition;
-using antflowcore.constant.enums;
+﻿using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using antflowcore.adaptor.nodetypecondition;
+using antflowcore.constant.enus;
+using AntFlowCore.Constants;
+using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.service.repository;
 using antflowcore.util;
 using antflowcore.vo;
 using Antflowcore.Vo;
-using AntFlowCore.Entity;
-using System.Reflection;
-using System.Text.Json;
 
-namespace antflowcore.adaptor.bpmnnodeadp;
+namespace antflowcore.adaptor;
 
 public class NodeTypeConditionsAdp : BpmnNodeAdaptor
 {
@@ -30,6 +32,7 @@ public class NodeTypeConditionsAdp : BpmnNodeAdaptor
     {
         var bpmnNodeConditionsConf =
             _bpmnNodeConditionsConfService.baseRepo.Where(a => a.BpmnNodeId == bpmnNodeVo.Id).First();
+        
 
         if (bpmnNodeConditionsConf == null)
         {
@@ -54,7 +57,8 @@ public class NodeTypeConditionsAdp : BpmnNodeAdaptor
             return bpmnNodeVo;
         }
 
-        var nodeConditionsParamConfs = _bpmnNodeConditionsParamConfService.baseRepo.Where(a => a.BpmnNodeConditionsId == bpmnNodeConditionsConf.Id).ToList();
+        var nodeConditionsParamConfs = _bpmnNodeConditionsParamConfService.baseRepo.Where(a=>a.BpmnNodeConditionsId==bpmnNodeConditionsConf.Id).ToList();
+        
 
         if (nodeConditionsParamConfs.Any())
         {
@@ -66,7 +70,7 @@ public class NodeTypeConditionsAdp : BpmnNodeAdaptor
             {
                 var conditionTypeEnum =
                     ConditionTypeEnumExtensions.GetEnumByCode(nodeConditionsParamConf.ConditionParamType);
-                ConditionTypeAttributes conditionTypeAttributes = conditionTypeEnum.Value.GetAttributes();
+                ConditionTypeAttributes conditionTypeAttributes = ConditionTypeEnumExtensions.GetAttributes(conditionTypeEnum.Value);
                 string conditionParamJson = nodeConditionsParamConf.ConditionParamJsom;
 
                 if (!string.IsNullOrEmpty(conditionParamJson))
@@ -115,7 +119,7 @@ public class NodeTypeConditionsAdp : BpmnNodeAdaptor
         {
             var columnDbname = extField.ColumnDbname;
             var lowCodeFlow =
-                ConditionTypeEnumExtensions.GetEnumByCode(int.Parse(extField.ColumnId)).Value.IsLowCodeFlow();
+                ConditionTypeEnumExtensions.IsLowCodeFlow(ConditionTypeEnumExtensions.GetEnumByCode(int.Parse(extField.ColumnId)).Value);
             if (lowCodeFlow)
             {
                 columnDbname = StringConstants.LOWFLOW_CONDITION_CONTAINER_FIELD_NAME;
@@ -139,6 +143,8 @@ public class NodeTypeConditionsAdp : BpmnNodeAdaptor
 
         return bpmnNodeVo;
     }
+
+
 
     private void SetProperty(BpmnNodeVo bpmnNodeVo, BpmnNodeConditionsConfBaseVo bpmnNodeConditionsConfBaseVo)
     {
@@ -183,13 +189,13 @@ public class NodeTypeConditionsAdp : BpmnNodeAdaptor
                 {
                     throw new AFBizException($"Cannot get node ConditionTypeEnum by code: {columnId}");
                 }
-                ConditionTypeAttributes conditionTypeAttributes = conditionTypeEnum.Value.GetAttributes();
+                ConditionTypeAttributes conditionTypeAttributes = ConditionTypeEnumExtensions.GetAttributes(conditionTypeEnum.Value);
                 FieldInfo? fieldInfo = typeof(BpmnNodeConditionsConfBaseVo).GetField(conditionTypeAttributes.FieldName);
                 if (fieldInfo == null)
                 {
                     throw new AFBizException("fieldInfo is null");
                 }
-                var conditionParam = fieldInfo.GetValue(bpmnNodeConditionsConfBaseVo);
+                var conditionParam =  fieldInfo.GetValue(bpmnNodeConditionsConfBaseVo);
                 if (conditionParam != null)
                 {
                     var conditionParamJson = conditionParam is string
@@ -218,7 +224,7 @@ public class NodeTypeConditionsAdp : BpmnNodeAdaptor
                         {
                             BpmnNodeConditionsId = nodeConditionsId,
                             ConditionParamType = (int)ConditionTypeEnum.CONDITION_TYPE_NUMBER_OPERATOR,
-                            ConditionParamName = ConditionTypeEnum.CONDITION_TYPE_NUMBER_OPERATOR.GetAttributes().FieldName,
+                            ConditionParamName = ConditionTypeEnumExtensions.GetAttributes(ConditionTypeEnum.CONDITION_TYPE_NUMBER_OPERATOR).FieldName,
                             ConditionParamJsom = JsonSerializer.Serialize(numberOperator),
                             CreateUser = SecurityUtils.GetLogInEmpNameSafe(),
                             CreateTime = DateTime.Now

@@ -1,17 +1,17 @@
-﻿namespace antflowcore.bpmn.model;
+﻿namespace antflowcore.bpmn;
 
 public class HistoricProcessInstanceEntity
 {
-    public string Id { get; set; }
-    public string ProcessInstanceId { get; set; }
-    public string EndActivityId { get; set; }
-    public string BusinessKey { get; set; }
-    public string StartUserId { get; set; }
-    public string StartActivityId { get; set; }
-    public string SuperProcessInstanceId { get; set; }
-    public string TenantId { get; set; } = TaskEntity.DEFAULT_NO_TENANT_ID;
-    public string Name { get; set; }
-    public string LocalizedName { get; set; }
-    public string Description { get; set; }
-    public string LocalizedDescription { get; set; }
+   public string Id { get; set; }
+   public string ProcessInstanceId { get; set; }
+   public String EndActivityId { get; set; }
+   public String BusinessKey { get; set; }
+   public String StartUserId { get; set; }
+   public String StartActivityId { get; set; }
+   public String SuperProcessInstanceId { get; set; }
+   public String TenantId { get; set; } =TaskEntity.DEFAULT_NO_TENANT_ID ;
+   public String Name { get; set; }
+   public String LocalizedName { get; set; }
+   public String Description { get; set; }
+   public String LocalizedDescription { get; set; }
 }

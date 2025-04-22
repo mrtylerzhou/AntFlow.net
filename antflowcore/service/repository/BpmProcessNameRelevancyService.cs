@@ -2,15 +2,13 @@
 
 namespace antflowcore.service.repository;
 
-public class BpmProcessNameRelevancyService : AFBaseCurdRepositoryService<BpmProcessNameRelevancy>
+public class BpmProcessNameRelevancyService: AFBaseCurdRepositoryService<BpmProcessNameRelevancy>
 {
     public BpmProcessNameRelevancyService(IFreeSql freeSql) : base(freeSql)
     {
     }
-
-    public BpmProcessNameRelevancy FindProcessNameRelevancy(String formCode)
-    {
-        BpmProcessNameRelevancy bpmProcessNameRelevancy = baseRepo.Where(a => a.ProcessKey.Equals(formCode) && a.IsDel == 0).ToOne();
+    public BpmProcessNameRelevancy FindProcessNameRelevancy(String formCode) {
+        BpmProcessNameRelevancy bpmProcessNameRelevancy = baseRepo.Where(a=>a.ProcessKey.Equals(formCode)&&a.IsDel==0).ToOne();
         return bpmProcessNameRelevancy;
     }
 
@@ -18,7 +16,7 @@ public class BpmProcessNameRelevancyService : AFBaseCurdRepositoryService<BpmPro
     {
         long count = this
             .baseRepo.
-            Where(a => a.ProcessKey == formCode && a.IsDel == 0)
+            Where(a=>a.ProcessKey==formCode&&a.IsDel==0)
             .Count();
         return count > 0;
     }
@@ -32,8 +30,8 @@ public class BpmProcessNameRelevancyService : AFBaseCurdRepositoryService<BpmPro
     {
         List<string> processK = this
             .baseRepo
-            .Where(a => a.ProcessNameId == id && a.IsDel == 0)
-            .ToList(a => a.ProcessKey);
+            .Where(a=>a.ProcessNameId==id&&a.IsDel==0)
+            .ToList(a=>a.ProcessKey);
         return processK;
     }
 }

@@ -1,5 +1,7 @@
-﻿using antflowcore.vo;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using antflowcore.vo;
 
 namespace AntFlowCore.Vo
 {
@@ -52,7 +54,6 @@ namespace AntFlowCore.Vo
         /// </summary>
         [JsonPropertyName("templateMark")]
         public string TemplateMark { get; set; }
-
         [JsonPropertyName("TemplateMarks")]
         public List<String> TemplateMarks { get; set; }
 
@@ -153,17 +154,14 @@ namespace AntFlowCore.Vo
         /// </summary>
         [JsonPropertyName("outSideLevelNodes")]
         public List<OutSideLevelNodeVo> OutSideLevelNodes { get; set; }
-
         [JsonPropertyName("lfConditions")]
-        public Dictionary<String, Object> LfConditions { get; set; }
-
+        public Dictionary<String,Object> LfConditions { get; set; }
         [JsonPropertyName("isLowCodeFlow")]
         public bool IsLowCodeFlow { get; set; }
-
         [JsonPropertyName("lfFields")]
-        public Dictionary<String, Object> LfFields { get; set; }
-
+        public Dictionary<String,Object> LfFields { get; set; }
+        
         [JsonPropertyName("approversList")]
-        public Dictionary<String, List<BaseIdTranStruVo>> ApproversList { get; set; }
+        public Dictionary<String,List<BaseIdTranStruVo>> ApproversList { get; set; }
     }
 }

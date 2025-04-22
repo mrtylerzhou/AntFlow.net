@@ -1,6 +1,6 @@
 ﻿using antflowcore.bpmn.listener;
-using antflowcore.bpmn.model;
-using antflowcore.constant.enums;
+using antflowcore.constant.enus;
+using AntFlowCore.Constants;
 using antflowcore.entity;
 using antflowcore.service.repository;
 using antflowcore.util;
@@ -10,88 +10,99 @@ namespace antflowcore.bpmn.service;
 
 public class RuntimeService
 {
-    private readonly AfTaskInstService _taskInstService;
-    private readonly AFTaskService _taskService;
-    private readonly ITaskListener _taskListener;
-    private readonly AFExecutionService _executionService;
+     private readonly AfTaskInstService _taskInstService;
+     private readonly AFTaskService _taskService;
+     private readonly ITaskListener _taskListener;
+     private readonly AFExecutionService _executionService;
 
-    public RuntimeService(
-         AfTaskInstService taskInstService,
-         AFTaskService taskService,
-         ITaskListener taskListener,
-         AFExecutionService executionService)
-    {
-        _taskInstService = taskInstService;
-        _taskService = taskService;
-        _taskListener = taskListener;
-        _executionService = executionService;
-    }
-
-    public ExecutionEntity StartProcessInstance(BpmnConfCommonVo bpmnConfCommonVo,
-         BpmnStartConditionsVo bpmnStartConditions, string deploymentId)
-    {
-        List<BpmnConfCommonElementVo> bpmnConfCommonElementVos = bpmnConfCommonVo.ElementList;
-        string procInstId = StrongUuidGenerator.GetNextId();
-        string executionId = StrongUuidGenerator.GetNextId();
-        BpmnConfCommonElementVo firtFirstAssigneeNode = BpmnFlowUtil.GetFirstAssigneeNode(bpmnConfCommonElementVos);
-        Dictionary<string, string> assigneeMap = firtFirstAssigneeNode.AssigneeMap;
-        DateTime nowTime = DateTime.Now;
-        BpmAfExecution execution = new BpmAfExecution
-        {
-            Id = executionId,
-            ProcInstId = procInstId,
-            BusinessKey = bpmnConfCommonVo.FormCode,
-            ProcDefId = deploymentId,
-            ActId = firtFirstAssigneeNode.ElementId,
-            Name = firtFirstAssigneeNode.ElementName,
-            StartTime = nowTime,
-            StartUserId = SecurityUtils.GetLogInEmpId(),
-            TaskCount = assigneeMap.Count,
-        };
-        _executionService.baseRepo.Insert(execution);
-        List<BpmAfTask> tasks = new List<BpmAfTask>();
-        List<BpmAfTaskInst> historyTaskInsts = new List<BpmAfTaskInst>();
-        BpmAfTaskInst startTask = new BpmAfTaskInst
-        {
-            Id = StrongUuidGenerator.GetNextId(),
-            ProcInstId = procInstId,
-            ProcDefId = deploymentId,
-            ExecutionId = executionId,
-            Name = StringConstants.START_USER_NODE_NAME,
-            TaskDefKey = ProcessNodeEnum.START_TASK_KEY.Description,
-            Owner = bpmnStartConditions.StartUserId,
-            Assignee = bpmnStartConditions.StartUserId,
-            AssigneeName = bpmnStartConditions.StartUserName,
-            StartTime = nowTime,
-            FormKey = bpmnConfCommonVo.FormCode,
-        };
-        historyTaskInsts.Add(startTask);
-        foreach (var (key, value) in assigneeMap)
-        {
-            BpmAfTask bpmAfTask = new BpmAfTask()
-            {
-                Id = StrongUuidGenerator.GetNextId(),
-                ProcInstId = procInstId,
-                ProcDefId = deploymentId,
-                ExecutionId = executionId,
-                Name = firtFirstAssigneeNode.ElementName,
-                TaskDefKey = firtFirstAssigneeNode.ElementId,
-                Owner = bpmnStartConditions.StartUserId,
-                Assignee = key,
-                AssigneeName = value,
-                CreateTime = nowTime,
-                FormKey = bpmnConfCommonVo.FormCode,
-            };
-            tasks.Add(bpmAfTask);
-            historyTaskInsts.Add(bpmAfTask.ToInst());
-        }
-        _taskService.baseRepo.Insert(tasks);
-        _taskInstService.baseRepo.Insert(historyTaskInsts);
-        ExecutionEntity executionEntity = new ExecutionEntity()
-        {
-            Name = execution.Name,
-            ProcessInstanceId = procInstId,
-        };
-        return executionEntity;
-    }
+     public RuntimeService(
+          AfTaskInstService taskInstService,
+          AFTaskService taskService,
+          ITaskListener taskListener,
+          AFExecutionService executionService)
+     {
+          _taskInstService = taskInstService;
+          _taskService = taskService;
+          _taskListener = taskListener;
+          _executionService = executionService;
+     }
+     
+     public ExecutionEntity StartProcessInstance(BpmnConfCommonVo bpmnConfCommonVo,
+          BpmnStartConditionsVo bpmnStartConditions,string deploymentId)
+     {
+          List<BpmnConfCommonElementVo> bpmnConfCommonElementVos = bpmnConfCommonVo.ElementList;
+          string procInstId = StrongUuidGenerator.GetNextId();
+          string executionId= StrongUuidGenerator.GetNextId();
+          BpmnConfCommonElementVo firstAssigneeNode = BpmnFlowUtil.GetFirstAssigneeNode(bpmnConfCommonElementVos);
+          Dictionary<string,string> assigneeMap = firstAssigneeNode.AssigneeMap;
+          DateTime nowTime = DateTime.Now;
+          int signType = firstAssigneeNode.SignType;
+          int taskCount=signType==SignTypeEnum.SIGN_TYPE_OR_SIGN.GetCode()||signType==SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode()?1:assigneeMap.Count;
+          BpmAfExecution execution = new BpmAfExecution
+          {
+               Id = executionId,
+               ProcInstId = procInstId,
+               BusinessKey = bpmnConfCommonVo.FormCode,
+               ProcDefId = deploymentId,
+               ActId = firstAssigneeNode.ElementId,
+               Name = firstAssigneeNode.ElementName,
+               StartTime = nowTime,
+               StartUserId = SecurityUtils.GetLogInEmpId(),
+               TaskCount = taskCount,
+               SignType = signType
+               
+          };
+          _executionService.baseRepo.Insert(execution);
+          List<BpmAfTask> tasks = new List<BpmAfTask>();
+          List<BpmAfTaskInst> historyTaskInsts = new List<BpmAfTaskInst>();
+          BpmAfTaskInst startTask = new BpmAfTaskInst
+          {
+               Id = StrongUuidGenerator.GetNextId(),
+               ProcInstId = procInstId,
+               ProcDefId = deploymentId,
+               ExecutionId = executionId,
+               Name = StringConstants.START_USER_NODE_NAME,
+               TaskDefKey = ProcessNodeEnum.START_TASK_KEY.Description,
+               Owner = bpmnStartConditions.StartUserId,
+               Assignee = bpmnStartConditions.StartUserId,
+               AssigneeName = bpmnStartConditions.StartUserName,
+               StartTime = nowTime,
+               FormKey = bpmnConfCommonVo.FormCode,
+          };
+          historyTaskInsts.Add(startTask);
+          for (var i = 0; i < assigneeMap.Count; i++)
+          {
+              var (key, value) = assigneeMap.ElementAt(i);
+               BpmAfTask bpmAfTask = new BpmAfTask()
+               {
+                    Id = StrongUuidGenerator.GetNextId(),
+                    ProcInstId = procInstId,
+                    ProcDefId = deploymentId,
+                    ExecutionId = executionId,
+                    Name = firstAssigneeNode.ElementName,
+                    TaskDefKey = firstAssigneeNode.ElementId,
+                    Owner = bpmnStartConditions.StartUserId,
+                    Assignee = key,
+                    AssigneeName = value,
+                    CreateTime = nowTime,
+                    FormKey = bpmnConfCommonVo.FormCode,
+               };
+               tasks.Add(bpmAfTask);
+               historyTaskInsts.Add(bpmAfTask.ToInst());
+               if (signType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode())
+               {
+                    break;
+               }
+          }
+         
+          _taskService.InsertTasks(tasks);
+          _taskInstService.baseRepo.Insert(historyTaskInsts);
+          ExecutionEntity executionEntity = new ExecutionEntity()
+          {
+               Name = execution.Name,
+               ProcessInstanceId = procInstId,
+          };
+          return executionEntity;
+     }
+     
 }

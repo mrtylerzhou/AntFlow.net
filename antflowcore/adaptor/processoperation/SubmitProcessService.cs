@@ -1,8 +1,9 @@
-﻿using antflowcore.adaptor.formoperation;
-using antflowcore.constant.enums;
+﻿using antflowcore.constant.enus;
 using antflowcore.entity;
+using AntFlowCore.Enums;
 using antflowcore.exception;
 using antflowcore.factory;
+using antflowcore.service.biz;
 using antflowcore.service.repository;
 using antflowcore.util;
 using AntFlowCore.Vo;
@@ -10,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace antflowcore.adaptor.processoperation;
 
-public class SubmitProcessService : IProcessOperationAdaptor
+public class SubmitProcessService: IProcessOperationAdaptor
 {
     private readonly FormFactory _formFactory;
     private readonly BpmnConfCommonService _bpmnConfCommonService;
@@ -40,31 +41,30 @@ public class SubmitProcessService : IProcessOperationAdaptor
         String entryId = businessDataVo.EntityName + ":" + businessDataVo.BusinessId;
         BpmnStartConditionsVo bpmnStartConditionsVo = formAdapter.PreviewSetCondition(businessDataVo);
         bpmnStartConditionsVo.ApproversList = businessDataVo.ApproversList;
-        bpmnStartConditionsVo.ProcessNum = (businessDataVo.FormCode + "_" + businessDataVo.BusinessId);
-        bpmnStartConditionsVo.EntryId = entryId;
-        bpmnStartConditionsVo.BusinessId = businessDataVo.BusinessId;
-        if (!_bpmBusinessProcessService.CheckProcessData(entryId))
-        {
+        bpmnStartConditionsVo.ProcessNum=(businessDataVo.FormCode + "_" + businessDataVo.BusinessId);
+        bpmnStartConditionsVo.EntryId=entryId;
+        bpmnStartConditionsVo.BusinessId=businessDataVo.BusinessId;
+        if (!_bpmBusinessProcessService.CheckProcessData(entryId)) {
             throw new AFBizException("the process has already been submitted！");
         }
         //process's name
         String processName = _bpmProcessNameService.GetBpmProcessName(businessDataVo.FormCode).ProcessName;
         //apply user info
         String applyName = SecurityUtils.GetLogInEmpName();
-        string processNumber = businessDataVo.FormCode + "_" + businessDataVo.BusinessId;
+        string processNumber = businessDataVo.FormCode+"_"+businessDataVo.BusinessId;
         //save business and process information
         BpmBusinessProcess bpmBusinessProcess = new BpmBusinessProcess
         {
             BusinessId = businessDataVo.BusinessId,
             ProcessinessKey = businessDataVo.FormCode,
             BusinessNumber = processNumber,
-            IsLowCodeFlow = businessDataVo.IsLowCodeFlow ?? 0,
+            IsLowCodeFlow = businessDataVo.IsLowCodeFlow??0,
             CreateUser = businessDataVo.StartUserId,
             UserName = businessDataVo.StartUserName,
             CreateTime = DateTime.Now,
             ProcessState = (int)ProcessStateEnum.HANDLING_STATE,
             EntryId = entryId,
-            Description = applyName + processName,
+            Description = applyName+processName,
             DataSourceId = businessDataVo.DataSourceId,
             Version = businessDataVo.BpmnCode
         };

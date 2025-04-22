@@ -1,15 +1,15 @@
-﻿using antflowcore.exception;
-using AntFlowCore.Entity;
+﻿using AntFlowCore.Entity;
+using antflowcore.exception;
 
 namespace antflowcore.service.repository;
 
-public class BpmnConfLfFormdataFieldService : AFBaseCurdRepositoryService<BpmnConfLfFormdataField>
+public class BpmnConfLfFormdataFieldService: AFBaseCurdRepositoryService<BpmnConfLfFormdataField>
 {
     public BpmnConfLfFormdataFieldService(IFreeSql freeSql) : base(freeSql)
     {
     }
 
-    public Dictionary<string, BpmnConfLfFormdataField> QryFormDataFieldMap(long confId)
+    public Dictionary<string,BpmnConfLfFormdataField> QryFormDataFieldMap(long confId)
     {
         List<BpmnConfLfFormdataField> allFields = baseRepo.Where(x => x.BpmnConfId == confId).ToList();
         if (allFields == null || !allFields.Any())

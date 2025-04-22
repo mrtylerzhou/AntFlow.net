@@ -1,4 +1,5 @@
-﻿using antflowcore.adaptor.personnel.provider;
+﻿
+using antflowcore.adaptor.personnel.provider;
 using antflowcore.entity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,12 +11,11 @@ public class ValuesController
     private readonly IFreeSql _free;
     private readonly IEnumerable<IBpmnPersonnelProviderService> _personnelProviderServices;
 
-    public ValuesController(IFreeSql free, IEnumerable<IBpmnPersonnelProviderService> personnelProviderServices)
+    public ValuesController(IFreeSql free,IEnumerable<IBpmnPersonnelProviderService> personnelProviderServices)
     {
         _free = free;
         _personnelProviderServices = personnelProviderServices;
     }
-
     [HttpGet("test")]
     public List<Student> testValue()
     {

@@ -1,11 +1,12 @@
-﻿using antflowcore.exception;
-using antflowcore.util;
+﻿using antflowcore.constant.enus;
 using AntFlowCore.Entity;
+using antflowcore.exception;
+using antflowcore.util;
 using FreeSql.DataAnnotations;
 
 namespace antflowcore.entity;
 
-using antflowcore.constant.enums;
+using FreeSql;
 using System;
 using System.Collections.Generic;
 
@@ -107,6 +108,7 @@ public class LFMainField
         return mainFields;
     }
 
+   
     public static LFMainField BuildMainField(object fieldValue, long mainId, int sort, BpmnConfLfFormdataField fieldConfig)
     {
         string fieldValueStr = fieldValue?.ToString();
@@ -124,32 +126,30 @@ public class LFMainField
             throw new AFBizException("控件类型未定义!");
         }
 
+      
         var fieldTypeEnum = LFFieldTypeEnum.GetByType(fieldConfig.FieldType.Value);
         if (fieldTypeEnum == null)
             throw new Exception($"field type can not be empty, {fieldConfig}");
-
+       
         switch (fieldTypeEnum)
         {
             case var fieldType when fieldType == LFFieldTypeEnum.STRING:
                 mainField.FieldValue = fieldValueStr;
                 break;
-
             case var fieldType when fieldType == LFFieldTypeEnum.NUMBER:
                 mainField.FieldValue = int.TryParse(fieldValueStr, out var num) ? num.ToString() : null;
                 break;
-
             case var fieldType when fieldType == LFFieldTypeEnum.DATE || fieldType == LFFieldTypeEnum.DATE_TIME:
                 mainField.FieldValueDt = DateTime.TryParse(fieldValueStr, out var dt) ? dt : null;
                 break;
-
             case var fieldType when fieldType == LFFieldTypeEnum.TEXT:
                 mainField.FieldValueText = fieldValueStr;
                 break;
-
             case var fieldType when fieldType == LFFieldTypeEnum.BOOLEAN:
                 mainField.FieldValue = bool.TryParse(fieldValueStr, out var boolean) ? boolean.ToString() : null;
                 break;
         }
+        
 
         return mainField;
     }

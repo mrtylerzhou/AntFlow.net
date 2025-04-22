@@ -9,7 +9,7 @@ public class GlobalExceptionMiddleware
     private readonly RequestDelegate _next;
     private readonly ILogger<GlobalExceptionMiddleware> _logger;
 
-    public GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> logger)
+    public GlobalExceptionMiddleware(RequestDelegate next,ILogger<GlobalExceptionMiddleware> logger)
     {
         _next = next;
         _logger = logger;
@@ -30,7 +30,7 @@ public class GlobalExceptionMiddleware
 
     private static Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        string errorMsg = exception.InnerException?.Message ?? exception.Message;
+        string errorMsg = exception.InnerException?.Message??exception.Message;
         var response = Result<object>.NewFailureResult("200", errorMsg);
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = StatusCodes.Status200OK;

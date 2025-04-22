@@ -1,8 +1,9 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Text.Json.Serialization;
 
 namespace AntFlowCore.Vo
 {
-    public class BpmProcessNodeOvertimeVo
+    public class BpmProcessNodeOvertimeVo 
     {
         [JsonPropertyName("id")]
         public long Id { get; set; }

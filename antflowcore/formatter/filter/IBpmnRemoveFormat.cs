@@ -1,10 +1,9 @@
-﻿using antflowcore.service;
-using antflowcore.vo;
+﻿using antflowcore.vo;
 using AntFlowCore.Vo;
 
-namespace antflowcore.formatter.filter;
+namespace antflowcore.service.processor.filter;
 
-public interface IBpmnRemoveFormat : IOrderedService
+public interface IBpmnRemoveFormat: IOrderedService
 {
     /// <summary>
     /// Remove unused node
@@ -12,6 +11,5 @@ public interface IBpmnRemoveFormat : IOrderedService
     /// <param name="bpmnConfVo"></param>
     /// <param name="bpmnStartConditions"></param>
     void RemoveBpmnConf(BpmnConfVo bpmnConfVo, BpmnStartConditionsVo bpmnStartConditions);
-
     List<Func<bool>> TrueFuncs(BpmnNodeVo nodeVo, BpmnStartConditionsVo bpmnStartConditionsVo);
 }

@@ -1,8 +1,8 @@
-﻿namespace antflowcore.bpmn.model;
+﻿namespace antflowcore.bpmn;
 
-public class StartEvent : AbstractEvent
+public class StartEvent: AbstractEvent
 {
-    public string Initiator { get; set; }
-    public string FormCode { get; set; }
-    public List<AFFormProperty> FormProperties { get; set; } = new List<AFFormProperty>();
+   public String Initiator { get; set; }
+   public String FormCode{ get; set; }
+   public List<AFFormProperty> FormProperties { get; set; } = new List<AFFormProperty>();
 }

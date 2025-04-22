@@ -15,7 +15,7 @@ public class BpmnNodeService : AFBaseCurdRepositoryService<BpmnNode>
             .InnerJoin((a, b) => a.Id == b.ConfId)
             .Where((a, b) => a.FormCode == formCode && a.EffectiveStatus == 1 && b.NodeProperty == property)
             .OrderByDescending((a, b) => a.CreateTime)
-            .ToList((a, b) => b);
+            .ToList((a,b)=>b);
         return bpmnNodes;
     }
 }

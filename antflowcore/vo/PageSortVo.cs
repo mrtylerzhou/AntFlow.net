@@ -1,4 +1,4 @@
-﻿using antflowcore.constant.enums;
+﻿using antflowcore.constant.enus;
 
 namespace antflowcore.vo;
 

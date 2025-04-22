@@ -1,11 +1,11 @@
-﻿using antflowcore.constant.enums;
+﻿using AntFlowCore.Enums;
 using antflowcore.service.biz;
 using antflowcore.service.repository;
 using AntFlowCore.Vo;
 
 namespace antflowcore.adaptor.processoperation;
 
-public class ChangeAssigneeProcessService : IProcessOperationAdaptor
+public class ChangeAssigneeProcessService: IProcessOperationAdaptor
 {
     private readonly BpmBusinessProcessService _bpmBusinessProcessService;
     private readonly AFTaskService _taskService;
@@ -24,10 +24,9 @@ public class ChangeAssigneeProcessService : IProcessOperationAdaptor
         _bpmFlowrunEntrustService = bpmFlowrunEntrustService;
         _taskMgmtService = taskMgmtService;
     }
-
     public void DoProcessButton(BusinessDataVo vo)
     {
-        var bpmBusinessProcess = _bpmBusinessProcessService.GetBpmBusinessProcess(vo.ProcessNumber);
+        var bpmBusinessProcess =_bpmBusinessProcessService.GetBpmBusinessProcess(vo.ProcessNumber);
         var taskList = _taskService.baseRepo
             .Where(t => t.ProcInstId == bpmBusinessProcess.ProcInstId)
             .ToList();
@@ -55,7 +54,7 @@ public class ChangeAssigneeProcessService : IProcessOperationAdaptor
                 ApplyUserName = userName,
                 TaskId = task.Id
             };
-
+            
             _taskMgmtService.UpdateTaskInst(taskMgmtVo);
             _taskMgmtService.UpdateTask(taskMgmtVo);
         }

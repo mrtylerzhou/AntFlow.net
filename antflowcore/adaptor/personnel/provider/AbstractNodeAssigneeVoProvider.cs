@@ -30,4 +30,5 @@ public abstract class AbstractNodeAssigneeVoProvider : IBpmnPersonnelProviderSer
 
     public abstract List<BpmnNodeParamsAssigneeVo> GetAssigneeList(BpmnNodeVo bpmnNodeVo,
         BpmnStartConditionsVo startConditionsVo);
+
 }

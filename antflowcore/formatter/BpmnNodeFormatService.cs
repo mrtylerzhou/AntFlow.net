@@ -1,12 +1,12 @@
 ﻿using antflowcore.adaptor.bpmnelementadp;
-using antflowcore.constant.enums;
+using antflowcore.constant.enus;
 using antflowcore.exception;
 using antflowcore.factory;
 using antflowcore.util;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 
-namespace antflowcore.formatter;
+namespace antflowcore.service.processor;
 
 public class BpmnNodeFormatService
 {
@@ -16,7 +16,6 @@ public class BpmnNodeFormatService
     {
         _adaptorFactory = adaptorFactory;
     }
-
     public List<BpmnConfCommonElementVo> GetBpmnConfCommonElementVoList(
         BpmnConfCommonVo bpmnConfCommonVo,
         List<BpmnNodeVo> nodes,
@@ -31,7 +30,7 @@ public class BpmnNodeFormatService
         string startElementId = ProcessNodeEnum.START_TASK_KEY.Description; // Start element
 
         // Process diagram element list
-        var bpmnConfCommonElementVos = new List<BpmnConfCommonElementVo>();
+        List<BpmnConfCommonElementVo> bpmnConfCommonElementVos = new List<BpmnConfCommonElementVo>();
 
         // Set start element
         string startEventElementId = $"{bpmnConfCommonVo.ProcessNum}_{ElementTypeEnum.ELEMENT_TYPE_START_EVENT.Desc}";
@@ -39,19 +38,19 @@ public class BpmnNodeFormatService
         bpmnConfCommonElementVos.Add(startEventElement);
 
         // Rebuild nodes recursively
-        var rebuildNodesList = new List<BpmnNodeVo>();
-        var startNode = GetStartUserNode(nodes);
+        List<BpmnNodeVo> rebuildNodesList = new List<BpmnNodeVo>();
+        BpmnNodeVo startNode = GetStartUserNode(nodes);
         rebuildNodesList.Add(startNode); // Set start node
         TreatNodesRecursively(rebuildNodesList, nodes, startNode);
 
         // Set start user node
-        var startUserNode = GetStartUserNode(rebuildNodesList);
+        BpmnNodeVo startUserNode = GetStartUserNode(rebuildNodesList);
         string startUserId = bpmnStartConditions.StartUserId?.ToString() ?? "";
-        var singleAssigneeMap = new Dictionary<string, string>
+        Dictionary<string, string> singleAssigneeMap = new Dictionary<string, string>
         {
             { startUserId, bpmnStartConditions.StartUserName }
         };
-        var startNodeElement =
+        BpmnConfCommonElementVo startNodeElement =
             BpmnElementUtils.GetSingleElement(startElementId, "发起人", "startUser", startUserId, singleAssigneeMap);
 
         // Set start user node buttons
@@ -124,7 +123,7 @@ public class BpmnNodeFormatService
         return startNodes[0];
     }
 
-    private string GetNodeTo(BpmnNodeVo nodeVo)
+    private String GetNodeTo(BpmnNodeVo nodeVo)
     {
         string paramsNodeTo = nodeVo.Params?.NodeTo;
         return paramsNodeTo;
@@ -147,7 +146,7 @@ public class BpmnNodeFormatService
 
         do
         {
-            var nextNodeVo = GetNextNodeVo(rebuildNodesList, nodeTo);
+            BpmnNodeVo nextNodeVo = GetNextNodeVo(rebuildNodesList, nodeTo);
 
             if ((int)NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY == nextNodeVo.NodeType)
             {
@@ -210,7 +209,6 @@ public class BpmnNodeFormatService
 
         return numMap;
     }
-
     private void TreatNodesRecursively(List<BpmnNodeVo> rebuildNodesList, List<BpmnNodeVo> nodes, BpmnNodeVo nodeVo)
     {
         var mapNodes = nodes.ToDictionary(node => node.NodeId, node => node);
@@ -231,7 +229,7 @@ public class BpmnNodeFormatService
             if ((int)NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY == nextNodeVo.NodeType)
             {
                 var aggregationNode = BpmnUtils.GetAggregationNode(nextNodeVo, mapNodes.Values);
-
+                
                 TreatParallelGatewayRecursively(nextNodeVo, aggregationNode, mapNodes, nodes, rebuildNodesList);
                 nodeVo = aggregationNode;
             }
@@ -244,7 +242,6 @@ public class BpmnNodeFormatService
             nextId = nodeVo.Params.NodeTo;
         } while (!string.IsNullOrEmpty(nextId));
     }
-
     private void TreatParallelGatewayRecursively(
         BpmnNodeVo outerMostParallelGatewayNode,
         BpmnNodeVo itsAggregationNode,
@@ -287,7 +284,6 @@ public class BpmnNodeFormatService
             }
         }
     }
-
     private void RebuildNodes(List<BpmnNodeVo> rebuildNodesList, List<BpmnNodeVo> nodes, BpmnNodeVo nodeVo)
     {
         var nodeParamsVo = nodeVo.Params;
@@ -302,6 +298,7 @@ public class BpmnNodeFormatService
         else
         {
             rebuildNodesList.Add(nodeVo);
+           
         }
     }
 
@@ -371,7 +368,6 @@ public class BpmnNodeFormatService
             }
         }
     }
-
     /// <summary>
     /// Recursively format BpmnNodeVo to BpmnConfCommonElementVo.
     /// </summary>
@@ -403,10 +399,10 @@ public class BpmnNodeFormatService
         {
             throw new AFBizException($"can not get element adaptor by node property:{nodePropertyEnum}");
         }
-        elementAdaptor.DoFormatNodesToElements(bpmnConfCommonElementVos, nextNodeVo, nodeCode, sequenceFlowNum, numMap);
+        elementAdaptor.DoFormatNodesToElements(bpmnConfCommonElementVos,nextNodeVo,nodeCode, sequenceFlowNum, numMap);
         // If there is still a next node, then continue formatting
         string nextNodeTo = GetNodeTo(nextNodeVo);
-
+        
         return numMap;
     }
 
@@ -431,7 +427,7 @@ public class BpmnNodeFormatService
 
     private BpmnNodeVo GetNextNodeVo(List<BpmnNodeVo> nodes, string nodeTo)
     {
-        var nextNodeVo = nodes
+        List<BpmnNodeVo> nextNodeVo = nodes
             .Where(o => o.NodeId == nodeTo)
             .ToList();
 
@@ -442,7 +438,6 @@ public class BpmnNodeFormatService
 
         return nextNodeVo[0];
     }
-
     private void SetStartNodeElementButtons(BpmnNodeVo startUserNode, BpmnConfCommonElementVo startNodeElement)
     {
         startNodeElement.Buttons = new BpmnConfCommonButtonsVo
@@ -463,4 +458,6 @@ public class BpmnNodeFormatService
                 .ToList()
         };
     }
+
+
 }

@@ -1,4 +1,6 @@
-﻿using FreeSql.DataAnnotations;
+﻿using FreeSql;
+using System;
+using FreeSql.DataAnnotations;
 
 namespace AntFlowCore.Entity
 {
@@ -27,7 +29,7 @@ namespace AntFlowCore.Entity
         public int ViewType { get; set; }
 
         /// <summary>
-        /// Button type: 1-submit, 2-resubmit, 3-agree, 4-disagree, 5-back to modify,
+        /// Button type: 1-submit, 2-resubmit, 3-agree, 4-disagree, 5-back to modify, 
         /// 6-back to previous node, 7-invalid, 8-print, 9-forward.
         /// </summary>
         [Column(Name = "button_type")]
@@ -59,7 +61,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// Create time.
         /// </summary>
-        [Column(Name = "create_time", IsIgnore = true)]
+        [Column(Name = "create_time",IsIgnore = true)]
         public DateTime? CreateTime { get; set; }
 
         /// <summary>
@@ -71,7 +73,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// Update time.
         /// </summary>
-        [Column(Name = "update_time", IsIgnore = true)]
+        [Column(Name = "update_time",IsIgnore = true)]
         public DateTime? UpdateTime { get; set; }
     }
 }

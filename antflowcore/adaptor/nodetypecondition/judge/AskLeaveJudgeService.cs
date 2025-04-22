@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace antflowcore.adaptor.nodetypecondition.judge;
 
-public class AskLeaveJudgeService : AbstractComparableJudge
+public class AskLeaveJudgeService: AbstractComparableJudge
 {
     private readonly ILogger<AskLeaveJudgeService> _logger;
 

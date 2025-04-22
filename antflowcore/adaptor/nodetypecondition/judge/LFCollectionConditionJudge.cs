@@ -1,8 +1,8 @@
-﻿using antflowcore.exception;
+﻿using System.Collections;
+using antflowcore.exception;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
-using System.Collections;
 
 namespace antflowcore.adaptor.nodetypecondition.judge;
 

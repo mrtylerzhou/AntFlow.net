@@ -1,12 +1,12 @@
-﻿using antflowcore.entity;
-using antflowcore.util;
+﻿using System.Collections.Concurrent;
+using antflowcore.entity;
 using AntFlowCore.Entity;
+using antflowcore.util;
 using AntFlowCore.Vo;
-using System.Collections.Concurrent;
 
 namespace antflowcore.service.repository;
 
-public class BpmProcessNameService : AFBaseCurdRepositoryService<BpmProcessName>
+public class BpmProcessNameService: AFBaseCurdRepositoryService<BpmProcessName>
 {
     private readonly BpmProcessNameRelevancyService _bpmProcessNameRelevancyService;
 
@@ -17,18 +17,14 @@ public class BpmProcessNameService : AFBaseCurdRepositoryService<BpmProcessName>
     {
         _bpmProcessNameRelevancyService = bpmProcessNameRelevancyService;
     }
-
     private static IDictionary<String, BpmProcessVo> processVoMap = new ConcurrentDictionary<string, BpmProcessVo>();
-
-    public BpmProcessName GetBpmProcessName(String processKey)
-    {
+    public BpmProcessName GetBpmProcessName(String processKey) {
         BpmProcessNameRelevancy processNameRelevancy = _bpmProcessNameRelevancyService.FindProcessNameRelevancy(processKey);
-        if (processNameRelevancy == null)
-        {
+        if (processNameRelevancy==null) {
             return new BpmProcessName();
         }
 
-        BpmProcessName bpmProcessName = baseRepo.Where(a => a.Id.Equals(processNameRelevancy.ProcessNameId)).ToOne();
+        BpmProcessName bpmProcessName = baseRepo.Where(a=>a.Id.Equals(processNameRelevancy.ProcessNameId)).ToOne();
         return bpmProcessName;
     }
 
@@ -37,7 +33,7 @@ public class BpmProcessNameService : AFBaseCurdRepositoryService<BpmProcessName>
         BpmProcessName processName = FindProcessName(bpmnConfByCode.BpmnName);
         BpmProcessNameRelevancyService bpmProcessNameRelevancyService = ServiceProviderUtils.GetService<BpmProcessNameRelevancyService>();
         bool flag = bpmProcessNameRelevancyService.SelectCount(bpmnConfByCode.FormCode);
-
+    
         if (processName?.Id != null)
         {
             if (!flag)
@@ -76,7 +72,7 @@ public class BpmProcessNameService : AFBaseCurdRepositoryService<BpmProcessName>
     private BpmProcessName FindProcessName(string processName)
     {
         List<BpmProcessName> bpmProcessNames = this.baseRepo
-            .Where(a => a.ProcessName == processName && a.IsDel == 0)
+            .Where(a=>a.ProcessName==processName&&a.IsDel==0)
             .ToList();
         if (bpmProcessNames.Count > 0)
         {
@@ -90,7 +86,7 @@ public class BpmProcessNameService : AFBaseCurdRepositoryService<BpmProcessName>
 
     public BpmProcessVo Get(string processKey)
     {
-        processVoMap.TryGetValue(processKey, out BpmProcessVo? bpmProcessVo);
+        processVoMap.TryGetValue(processKey,out  BpmProcessVo? bpmProcessVo);
         if (bpmProcessVo != null)
         {
             return bpmProcessVo;
@@ -107,11 +103,13 @@ public class BpmProcessNameService : AFBaseCurdRepositoryService<BpmProcessName>
         List<BpmProcessVo> list = this.AllProcess();
         foreach (BpmProcessVo next in list)
         {
+            
             if (!string.IsNullOrEmpty(next.ProcessKey))
             {
+              
                 if (!processVoMap.ContainsKey(next.ProcessKey))
                 {
-                    processVoMap.Add(next.ProcessKey, next);
+                    processVoMap.Add(next.ProcessKey,next);
                 }
             }
         }
@@ -120,9 +118,9 @@ public class BpmProcessNameService : AFBaseCurdRepositoryService<BpmProcessName>
     private List<BpmProcessVo> AllProcess()
     {
         List<BpmProcessVo> bpmProcessVos = this.Frsql
-            .Select<BpmProcessName, BpmProcessNameRelevancy>()
-            .LeftJoin((a, b) => b.ProcessNameId == a.Id)
-            .ToList<BpmProcessVo>((b, s) => new BpmProcessVo()
+            .Select<BpmProcessName,BpmProcessNameRelevancy>()
+            .LeftJoin((a,b)=>b.ProcessNameId==a.Id)
+            .ToList<BpmProcessVo>((b,s)=>new BpmProcessVo()
             {
                 ProcessName = b.ProcessName,
                 ProcessKey = s.ProcessKey

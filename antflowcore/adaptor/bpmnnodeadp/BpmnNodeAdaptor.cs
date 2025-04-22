@@ -1,8 +1,8 @@
 ﻿using antflowcore.vo;
 
-namespace antflowcore.adaptor.bpmnnodeadp;
+namespace antflowcore.adaptor;
 
-public abstract class BpmnNodeAdaptor : IAdaptorService
+public abstract class BpmnNodeAdaptor: IAdaptorService
 {
     /**
      * format BpmnNodeVo
@@ -10,16 +10,14 @@ public abstract class BpmnNodeAdaptor : IAdaptorService
      * @param bpmnNodeVo
      * @return
      */
-
     public abstract BpmnNodeVo FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo);
-
     /**
      * edit bpmn node info
      *
      * @param bpmnNodeVo
      */
-
     public abstract void EditBpmnNode(BpmnNodeVo bpmnNodeVo);
 
     public abstract void SetSupportBusinessObjects();
+
 }

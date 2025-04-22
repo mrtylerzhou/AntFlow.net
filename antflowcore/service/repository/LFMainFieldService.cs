@@ -2,7 +2,7 @@
 
 namespace antflowcore.service.repository;
 
-public class LFMainFieldService : AFBaseCurdRepositoryService<LFMainField>
+public class LFMainFieldService: AFBaseCurdRepositoryService<LFMainField>
 {
     public LFMainFieldService(IFreeSql freeSql) : base(freeSql)
     {

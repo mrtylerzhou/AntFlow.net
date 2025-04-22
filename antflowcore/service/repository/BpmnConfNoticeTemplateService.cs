@@ -1,4 +1,5 @@
-﻿using antflowcore.constant.enums;
+﻿using antflowcore.constant.enus;
+using antflowcore.entity;
 using AntFlowCore.Entity;
 
 namespace antflowcore.service.repository;
@@ -8,9 +9,7 @@ public class BpmnConfNoticeTemplateService : AFBaseCurdRepositoryService<BpmnCon
     public BpmnConfNoticeTemplateService(IFreeSql freeSql) : base(freeSql)
     {
     }
-
-    public long Insert(String bpmnCode)
-    {
+    public long Insert(String bpmnCode) {
         BpmnConfNoticeTemplate bpmnConfNoticeTemplate = new BpmnConfNoticeTemplate()
         {
             BpmnCode = bpmnCode
@@ -19,7 +18,7 @@ public class BpmnConfNoticeTemplateService : AFBaseCurdRepositoryService<BpmnCon
         long id = bpmnConfNoticeTemplate.Id;
 
         List<BpmnConfNoticeTemplateDetail> list = new List<BpmnConfNoticeTemplateDetail>();
-
+        
         foreach (MsgNoticeTypeEnum msgNoticeTypeEnum in Enum.GetValues<MsgNoticeTypeEnum>())
         {
             BpmnConfNoticeTemplateDetail detail = new BpmnConfNoticeTemplateDetail

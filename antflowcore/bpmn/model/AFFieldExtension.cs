@@ -1,8 +1,8 @@
-﻿namespace antflowcore.bpmn.model;
+﻿namespace antflowcore.bpmn;
 
 public class AFFieldExtension
 {
-    public string FieldName { get; set; }
-    public string StringValue { get; set; }
-    public string Expression { get; set; }
+   public String FieldName{ get; set; }
+   public String StringValue{ get; set; }
+   public String Expression{ get; set; }
 }

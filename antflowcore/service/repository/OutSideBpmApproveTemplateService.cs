@@ -3,143 +3,144 @@ using antflowcore.entity;
 using antflowcore.exception;
 using antflowcore.util;
 using antflowcore.vo;
+using Microsoft.Extensions.Logging;
 
 namespace antflowcore.service.repository;
 
-public class OutSideBpmApproveTemplateService : AFBaseCurdRepositoryService<OutSideBpmApproveTemplate>
-{
-    public OutSideBpmApproveTemplateService(IFreeSql freeSql) : base(freeSql)
+ public class OutSideBpmApproveTemplateService :AFBaseCurdRepositoryService<OutSideBpmApproveTemplate>
     {
-    }
+        public OutSideBpmApproveTemplateService(IFreeSql freeSql) : base(freeSql)
+        {
+        }
 
-    /// <summary>
-    /// 分页查询审批模板
-    /// </summary>
-    public ResultAndPage<OutSideBpmApproveTemplateVo> ListPage(PageDto pageDto, OutSideBpmApproveTemplateVo vo)
-    {
-        Page<OutSideBpmApproveTemplateVo> page = PageUtils.GetPageByPageDto<OutSideBpmApproveTemplateVo>(pageDto);
-        List<OutSideBpmApproveTemplateVo> outSideBpmApproveTemplateVos = Frsql
-            .Select<OutSideBpmApproveTemplate>()
-            .Where(a => a.IsDel == 0)
-            .WhereIf(!string.IsNullOrWhiteSpace(vo.ApproveTypeName),
-                a => a.ApproveTypeName.Contains(vo.ApproveTypeName))
-            .OrderByDescending(a => a.CreateTime)
-            .Page(page.Current, page.Size)
-            .ToList()
-            .Select(a => new OutSideBpmApproveTemplateVo
+        /// <summary>
+        /// 分页查询审批模板
+        /// </summary>
+        public ResultAndPage<OutSideBpmApproveTemplateVo> ListPage(PageDto pageDto, OutSideBpmApproveTemplateVo vo)
+        {
+            Page<OutSideBpmApproveTemplateVo> page = PageUtils.GetPageByPageDto<OutSideBpmApproveTemplateVo>(pageDto);
+            List<OutSideBpmApproveTemplateVo> outSideBpmApproveTemplateVos = Frsql
+                .Select<OutSideBpmApproveTemplate>()
+                .Where(a => a.IsDel == 0)
+                .WhereIf(!string.IsNullOrWhiteSpace(vo.ApproveTypeName),
+                    a => a.ApproveTypeName.Contains(vo.ApproveTypeName))
+                .OrderByDescending(a => a.CreateTime)
+                .Page(page.Current, page.Size)
+                .ToList()
+                .Select(a => new OutSideBpmApproveTemplateVo
+                {
+                    Id = a.Id,
+                    BusinessPartyId = a.BusinessPartyId,
+                    ApplicationId = a.ApplicationId,
+                    ApproveTypeId = a.ApproveTypeId,
+                    ApproveTypeName = a.ApproveTypeName,
+                    ApiClientId = a.ApiClientId,
+                    ApiClientSecret = a.ApiClientSecret,
+                    ApiToken = a.ApiToken,
+                    ApiUrl = a.ApiUrl,
+                    Remark = a.Remark,
+                    IsDel = a.IsDel,
+                    CreateUserId = a.CreateUserId,
+                    CreateUser = a.CreateUser,
+                    CreateTime = a.CreateTime
+                }).ToList();
+            
+            page.Records=outSideBpmApproveTemplateVos;
+            return PageUtils.GetResultAndPage(page);
+        }
+
+        /// <summary>
+        /// 根据 applicationId 获取模板列表
+        /// </summary>
+        public List<OutSideBpmApproveTemplateVo> SelectListByTemp(int applicationId)
+        {
+            List<OutSideBpmApproveTemplate> templates = this.baseRepo
+                .Where(t => t.IsDel == 0 && t.ApplicationId == applicationId)
+                .ToList();
+
+            if (templates == null ||!templates.Any())
             {
-                Id = a.Id,
-                BusinessPartyId = a.BusinessPartyId,
-                ApplicationId = a.ApplicationId,
-                ApproveTypeId = a.ApproveTypeId,
-                ApproveTypeName = a.ApproveTypeName,
-                ApiClientId = a.ApiClientId,
-                ApiClientSecret = a.ApiClientSecret,
-                ApiToken = a.ApiToken,
-                ApiUrl = a.ApiUrl,
-                Remark = a.Remark,
-                IsDel = a.IsDel,
-                CreateUserId = a.CreateUserId,
-                CreateUser = a.CreateUser,
-                CreateTime = a.CreateTime
-            }).ToList();
-
-        page.Records = outSideBpmApproveTemplateVos;
-        return PageUtils.GetResultAndPage(page);
-    }
-
-    /// <summary>
-    /// 根据 applicationId 获取模板列表
-    /// </summary>
-    public List<OutSideBpmApproveTemplateVo> SelectListByTemp(int applicationId)
-    {
-        List<OutSideBpmApproveTemplate> templates = this.baseRepo
-            .Where(t => t.IsDel == 0 && t.ApplicationId == applicationId)
-            .ToList();
-
-        if (templates == null || !templates.Any())
-        {
-            return new List<OutSideBpmApproveTemplateVo>();
+                return new List<OutSideBpmApproveTemplateVo>();
+            }
+            return templates
+                .Select(o => new OutSideBpmApproveTemplateVo
+                {
+                    Id = o.Id,
+                    ApproveTypeId = o.ApproveTypeId,
+                    ApproveTypeName = o.ApproveTypeName,
+                    ApiClientId = o.ApiClientId,
+                    ApiClientSecret = o.ApiClientSecret,
+                    ApiToken = o.ApiToken,
+                    ApiUrl = o.ApiUrl,
+                    Remark = o.Remark,
+                    CreateTime = o.CreateTime
+                })
+                .ToList();
         }
-        return templates
-            .Select(o => new OutSideBpmApproveTemplateVo
+
+        /// <summary>
+        /// 查询详情
+        /// </summary>
+        public OutSideBpmApproveTemplateVo Detail(long id)
+        {
+            OutSideBpmApproveTemplate entity  = this.baseRepo
+                .Where(a => a.Id == id)
+                .ToOne();
+            OutSideBpmApproveTemplateVo vo = entity.MapToVo();
+            return vo;
+        }
+
+        /// <summary>
+        /// 编辑或新增模板
+        /// </summary>
+        public void Edit(OutSideBpmApproveTemplateVo vo)
+        {
+            long exist = this.baseRepo
+                .Where(x => x.IsDel == 0 
+                            && x.ApplicationId == vo.ApplicationId 
+                            && x.ApproveTypeId == vo.ApproveTypeId)
+                .Count();
+
+            if (exist > 0)
             {
-                Id = o.Id,
-                ApproveTypeId = o.ApproveTypeId,
-                ApproveTypeName = o.ApproveTypeName,
-                ApiClientId = o.ApiClientId,
-                ApiClientSecret = o.ApiClientSecret,
-                ApiToken = o.ApiToken,
-                ApiUrl = o.ApiUrl,
-                Remark = o.Remark,
-                CreateTime = o.CreateTime
-            })
-            .ToList();
-    }
+                throw new AFBizException($"{vo.ApproveTypeName} 审批模板已存在");
+            }
 
-    /// <summary>
-    /// 查询详情
-    /// </summary>
-    public OutSideBpmApproveTemplateVo Detail(long id)
-    {
-        OutSideBpmApproveTemplate entity = this.baseRepo
-            .Where(a => a.Id == id)
-            .ToOne();
-        OutSideBpmApproveTemplateVo vo = entity.MapToVo();
-        return vo;
-    }
+            var now = DateTime.Now;
+            
+            OutSideBpmApproveTemplate templateEntity = this.baseRepo
+                    .Where(x => x.Id == vo.Id)
+                    .First();
 
-    /// <summary>
-    /// 编辑或新增模板
-    /// </summary>
-    public void Edit(OutSideBpmApproveTemplateVo vo)
-    {
-        long exist = this.baseRepo
-            .Where(x => x.IsDel == 0
-                        && x.ApplicationId == vo.ApplicationId
-                        && x.ApproveTypeId == vo.ApproveTypeId)
-            .Count();
+                if (templateEntity != null)
+                {
+                    vo.CopyTo(templateEntity);
+                    templateEntity.UpdateUser = SecurityUtils.GetLogInEmpNameSafe();
+                    templateEntity.UpdateTime = now;
+                    this.baseRepo.Update(templateEntity);
+                    return;
+                }
 
-        if (exist > 0)
-        {
-            throw new AFBizException($"{vo.ApproveTypeName} 审批模板已存在");
+            var newEntity = new OutSideBpmApproveTemplate();
+            vo.CopyTo(newEntity);
+            newEntity.IsDel = 0;
+            newEntity.CreateUser = SecurityUtils.GetLogInEmpNameSafe();
+            newEntity.CreateUserId = SecurityUtils.GetLogInEmpIdSafe();
+            newEntity.CreateTime = now;
+            newEntity.UpdateUser = newEntity.CreateUser;
+            newEntity.UpdateTime = now;
+
+            this.baseRepo.Insert(newEntity);
         }
 
-        var now = DateTime.Now;
-
-        OutSideBpmApproveTemplate templateEntity = this.baseRepo
-                .Where(x => x.Id == vo.Id)
-                .First();
-
-        if (templateEntity != null)
+        /// <summary>
+        /// 删除（逻辑删除）
+        /// </summary>
+        public void Delete(long id)
         {
-            vo.CopyTo(templateEntity);
-            templateEntity.UpdateUser = SecurityUtils.GetLogInEmpNameSafe();
-            templateEntity.UpdateTime = now;
-            this.baseRepo.Update(templateEntity);
-            return;
+            this.Frsql.Update<OutSideBpmApproveTemplate>()
+                .Set(x => x.IsDel, 1)
+                .Where(x => x.Id == id)
+                .ExecuteAffrows();
         }
-
-        var newEntity = new OutSideBpmApproveTemplate();
-        vo.CopyTo(newEntity);
-        newEntity.IsDel = 0;
-        newEntity.CreateUser = SecurityUtils.GetLogInEmpNameSafe();
-        newEntity.CreateUserId = SecurityUtils.GetLogInEmpIdSafe();
-        newEntity.CreateTime = now;
-        newEntity.UpdateUser = newEntity.CreateUser;
-        newEntity.UpdateTime = now;
-
-        this.baseRepo.Insert(newEntity);
     }
-
-    /// <summary>
-    /// 删除（逻辑删除）
-    /// </summary>
-    public void Delete(long id)
-    {
-        this.Frsql.Update<OutSideBpmApproveTemplate>()
-            .Set(x => x.IsDel, 1)
-            .Where(x => x.Id == id)
-            .ExecuteAffrows();
-    }
-}
