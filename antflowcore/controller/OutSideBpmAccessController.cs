@@ -23,6 +23,11 @@ public class OutSideBpmAccessController
         _logger = logger;
     }
 
+    /// <summary>
+    /// 外部工作流提交
+    /// </summary>
+    /// <param name="vo"></param>
+    /// <returns></returns>
     [HttpPost("processSubmit")]
     public Result<OutSideBpmAccessRespVo> AccessBusinessStart([FromBody] OutSideBpmAccessBusinessVo vo)
     {
@@ -30,6 +35,11 @@ public class OutSideBpmAccessController
         return ResultHelper.Success(data);
     }
 
+    /// <summary>
+    /// 分页获取外部工作流的formcode(外部的都是通过字典配置的,内嵌的是通过实现IFormOperationAdaptor的服务上的AfFormServiceAnno属性拿到的
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
     [HttpPost("getOutSideFormCodePageList")]
     public ResultAndPage<BpmnConfVo> ListPage([FromBody] PageRequestDto<BpmnConfVo> dto)
     {

@@ -85,6 +85,11 @@ namespace antflowcore.controller;
             return ResultHelper.Success(applicationsPageList);
         }
 
+        /// <summary>
+        /// 外部接入工作流增加应用
+        /// </summary>
+        /// <param name="vo"></param>
+        /// <returns></returns>
         [HttpPost("businessParty/addBpmProcessAppApplication")]
         public Result<bool> AddBpmProcessAppApplication([FromBody] BpmProcessAppApplicationVo vo)
         {
@@ -92,6 +97,11 @@ namespace antflowcore.controller;
             return ResultHelper.Success(ret);
         }
 
+        /// <summary>
+        /// 查看外部接入工作流详情
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("businessParty/applicationDetail/{id}")]
         public Result<BpmProcessAppApplication> ApplicationDetail(int id)
         {
@@ -102,24 +112,45 @@ namespace antflowcore.controller;
             return ResultHelper.Success(bpmProcessAppApplication);
         }
 
+        /// <summary>
+        /// 查看外部工作流条件模块配置
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="vo"></param>
+        /// <returns></returns>
         [HttpGet("conditionTemplate/listPage")]
         public Result<ResultAndPage<OutSideBpmConditionsTemplateVo>> ConditionTemplateListPage([FromQuery] PageDto page, [FromQuery] OutSideBpmConditionsTemplateVo vo)
         {
             return ResultHelper.Success(_outSideBpmConditionsTemplateService.ListPage(page, vo));
         }
 
+        /// <summary>
+        /// 根据应用查看外部工作流条件
+        /// </summary>
+        /// <param name="applicationId"></param>
+        /// <returns></returns>
         [HttpGet("conditionTemplate/selectListByTemp/{applicationId}")]
         public Result<List<OutSideBpmConditionsTemplateVo>> SelectConditionListByAppId(int applicationId)
         {
             return ResultHelper.Success(_outSideBpmConditionsTemplateService.SelectConditionListByAppId(applicationId));
         }
 
+        /// <summary>
+        /// 编辑外部工作流条件模板
+        /// </summary>
+        /// <param name="vo"></param>
+        /// <returns></returns>
         [HttpPost("conditionTemplate/edit")]
         public Result<string> EditConditionTemplate([FromBody] OutSideBpmConditionsTemplateVo vo)
         {
             _outSideBpmConditionsTemplateService.Edit(vo);
             return ResultHelper.Success("ok");
         }
+        /// <summary>
+        /// 删除外部工作流条件模块
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
 
         [HttpGet("conditionTemplate/delete/{id}")]
         public Result<string> DeleteConditionTemplate(int id)
