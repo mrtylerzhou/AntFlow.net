@@ -6,9 +6,11 @@ using antflowcore.conf.json;
 using antflowcore.conf.middleware;
 using antflowcore.conf.serviceregistration;
 using antflowcore.constant.enus;
+using antflowcore.controller;
 using antflowcore.util;
 
 using FreeSql;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace antflownet;
 
@@ -20,6 +22,17 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
         ServiceCollectionHolder.SetServiceCollection(builder.Services);
         builder.Services.AddHttpContextAccessor();
+        builder.Services.AddControllers().AddApplicationPart(typeof(BpmnConfController).Assembly);
+        builder.Services.AddOpenApi();
+        //解决跨域
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("CorsPolicy", builder => builder
+                .SetIsOriginAllowed((host) => true)
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials());
+        });
         builder.Services.
             AddControllers()
             .AddJsonOptions(options =>
@@ -38,14 +51,16 @@ public class Program
         builder.Services.AddScoped<UnitOfWorkManager>();//freesql uow
         builder.Services.AntFlowServiceSetUp();//注册AntFlow本身使用到的服务
         var app = builder.Build();
+        app.MapOpenApi();
+        app.UseCors("CorsPolicy");//解决跨域
         ServiceProviderUtils.Initialize(app.Services);
         app.UseMiddleware<TransactionalMiddleware>();
         app.UseMiddleware<HeaderMiddleware>();
         app.UseMiddleware<GlobalExceptionMiddleware>();
         //app.MapGet("/testvalue", () => service.testValue());
-        app.MapControllerRoute(
-            name: "default",
-            pattern: "{controller=Home}/{action}");
+        app.MapControllers(); 
+
+        app.MapGet("/", () => $"Hello Antflow!");
         app.Run();
     }
 }
