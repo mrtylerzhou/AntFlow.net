@@ -13,13 +13,13 @@ using Antflowcore.Vo;
 
 namespace antflowcore.adaptor;
 
-public class NodeTypeConditionsAdp : BpmnNodeAdaptor
+public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
 {
     private readonly BpmnNodeConditionsConfService _bpmnNodeConditionsConfService;
     private readonly BpmnNodeConditionsParamConfService _bpmnNodeConditionsParamConfService;
     private readonly BpmnConfLfFormdataFieldService _lfFormdataFieldService;
 
-    public NodeTypeConditionsAdp(BpmnNodeConditionsConfService bpmnNodeConditionsConfService,
+    public NodeTypeConditionsAdaptor(BpmnNodeConditionsConfService bpmnNodeConditionsConfService,
         BpmnNodeConditionsParamConfService bpmnNodeConditionsParamConfService,
         BpmnConfLfFormdataFieldService lfFormdataFieldService)
     {
@@ -156,8 +156,8 @@ public class NodeTypeConditionsAdp : BpmnNodeAdaptor
 
     public override void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
     {
-        var bpmnNodeConditionsConfBaseVo = bpmnNodeVo.Property?.ConditionsConf ?? new BpmnNodeConditionsConfBaseVo();
-        var bpmnNodeConditionsConf = new BpmnNodeConditionsConf
+        BpmnNodeConditionsConfBaseVo bpmnNodeConditionsConfBaseVo = bpmnNodeVo.Property?.ConditionsConf ?? new BpmnNodeConditionsConfBaseVo();
+        BpmnNodeConditionsConf bpmnNodeConditionsConf = new BpmnNodeConditionsConf
         {
             BpmnNodeId = bpmnNodeVo.Id,
             IsDefault = bpmnNodeConditionsConfBaseVo.IsDefault,
@@ -237,6 +237,6 @@ public class NodeTypeConditionsAdp : BpmnNodeAdaptor
 
     public override void SetSupportBusinessObjects()
     {
-        throw new NotImplementedException();
+        ((IAdaptorService)this).AddSupportBusinessObjects(BpmnNodeAdpConfEnum.ADP_CONF_NODE_TYPE_CONDITIONS);
     }
 }

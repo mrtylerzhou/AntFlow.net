@@ -202,7 +202,7 @@ public static class ServiceRegistration
         services.AddSingleton<IAdaptorService, NodePropertyOutSideAccessAdaptor>();
         services.AddSingleton<IAdaptorService, NodePropertyRoleAdaptor>();
         services.AddSingleton<IAdaptorService, NodePropertyStartUserAdaptor>();
-        
+        services.AddSingleton<IAdaptorService, NodeTypeConditionsAdaptor>();
         
         
         
