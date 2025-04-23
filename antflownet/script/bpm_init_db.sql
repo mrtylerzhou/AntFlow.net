@@ -25,7 +25,7 @@
     KEY `index_form_code` (`form_code`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='process main configuration table';
+    COMMENT ='process main configuration table';
 
 CREATE TABLE if not exists `t_bpmn_node`
 (
@@ -55,7 +55,7 @@ CREATE TABLE if not exists `t_bpmn_node`
     KEY `index_conf_id` (`conf_id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='the conf,s node table';
+    COMMENT ='the conf,s node table';
 
 CREATE TABLE if not exists `t_bpmn_node_business_table_conf`
 (
@@ -73,7 +73,7 @@ CREATE TABLE if not exists `t_bpmn_node_business_table_conf`
     PRIMARY KEY (`id`) USING BTREE,
     KEY `index_node_id` (`bpmn_node_id`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='node conf,s business conf table';
+    COMMENT ='node conf,s business conf table';
 
 CREATE TABLE if not exists `t_bpmn_conf_notice_template`
 (
@@ -88,7 +88,7 @@ CREATE TABLE if not exists `t_bpmn_conf_notice_template`
     KEY `index_bpmn_code` (`bpmn_code`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='process,s notice template';
+    COMMENT ='process,s notice template';
 
 CREATE TABLE if not exists `t_bpmn_view_page_button`
 (
@@ -105,7 +105,7 @@ CREATE TABLE if not exists `t_bpmn_view_page_button`
     `update_time` timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='审批流查看页按钮配置表';
+    COMMENT ='审批流查看页按钮配置表';
 
 CREATE TABLE if not exists `t_bpmn_template`
 (
@@ -125,7 +125,7 @@ CREATE TABLE if not exists `t_bpmn_template`
     `update_user` varchar(50)        DEFAULT '' COMMENT 'as its name says',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='notice template';
+    COMMENT ='notice template';
 
 CREATE TABLE if not exists `t_information_template`
 (
@@ -147,7 +147,7 @@ CREATE TABLE if not exists `t_information_template`
     `update_user`    varchar(50)          DEFAULT '' COMMENT 'as its name says',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='消息模板';
+    COMMENT ='消息模板';
 
 CREATE TABLE if not exists `bpm_business`
 (
@@ -161,7 +161,7 @@ CREATE TABLE if not exists `bpm_business`
     `is_del`           int(11)      DEFAULT '0',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='process draft';
+    COMMENT ='process draft';
 
 CREATE TABLE if not exists `bpm_flowrun_entrust`
 (
@@ -179,7 +179,7 @@ CREATE TABLE if not exists `bpm_flowrun_entrust`
     PRIMARY KEY (`id`) USING BTREE,
     KEY `BPM_IDX_ID` (`runinfoid`, `original`, `actual`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='entrust and forward view conf table';
+    COMMENT ='entrust and forward view conf table';
 
 
 CREATE TABLE if not exists `bpm_flowruninfo`
@@ -195,7 +195,7 @@ CREATE TABLE if not exists `bpm_flowruninfo`
     `createdate`    timestamp  NOT NULL     DEFAULT CURRENT_TIMESTAMP NULL COMMENT 'create time',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='process run time info';
+    COMMENT ='process run time info';
 
 CREATE TABLE if not exists `bpm_manual_notify`
 (
@@ -207,7 +207,7 @@ CREATE TABLE if not exists `bpm_manual_notify`
     `update_time` timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='manual notify';
+    COMMENT ='manual notify';
 
 CREATE TABLE if not exists `t_bpmn_approve_remind`
 (
@@ -223,7 +223,7 @@ CREATE TABLE if not exists `t_bpmn_approve_remind`
     `update_user` varchar(50)        DEFAULT '' COMMENT 'update user',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='approvement remind';
+    COMMENT ='approvement remind';
 
 CREATE TABLE if not exists `t_bpmn_conf_notice_template_detail`
 (
@@ -241,7 +241,7 @@ CREATE TABLE if not exists `t_bpmn_conf_notice_template_detail`
     KEY `index_bpmn_type` (`notice_template_type`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='notice template detail';
+    COMMENT ='notice template detail';
 
 
 CREATE TABLE if not exists `t_bpmn_node_conditions_conf`
@@ -260,7 +260,7 @@ CREATE TABLE if not exists `t_bpmn_node_conditions_conf`
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='node,s conditions conf';
+    COMMENT ='node,s conditions conf';
 
 CREATE TABLE if not exists `t_bpmn_node_conditions_param_conf`
 (
@@ -278,7 +278,7 @@ CREATE TABLE if not exists `t_bpmn_node_conditions_param_conf`
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='condition params conf';
+    COMMENT ='condition params conf';
 
 CREATE TABLE if not exists `t_bpmn_node_sign_up_conf`
 (
@@ -294,7 +294,7 @@ CREATE TABLE if not exists `t_bpmn_node_sign_up_conf`
     `update_time`       timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='node sign up conf';
+    COMMENT ='node sign up conf';
 
 CREATE TABLE if not exists `t_bpmn_node_to`
 (
@@ -310,7 +310,7 @@ CREATE TABLE if not exists `t_bpmn_node_to`
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='审批流节点走向表';
+    COMMENT ='审批流节点走向表';
 
 
 CREATE TABLE if not exists `bpm_process_dept`
@@ -330,7 +330,7 @@ CREATE TABLE if not exists `bpm_process_dept`
     `is_all`       tinyint(11)             DEFAULT '0' COMMENT 'it to all',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='process and department join table,used to control access right';
+    COMMENT ='process and department join table,used to control access right';
 
 CREATE TABLE if not exists `bpm_process_forward`
 (
@@ -351,7 +351,7 @@ CREATE TABLE if not exists `bpm_process_forward`
     KEY `index_forward_user_id_is_read` (`forward_user_id`, `is_read`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='process forward table';
+    COMMENT ='process forward table';
 
 
 CREATE TABLE if not exists `bpm_process_node_overtime`
@@ -364,7 +364,7 @@ CREATE TABLE if not exists `bpm_process_node_overtime`
     `notice_time` int(11)      DEFAULT NULL COMMENT 'update time',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='process approve overtime notice';
+    COMMENT ='process approve overtime notice';
 
 CREATE TABLE if not exists `bpm_process_node_record`
 (
@@ -374,7 +374,7 @@ CREATE TABLE if not exists `bpm_process_node_record`
     `create_time`        timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='process over time node record';
+    COMMENT ='process over time node record';
 
 CREATE TABLE if not exists `bpm_process_node_submit`
 (
@@ -388,7 +388,7 @@ CREATE TABLE if not exists `bpm_process_node_submit`
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='process node submit';
+    COMMENT ='process node submit';
 
 CREATE TABLE if not exists `bpm_process_notice`
 (
@@ -397,7 +397,7 @@ CREATE TABLE if not exists `bpm_process_notice`
     `process_key` varchar(50) DEFAULT NULL COMMENT 'process key',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='process notice table';
+    COMMENT ='process notice table';
 
 CREATE TABLE if not exists `bpm_taskconfig`
 (
@@ -411,7 +411,7 @@ CREATE TABLE if not exists `bpm_taskconfig`
     PRIMARY KEY (`id`) USING BTREE,
     KEY `BPM_IDX__TASK_CONFIG` (`proc_def_id_`, `task_def_key_`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='task config';
+    COMMENT ='task config';
 
 
 
@@ -434,7 +434,7 @@ CREATE TABLE if not exists `t_bpm_variable`
     KEY `index_process_num` (`process_num`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='process variable table';
+    COMMENT ='process variable table';
 
 CREATE TABLE if not exists `t_bpm_variable_approve_remind`
 (
@@ -451,7 +451,7 @@ CREATE TABLE if not exists `t_bpm_variable_approve_remind`
     PRIMARY KEY (`id`) USING BTREE,
     KEY `variable_id_element_id` (`variable_id`, `element_id`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='process remind variable';
+    COMMENT ='process remind variable';
 
 CREATE TABLE if not exists `t_bpm_variable_button`
 (
@@ -471,7 +471,7 @@ CREATE TABLE if not exists `t_bpm_variable_button`
     KEY `variable_id` (`variable_id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='variable button table';
+    COMMENT ='variable button table';
 
 CREATE TABLE if not exists `t_bpm_variable_message`
 (
@@ -491,7 +491,7 @@ CREATE TABLE if not exists `t_bpm_variable_message`
     KEY `variable_id_element_id_message_type_event_type` (`variable_id`, `element_id`, `message_type`, `event_type`) USING BTREE,
     KEY `variable_id_message_type_event_type` (`variable_id`, `message_type`, `event_type`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='variable message table';
+    COMMENT ='variable message table';
 
 CREATE TABLE if not exists `t_bpm_variable_multiplayer`
 (
@@ -513,7 +513,7 @@ CREATE TABLE if not exists `t_bpm_variable_multiplayer`
     KEY `variable_id_element_id` (`variable_id`, `element_id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='process multiplayer variable table';
+    COMMENT ='process multiplayer variable table';
 
 CREATE TABLE if not exists `t_bpm_variable_multiplayer_personnel`
 (
@@ -532,7 +532,7 @@ CREATE TABLE if not exists `t_bpm_variable_multiplayer_personnel`
     KEY `variable_multiplayer_id` (`variable_multiplayer_id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='multiplayer assignees variable table';
+    COMMENT ='multiplayer assignees variable table';
 
 CREATE TABLE if not exists `t_bpm_variable_sequence_flow`
 (
@@ -553,7 +553,7 @@ CREATE TABLE if not exists `t_bpm_variable_sequence_flow`
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='sequence flow table';
+    COMMENT ='sequence flow table';
 
 CREATE TABLE if not exists `t_bpm_variable_sign_up`
 (
@@ -573,7 +573,7 @@ CREATE TABLE if not exists `t_bpm_variable_sign_up`
     KEY `variable_id` (`variable_id`) USING BTREE,
     KEY `variable_id_element_id` (`variable_id`, `element_id`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='process sign up node table';
+    COMMENT ='process sign up node table';
 
 
 CREATE TABLE if not exists `t_bpm_variable_sign_up_personnel`
@@ -593,7 +593,7 @@ CREATE TABLE if not exists `t_bpm_variable_sign_up_personnel`
     KEY `variable_id` (`variable_id`) USING BTREE,
     KEY `variable_id_element_id` (`variable_id`, `element_id`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='node sign up personnel table';
+    COMMENT ='node sign up personnel table';
 
 
 
@@ -618,7 +618,7 @@ CREATE TABLE if not exists `t_bpm_variable_single`
     KEY `variable_id_element_id` (`variable_id`, `element_id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='node single assignee table';
+    COMMENT ='node single assignee table';
 
 
 CREATE TABLE if not exists `t_bpm_variable_view_page_button`
@@ -637,7 +637,7 @@ CREATE TABLE if not exists `t_bpm_variable_view_page_button`
     PRIMARY KEY (`id`) USING BTREE,
     KEY `index_variable_id` (`variable_id`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='start up view page button params';
+    COMMENT ='start up view page button params';
 
 
 CREATE TABLE if not exists `bpm_verify_info`
@@ -661,7 +661,7 @@ CREATE TABLE if not exists `bpm_verify_info`
     KEY `process_code_index` (`process_code`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='verify info';
+    COMMENT ='verify info';
 
 
 
@@ -677,7 +677,7 @@ CREATE TABLE if not exists `t_default_template`
     `update_user` varchar(255)        DEFAULT '' COMMENT 'as its name says',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='default tempalte';
+    COMMENT ='default tempalte';
 
 
 
@@ -695,7 +695,7 @@ CREATE TABLE if not exists `t_user_email_send`
     PRIMARY KEY (`id`) USING BTREE,
     KEY `sender` (`receiver`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='user email send';
+    COMMENT ='user email send';
 
 create table if not exists t_method_replay
 (
@@ -711,7 +711,7 @@ create table if not exists t_method_replay
     ALREADY_REPLAY_TIMES int          null,
     MAX_REPLAY_TIMES     int          null
     )ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 comment 'method replay records';
+    comment 'method replay records';
 
 create index t_method_replay_NOW_TIME_index
     on t_method_replay (NOW_TIME);
@@ -734,7 +734,7 @@ CREATE TABLE if not exists `t_user_entrust`
     UNIQUE KEY `s_r_id` (`sender`, `receiver_id`, `power_id`) USING BTREE,
     KEY `user_id` (`sender`, `power_id`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='user entrust info';
+    COMMENT ='user entrust info';
 
 
 
@@ -757,7 +757,7 @@ CREATE TABLE if not exists `t_user_message_status`
     PRIMARY KEY (`id`) USING BTREE,
     KEY `user_id` (`user_id`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='user receive message table';
+    COMMENT ='user receive message table';
 
 CREATE TABLE if not exists `t_bpmn_node_button_conf`
 (
@@ -775,7 +775,7 @@ CREATE TABLE if not exists `t_bpmn_node_button_conf`
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='node button conf';
+    COMMENT ='node button conf';
 
 CREATE TABLE if not exists `bpm_business_process`
 (
@@ -806,7 +806,7 @@ CREATE TABLE if not exists `bpm_business_process`
     KEY `process_state_index` (`process_state`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='process and business association table';
+    COMMENT ='process and business association table';
 
 
 
@@ -823,7 +823,7 @@ CREATE TABLE if not exists `bpm_process_name_relevancy`
     KEY `process_name_id_index` (`process_name_id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='process advanced search table';
+    COMMENT ='process advanced search table';
 
 
 
@@ -841,7 +841,7 @@ CREATE TABLE if not exists `t_bpmn_node_personnel_conf`
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='node person conf table';
+    COMMENT ='node person conf table';
 
 CREATE TABLE if not exists `t_bpmn_node_personnel_empl_conf`
 (
@@ -858,7 +858,7 @@ CREATE TABLE if not exists `t_bpmn_node_personnel_empl_conf`
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='node assignee employee conf';
+    COMMENT ='node assignee employee conf';
 
 CREATE TABLE IF NOT EXISTS `bpm_process_operation`
 (
@@ -869,7 +869,7 @@ CREATE TABLE IF NOT EXISTS `bpm_process_operation`
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='process operation table';
+    COMMENT ='process operation table';
 
 CREATE TABLE if not exists `bpm_process_node_back`
 (
@@ -880,7 +880,7 @@ CREATE TABLE if not exists `bpm_process_node_back`
     `process_key` varchar(100) DEFAULT NULL COMMENT 'process key',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4 COMMENT ='process node back table';
+    COMMENT ='process node back table';
 
 
 CREATE TABLE if not exists `bpm_process_name`
@@ -892,7 +892,7 @@ CREATE TABLE if not exists `bpm_process_name`
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4 COMMENT ='process advanced search table';
+    COMMENT ='process advanced search table';
 
 CREATE TABLE if not exists `t_user_message`
 (
@@ -913,7 +913,7 @@ CREATE TABLE if not exists `t_user_message`
     app_url     varchar(255) null comment 'appurl',
     source      int          null
     ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4;
+   ;
 
 CREATE TABLE IF NOT EXISTS `t_op_log`
 (
@@ -935,7 +935,7 @@ CREATE TABLE IF NOT EXISTS `t_op_log`
     PRIMARY KEY (`id`)
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4
+   
     COLLATE = utf8mb4_general_ci;
 
 CREATE TABLE IF NOT EXISTS  `third_party_account_apply`
@@ -947,7 +947,7 @@ CREATE TABLE IF NOT EXISTS  `third_party_account_apply`
     PRIMARY KEY (`id`)
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    DEFAULT CHARSET = utf8mb4
+   
     COLLATE = utf8mb4_general_ci COMMENT ='a third party account apply demo';
 
 
@@ -1231,7 +1231,7 @@ CREATE TABLE IF NOT EXISTS  `t_sys_version` (
     `update_user` VARCHAR(50) COMMENT 'Update user',
     `is_hide` TINYINT COMMENT '0 for not hide and 1 for hide',
     `download_code` VARCHAR(255) COMMENT 'Download code',
-    `effective_time` timestamp COMMENT 'Effective time',
+    `effective_time` timestamp DEFAULT CURRENT_TIMESTAMP COMMENT 'Effective time',
     INDEX `idx_version` (`version`) -- Optional index for improved performance on `version` queries
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='sys version control';
 
