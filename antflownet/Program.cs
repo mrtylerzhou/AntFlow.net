@@ -5,13 +5,10 @@ using antflowcore.conf.freesql;
 using antflowcore.conf.json;
 using antflowcore.conf.middleware;
 using antflowcore.conf.serviceregistration;
-using antflowcore.constant.enus;
-using antflowcore.controller;
+using antflowcore.constant.enus; 
 using antflowcore.util;
 
 using FreeSql;
-using Microsoft.Extensions.DependencyInjection;
-
 namespace antflownet;
 
 public class Program
@@ -21,8 +18,8 @@ public class Program
         EnumBase<LFFieldTypeEnum>.InitializeEnumBaseTypes();
         var builder = WebApplication.CreateBuilder(args);
         ServiceCollectionHolder.SetServiceCollection(builder.Services);
-        builder.Services.AddHttpContextAccessor();
-        builder.Services.AddControllers().AddApplicationPart(typeof(BpmnConfController).Assembly);
+        builder.Services.AddHttpContextAccessor(); 
+        builder.Services.AddControllers().AddAFApplicationComponents(); //Add Custom  Mvc Controller
         builder.Services.AddOpenApi();
         //解决跨域
         builder.Services.AddCors(options =>
