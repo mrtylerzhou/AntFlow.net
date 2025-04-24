@@ -9,7 +9,13 @@ public class JudgeOperatorEnum
     public static readonly JudgeOperatorEnum LTE = new JudgeOperatorEnum(3, "<=");
     public static readonly JudgeOperatorEnum LT = new JudgeOperatorEnum(4, "<");
     public static readonly JudgeOperatorEnum EQ = new JudgeOperatorEnum(5, "=");
-
+    public static readonly JudgeOperatorEnum GT1LT2=new JudgeOperatorEnum(6,"first<a<second");
+    public static readonly JudgeOperatorEnum GTE1LT2=new JudgeOperatorEnum(7,"first<=a<second");
+    public static readonly JudgeOperatorEnum GET1LE2=new JudgeOperatorEnum(8,"first<a<=second");
+    public static readonly JudgeOperatorEnum GTE1LTE2=new JudgeOperatorEnum(9,"first<=a<=second");
+  
+ 
+    
     public int Code { get; }
     public string Symbol { get; }
 
@@ -42,5 +48,9 @@ public class JudgeOperatorEnum
     private static JudgeOperatorEnum[] AllValues()
     {
         return new[] { GTE, GT, LTE, LT, EQ };
+    }
+    public static List<int> BinaryOperator()
+    {
+        return new List<int>() { 6, 7, 8, 9 };
     }
 }

@@ -156,6 +156,11 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
 
     public override void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
     {
+        BpmnNodePropertysVo bpmnNodePropertysVo = bpmnNodeVo.Property;
+        if (bpmnNodePropertysVo != null)
+        {
+            
+        }
         BpmnNodeConditionsConfBaseVo bpmnNodeConditionsConfBaseVo = bpmnNodeVo.Property?.ConditionsConf ?? new BpmnNodeConditionsConfBaseVo();
         BpmnNodeConditionsConf bpmnNodeConditionsConf = new BpmnNodeConditionsConf
         {

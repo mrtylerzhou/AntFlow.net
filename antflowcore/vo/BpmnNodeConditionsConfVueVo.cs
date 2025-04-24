@@ -38,7 +38,10 @@ namespace Antflowcore.Vo
 
         [JsonPropertyName("columnType")]
         public string ColumnType { get; set; }
-
+        [JsonPropertyName("multiple")]
+        public bool? Multiple { get; set; }
+        [JsonPropertyName("columnType")]
+        public int MultipleLimit { get; set; }
         [JsonPropertyName("fixedDownBoxValue")]
         public string FixedDownBoxValue { get; set; }
     }
