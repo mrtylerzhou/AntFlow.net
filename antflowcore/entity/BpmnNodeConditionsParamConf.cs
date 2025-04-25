@@ -40,6 +40,8 @@ namespace AntFlowCore.Entity
         [Column(Name = "condition_param_jsom")]
         public string ConditionParamJsom { get; set; }
 
+        [Column(Name = "operator")]
+        public int? TheOperator { get; set; }
         /// <summary>
         /// Remarks.
         /// </summary>

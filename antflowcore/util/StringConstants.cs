@@ -24,7 +24,7 @@ namespace AntFlowCore.Constants
         public const string PROJECT_NAME = "antFlow";
         public const string LOWFLOW_FORM_CODE = "LF";
         public const string LOWFLOW_FORM_CONTAINER_TYPE = "container";
-        public const string LOWFLOW_CONDITION_CONTAINER_FIELD_NAME = "lfConditions";
+        public const string LOWFLOW_CONDITION_CONTAINER_FIELD_NAME = "LfConditions";
         public const string LOWFLOW_FORM_DATA_MAIN_TABLE_NAME = "t_lf_main";
         public const string LOWFLOW_FORM_DATA_FIELD_TABLE_NAME = "t_lf_main_field";
 

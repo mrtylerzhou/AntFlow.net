@@ -53,12 +53,12 @@ public static class ConditionTypeEnumExtensions
             new ConditionTypeAttributes
             {
                 Description = "三方账户",
-                FieldName = "accountType",
+                FieldName = "AccountType",
                 FieldType = 1,
                 AdaptorClass = typeof(BpmnNodeConditionsAccountTypeAdaptor),
                 FieldClass = typeof(int),
                 AlignmentClass = typeof(BpmnStartConditionsVo),
-                AlignmentFieldName = "accountType",
+                AlignmentFieldName = "AccountType",
                 ConditionJudgeClass = typeof(ThirdAccountJudgeService),
             }
         },
@@ -67,12 +67,12 @@ public static class ConditionTypeEnumExtensions
             new ConditionTypeAttributes
             {
                 Description = "请假时长",
-                FieldName = "leaveHour",
+                FieldName = "LeaveHour",
                 FieldType = 2,
                 FieldClass = typeof(double),
                 AdaptorClass = typeof(BpmnNodeConditionsEmptyAdaptor),
                 AlignmentClass = typeof(BpmnStartConditionsVo),
-                AlignmentFieldName = "leaveHour",
+                AlignmentFieldName = "LeaveHour",
                 ConditionJudgeClass = typeof(AskLeaveJudgeService)
             }
         },
@@ -81,12 +81,12 @@ public static class ConditionTypeEnumExtensions
             new ConditionTypeAttributes
             {
                 Description = "采购费用",
-                FieldName = "planProcurementTotalMoney",
+                FieldName = "PlanProcurementTotalMoney",
                 FieldType = 2,
                 FieldClass = typeof(double),
                 AdaptorClass = typeof(BpmnNodeConditionsEmptyAdaptor),
                 AlignmentClass = typeof(BpmnStartConditionsVo),
-                AlignmentFieldName = "planProcurementTotalMoney",
+                AlignmentFieldName = "PlanProcurementTotalMoney",
                 ConditionJudgeClass = typeof(PurchaseTotalMoneyJudge),
             }
         },
@@ -95,12 +95,12 @@ public static class ConditionTypeEnumExtensions
             new ConditionTypeAttributes
             {
                 Description = "数字运算符",
-                FieldName = "numberOperator",
+                FieldName = "NumberOperator",
                 FieldType = 2,
                 FieldClass = typeof(int),
                 AdaptorClass = typeof(BpmnNodeConditionsEmptyAdaptor),
                 AlignmentClass = typeof(BpmnStartConditionsVo),
-                AlignmentFieldName = "numberOperator",
+                AlignmentFieldName = "NumberOperator",
                 ConditionJudgeClass = typeof(NumberOperatorJudgeService),
             }
         },
@@ -109,12 +109,12 @@ public static class ConditionTypeEnumExtensions
             new ConditionTypeAttributes
             {
                 Description = "总金额",
-                FieldName = "totalMoney",
+                FieldName = "TotalMoney",
                 FieldType = 2,
                 FieldClass = typeof(double),
                 AdaptorClass = typeof(BpmnNodeConditionsEmptyAdaptor),
                 AlignmentClass = typeof(BpmnStartConditionsVo),
-                AlignmentFieldName = "totalMoney",
+                AlignmentFieldName = "TotalMoney",
                 ConditionJudgeClass = typeof(NumberOperatorJudgeService),
             }
         },
@@ -123,12 +123,12 @@ public static class ConditionTypeEnumExtensions
             new ConditionTypeAttributes
             {
                 Description = "条件模板标识",
-                FieldName = "templateMarks",
+                FieldName = "TemplateMarks",
                 FieldType = 1,
                 FieldClass = typeof(string),
                 AdaptorClass = typeof(BpmnTemplateMarkAdaptor),
                 AlignmentClass = typeof(BpmnStartConditionsVo),
-                AlignmentFieldName = "templateMarks",
+                AlignmentFieldName = "TemplateMarks",
                 ConditionJudgeClass = typeof(BpmnTemplateMarkJudgeService),
             }
         },

@@ -51,6 +51,8 @@ namespace antflowcore.vo
         [JsonPropertyName("numberOperator")]
         public int? NumberOperator { get; set; }
 
+        [JsonPropertyName("numberOperatorList")]
+        public List<int> NumberOperatorList { get; set; } = new List<int>();
         [JsonPropertyName("extJson")]
         public string ExtJson { get; set; }
 

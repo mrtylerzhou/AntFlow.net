@@ -74,8 +74,8 @@ public class BpmnConfNodePropertyConverter
             conditionTypes.Add(columnIdInt);
             var fieldName = conditionTypeAttributes.FieldName;
             var columnDbname = newModel.ColumnDbname;
-
-            if (!fieldName.Equals(columnDbname) && !string.IsNullOrEmpty(columnDbname))
+            
+            if (!fieldName.Equals(columnDbname,StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(columnDbname))
             {
                 //if it is a lowcode flow condition,its name defined in ConditionTypeEnum is a constant,it is lfConditions,it is always not equals to the name specified
                 if (!StringConstants.LOWFLOW_CONDITION_CONTAINER_FIELD_NAME.Equals(fieldName))
