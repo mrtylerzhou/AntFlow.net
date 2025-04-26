@@ -37,7 +37,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// Remark
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = "";
 
         /// <summary>
         /// Deletion Status (0: normal, 1: deleted)

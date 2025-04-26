@@ -22,6 +22,7 @@ public class BpmnNodeSignUpConfService: AFBaseCurdRepositoryService<BpmnNodeSign
             AfterSignUpWay = bpmnNodeVo.Property.AfterSignUpWay,
             SignUpType = bpmnNodeVo.Property.SignUpType,
             CreateUser = SecurityUtils.GetLogInEmpNameSafe(),
+            Remark = "",
             CreateTime =   DateTime.Now
         };
         baseRepo.Insert(bpmnNodeSignUpConf);

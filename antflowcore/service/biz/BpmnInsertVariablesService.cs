@@ -129,6 +129,7 @@ namespace antflowcore.service.biz;
                     AfterSignUpWay = elementVo.AfterSignUpWay,
                     ElementId = key,
                     NodeId = elementVo.NodeId,
+                    Remark = "",
                     SubElements = JsonSerializer.Serialize(subElements)
                 });
             }
