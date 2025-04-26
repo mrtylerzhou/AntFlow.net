@@ -18,7 +18,7 @@ public class BpmBusinessController
     private readonly UserEntrustService _userEntrustService;
     private readonly BpmnNodeService _bpmnNodeService;
 
-    BpmBusinessController(TaskMgmtService taskMgmtService,
+   public BpmBusinessController(TaskMgmtService taskMgmtService,
         UserEntrustService userEntrustService,
         BpmnNodeService bpmnNodeService)
     {
@@ -32,7 +32,7 @@ public class BpmBusinessController
     /// </summary>
     /// <param name="desc"></param>
     /// <returns></returns>
-    [HttpGet("GetDIYFormCodeList")]
+    [HttpGet("getDIYFormCodeList")]
     public Result<List<DIYProcessInfoDTO>> GetDIYFormCodeList(String desc) {
         List<DIYProcessInfoDTO> diyProcessInfoDTOS = _taskMgmtService.ViewProcessInfo(desc);
         return ResultHelper.Success(diyProcessInfoDTOS);

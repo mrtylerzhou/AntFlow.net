@@ -77,7 +77,7 @@ public class OutSideBpmAccessBusinessService : AFBaseCurdRepositoryService<OutSi
 
         if (businessDataVo is UDLFApplyVo udlf)
         {
-            udlf.lfFields = vo.LfFields;
+            udlf.LfFields = vo.LfFields;
         }
 
         businessDataVo.FormCode = vo.FormCode;

@@ -103,8 +103,8 @@ using System.Text.RegularExpressions;
         /// <summary>
         /// create time
         /// </summary>
-        [Column(Name = "create_time",IsIgnore = true)]
-        public DateTime? CreateTime { get; set; }
+        [Column(Name = "create_time")]
+        public DateTime? CreateTime { get; set; } = DateTime.Now;
 
         /// <summary>
         /// update user

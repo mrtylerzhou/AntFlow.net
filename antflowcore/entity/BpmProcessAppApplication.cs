@@ -7,6 +7,7 @@ namespace AntFlowCore.Entity
     /// <summary>
     /// Represents the BPM process application.
     /// </summary>
+    [Table(Name = "bpm_process_app_application")]
     public class BpmProcessAppApplication
     {
         /// <summary>

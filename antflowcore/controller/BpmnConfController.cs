@@ -126,9 +126,9 @@ public class BpmnConfController
         return Result<List<BpmVerifyInfoVo>>.Succ(_bpmVerifyInfoBizService.GetBpmVerifyInfoVos(processNumber, false));
     }
     [HttpPost("process/viewBusinessProcess")]
-    public Result<BusinessDataVo> ViewBusinessProcess( [FromServices] IHttpContextAccessor accessor, String formCode) {
+    public Result<dynamic> ViewBusinessProcess( [FromServices] IHttpContextAccessor accessor, String formCode) {
         string values = accessor.HttpContext!.ReadRawBodyAsString();
-        return Result<BusinessDataVo>.Succ(_processApprovalService.GetBusinessInfo(values, formCode));
+        return Result<dynamic>.Succ(_processApprovalService.GetBusinessInfo(values, formCode));
     }
     
     /// <summary>

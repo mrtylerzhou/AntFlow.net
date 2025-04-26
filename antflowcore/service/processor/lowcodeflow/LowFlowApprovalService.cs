@@ -55,7 +55,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         }
         else
         {
-            startConditionsVo.LfConditions = vo.lfFields;
+            startConditionsVo.LfConditions = vo.LfFields;
         }
 
         return startConditionsVo;
@@ -76,7 +76,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         }
         else
         {
-            startConditionsVo.LfConditions = vo.lfFields;
+            startConditionsVo.LfConditions = vo.LfFields;
         }
 
         return startConditionsVo;
@@ -195,7 +195,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
             }
         }
 
-        vo.lfFields = fieldVoMap;
+        vo.LfFields = fieldVoMap;
 
         List<BpmnConfLfFormdata> bpmnConfLfFormdataList =
             _lfformdataService.baseRepo.Where(x => x.BpmnConfId == confId).ToList();
@@ -210,7 +210,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
 
     public void OnSubmitData(UDLFApplyVo vo)
     {
-        var lfFields = vo.lfFields;
+        var lfFields = vo.LfFields;
         if (lfFields == null || lfFields.Count == 0)
         {
             throw new AFBizException("form data does not contain any field");
@@ -255,7 +255,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
             return ;
         }
 
-        var lfFields = vo.lfFields;
+        var lfFields = vo.LfFields;
         if (lfFields == null || lfFields.Count == 0)
         {
             throw new AFBizException("form data does not contain any field");

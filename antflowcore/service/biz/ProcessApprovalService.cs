@@ -107,7 +107,7 @@ public class ProcessApprovalService
 
     }
 
-    public BusinessDataVo GetBusinessInfo(string parameters, string formCode)
+    public dynamic GetBusinessInfo(string parameters, string formCode)
     {
         var vo = _formFactory.DataFormConversion(parameters, formCode);
         var bpmBusinessProcess = _bpmBusinessProcessService.GetBpmBusinessProcess(vo.ProcessNumber);
@@ -119,7 +119,7 @@ public class ProcessApprovalService
 
         vo.BusinessId = bpmBusinessProcess.BusinessId;
 
-        BusinessDataVo businessDataVo;
+        dynamic businessDataVo;
         if (vo.IsOutSideAccessProc == null || !vo.IsOutSideAccessProc.Value || vo.IsLowCodeFlow == 1)
         {
             var formAdaptor = _formFactory.GetFormAdaptor(vo);
