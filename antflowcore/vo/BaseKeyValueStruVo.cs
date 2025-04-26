@@ -1,10 +1,11 @@
 ﻿using System.Text.Json.Serialization;
+using antflowcore.conf.json;
 
 namespace antflowcore.vo;
 
 public class BaseKeyValueStruVo
 {
-    [JsonPropertyName("key")] 
+    [JsonPropertyName("key"),JsonConverter(typeof(IntToStringConverter))] 
     public string Key { get; set; }
     [JsonPropertyName("value")] 
     public string Value { get; set; }

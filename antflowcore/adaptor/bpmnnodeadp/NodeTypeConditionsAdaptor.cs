@@ -85,7 +85,8 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
                 {
                     if (conditionTypeAttributes.FieldType == 1) // List
                     {
-                        var objects = JsonSerializer.Deserialize(conditionParamJson, conditionTypeAttributes.FieldClass);
+                        Type genericTypeToDeserialize = typeof(List<>).MakeGenericType(conditionTypeAttributes.FieldClass);
+                        var objects = JsonSerializer.Deserialize(conditionParamJson, genericTypeToDeserialize);
                         if (conditionTypeEnum.Value.IsLowCodeFlow())
                         {
                             String columnDbname = name2confVueMap[nodeConditionsParamConf.ConditionParamName].ColumnDbname;
@@ -95,7 +96,7 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
                             wrappedValue.Add(columnDbname,objects);
                         }
 
-                        var field = typeof(BpmnNodeConditionsConfBaseVo).GetField(conditionTypeAttributes.FieldName,
+                        var field = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(conditionTypeAttributes.FieldName,
                             BindingFlags.Public | BindingFlags.Instance);
                         field.SetValue(bpmnNodeConditionsConfBaseVo, wrappedValue??objects);
                     }
@@ -116,7 +117,7 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
                         }
                         else
                         {
-                            var field = typeof(BpmnNodeConditionsConfBaseVo).GetField(conditionTypeAttributes.FieldName,
+                            var field = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(conditionTypeAttributes.FieldName,
                                 BindingFlags.Public | BindingFlags.Instance);
                             field.SetValue(bpmnNodeConditionsConfBaseVo, wrappedValue??obj); 
                         }
@@ -151,7 +152,9 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
 
             if (voMap.Any())
             {
-                var vueVo = voMap.GetValueOrDefault(columnDbname);
+                //由于前端定义的是首字母小写,
+                string first = voMap.Keys.First(a=>a.Equals(columnDbname,StringComparison.CurrentCultureIgnoreCase));
+                var vueVo = voMap.GetValueOrDefault(first);
                 if (vueVo == null)
                 {
                     throw new AFBizException("Logic error!");
@@ -197,6 +200,7 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
             Sort = bpmnNodeConditionsConfBaseVo.Sort,
             ExtJson = bpmnNodeConditionsConfBaseVo.ExtJson,
             CreateTime = DateTime.Now,
+            Remark = "",
             CreateUser = SecurityUtils.GetLogInEmpNameSafe()
         };
 
@@ -224,7 +228,7 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
                     throw new AFBizException($"Cannot get node ConditionTypeEnum by code: {columnId}");
                 }
                 ConditionTypeAttributes conditionTypeAttributes = ConditionTypeEnumExtensions.GetAttributes(conditionTypeEnum.Value);
-                FieldInfo? fieldInfo = typeof(BpmnNodeConditionsConfBaseVo).GetField(conditionTypeAttributes.FieldName);
+                PropertyInfo? fieldInfo = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(conditionTypeAttributes.FieldName);
                 if (fieldInfo == null)
                 {
                     throw new AFBizException("fieldInfo is null");
@@ -258,6 +262,7 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
                         ConditionParamName = extField.ColumnDbname,
                         ConditionParamJsom = conditionParamJson,
                         CreateUser = SecurityUtils.GetLogInEmpNameSafe(),
+                        Remark = "",
                         CreateTime = DateTime.Now
                     });
 

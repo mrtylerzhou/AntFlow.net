@@ -100,7 +100,11 @@ public class BpmnConfNodePropertyConverter
 
                 var keys = zdy1.Split(',');
 
-                List<object> values = new List<object>(keys.Length);
+               
+                var field = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(conditionTypeAttributes.FieldName,
+                    BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+
+                IList values = (IList)Activator.CreateInstance(field.PropertyType);
                 foreach (string key in keys)
                 {
                     BaseKeyValueStruVo baseKeyValueStruVo = valueStruVoList.First(v => v.Key == key);
@@ -122,9 +126,7 @@ public class BpmnConfNodePropertyConverter
                     wrapperResult.Add(columnDbname, values);
                     valueOrWrapper = wrapperResult;
                 }
-
-                var field = typeof(BpmnNodeConditionsConfBaseVo).GetField(conditionTypeAttributes.FieldName,
-                    BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+                
                 field.SetValue(result, valueOrWrapper ?? values);
             }
             else
@@ -132,7 +134,7 @@ public class BpmnConfNodePropertyConverter
                 string zdy1 = newModel.Zdy1;
                 String zdy2 = newModel.Zdy2;
 
-                var field = typeof(BpmnNodeConditionsConfBaseVo).GetField(conditionTypeAttributes.FieldName,
+                var field = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(conditionTypeAttributes.FieldName,
                     BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
                 var opt1 = newModel.Opt1;
                 int? optType = newModel.OptType;
@@ -145,7 +147,7 @@ public class BpmnConfNodePropertyConverter
                         throw new AFBizException($"condition optype of {optType} is undefined!");
                     }
 
-                    var opField = typeof(BpmnNodeConditionsConfBaseVo).GetField(StringConstants.NUM_OPERATOR,
+                    var opField = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(StringConstants.NUM_OPERATOR,
                         BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
                     opField.SetValue(result, symbol.Code);
                 }
@@ -194,7 +196,7 @@ public class BpmnConfNodePropertyConverter
 
         if (isLowCodeFlow)
         {
-            var field = typeof(BpmnNodeConditionsConfBaseVo).GetField("LfConditions",
+            var field = typeof(BpmnNodeConditionsConfBaseVo).GetProperty("LfConditions",
                 BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
             field.SetValue(result, wrapperResult);
         }
@@ -237,7 +239,7 @@ public class BpmnConfNodePropertyConverter
 
             if (fieldType == 1)
             {
-                var field = typeof(BpmnNodeConditionsConfBaseVo).GetField(conditionTypeAttributes.FieldName,
+                var field = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(conditionTypeAttributes.FieldName,
                     BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
                 IDictionary wrappedValues = null;
                 List<object> objects = new List<object>();
@@ -266,14 +268,14 @@ public class BpmnConfNodePropertyConverter
                 var join = string.Join(",", objects);
                 vueVo.Zdy1 = join;
 
-                FieldInfo? extField = null;
+                PropertyInfo? extField = null;
                 if (enumByCode.Value.IsLowCodeFlow())
                 {
                     extField = field;
                 }
                 else
                 {
-                    extField = typeof(BpmnNodeConditionsConfBaseVo).GetField(conditionTypeAttributes.FieldName + "List",
+                    extField = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(conditionTypeAttributes.FieldName + "List",
                         BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
                 }
 

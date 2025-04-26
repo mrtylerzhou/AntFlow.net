@@ -42,6 +42,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// Additional remarks.
         /// </summary>
+        [Column(Name = "remark")]
         public string Remark { get; set; }
 
         /// <summary>

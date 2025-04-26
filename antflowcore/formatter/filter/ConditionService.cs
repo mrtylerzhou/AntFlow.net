@@ -35,12 +35,12 @@ public class ConditionService : IConditionService
 
             ConditionTypeAttributes conditionTypeAttributes = conditionTypeEnum.Value.GetAttributes();
             Type conditionJudgeClassType = conditionTypeAttributes.ConditionJudgeClass;
-            IEnumerable conditionJudgeServices = ServiceProviderUtils.GetServices(conditionJudgeClassType);
+            IEnumerable conditionJudgeServices = ServiceProviderUtils.GetServices(typeof(IConditionJudge));
             if (conditionJudgeServices == null)
             {
                 throw new AFBizException($"未能根据服务类型:{conditionJudgeClassType}找到对应服务,请检查是否存在或者是否已经注入");
             }
-
+           
             IConditionJudge conditionJudge = null;
             int count = 0;
             //in fact each time one can only get one
@@ -50,8 +50,13 @@ public class ConditionService : IConditionService
                {
                    throw new AFBizException("there should be only condition judge service!");
                }
-                conditionJudge= (IConditionJudge)conditionJudgeService;
-               count++;
+
+               if (conditionJudgeService.GetType() == conditionJudgeClassType)
+               {
+                   conditionJudge= (IConditionJudge)conditionJudgeService;
+                   count++;
+               }
+               
            }
 
            if (conditionJudge == null)
