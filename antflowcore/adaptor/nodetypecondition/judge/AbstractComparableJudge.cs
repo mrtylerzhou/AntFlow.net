@@ -1,64 +1,85 @@
 ﻿using System.Numerics;
+using antflowcore.exception;
 using antflowcore.service.processor.filter;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 
 namespace antflowcore.adaptor.nodetypecondition.judge;
 
-public abstract class AbstractComparableJudge: IConditionJudge
+/// <summary>
+/// 抽象的比较判断器，用于数字区间和单值比较
+/// </summary>
+public abstract class AbstractComparableJudge : IConditionJudge
 {
-    protected bool CompareJudge(decimal confTotal, decimal actual, int operatorType)
+    protected bool CompareJudge(decimal? confTotal, decimal? confTotal2, decimal? actual, int? operatorType)
     {
-        
         if (confTotal == null)
         {
-            throw new ArgumentNullException(nameof(confTotal), "Operator left is null");
+            throw new AFBizException("operator left is null");
         }
+
         if (actual == null)
         {
-            throw new ArgumentNullException(nameof(actual), "Operator right is null");
+            throw new AFBizException("operator right is null");
         }
 
-        // 比较 -1 表示小于, 0 表示等于, 1 表示大于
-        bool result = false;
+        if (operatorType == null)
+        {
+            throw new AFBizException("operator is null");
+        }
+
+        if (confTotal2 == null)
+        {
+            confTotal2 = 0;
+        }
+        bool flag = false;
+
         switch (operatorType)
         {
-            case 1: // 大于等于
+            case 1:
                 if (actual >= confTotal)
-                {
-                    result = true;
-                }
+                    flag = true;
                 break;
-            case 2: // 大于
+            case 2:
                 if (actual > confTotal)
-                {
-                    result = true;
-                }
+                    flag = true;
                 break;
-            case 3: // 小于等于
+            case 3:
                 if (actual <= confTotal)
-                {
-                    result = true;
-                }
+                    flag = true;
                 break;
-            case 4: // 小于
+            case 4:
                 if (actual < confTotal)
-                {
-                    result = true;
-                }
+                    flag = true;
                 break;
-            case 5: // 等于
+            case 5:
                 if (actual == confTotal)
-                {
-                    result = true;
-                }
+                    flag = true;
+                break;
+            case 6:
+                if (actual > confTotal && actual < confTotal2)
+                    flag = true;
+                break;
+            case 7:
+                if (actual >= confTotal && actual < confTotal2)
+                    flag = true;
+                break;
+            case 8:
+                if (actual > confTotal && actual <= confTotal2)
+                    flag = true;
+                break;
+            case 9:
+                if (actual >= confTotal && actual <= confTotal2)
+                    flag = true;
                 break;
             default:
-                throw new ArgumentException("Invalid operator type", nameof(operatorType));
+                throw new AFBizException("operator is not supported at the moment yet");
         }
-        return result;
-    }
-    public abstract bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf,
-        BpmnStartConditionsVo bpmnStartConditionsVo);
 
+        return flag;
+    }
+
+
+    public abstract bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf,
+        BpmnStartConditionsVo bpmnStartConditionsVo, int index);
 }

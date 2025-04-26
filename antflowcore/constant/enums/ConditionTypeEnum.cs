@@ -73,7 +73,7 @@ public static class ConditionTypeEnumExtensions
                 AdaptorClass = typeof(BpmnNodeConditionsEmptyAdaptor),
                 AlignmentClass = typeof(BpmnStartConditionsVo),
                 AlignmentFieldName = "LeaveHour",
-                ConditionJudgeClass = typeof(AskLeaveJudgeService)
+                ConditionJudgeClass = typeof(AskLeaveJudge)
             }
         },
         {
@@ -129,7 +129,7 @@ public static class ConditionTypeEnumExtensions
                 AdaptorClass = typeof(BpmnTemplateMarkAdaptor),
                 AlignmentClass = typeof(BpmnStartConditionsVo),
                 AlignmentFieldName = "TemplateMarks",
-                ConditionJudgeClass = typeof(BpmnTemplateMarkJudgeService),
+                ConditionJudgeClass = typeof(BpmnTemplateMarkJudge),
             }
         },
         {
@@ -143,7 +143,7 @@ public static class ConditionTypeEnumExtensions
                 AdaptorClass = typeof(BpmnNodeConditionsEmptyAdaptor),
                 AlignmentClass = typeof(BpmnStartConditionsVo),
                 AlignmentFieldName = LOWFLOW_CONDITION_CONTAINER_FIELD_NAME,
-                ConditionJudgeClass = typeof(LFStringConditionJudgeService),
+                ConditionJudgeClass = typeof(LFStringConditionJudge),
             }
         },
         {
@@ -157,7 +157,7 @@ public static class ConditionTypeEnumExtensions
                 AdaptorClass = typeof(BpmnNodeConditionsEmptyAdaptor),
                 AlignmentClass = typeof(BpmnStartConditionsVo),
                 AlignmentFieldName = LOWFLOW_CONDITION_CONTAINER_FIELD_NAME,
-                ConditionJudgeClass = typeof(LFNumberFormatConditionJudgeService),
+                ConditionJudgeClass = typeof(LFNumberFormatJudge),
             }
         },
         {
@@ -171,7 +171,7 @@ public static class ConditionTypeEnumExtensions
                 AdaptorClass = typeof(BpmnNodeConditionsEmptyAdaptor),
                 AlignmentClass = typeof(BpmnStartConditionsVo),
                 AlignmentFieldName = LOWFLOW_CONDITION_CONTAINER_FIELD_NAME,
-                ConditionJudgeClass = typeof(LFDateConditionJudgeService),
+                ConditionJudgeClass = typeof(LFDateConditionJudge),
             }
         },
         {

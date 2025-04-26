@@ -5,15 +5,15 @@ using Microsoft.Extensions.Logging;
 
 namespace antflowcore.adaptor.nodetypecondition.judge;
 
-public class PurchaseTotalMoneyJudge: AbstractBinaryComparableJudge
+public class AskLeaveJudge: AbstractBinaryComparableJudge
 {
     protected override string FieldNameInDb()
     {
-        return "PlanProcurementTotalMoney";
+        return "LeaveHour";
     }
 
     protected override string FieldNameInStartConditions()
     {
-        return "PlanProcurementTotalMoney";
+        return "LeaveHour";
     }
 }

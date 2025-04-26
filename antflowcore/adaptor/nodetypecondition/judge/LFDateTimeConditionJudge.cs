@@ -3,9 +3,9 @@ using Microsoft.Extensions.Logging;
 
 namespace antflowcore.adaptor.nodetypecondition.judge;
 
-public class LFDateTimeConditionJudgeService: AbstractLFDateTimeConditionJudge
+public class LFDateTimeConditionJudge: AbstractLFDateTimeConditionJudge
 {
-    public LFDateTimeConditionJudgeService(ILogger<AbstractLFDateTimeConditionJudge> logger) : base(logger)
+    public LFDateTimeConditionJudge(ILogger<AbstractLFDateTimeConditionJudge> logger) : base(logger)
     {
     }
 

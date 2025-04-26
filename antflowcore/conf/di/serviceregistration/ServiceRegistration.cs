@@ -174,14 +174,14 @@ public static class ServiceRegistration
         
 
         services.AddSingleton<IConditionJudge, ThirdAccountJudgeService>();
-        services.AddSingleton<IConditionJudge, AskLeaveJudgeService>();
+        services.AddSingleton<IConditionJudge, AskLeaveJudge>();
         services.AddSingleton<IConditionJudge, PurchaseTotalMoneyJudge>();
         services.AddSingleton<IConditionJudge, NumberOperatorJudgeService>();
-        services.AddSingleton<IConditionJudge, BpmnTemplateMarkJudgeService>();
-        services.AddSingleton<IConditionJudge, LFStringConditionJudgeService>();
-        services.AddSingleton<IConditionJudge, LFNumberFormatConditionJudgeService>();
-        services.AddSingleton<IConditionJudge, LFDateConditionJudgeService>();
-        services.AddSingleton<IConditionJudge, LFDateTimeConditionJudgeService>();
+        services.AddSingleton<IConditionJudge, BpmnTemplateMarkJudge>();
+        services.AddSingleton<IConditionJudge, LFStringConditionJudge>();
+        services.AddSingleton<IConditionJudge, LFNumberFormatJudge>();
+        services.AddSingleton<IConditionJudge, LFDateConditionJudge>();
+        services.AddSingleton<IConditionJudge, LFDateTimeConditionJudge>();
         services.AddSingleton<IConditionJudge, LFCollectionConditionJudge>();
 
         services.AddSingleton<IBpmnDeduplicationFormat, BpmnDeduplicationFormatService>();

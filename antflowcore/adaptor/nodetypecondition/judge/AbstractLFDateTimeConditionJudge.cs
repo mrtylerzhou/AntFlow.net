@@ -14,18 +14,25 @@ public abstract class AbstractLFDateTimeConditionJudge : AbstractLFConditionJudg
         _logger = logger;
     }
 
-    public override bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo)
+    public override bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo,int index)
     {
-        Func<object, object, bool> predicate = (a, b) =>
+        Func<object, object,int, bool> predicate = (a, b,c) =>
         {
             try
             {
-                var dateFromDb = (DateTime)a;
+                String[] split = a.ToString().Split(",");
+                DateTime dateFromDb1 =DateTime.ParseExact(split[0], CurrentDateFormatter(), CultureInfo.InvariantCulture);
+                DateTime? dateFromDb2 = null;
+                if (split.Length > 1)
+                {
+                    DateTime.ParseExact(split[1], CurrentDateFormatter(), CultureInfo.InvariantCulture);
+                }
                 var dateFromUser = DateTime.ParseExact(b.ToString(), CurrentDateFormatter(), CultureInfo.InvariantCulture);
-                var dateFromDbTicks = new decimal(dateFromDb.Ticks);
+                decimal dateFromDb1Ticks = new decimal(dateFromDb1.Ticks);
+                decimal? dateFromDb2Ticks =dateFromDb2==null?null: new decimal(dateFromDb1.Ticks);
                 var dateFromUserTicks = new decimal(dateFromUser.Ticks);
-                var numberOperator = conditionsConf.NumberOperator;
-                return CompareJudge(dateFromDbTicks, dateFromUserTicks, numberOperator.Value);
+                
+                return CompareJudge(dateFromDb1Ticks, dateFromDb2Ticks,dateFromUserTicks, c);
             }
             catch (FormatException e)
             {
@@ -34,7 +41,7 @@ public abstract class AbstractLFDateTimeConditionJudge : AbstractLFConditionJudg
             }
         };
 
-        return LfCommonJudge(conditionsConf, bpmnStartConditionsVo, predicate);
+        return LfCommonJudge(conditionsConf, bpmnStartConditionsVo, predicate,index);
     }
 
     protected abstract string CurrentDateFormatter();

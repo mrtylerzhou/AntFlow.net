@@ -6,9 +6,9 @@ using AntFlowCore.Vo;
 
 namespace antflowcore.adaptor.nodetypecondition.judge;
 
-public class BpmnTemplateMarkJudgeService: IConditionJudge
+public class BpmnTemplateMarkJudge: IConditionJudge
 {
-    public bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo)
+    public bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo,int index)
     {
         int? templateMarkId = bpmnStartConditionsVo.TemplateMarkId;
         if (templateMarkId == null)

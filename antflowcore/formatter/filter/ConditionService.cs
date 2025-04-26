@@ -23,6 +23,8 @@ public class ConditionService : IConditionService
         if (ObjectUtils.IsEmpty(conditionParamTypeList)) {
             return false;
         }
+
+        int index = 0;
         bool result = true;
         foreach (int conditionParam in conditionParamTypeList)
         {
@@ -67,18 +69,24 @@ public class ConditionService : IConditionService
 
            try
            {
-               if (!conditionJudge.Judge(nodeId, conditionsConf, bpmnStartConditionsVo))
+               if (!conditionJudge.Judge(nodeId, conditionsConf, bpmnStartConditionsVo,index))
                {
                    //if any condition judge service judge failed,then the whole result is failed
                    result = false;
                    break;
                }
            }
+           catch (AFBizException e)
+           {
+               _logger.LogInformation($"condiiton judge business exception:{ e.Message}" );
+               throw;
+           }
            catch (Exception e)
            {
               _logger.LogInformation("conditionjudge error:{}",e);
                throw;
            }
+           index++;
         }
 
         return result;
