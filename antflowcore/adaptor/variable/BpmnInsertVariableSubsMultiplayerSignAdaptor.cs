@@ -30,10 +30,10 @@ public class BpmnInsertVariableSubsMultiplayerSignAdaptor: IBpmnInsertVariableSu
 
         _bpmVariableMultiplayerService.baseRepo.Insert(variableMultiplayer);
 
-        var assigneeMap = elementVo.AssigneeMap;
-        var variableMultiplayerId = variableMultiplayer.Id;
+        Dictionary<string,string> assigneeMap = elementVo.AssigneeMap;
+        long variableMultiplayerId = variableMultiplayer.Id;
 
-        var personnelList = elementVo.CollectionValue
+        List<BpmVariableMultiplayerPersonnel> personnelList = elementVo.CollectionValue
             .Select(o => new BpmVariableMultiplayerPersonnel
             {
                 VariableMultiplayerId = variableMultiplayerId,
