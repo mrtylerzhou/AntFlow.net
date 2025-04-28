@@ -583,7 +583,7 @@ CREATE TABLE if not exists `t_bpm_variable_sign_up_personnel`
     `element_id`  varchar(60)         NOT NULL DEFAULT '' COMMENT 'element id',
     `assignee`    varchar(60)         NOT NULL DEFAULT '' COMMENT 'assignee',
     `assignee_name`    varchar(60)   NOT NULL DEFAULT '' COMMENT 'assigneeName',
-    `remark`      varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
+    `remark`      varchar(255)        DEFAULT '' COMMENT 'remark',
     `is_del`      tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
     `create_user` varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time` timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',

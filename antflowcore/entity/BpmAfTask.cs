@@ -131,6 +131,8 @@ namespace antflowcore.entity;
         public string Description { get; set; }
         [Column(IsIgnore = true)]
         public string ProcessNumber { get; set; }
+        [Column(IsIgnore = true)]
+        public bool IsNextNodeSignUp { get; set; }
     }
 
     public static class BpmAfTaskExtensions

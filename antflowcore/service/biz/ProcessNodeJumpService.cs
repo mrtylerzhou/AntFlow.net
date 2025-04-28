@@ -31,7 +31,7 @@ public class ProcessNodeJumpService
         _afDeploymentService = afDeploymentService;
         _taskService = taskService;
     }
-    public void CommitProcess(String taskId, Dictionary<String, Object> variables,
+    public void CommitProcess(BpmAfTask task, Dictionary<String, Object> variables,
         String backNodeKey)
     {
         if (variables == null) {
@@ -40,11 +40,11 @@ public class ProcessNodeJumpService
 
         if (string.IsNullOrEmpty(backNodeKey))
         {
-            _taskService.Complete(taskId);
+            _taskService.Complete(task);
         }
         else
         {
-            TurnTransition(taskId, backNodeKey,variables);
+            TurnTransition(task.Id, backNodeKey,variables);
         }
     }
 

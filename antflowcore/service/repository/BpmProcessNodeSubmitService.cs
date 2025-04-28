@@ -55,7 +55,7 @@ public class BpmProcessNodeSubmitService: AFBaseCurdRepositoryService<BpmProcess
         }
         else
         {
-            _taskService.Complete(task.Id);
+            _taskService.Complete(task);
         }
     }
 

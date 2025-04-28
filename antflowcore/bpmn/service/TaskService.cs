@@ -8,6 +8,7 @@ using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.service.repository;
 using antflowcore.util;
+using antflowcore.vo;
 using AntFlowCore.Vo;
 
 namespace antflowcore.bpmn.service;
@@ -18,6 +19,7 @@ public class TaskService
     private readonly AfTaskInstService _afTaskInstService;
     private readonly AFExecutionService _afExecutionService;
     private readonly IExecutionListener _executionListener;
+    private readonly BpmVariableSignUpPersonnelService _signUpPersonnelService;
     private readonly AFDeploymentService _afDeploymentService;
 
     public TaskService(
@@ -25,12 +27,14 @@ public class TaskService
         AfTaskInstService afTaskInstService,
         AFExecutionService afExecutionService,
         IExecutionListener executionListener,
+        BpmVariableSignUpPersonnelService signUpPersonnelService,
         AFDeploymentService afDeploymentService)
     {
         _afTaskService = afTaskService;
         _afTaskInstService = afTaskInstService;
         _afExecutionService = afExecutionService;
         _executionListener = executionListener;
+        _signUpPersonnelService = signUpPersonnelService;
         _afDeploymentService = afDeploymentService;
     }
     public List<BpmAfTask> CreateTaskQuery(Expression<Func<BpmAfTask,bool>> filter)
@@ -40,11 +44,12 @@ public class TaskService
     }
 
     
-    public void Complete( string taskId)
+    public void Complete( BpmAfTask task)
     {
        
         DateTime nowTime = DateTime.Now;
         string deleteReason = StringConstants.DEFAULT_TASK_DELETE_REASON;
+        string taskId = task.Id;
         BpmAfTask bpmAfTask = _afTaskService.baseRepo.Where(a=>a.Id == taskId).First();
       
         if (bpmAfTask == null)
@@ -60,7 +65,7 @@ public class TaskService
         string procDefId = bpmAfTask.ProcDefId;
         string taskDefKey = bpmAfTask.TaskDefKey;
         string procInstId = bpmAfTask.ProcInstId;
-        if (currentSignType == 2)
+        if (currentSignType == 2||task.IsNextNodeSignUp)
         {
             _afTaskService.Frsql.Delete<BpmAfTask>()
                 .Where(a => a.TaskDefKey == taskDefKey)
@@ -122,10 +127,24 @@ public class TaskService
         }
       
         Dictionary<string,string> assigneeMap = elementToDeal.AssigneeMap;
+        if (elementToDeal.IsSignUpSubElement == 1)
+        {
+            List<KeyValuePair<string,string>> signupNodeAssigneeMap = this._signUpPersonnelService.Frsql
+                .Select<BpmBusinessProcess,BpmVariable,BpmVariableSignUpPersonnel>()
+                .InnerJoin((a,b,c)=>a.BusinessNumber==b.ProcessNum)
+                .InnerJoin((a,b,c)=>b.Id==c.VariableId)
+                .Where((a,b,c)=>a.ProcInstId==procInstId)
+                .ToList<KeyValuePair<string,string>>((a,b,c)=>new KeyValuePair<string, string>(c.Assignee,c.AssigneeName));
+            if (signupNodeAssigneeMap.Count <= 0)
+            {
+                throw new AFBizException("加批节点未获取到审批人!");
+            }
+            assigneeMap = signupNodeAssigneeMap.ToDictionary(k => k.Key, v => v.Value);
+        }
         int taskCount=currentSignType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode()?1:assigneeMap?.Count??0;
         BpmAfExecution execution = new BpmAfExecution
         {
-            Id = bpmAfTask.ExecutionId,
+            Id = currentExecution.Id,
             ProcInstId = procInstId,
             //BusinessKey = bpmnStartConditions.BusinessId, //todo注意观察此字段更新时是否会丢失
             ProcDefId = procDefId,
@@ -165,7 +184,7 @@ public class TaskService
                 Id = StrongUuidGenerator.GetNextId(),
                 ProcInstId = procInstId,
                 ProcDefId = procDefId,
-                ExecutionId = bpmAfTask.ExecutionId,
+                ExecutionId = currentExecution.Id,
                 Name = elementToDeal.ElementName,
                 TaskDefKey = elementToDeal.ElementId,
                 Owner = bpmAfTask.Owner,

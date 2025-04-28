@@ -123,14 +123,14 @@ using System.Linq;
             });
 
             // 并行任务回退
-            foreach (var task in taskList)
+            foreach (BpmAfTask task in taskList)
             {
-                var varMap = new Dictionary<string, object>
+                Dictionary<string, object> varMap = new Dictionary<string, object>
                 {
                     { StringConstants.TASK_ASSIGNEE_NAME, task.AssigneeName },
                     {StringConstants.VERIFY_COMMENT,vo.ApprovalComment},
                 };
-                _processNodeJump.CommitProcess(task.Id, varMap, backToNodeKey);
+                _processNodeJump.CommitProcess(task, varMap, backToNodeKey);
             }
 
             vo.BusinessId = bpmBusinessProcess.BusinessId;
