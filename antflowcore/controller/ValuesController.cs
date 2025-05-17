@@ -1,11 +1,13 @@
 ﻿
 using antflowcore.adaptor.personnel.provider;
 using antflowcore.entity;
+using AntFlowCore.Entity;
+using AntFlowCore.Vo;
 using Microsoft.AspNetCore.Mvc;
 
 namespace antflowcore.controller;
 
-[Route("value")]
+[Route("user")]
 public class ValuesController
 {
     private readonly IFreeSql _free;
@@ -28,5 +30,17 @@ public class ValuesController
     public List<Student> caseTestValue()
     {
         return new List<Student>() { new Student { Age = 32 } };
+    }
+    [HttpGet("getUser")] 
+    public Result<List<Student>>  getUserList()
+    {
+        var list = new List<Student>() { 
+            new Student {  Id = 1,Name="张三" },
+            new Student {  Id = 2,Name="李四"  }, 
+            new Student {  Id = 3,Name="王五"  },
+            new Student {  Id = 4,Name="蔡六"  }
+
+        };
+        return Result<List<Student>>.Succ(list);
     }
 }
