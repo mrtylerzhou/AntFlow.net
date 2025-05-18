@@ -48,7 +48,7 @@ public class SubmitProcessService: IProcessOperationAdaptor
             throw new AFBizException("the process has already been submitted！");
         }
         //process's name
-        String processName = _bpmProcessNameService.GetBpmProcessName(businessDataVo.FormCode).ProcessName;
+        String processName = _bpmProcessNameService.GetBpmProcessName(businessDataVo.FormCode)?.ProcessName;
         //apply user info
         String applyName = SecurityUtils.GetLogInEmpName();
         string processNumber = businessDataVo.FormCode+"_"+businessDataVo.BusinessId;
