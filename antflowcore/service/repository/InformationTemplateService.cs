@@ -7,6 +7,7 @@ using AntFlowCore.Enums;
 using antflowcore.exception;
 using antflowcore.util;
 using AntFlowCore.Vo;
+using FreeSql.Internal.Model;
 
 namespace antflowcore.service.repository;
 
@@ -34,9 +35,10 @@ public class InformationTemplateService: AFBaseCurdRepositoryService<Information
             expression.And(a => a.Name.Contains(informationTemplateVo.Name));
         }
 
+        BasePagingInfo basePagingInfo = page.ToPagingInfo();
         List<InformationTemplate> informationTemplates = this.baseRepo
             .Where(expression)
-            .Page(page.Current,page.Size)
+            .Page(basePagingInfo)
             .ToList();
         List<InformationTemplateVo> results = new List<InformationTemplateVo>();
         foreach (InformationTemplate informationTemplate in informationTemplates)
@@ -46,9 +48,8 @@ public class InformationTemplateService: AFBaseCurdRepositoryService<Information
             templateVo.StatusValue = informationTemplate.Status == 0 ? "启用" : "禁用";
             results.Add(templateVo);
         }
-
-        page.Records = results;
-        return PageUtils.GetResultAndPage(page);
+        
+        return PageUtils.GetResultAndPage(page.Of(results,basePagingInfo));
     }
 
     public void Edit(InformationTemplateVo informationTemplateVo)

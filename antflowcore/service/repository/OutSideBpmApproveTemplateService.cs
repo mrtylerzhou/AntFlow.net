@@ -3,6 +3,7 @@ using antflowcore.entity;
 using antflowcore.exception;
 using antflowcore.util;
 using antflowcore.vo;
+using FreeSql.Internal.Model;
 using Microsoft.Extensions.Logging;
 
 namespace antflowcore.service.repository;
@@ -19,13 +20,14 @@ namespace antflowcore.service.repository;
         public ResultAndPage<OutSideBpmApproveTemplateVo> ListPage(PageDto pageDto, OutSideBpmApproveTemplateVo vo)
         {
             Page<OutSideBpmApproveTemplateVo> page = PageUtils.GetPageByPageDto<OutSideBpmApproveTemplateVo>(pageDto);
+            BasePagingInfo basePagingInfo = page.ToPagingInfo();
             List<OutSideBpmApproveTemplateVo> outSideBpmApproveTemplateVos = Frsql
                 .Select<OutSideBpmApproveTemplate>()
                 .Where(a => a.IsDel == 0)
                 .WhereIf(!string.IsNullOrWhiteSpace(vo.ApproveTypeName),
                     a => a.ApproveTypeName.Contains(vo.ApproveTypeName))
                 .OrderByDescending(a => a.CreateTime)
-                .Page(page.Current, page.Size)
+                .Page(basePagingInfo)
                 .ToList()
                 .Select(a => new OutSideBpmApproveTemplateVo
                 {
@@ -45,8 +47,7 @@ namespace antflowcore.service.repository;
                     CreateTime = a.CreateTime
                 }).ToList();
             
-            page.Records=outSideBpmApproveTemplateVos;
-            return PageUtils.GetResultAndPage(page);
+            return PageUtils.GetResultAndPage(page.Of(outSideBpmApproveTemplateVos,basePagingInfo));
         }
 
         /// <summary>

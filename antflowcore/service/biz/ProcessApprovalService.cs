@@ -12,6 +12,7 @@ using antflowcore.service.repository;
 using antflowcore.util;
 using AntFlowCore.Util;
 using AntFlowCore.Vo;
+using FreeSql.Internal.Model;
 using Microsoft.Extensions.Logging;
 
 namespace antflowcore.service.biz;
@@ -345,6 +346,7 @@ private bool IsOperatable(TaskMgmtVO taskMgmtVo)
 
 List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
     {
+        BasePagingInfo basePagingInfo = page.ToPagingInfo();
         List<TaskMgmtVO> taskMgmtVos = _freeSql
             .Select<BpmAfTaskInst, BpmBusinessProcess>()
             .LeftJoin((h, b) => h.ProcInstId == b.ProcInstId)
@@ -362,11 +364,13 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
                 ProcessDigest = a.t2.ProcessDigest,
             })
             .Where(CommonCond(taskMgmtVO))
-            .Page(page.Current, page.Size).ToList();
+            .Page(basePagingInfo).ToList();
+        page.Total = (int)basePagingInfo.Count;
         return taskMgmtVos;
     }
     
     List<TaskMgmtVO> ViewPcpNewlyBuildList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO){
+        BasePagingInfo basePagingInfo = page.ToPagingInfo();
         List<TaskMgmtVO> taskMgmtVos = _freeSql
             .Select<BpmAfTaskInst, BpmBusinessProcess>()
             .LeftJoin((h, b) => h.ProcInstId == b.ProcInstId)
@@ -387,11 +391,13 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
                 ProcessDigest = a.t2.ProcessDigest,
             })
             .Where(CommonCond(taskMgmtVO))
-            .Page(page.Current, page.Size)
+            .Page(basePagingInfo)
             .ToList();
+        page.Total = (int)basePagingInfo.Count;
         return taskMgmtVos;
     }
     List<TaskMgmtVO> ViewPcAlreadyDoneList(Page<TaskMgmtVO> page,  TaskMgmtVO taskMgmtVO){
+        BasePagingInfo basePagingInfo = page.ToPagingInfo();
         List<TaskMgmtVO> taskMgmtVos = _freeSql
             .Select<BpmAfTaskInst, BpmBusinessProcess>()
             .LeftJoin((h, b) => h.ProcInstId == b.ProcInstId)
@@ -409,12 +415,14 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
                 ProcessState = a.t2.ProcessState,
                 ProcessDigest = a.t2.ProcessDigest,
             }).Where(CommonCond(taskMgmtVO))
-            .Page(page.Current, page.Size)
+            .Page(basePagingInfo)
             .ToList();
+        page.Total = (int)basePagingInfo.Count;
         return taskMgmtVos;
     }
     List<TaskMgmtVO> ViewPcToDoList(Page<TaskMgmtVO> page,TaskMgmtVO taskMgmtVO)
     {
+        BasePagingInfo basePagingInfo = page.ToPagingInfo();
         List<TaskMgmtVO> taskMgmtVos = _freeSql
             .Select<BpmAfTask, BpmBusinessProcess>()
             .LeftJoin((a, b) => a.ProcInstId == b.ProcInstId)
@@ -435,11 +443,13 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
                 ProcessDigest = a.t2.ProcessDigest,
             })
             .Where(CommonCond(taskMgmtVO))
-            .Page(page.Current, page.Size)
+            .Page(basePagingInfo)
             .ToList();
+        page.Total = (int)basePagingInfo.Count;
         return taskMgmtVos;
     }
     List<TaskMgmtVO> AllProcessList(Page<TaskMgmtVO> page,TaskMgmtVO taskMgmtVO){
+        BasePagingInfo basePagingInfo = page.ToPagingInfo();
         List<TaskMgmtVO> taskMgmtVos = _freeSql
             .Select<BpmAfTask, BpmBusinessProcess>()
             .LeftJoin((a, b) => a.ProcInstId == b.ProcInstId)
@@ -462,11 +472,13 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
                 TaskName = a.t1.TaskDefKey,
             })
             .Where(CommonCond(taskMgmtVO))
-            .Page(page.Current, page.Size)
+            .Page(basePagingInfo)
             .ToList();
+        page.Total = (int)basePagingInfo.Count;
         return taskMgmtVos;
     }
     List<TaskMgmtVO> ViewPcForwardList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO){
+        BasePagingInfo basePagingInfo = page.ToPagingInfo();
         List<TaskMgmtVO> taskMgmtVos = _freeSql
             .Select<BpmAfTaskInst, BpmBusinessProcess,BpmProcessForward>()
             .LeftJoin((a,b,c)=>a.ProcInstId == b.ProcInstId)
@@ -488,9 +500,9 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
                 ProcessDigest = a.t2.ProcessDigest,
             })
             .Where(CommonCond(taskMgmtVO))
-            .Page(page.Current, page.Size)
+            .Page(basePagingInfo)
             .ToList();
-
+        page.Total = (int)basePagingInfo.Count;
         return taskMgmtVos;
     }
     private Expression<Func<TaskMgmtVO, bool>> CommonCond(TaskMgmtVO paramVo)

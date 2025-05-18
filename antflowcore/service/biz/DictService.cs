@@ -5,6 +5,7 @@ using antflowcore.entity;
 using antflowcore.util;
 using antflowcore.vo;
 using AntFlowCore.Vo;
+using FreeSql.Internal.Model;
 
 namespace antflowcore.service.repository;
 
@@ -106,14 +107,16 @@ public class DictService
                     a.DictType.Contains(taskMgmtVO.Description) || a.Value.Contains(taskMgmtVO.Description));
             }
 
+            BasePagingInfo basePagingInfo = page.ToPagingInfo();
             List<DictData> dictDataList = _dicDataSerivce
                 .Frsql
                 .Select<DictData, BpmnConf>()
                 .InnerJoin((a, b) => a.Value == b.FormCode && b.IsLowCodeFlow == 1)
                 .Where(expression)
                 .OrderByDescending((a, b) => a.CreateTime)
-                .Page(page.Current,page.Size)
+                .Page(basePagingInfo)
                 .ToList<DictData>((a, b) => a);
+            page.Total = (int)basePagingInfo.Count;
             return dictDataList;
         }
 
@@ -127,11 +130,13 @@ public class DictService
                     a.DictType.Contains(taskMgmtVO.Description) || a.Value.Contains(taskMgmtVO.Description));
             }
 
+            BasePagingInfo basePagingInfo = page.ToPagingInfo();
             List<DictData> dictDatas = this._dicDataSerivce
                 .baseRepo
                 .Where(expression)
-                .Page(page.Current,page.Size)
+                .Page(basePagingInfo)
                 .ToList();
+            page.Total = (int)basePagingInfo.Count;
             return dictDatas;
         }
         private ResultAndPage<BaseKeyValueStruVo> HandleLFFormCodePageList(Page<BaseKeyValueStruVo> page, List<DictData> dictlist)

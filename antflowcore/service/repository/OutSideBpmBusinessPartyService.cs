@@ -8,6 +8,7 @@ using antflowcore.service.biz;
 using antflowcore.util;
 using antflowcore.vo;
 using AntFlowCore.Vo;
+using FreeSql.Internal.Model;
 
 namespace antflowcore.service.repository;
 
@@ -70,10 +71,11 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
 
     public List<OutSideBpmBusinessPartyVo> SelectPageList(Page<OutSideBpmBusinessPartyVo> page)
     {
+        BasePagingInfo basePagingInfo = page.ToPagingInfo();
         List<OutSideBpmBusinessPartyVo> result = this.baseRepo
             .Where(a => a.IsDel == 0)
             .OrderByDescending(a => a.CreateTime)
-            .Page(page.Current, page.Size)
+            .Page(basePagingInfo)
             .ToList<OutSideBpmBusinessPartyVo>(a => new OutSideBpmBusinessPartyVo
             {
                 Id = a.Id,
@@ -85,7 +87,7 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
                 Remark = a.Remark,
                 CreateTime = a.CreateTime
             });
-
+        page.Total = (int)basePagingInfo.Count;
         return result;
     }
 

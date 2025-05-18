@@ -7,6 +7,7 @@ using antflowcore.exception;
 using antflowcore.util;
 using AntFlowCore.Vo;
 using AntOffice.Base.Util;
+using FreeSql.Internal.Model;
 
 namespace antflowcore.service.repository;
 
@@ -134,11 +135,12 @@ public class BpmProcessAppApplicationService : AFBaseCurdRepositoryService<BpmPr
     private List<BpmProcessAppApplicationVo> NewListPage(Page<BpmProcessAppApplicationVo> page,
         BpmProcessAppApplicationVo vo)
     {
+        BasePagingInfo basePagingInfo = page.ToPagingInfo();
         List<BpmProcessAppApplicationVo> list = this.Frsql.Select<BpmProcessAppApplication, OutSideBpmBusinessParty>()
             .LeftJoin((app, party) => app.BusinessCode == party.BusinessPartyMark)
             .Where((app, party) => app.IsDel == 0)
             .OrderByDescending((app, party) => app.CreateTime)
-            .Page(page.Current, page.Size)
+            .Page(basePagingInfo)
             .ToList((app, party) => new BpmProcessAppApplicationVo
             {
                 Id = app.Id,
@@ -161,6 +163,7 @@ public class BpmProcessAppApplicationService : AFBaseCurdRepositoryService<BpmPr
                 CreateUserId = app.CreateUserId,
                 CreateTime = app.CreateTime
             });
+        page.Total = (int)basePagingInfo.Count;
         return list;
     }
 

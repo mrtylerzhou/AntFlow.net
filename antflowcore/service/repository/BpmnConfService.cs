@@ -6,6 +6,7 @@ using antflowcore.util;
 using antflowcore.vo;
 using AntOffice.Base.Util;
 using FreeSql;
+using FreeSql.Internal.Model;
 
 namespace antflowcore.service.repository;
 
@@ -86,8 +87,9 @@ public class BpmnConfService
             expression.And((a,b,c)=>c.Label.Contains(vo.FormCodeDisplayName));
         }
 
+        BasePagingInfo basePagingInfo = page.ToPagingInfo();
         List<BpmnConfVo> bpmnConfVos = select.Where(expression)
-            .Page(page.Current,page.Size)
+            .Page(basePagingInfo)
             .ToList((a, b, c) => new BpmnConfVo()
         {
             Id = a.Id,
@@ -103,6 +105,7 @@ public class BpmnConfService
             Remark = a.Remark,
             
         });
+        page.Total = (int)basePagingInfo.Count;
         return bpmnConfVos;
     }
 
