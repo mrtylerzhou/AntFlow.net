@@ -132,12 +132,19 @@ public class BpmnConfService
         BpmnConf confToEffective = new BpmnConf
         {
             Id = id,
-            AppId = alreadyEffectiveConf.AppId,
-            FormCode = alreadyEffectiveConf.FormCode,
-            BpmnType = alreadyEffectiveConf.BpmnType,
+            AppId = alreadyEffectiveConf.AppId??bpmnConf.AppId,
+            FormCode = alreadyEffectiveConf.FormCode??bpmnConf.FormCode,
+            BpmnType = alreadyEffectiveConf.BpmnType??bpmnConf.BpmnType,
             IsAll = GetIsAll(bpmnConf, alreadyEffectiveConf)
         };
-        this.baseRepo.Update(confToEffective);
+        this._freeSql
+            .Update<BpmnConf>()
+            .Set(a => a.AppId, confToEffective.AppId)
+            .Set(a => a.BpmnType, confToEffective.BpmnType)
+            .Set(a => a.IsAll, confToEffective.IsAll)
+            .Set(a => a.EffectiveStatus, 1)
+            .Where(a=>a.Id==id)
+            .ExecuteAffrows();
         BpmProcessNameService bpmProcessNameService = ServiceProviderUtils.GetService<BpmProcessNameService>();
         bpmProcessNameService.EditProcessName(bpmnConf);
     }
