@@ -74,7 +74,14 @@ namespace antflowcore.util.Extension
         {
             return first.Compose(second, Expression.OrElse);
         }
-
+        public static Expression<Func<T1, T2, bool>> Or<T1, T2>(this Expression<Func<T1, T2, bool>> first, Expression<Func<T1, T2, bool>> second)
+        {
+            return first.Compose(second, Expression.OrElse);
+        }
+        public static Expression<Func<T1, T2, T3, bool>> Or<T1, T2, T3>(this Expression<Func<T1, T2, T3, bool>> first, Expression<Func<T1, T2, T3, bool>> second)
+        {
+            return first.Compose(second, Expression.OrElse);
+        }
         /// <summary>
         /// WhereIf 封装
         /// </summary>

@@ -49,7 +49,11 @@ public class BpmnConfService
         ISelect<BpmnConf, OutSideBpmBusinessParty, DictData> select = _freeSql
             .Select<BpmnConf, OutSideBpmBusinessParty, DictData>()
             .LeftJoin((a, b, c) => a.BusinessPartyId == b.Id)
-            .LeftJoin((a, b, c) => a.FormCode == c.Value && a.IsLowCodeFlow == 1); 
+            .LeftJoin((a, b, c) => a.FormCode == c.Value && a.IsLowCodeFlow == 1);
+
+        var expression22 = LinqExtensions.True<BpmnConf, OutSideBpmBusinessParty>();
+
+        expression22 = expression22.And((a, b) => a.IsDel == 0);
 
         var expression = LinqExtensions.True<BpmnConf, OutSideBpmBusinessParty, DictData>(); 
         expression = expression.And((a, b, c) => a.IsDel == 0);
