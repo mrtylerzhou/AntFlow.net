@@ -171,8 +171,8 @@ public class BpmnConfCommonService
         BpmnConfVo detail = isStartPagePreview
             ? _bpmnConfBizService.DetailByFormCode(dataVo.FormCode)
             : _bpmnConfBizService.Detail(dataVo.BpmnCode);
-        string obj = "{\"formCode\":\""+detail.FormCode + "\"}";
-        var vo = _formFactory.DataFormConversion(obj, null);
+        dataVo.FormCode = detail.FormCode;
+        var vo = _formFactory.DataFormConversion(JsonSerializer.Serialize(dataVo), null);
         vo.IsOutSideAccessProc = detail.IsOutSideProcess == 1;
         vo.IsLowCodeFlow = detail.IsLowCodeFlow;
         vo.BpmnConfVo = detail;
