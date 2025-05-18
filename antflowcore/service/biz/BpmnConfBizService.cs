@@ -13,6 +13,7 @@ using antflowcore.util;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 using AntOffice.Base.Util;
+using antflowcore.util.Extension;
 
 namespace antflowcore.service.biz;
 
@@ -125,7 +126,7 @@ public class BpmnConfBizService
             bpmnNode.Remark ??= "";
             _bpmnNodeService.baseRepo.Insert(bpmnNode);
             long bpmnNodeId = bpmnNode.Id;
-            if(bpmnNodeId==null||bpmnNodeId==0){
+            if(bpmnNodeId.IsNullOrZero()){
                 throw new AFBizException("can not get bpmn node id!");
             }
             //edit node to
@@ -186,7 +187,7 @@ public class BpmnConfBizService
         
             foreach (var record in bpmnConfVos)
             {
-                if (record.IsLowCodeFlow == 0 && record.IsOutSideProcess == 0)
+                if(record.IsLowCodeFlow.IsNullOrZero() && record.IsOutSideProcess.IsNullOrZero()) 
                 {
                     record.FormCodeDisplayName = diyFormCodes.GetValueOrDefault(record.FormCode);
                 }
@@ -216,7 +217,7 @@ public class BpmnConfBizService
 
         NodeTypeEnum? nodeTypeEnumByCode = NodeTypeEnumExtensions.GetNodeTypeEnumByCode(bpmnNodeVo.NodeType);
 
-        if (nodeTypeEnumByCode!=null&&nodeTypeEnumByCode>0) {
+        if (!nodeTypeEnumByCode.IsNullOrZero()) {
             if (NodeTypeEnum.NODE_TYPE_APPROVER==nodeTypeEnumByCode) {
                 NodePropertyEnum? nodePropertyEnum = NodePropertyEnumExtensions.GetByCode(bpmnNodeVo.NodeProperty);
                 bpmnNodeAdpConfEnum = BpmnNodeAdpConfEnumExtensions.GetBpmnNodeAdpConfEnumByEnum(nodePropertyEnum)??bpmnNodeAdpConfEnum;
