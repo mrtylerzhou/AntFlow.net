@@ -109,11 +109,17 @@ using System.Linq;
         {
             BasePagingInfo info = new BasePagingInfo()
             {
-                Count = this.Total,
                 PageSize = (int)this.Size,
                 PageNumber = (int)this.Current,
             };
             return info;
+        }
+
+        public Page<T> Of(ICollection<T> records, BasePagingInfo pagingInfo)
+        {
+            this.Records.AddRange(records);
+            this.Total = (int)pagingInfo.Count;
+            return this;
         }
     }
 

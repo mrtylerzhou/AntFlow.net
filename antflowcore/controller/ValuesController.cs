@@ -51,8 +51,7 @@ public class ValuesController
         PageDto pageDto = requestDto.PageDto;
         Page<BaseIdTranStruVo> page = PageUtils.GetPageByPageDto<BaseIdTranStruVo>(pageDto);
         TaskMgmtVO taskMgmtVO = requestDto.TaskMgmtVO;
-        List<BaseIdTranStruVo> baseIdTranStruVos = _userService.SelectUserPageList(page, taskMgmtVO);
-        page.Records=baseIdTranStruVos;
-        return PageUtils.GetResultAndPage(page);
+        ResultAndPage<BaseIdTranStruVo> selectUserPageList = _userService.SelectUserPageList(page, taskMgmtVO);
+        return selectUserPageList;
     }
 }

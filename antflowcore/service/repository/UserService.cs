@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using antflowcore.dto;
 using AntFlowCore.Entities;
 using antflowcore.entity;
 using AntFlowCore.Entity;
@@ -6,6 +7,7 @@ using antflowcore.util;
 using AntFlowCore.Util;
 using antflowcore.vo;
 using AntFlowCore.Vo;
+using FreeSql.Internal.Model;
 
 namespace antflowcore.service.repository;
 
@@ -62,7 +64,7 @@ public class UserService: AFBaseCurdRepositoryService<User>
         return new BaseIdTranStruVo{Id = first.Id.ToString(),Name = first.Name};
     }
 
-    public  List<BaseIdTranStruVo> SelectUserPageList(Page<BaseIdTranStruVo> page, TaskMgmtVO taskMgmtVo)
+    public  ResultAndPage<BaseIdTranStruVo> SelectUserPageList(Page<BaseIdTranStruVo> page, TaskMgmtVO taskMgmtVo)
     {
         Expression<Func<User, bool>> expression = a => 1 == 1;
         if (!string.IsNullOrEmpty(taskMgmtVo?.Description))
@@ -70,11 +72,13 @@ public class UserService: AFBaseCurdRepositoryService<User>
             expression=expression.And(a=>a.Name.Contains(taskMgmtVo.Description));
         }
 
+        BasePagingInfo basePagingInfo = page.ToPagingInfo();
+        
         List<User> users = baseRepo.Where(expression)
-            .Page(page.Current, page.Size)
+            .Page(basePagingInfo)
             .ToList();
-
-        return users.Select(a=>a.ToBaseIdTranStruVo()).ToList();
+        List<BaseIdTranStruVo> baseIdTranStruVos = users.Select(a=>a.ToBaseIdTranStruVo()).ToList();
+        return PageUtils.GetResultAndPage(page.Of(baseIdTranStruVos, basePagingInfo));
     }
 
     public List<BaseIdTranStruVo> SelectAll()
