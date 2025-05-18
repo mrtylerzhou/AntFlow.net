@@ -17,11 +17,9 @@ public class BpmnConfLFFormDataBizService
     {
         BpmnConfLfFormdata bpmnConfLfFormdata = _bpmnConfLfFormdataService
             .Frsql
-            .Select<BpmnConfLfFormdata>()
-            .From<BpmnConfLfFormdata, BpmnConf>(
-                (a,b,c)=>
-                    a.LeftJoin(x=>x.BpmnConfId==c.Id)
-            ).Where(m => m.t3.EffectiveStatus == 1 && m.t3.FormCode == formCode)
+            .Select<BpmnConfLfFormdata,BpmnConf>()
+            .InnerJoin((a,b)=>a.BpmnConfId ==b.Id&&b.EffectiveStatus==1)
+            .Where(m => m.t2.FormCode == formCode)
             .First();
         return bpmnConfLfFormdata;
     }
