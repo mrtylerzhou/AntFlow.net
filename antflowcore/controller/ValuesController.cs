@@ -1,7 +1,11 @@
 ﻿
 using antflowcore.adaptor.personnel.provider;
+using antflowcore.dto;
 using antflowcore.entity;
 using AntFlowCore.Entity;
+using antflowcore.service.repository;
+using antflowcore.util;
+using antflowcore.vo;
 using AntFlowCore.Vo;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,11 +16,15 @@ public class ValuesController
 {
     private readonly IFreeSql _free;
     private readonly IEnumerable<IBpmnPersonnelProviderService> _personnelProviderServices;
+    private readonly UserService _userService;
 
-    public ValuesController(IFreeSql free,IEnumerable<IBpmnPersonnelProviderService> personnelProviderServices)
+    public ValuesController(IFreeSql free,
+        IEnumerable<IBpmnPersonnelProviderService> personnelProviderServices,
+        UserService userService)
     {
         _free = free;
         _personnelProviderServices = personnelProviderServices;
+        _userService = userService;
     }
     [HttpGet("test")]
     public List<Student> testValue()
@@ -32,15 +40,19 @@ public class ValuesController
         return new List<Student>() { new Student { Age = 32 } };
     }
     [HttpGet("getUser")] 
-    public Result<List<Student>>  getUserList()
+    public Result<List<BaseIdTranStruVo>>  GetUserList()
     {
-        var list = new List<Student>() { 
-            new Student {  Id = 1,Name="张三" },
-            new Student {  Id = 2,Name="李四"  }, 
-            new Student {  Id = 3,Name="王五"  },
-            new Student {  Id = 4,Name="蔡六"  }
+       return ResultHelper.Success(_userService.SelectAll());
+    }
 
-        };
-        return Result<List<Student>>.Succ(list);
+    [HttpPost("getUserPageList")]
+    public ResultAndPage<BaseIdTranStruVo> GetUserPageList([FromBody] DetailRequestDto requestDto)
+    {
+        PageDto pageDto = requestDto.PageDto;
+        Page<BaseIdTranStruVo> page = PageUtils.GetPageByPageDto<BaseIdTranStruVo>(pageDto);
+        TaskMgmtVO taskMgmtVO = requestDto.TaskMgmtVO;
+        List<BaseIdTranStruVo> baseIdTranStruVos = _userService.SelectUserPageList(page, taskMgmtVO);
+        page.Records=baseIdTranStruVos;
+        return PageUtils.GetResultAndPage(page);
     }
 }
