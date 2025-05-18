@@ -38,11 +38,30 @@ namespace antflowcore.util.Extension
         public static Expression<Func<T, bool>> False<T>()
         { return param => false; }
 
+        public static Expression<Func<T1, T2, bool>> True<T1, T2>()
+        {
+            return (a, b) => true;
+        }
+        public static Expression<Func<T1, T2, T3, bool>> True<T1, T2, T3>()
+        { 
+            return (a,b,c) => true;  
+        } 
+
         /// <summary>
         /// 组合And
         /// </summary>
         /// <returns></returns>
         public static Expression<Func<T, bool>> And<T>(this Expression<Func<T, bool>> first, Expression<Func<T, bool>> second)
+        {
+            return first.Compose(second, Expression.AndAlso);
+        }
+
+        public static Expression<Func<T1, T2, bool>> And<T1, T2>(this Expression<Func<T1, T2, bool>> first, Expression<Func<T1, T2, bool>> second)
+        {
+            return first.Compose(second, Expression.AndAlso);
+        }
+
+        public static Expression<Func<T1, T2, T3, bool>> And<T1, T2, T3>(this Expression<Func<T1, T2, T3, bool>> first, Expression<Func<T1, T2, T3, bool>> second)
         {
             return first.Compose(second, Expression.AndAlso);
         }
@@ -54,6 +73,27 @@ namespace antflowcore.util.Extension
         public static Expression<Func<T, bool>> Or<T>(this Expression<Func<T, bool>> first, Expression<Func<T, bool>> second)
         {
             return first.Compose(second, Expression.OrElse);
+        }
+
+        /// <summary>
+        /// WhereIf 封装
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="condition"></param>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public static Expression<Func<T, bool>> WhereIf<T>(this Expression<Func<T, bool>> source,bool condition,Expression<Func<T, bool>> predicate)
+        {
+            return condition ? source.And(predicate) : source;
+        }
+        public static Expression<Func<T1, T2, bool>> WhereIf<T1, T2>(this Expression<Func<T1, T2, bool>> source, bool condition, Expression<Func<T1, T2, bool>> predicate)
+        {
+            return condition ? source.And(predicate) : source;
+        }
+        public static Expression<Func<T1, T2, T3, bool>> WhereIf<T1, T2, T3>(this Expression<Func<T1, T2, T3, bool>> source, bool condition, Expression<Func<T1, T2, T3, bool>> predicate)
+        {
+            return condition ? source.And(predicate) : source;
         }
 
         /// <summary>
