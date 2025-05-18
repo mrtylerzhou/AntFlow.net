@@ -34,7 +34,7 @@ public class LowCodeFlowController
         return ResultHelper.Success(lowCodeFlowFormCodes);
     }
     [HttpPost("getLFFormCodePageList")]
-    public ResultAndPage<BaseKeyValueStruVo> GetLFFormCodePageList(DetailRequestDto requestDto) {
+    public ResultAndPage<BaseKeyValueStruVo> GetLFFormCodePageList([FromBody] DetailRequestDto requestDto) {
         PageDto pageDto = requestDto.PageDto;
         TaskMgmtVO taskMgmtVO = requestDto.TaskMgmtVO;
         return _dictService.SelectLFFormCodePageList(pageDto, taskMgmtVO);

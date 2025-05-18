@@ -24,7 +24,7 @@ public class Program
         //解决跨域
         builder.Services.AddCors(options =>
         {
-            options.AddPolicy("CorsPolicy", builder => builder
+            options.AddPolicy("CorsPolicy", bd => bd
                 .SetIsOriginAllowed((host) => true)
                 .AllowAnyMethod()
                 .AllowAnyHeader()
