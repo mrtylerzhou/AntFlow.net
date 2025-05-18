@@ -13,7 +13,10 @@ using Microsoft.Extensions.Logging;
 
 namespace antflowcore.service.processor.lowcodeflow;
 
-[AfFormServiceAnno(SvcName = "LF", Desc = "低(无)代码流程")]
+/**
+ * 低(无)代码流程
+ */
+[AfFormServiceAnno(SvcName = "LF", Desc = "")]
 public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
 {
     private readonly ILogger<LowFlowApprovalService> _logger;
