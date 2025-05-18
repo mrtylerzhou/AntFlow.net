@@ -359,7 +359,7 @@ public class BpmnConfBizService
         Dictionary<long,List<BpmnTemplateVo>> bpmnTemplateVoMap = GetBpmnTemplateVoMap(idList);
         Dictionary<long,BpmnApproveRemindVo> bpmnApproveRemindVoMap = GetBpmnApproveRemindVoMap(idList);
         int? isLowCodeFlow = bpmnNodeList[0].IsLowCodeFlow;
-        Dictionary<long, List<BpmnNodeLfFormdataFieldControl>> bpmnNodeFieldControlConfMap=null;
+        Dictionary<long, List<BpmnNodeLfFormdataFieldControl>> bpmnNodeFieldControlConfMap=new();
         if (isLowCodeFlow is 1)
         {
             bpmnNodeFieldControlConfMap = GetBpmnNodeFieldControlConfMap(idList);
