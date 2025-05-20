@@ -78,12 +78,12 @@ public class TaskMgmtService
        _taskService.baseRepo.Delete(a=>a.Id==taskId);
     }
 
-    public List<DIYProcessInfoDTO> ViewProcessInfo(string desc)
+    public List<DIYProcessInfoDTO> ViewProcessInfo(string desc = "")
     {
         List<DIYProcessInfoDTO> diyProcessInfoDTOS = BaseFormInfo(desc);
         if (diyProcessInfoDTOS == null || diyProcessInfoDTOS.Count == 0)
         {
-            return diyProcessInfoDTOS;
+            return new List<DIYProcessInfoDTO>();
         }
 
         List<string> formCodes = diyProcessInfoDTOS.Select(dto => dto.Key).ToList();

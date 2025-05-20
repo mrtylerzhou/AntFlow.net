@@ -97,7 +97,7 @@ public class BpmnConfBizService
         //notice template
         _bpmnConfNoticeTemplateService.Insert(bpmnCode);
         long confId = bpmnConf.Id;
-        if(confId==null||confId==0){
+        if(confId.IsNullOrZero()){
             throw new AFBizException($"conf id for formcode:{formCode} can not be null");
         }
         bpmnConfVo.Id=confId;
@@ -182,7 +182,7 @@ public class BpmnConfBizService
     
         if (vo.IsOutSideProcess == 0)
         {
-            List<DIYProcessInfoDTO> diyFormCodeList = _taskMgmtService.ViewProcessInfo(null);
+            List<DIYProcessInfoDTO> diyFormCodeList = _taskMgmtService.ViewProcessInfo();
             var diyFormCodes = diyFormCodeList.ToDictionary(p => p.Key, p => p.Value);
         
             foreach (var record in bpmnConfVos)
@@ -359,7 +359,7 @@ public class BpmnConfBizService
         Dictionary<long,List<BpmnTemplateVo>> bpmnTemplateVoMap = GetBpmnTemplateVoMap(idList);
         Dictionary<long,BpmnApproveRemindVo> bpmnApproveRemindVoMap = GetBpmnApproveRemindVoMap(idList);
         int? isLowCodeFlow = bpmnNodeList[0].IsLowCodeFlow;
-        Dictionary<long, List<BpmnNodeLfFormdataFieldControl>> bpmnNodeFieldControlConfMap=null;
+        Dictionary<long, List<BpmnNodeLfFormdataFieldControl>> bpmnNodeFieldControlConfMap=new();
         if (isLowCodeFlow is 1)
         {
             bpmnNodeFieldControlConfMap = GetBpmnNodeFieldControlConfMap(idList);

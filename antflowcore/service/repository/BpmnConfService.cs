@@ -1,12 +1,11 @@
-﻿using System.Linq.Expressions;
-using antflowcore.entity;
-using AntFlowCore.Entity;
-using antflowcore.exception;
+﻿using antflowcore.entity;
+using AntFlowCore.Entity; 
 using antflowcore.util;
 using antflowcore.vo;
 using AntOffice.Base.Util;
 using FreeSql;
 using FreeSql.Internal.Model;
+using antflowcore.util.Extension; 
 
 namespace antflowcore.service.repository;
 
@@ -50,43 +49,17 @@ public class BpmnConfService
         ISelect<BpmnConf, OutSideBpmBusinessParty, DictData> select = _freeSql
             .Select<BpmnConf, OutSideBpmBusinessParty, DictData>()
             .LeftJoin((a, b, c) => a.BusinessPartyId == b.Id)
-            .LeftJoin((a, b, c) => a.FormCode == c.Value && a.IsLowCodeFlow == 1);
-        Expression<Func<BpmnConf,OutSideBpmBusinessParty,DictData, bool>> expression=(a,b,c)=>a.IsDel==0;
-        if (vo.IsOutSideProcess != null)
-        {
-            expression.And((a,b,c)=>a.IsOutSideProcess==vo.IsOutSideProcess);
-        }
-
-        if (vo.IsLowCodeFlow != null)
-        {
-            expression.And((a,b,c)=>a.IsLowCodeFlow==vo.IsLowCodeFlow);
-        }
-
-        if (!string.IsNullOrEmpty(vo.Search))
-        {
-            expression.And((a,b,c)=>a.BpmnName.Contains(vo.Search));
-        }
-
-        if (!string.IsNullOrEmpty(vo.FormCode))
-        {
-            expression.And((a,b,c)=>a.FormCode.Contains(vo.FormCode));
-        }
-
-        if (!string.IsNullOrEmpty(vo.BpmnCode))
-        {
-            expression.And((a,b,c)=>a.BpmnCode.Contains(vo.BpmnCode));
-        }
-
-        if (!string.IsNullOrEmpty(vo.BusinessPartyMark))
-        {
-            expression.And((a,b,c)=>b.BusinessPartyMark.Equals(vo.BusinessPartyMark));
-        }
-        expression.And((a,b,c)=>a.EffectiveStatus==vo.EffectiveStatus);
-        if (!string.IsNullOrEmpty(vo.FormCodeDisplayName))
-        {
-            expression.And((a,b,c)=>c.Label.Contains(vo.FormCodeDisplayName));
-        }
-
+            .LeftJoin((a, b, c) => a.FormCode == c.Value && a.IsLowCodeFlow == 1); 
+        var expression = LinqExtensions.True<BpmnConf, OutSideBpmBusinessParty, DictData>(); 
+        expression = expression.And((a, b, c) => a.IsDel == 0);
+        expression = expression.WhereIf(vo.EffectiveStatus > 0, (a, b, c) => a.EffectiveStatus == vo.EffectiveStatus);
+        expression = expression.WhereIf(vo.IsOutSideProcess.HasValue ,(a, b, c) => (!a.IsOutSideProcess.HasValue || a.IsOutSideProcess == vo.IsOutSideProcess));
+        expression = expression.WhereIf(vo.IsLowCodeFlow.HasValue, (a, b, c) => a.IsLowCodeFlow == vo.IsLowCodeFlow);
+        expression = expression.WhereIf(!string.IsNullOrEmpty(vo.Search), (a, b, c) 
+            => a.BpmnName.Contains(vo.Search) || a.FormCode.Contains(vo.Search) || a.BpmnCode.Contains(vo.Search));
+        expression = expression.WhereIf(!string.IsNullOrEmpty(vo.FormCode), (a, b, c) => a.FormCode.Trim() == vo.FormCode.Trim());
+        expression = expression.WhereIf(!string.IsNullOrEmpty(vo.BusinessPartyMark), (a, b, c) => b.BusinessPartyMark.Trim() == vo.BusinessPartyMark.Trim());
+   
         BasePagingInfo basePagingInfo = page.ToPagingInfo();
         List<BpmnConfVo> bpmnConfVos = select.Where(expression)
             .Page(basePagingInfo)
@@ -152,10 +125,7 @@ public class BpmnConfService
         if (bpmnConf.IsOutSideProcess!=null&&bpmnConf.IsOutSideProcess == 1) {
             return 1;
         } else {
-            if (prevBpmnConf.IsAll!=null) {
-                return prevBpmnConf.IsAll;
-            }
-        }
-        return 0;
+            return prevBpmnConf.IsAll;
+        } 
     }
 }

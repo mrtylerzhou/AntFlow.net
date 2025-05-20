@@ -246,3 +246,7 @@ ModelManifest.xml
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+# VS2022
+appsettings.json
+appsettings.Development.json
