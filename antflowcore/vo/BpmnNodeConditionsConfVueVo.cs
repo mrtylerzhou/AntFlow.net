@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Text.Json.Serialization;
+using antflowcore.conf.json;
 
 namespace Antflowcore.Vo
 {
@@ -12,6 +13,8 @@ namespace Antflowcore.Vo
         [JsonPropertyName("columnId")]
         public string ColumnId { get; set; }
 
+        [JsonPropertyName("formId")]
+        public int?  FormId { get; set; }
         [JsonPropertyName("type")]
         public int? Type { get; set; }
 
@@ -36,6 +39,8 @@ namespace Antflowcore.Vo
         [JsonPropertyName("columnDbname")]
         public string ColumnDbname { get; set; }
 
+        [JsonPropertyName("fieldTypeName")]
+        public String FieldTypeName { get; set; }
         [JsonPropertyName("columnType")]
         public string ColumnType { get; set; }
         [JsonPropertyName("multiple")]
