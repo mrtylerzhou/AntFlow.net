@@ -332,6 +332,10 @@ public class BpmVerifyInfoBizService
     foreach (var nextElement in nextElements)
     {
         Dictionary<string,string> nextElementAssigneeMap = nextElement.AssigneeMap;
+        if (nextElementAssigneeMap == null)
+        {
+            continue;
+        }
         foreach (KeyValuePair<string,string> keyValuePair in nextElementAssigneeMap)
         {
             empIds.Add(keyValuePair.Key);

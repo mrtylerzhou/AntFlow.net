@@ -60,8 +60,14 @@ public class ActivitiAdditionalInfoService
     public static List<BpmnConfCommonElementVo> GetNextElementList(string elementId, List<BpmnConfCommonElementVo> activitiList)
     {
         IEnumerable<BpmnConfCommonElementVo> bpmnConfCommonElementVos = activitiList.Where(a=>a.ElementId==elementId);
-        IEnumerable<string> flowToElementIds = bpmnConfCommonElementVos.Select(a=>a.FlowTo);
-        List<BpmnConfCommonElementVo> flowTos = bpmnConfCommonElementVos.Where(a=>flowToElementIds.Contains(a.ElementId)).ToList();
-        return flowTos;
+        List<BpmnConfCommonElementVo> flowToSequences = activitiList.Where(a=>elementId.Equals(a.FlowFrom)).ToList();
+        List<string> flowTos = flowToSequences.Select(a=>a.FlowTo).ToList();
+        if (!flowTos.Any())
+        {
+            return null;
+        }
+
+        List<BpmnConfCommonElementVo> nextElementVos = activitiList.Where(a=>flowTos.Contains(a.ElementId)).ToList();
+        return nextElementVos;
     }
 }
