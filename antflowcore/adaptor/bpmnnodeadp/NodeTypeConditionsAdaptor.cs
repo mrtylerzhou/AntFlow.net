@@ -245,7 +245,7 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
                         ? conditionParam.ToString()
                         : JsonSerializer.Serialize(conditionParam);
 
-                    JsonSerializer.Deserialize<JsonNode>(conditionParamJson);
+                   
                     if (conditionTypeAttributes.FieldType == 1)
                     {
                         JsonNode? jsonNode = JsonSerializer.Deserialize<JsonNode>(conditionParamJson);

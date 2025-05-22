@@ -21,7 +21,7 @@ namespace Antflowcore.Vo
         [JsonPropertyName("showName")]
         public string ShowName { get; set; }
 
-        [JsonPropertyName("optType")]
+        [JsonPropertyName("optType"),JsonConverter(typeof(StringToIntConverter))]
         public int? OptType { get; set; }
 
         [JsonPropertyName("zdy1")]

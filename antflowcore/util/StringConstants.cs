@@ -39,7 +39,7 @@ namespace AntFlowCore.Constants
        
         public const  String outSideAccessmarker = "outSideAccess";
         
-        public const String NUM_OPERATOR="numberOperator";
+        public const String NUM_OPERATOR="NumberOperator";
 
         public const string START_USER_NODE_NAME = "发起人";
         
