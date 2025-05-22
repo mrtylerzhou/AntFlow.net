@@ -372,25 +372,26 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
     List<TaskMgmtVO> ViewPcpNewlyBuildList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO){
         BasePagingInfo basePagingInfo = page.ToPagingInfo();
         List<TaskMgmtVO> taskMgmtVos = _freeSql
-            .Select<BpmAfTaskInst, BpmBusinessProcess>()
-            .LeftJoin((h, b) => h.ProcInstId == b.ProcInstId)
-            .Where((a,b)=>b.CreateUser==taskMgmtVO.ApplyUser&&b.IsDel==0)
+            .Select<BpmBusinessProcess,BpmAfTaskInst>()
+            .LeftJoin((b,h) => h.ProcInstId == b.ProcInstId&&h.TaskDefKey=="task1418018332271")
+            .Where((b,a)=>b.CreateUser==taskMgmtVO.ApplyUser&&b.IsDel==0)
             .WithTempQuery(a=>new TaskMgmtVO
             {
                 ProcessInstanceId = a.t1.ProcInstId,
-                ProcessId = a.t1.ProcDefId,
-                UserId = a.t2.CreateUser,
-                CreateTime = a.t1.StartTime,
-                RunTime = a.t1.StartTime,
-                BusinessId = a.t2.BusinessId,
-                ProcessNumber = a.t2.BusinessNumber,
+                ProcessId = a.t2.ProcDefId,
+                UserId = a.t1.CreateUser,
+                CreateTime = a.t2.StartTime,
+                RunTime = a.t2.StartTime,
+                BusinessId = a.t1.BusinessId,
+                ProcessNumber = a.t1.BusinessNumber,
                 Description = a.t2.Description,
-                ProcessState = a.t2.ProcessState,
-                ProcessKey = a.t2.ProcessinessKey,
-                TaskStype = a.t2.ProcessState,
-                ProcessDigest = a.t2.ProcessDigest,
+                ProcessState = a.t1.ProcessState,
+                ProcessKey = a.t1.ProcessinessKey,
+                TaskStype = a.t1.ProcessState,
+                ProcessDigest = a.t1.ProcessDigest,
             })
             .Where(CommonCond(taskMgmtVO))
+            .OrderByDescending(a=>a.CreateTime)
             .Page(basePagingInfo)
             .ToList();
         page.Total = (int)basePagingInfo.Count;
@@ -414,7 +415,9 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
                 RunTime = a.t1.EndTime,
                 ProcessState = a.t2.ProcessState,
                 ProcessDigest = a.t2.ProcessDigest,
-            }).Where(CommonCond(taskMgmtVO))
+            })
+            .Where(CommonCond(taskMgmtVO))
+            .OrderByDescending(a=>a.RunTime)
             .Page(basePagingInfo)
             .ToList();
         page.Total = (int)basePagingInfo.Count;
@@ -443,6 +446,7 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
                 ProcessDigest = a.t2.ProcessDigest,
             })
             .Where(CommonCond(taskMgmtVO))
+            .OrderByDescending(a=>a.RunTime)
             .Page(basePagingInfo)
             .ToList();
         page.Total = (int)basePagingInfo.Count;
@@ -472,6 +476,7 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
                 TaskName = a.t1.TaskDefKey,
             })
             .Where(CommonCond(taskMgmtVO))
+            .OrderByDescending(a=>a.RunTime)
             .Page(basePagingInfo)
             .ToList();
         page.Total = (int)basePagingInfo.Count;
@@ -500,6 +505,7 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
                 ProcessDigest = a.t2.ProcessDigest,
             })
             .Where(CommonCond(taskMgmtVO))
+            .OrderByDescending(a=>a.CreateTime)
             .Page(basePagingInfo)
             .ToList();
         page.Total = (int)basePagingInfo.Count;

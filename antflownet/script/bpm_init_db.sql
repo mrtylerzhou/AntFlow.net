@@ -1747,6 +1747,8 @@ create index AF_HI_TASK_INST_PROCINST
 create index idx_assignee_name
     on bpm_af_taskinst (assignee_name);
 
+create index idx_task_def_key
+    on bpm_af_taskinst (task_def_key);
 
 create table bpm_af_task
 (
@@ -1777,7 +1779,8 @@ create index AF_IDX_TASK_CREATE
     on bpm_af_task (CREATE_TIME);
 create index AF_IDX_PROCINSTID
     on bpm_af_task (proc_inst_id);
-
+create index AF_IDX_TASK_DEF_KEY
+    on bpm_af_task (task_def_key);
 create table bpm_af_execution
 (
     id                   varchar(64)             not null

@@ -62,6 +62,7 @@ public class BpmnConfService
    
         BasePagingInfo basePagingInfo = page.ToPagingInfo();
         List<BpmnConfVo> bpmnConfVos = select.Where(expression)
+            .OrderByDescending(a=>a.t1.CreateTime)
             .Page(basePagingInfo)
             .ToList((a, b, c) => new BpmnConfVo()
         {
