@@ -11,8 +11,8 @@ public abstract class AbstractLFConditionJudge: AbstractComparableJudge
         BpmnStartConditionsVo bpmnStartConditionsVo, 
         Func<object, object,int, bool> predicate,int currentIndex)
     {
-        Dictionary<string,object> lfConditionsFromDb = conditionsConf.LfConditions;
-        Dictionary<string,object> lfConditionsFromUser = bpmnStartConditionsVo.LfConditions;
+        IDictionary<string,object> lfConditionsFromDb = conditionsConf.LfConditions;
+        IDictionary<string,object> lfConditionsFromUser = bpmnStartConditionsVo.LfConditions;
 
         if (lfConditionsFromDb == null || !lfConditionsFromDb.Any())
         {

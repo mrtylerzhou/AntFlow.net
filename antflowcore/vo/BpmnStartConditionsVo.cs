@@ -197,7 +197,7 @@ namespace AntFlowCore.Vo
         /// Gets or sets the list of LF conditions.
         /// </summary>
         [JsonPropertyName("lfConditions")]
-        public Dictionary<string, object> LfConditions { get; set; }
+        public IDictionary<string, object> LfConditions { get; set; }
         public bool IsLowCodeFlow { get; set; }
         [JsonPropertyName("bpmnCode")]
         public String BpmnCode { get; set; }

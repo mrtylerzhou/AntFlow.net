@@ -172,7 +172,9 @@ public class BpmnConfCommonService
             ? _bpmnConfBizService.DetailByFormCode(dataVo.FormCode)
             : _bpmnConfBizService.Detail(dataVo.BpmnCode);
         dataVo.FormCode = detail.FormCode;
-        var vo = _formFactory.DataFormConversion(JsonSerializer.Serialize(dataVo), null);
+        JsonNode jobj = JsonSerializer.Deserialize<JsonNode>(parameters);
+        jobj["formCode"] = detail.FormCode;
+        var vo = _formFactory.DataFormConversion(JsonSerializer.Serialize(jobj), null);
         vo.IsOutSideAccessProc = detail.IsOutSideProcess == 1;
         vo.IsLowCodeFlow = detail.IsLowCodeFlow;
         vo.BpmnConfVo = detail;

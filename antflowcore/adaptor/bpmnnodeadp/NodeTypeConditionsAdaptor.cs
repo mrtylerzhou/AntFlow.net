@@ -133,6 +133,13 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
                     bpmnNodeConditionsConfBaseVo.NumberOperatorList.Add(theOperator.Value);
                 }
             }
+
+            if (isLowCodeFlow)
+            {
+                var field = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(StringConstants.LOWFLOW_CONDITION_CONTAINER_FIELD_NAME,
+                    BindingFlags.Public | BindingFlags.Instance);
+                field.SetValue(bpmnNodeConditionsConfBaseVo,wrappedValue);
+            }
         }
 
         SetProperty(bpmnNodeVo, bpmnNodeConditionsConfBaseVo);
@@ -254,7 +261,7 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
                             continue;
                         }
                     }
-
+                    var numberOperator = extField.OptType;
                     _bpmnNodeConditionsParamConfService.baseRepo.Insert(new BpmnNodeConditionsParamConf
                     {
                         BpmnNodeConditionsId = nodeConditionsId,
@@ -263,13 +270,14 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
                         ConditionParamJsom = conditionParamJson,
                         CreateUser = SecurityUtils.GetLogInEmpNameSafe(),
                         Remark = "",
+                        TheOperator = numberOperator,
                         CreateTime = DateTime.Now
                     });
 
                     //if condition value doest not a collection and doest not a string type,it must have an operator
                     if (conditionTypeAttributes.FieldType == 2 && !(conditionParam is string))
                     {
-                        var numberOperator = bpmnNodeConditionsConfBaseVo.NumberOperator;
+                        
                         _bpmnNodeConditionsParamConfService.baseRepo.Insert(new BpmnNodeConditionsParamConf
                         {
                             BpmnNodeConditionsId = nodeConditionsId,
