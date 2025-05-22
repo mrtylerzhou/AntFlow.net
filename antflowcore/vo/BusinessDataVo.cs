@@ -176,6 +176,6 @@ namespace AntFlowCore.Vo
         public List<string> TemplateMarkIds { get; set; }
 
         [JsonPropertyName("lfConditions")]
-        public Dictionary<String,Object> LfConditions;
+        public Dictionary<String,Object> LfConditions { get; set; }
     }
 }

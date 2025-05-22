@@ -469,14 +469,12 @@ public class BpmnConfCommonService
 
         // 解析 processStartConditions 并添加额外字段
         JsonNode? objectStart = JsonNode.Parse(bpmnVariable.ProcessStartConditions);
-        if (objectStart != null)
-        {
-            objectStart["bpmnCode"] = bpmnVariable.BpmnCode;
-            objectStart["isLowCodeFlow"] = isLowCodeFlow;
-            objectStart["processNumber"] = processNumber;
-            return GetPreviewNode(objectStart.ToJsonString(), false);
-        }
-        return new PreviewNode();
+
+        objectStart["bpmnCode"] = bpmnVariable.BpmnCode;
+        objectStart["isLowCodeFlow"] = isLowCodeFlow;
+        objectStart["processNumber"] = processNumber;
+        return GetPreviewNode(objectStart.ToJsonString(), false);
+            
     }
 
     public List<BpmnConf> GetBpmnConfByFormCodeBatch(List<string> formCodes)
