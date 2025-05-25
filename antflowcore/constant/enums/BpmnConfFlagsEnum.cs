@@ -32,7 +32,10 @@
         {
             return alreadyFlags | newFlag.Code;
         }
-
+        public static int BinaryOr(int alreadyFlags, int newFlag)
+        {
+            return alreadyFlags | newFlag;
+        }
         /// <summary>
         /// 从已有的标识中清除某个标识
         /// </summary>

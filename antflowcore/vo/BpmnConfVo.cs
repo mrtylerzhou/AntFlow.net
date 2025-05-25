@@ -145,4 +145,6 @@ namespace antflowcore.vo;
         public long? LfFormDataId { get; set; }
         [JsonPropertyName("formCodeDisplayName")]
         public String FormCodeDisplayName { get; set; }
+        [JsonPropertyName("extraFlags")]
+        public int? ExtraFlags { get; set; }
     }

@@ -108,12 +108,24 @@ public class BpmnConfBizService
         ProcessorFactory.ExecutePreWriteProcessors(bpmnConfVo);
         
         List<BpmnNodeVo> confNodes = bpmnConfVo.Nodes;
+        int hasStartUserChooseModules=0;
+        int hasCopy=0;
+        int hasLastNodeCopy=0;
         foreach (BpmnNodeVo bpmnNodeVo in confNodes)
         {
             if (bpmnNodeVo.NodeType == (int)NodeTypeEnum.NODE_TYPE_APPROVER
                 && bpmnNodeVo.NodeProperty==null) {
                 throw new AFBizException("apporver node has no property,can not be saved！");
             }
+            
+            if((int)NodePropertyEnum.NODE_PROPERTY_CUSTOMIZE==bpmnNodeVo.NodeProperty){
+                hasStartUserChooseModules=BpmnConfFlagsEnum.HAS_STARTUSER_CHOOSE_MODULES.Code;
+            }
+            if((int)NodeTypeEnum.NODE_TYPE_COPY==(bpmnNodeVo.NodeType))
+            {
+                hasCopy = BpmnConfFlagsEnum.HAS_COPY.Code;
+            }
+            
             bpmnNodeVo.IsOutSideProcess=isOutSideProcess;
             bpmnNodeVo.IsLowCodeFlow=isLowCodeFlow;
 
@@ -152,6 +164,25 @@ public class BpmnConfBizService
 
             //then edit the node
             bpmnNodeAdaptor.EditBpmnNode(bpmnNodeVo);
+            
+            if((int)NodeTypeEnum.NODE_TYPE_COPY==bpmnNodeVo.NodeType&&bpmnNodeVo.NodeTo!=null&&bpmnNodeVo.NodeTo.Any()){
+                hasLastNodeCopy=BpmnConfFlagsEnum.HAS_LAST_NODE_COPY.Code;
+            }
+        }
+
+        int extraFlags = bpmnConfVo.ExtraFlags??0;
+        int currentFlags=hasStartUserChooseModules|hasCopy|hasLastNodeCopy;
+        if(currentFlags>0){
+            int binariedOr = BpmnConfFlagsEnum.BinaryOr(extraFlags, currentFlags);
+            bpmnConfVo.ExtraFlags=binariedOr;
+        }
+        if (bpmnConfVo.ExtraFlags!=null) {
+            this._bpmnNodeService.Frsql
+                .Update<BpmnConf>()
+                .Set(a => a.ExtraFlags, bpmnConfVo.ExtraFlags)
+                .Where(a => a.Id == confId)
+                .ExecuteAffrows();
+            
         }
         ProcessorFactory.ExecutePostProcessors(bpmnConfVo);
     }
