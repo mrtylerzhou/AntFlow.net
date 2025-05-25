@@ -1811,3 +1811,18 @@ create index AF_IDX_EXEC_PROCINSTID
 
 create index AF_IDX_EXEC_BUSKEY
     on bpm_af_execution (business_key);
+
+create table t_bpmn_node_customize_conf
+(
+    id           bigint auto_increment comment 'auto incr id'
+        primary key,
+    bpmn_node_id bigint       null comment 'node id',
+    sign_type    int          not null comment 'sign type 1 all sign,2 or sign',
+    remark       varchar(255) null comment 'remark',
+    is_del       int          null comment '0 for normal,1 for deleted',
+    create_user  varchar(255) null comment 'create user',
+    create_time  datetime     null comment 'create time',
+    update_user  varchar(255) null comment 'update user',
+    update_time  datetime     null comment 'update time'
+)
+    comment 'customize config entity';

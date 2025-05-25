@@ -126,7 +126,7 @@ public class TaskService
             elementToDeal=nextUserElement;
         }
       
-        Dictionary<string,string> assigneeMap = elementToDeal.AssigneeMap;
+        IDictionary<string,string> assigneeMap = elementToDeal.AssigneeMap;
         if (elementToDeal.IsSignUpSubElement == 1)
         {
             List<KeyValuePair<string,string>> signupNodeAssigneeMap = this._signUpPersonnelService.Frsql

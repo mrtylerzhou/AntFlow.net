@@ -93,6 +93,7 @@ public static class ServiceRegistration
         services.AddSingleton<BpmnNodeHrbpConfService>();
         services.AddSingleton<BpmnNodeAssignLevelConfService>();
         services.AddSingleton<BpmnNodeLoopConfService>();
+        services.AddSingleton<BpmnNodeCustomizeConfService>();
         services.AddSingleton<BpmnNodeOutSideAccessConfService>();
         services.AddSingleton<BpmnNodeRoleConfService>();
         services.AddSingleton<BpmnNodeRoleOutsideEmpConfService>();
@@ -203,7 +204,7 @@ public static class ServiceRegistration
         services.AddSingleton<IAdaptorService, NodePropertyRoleAdaptor>();
         services.AddSingleton<IAdaptorService, NodePropertyStartUserAdaptor>();
         services.AddSingleton<IAdaptorService, NodeTypeConditionsAdaptor>();
-        
+        services.AddSingleton<IAdaptorService, NodePropertyCustomizeAdaptor>();
         
         
         

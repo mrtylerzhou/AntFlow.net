@@ -14,6 +14,7 @@ public enum BpmnNodeAdpConfEnum
     ADP_CONF_NODE_PROPERTY_HRBP = 10,
     ADP_CONF_NODE_PROPERTY_BUSINESSTABLE = 11,
     ADP_CONF_NODE_PROPERTY_DIRECT_LEADER = 12,
+    ADP_CONF_NODE_PROPERTY_CUSTOMIZE=13,
 }
 
 public static class BpmnNodeAdpConfEnumExtensions
@@ -33,6 +34,7 @@ public static class BpmnNodeAdpConfEnumExtensions
         { BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_HRBP, NodePropertyEnum.NODE_PROPERTY_HRBP },
         { BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_BUSINESSTABLE, NodePropertyEnum.NODE_PROPERTY_BUSINESSTABLE },
         { BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_DIRECT_LEADER, NodePropertyEnum.NODE_PROPERTY_DIRECT_LEADER },
+        {BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_CUSTOMIZE,NodePropertyEnum.NODE_PROPERTY_CUSTOMIZE}
     };
 
     

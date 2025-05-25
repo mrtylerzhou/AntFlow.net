@@ -26,7 +26,7 @@ namespace antflowcore.adaptor;
 
         public override BpmnNodeVo FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
         {
-            var bpmnNodeAssignLevelConf = _bpmnNodeAssignLevelConfService.baseRepo.Where(conf => conf.BpmnNodeId == bpmnNodeVo.Id).First();
+            BpmnNodeAssignLevelConf bpmnNodeAssignLevelConf = _bpmnNodeAssignLevelConfService.baseRepo.Where(conf => conf.BpmnNodeId == bpmnNodeVo.Id).First();
 
             if (bpmnNodeAssignLevelConf != null)
             {
@@ -43,9 +43,9 @@ namespace antflowcore.adaptor;
        
         public override void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
         {
-            var bpmnNodePropertysVo = bpmnNodeVo.Property ?? new BpmnNodePropertysVo();
+            BpmnNodePropertysVo bpmnNodePropertysVo = bpmnNodeVo.Property ?? new BpmnNodePropertysVo();
 
-            var bpmnNodeAssignLevelConf = new BpmnNodeAssignLevelConf
+            BpmnNodeAssignLevelConf bpmnNodeAssignLevelConf = new BpmnNodeAssignLevelConf
             {
                 BpmnNodeId = bpmnNodeVo.Id,
                 AssignLevelType = bpmnNodePropertysVo.AssignLevelType,

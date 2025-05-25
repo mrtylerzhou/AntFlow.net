@@ -79,7 +79,7 @@ public class ProcessNodeJumpService
         string content = bpmAfDeployment.Content;
         List<BpmnConfCommonElementVo> elements = JsonSerializer.Deserialize<List<BpmnConfCommonElementVo>>(content);
         BpmnConfCommonElementVo turnToElement = elements.First(a => a.ElementId==taskToTurnToNodeKey);
-        Dictionary<string,string> assigneeMap = turnToElement.AssigneeMap;
+        IDictionary<string,string> assigneeMap = turnToElement.AssigneeMap;
         BpmAfExecution execution = new BpmAfExecution
         {
             Id = bpmAfTask.ExecutionId,

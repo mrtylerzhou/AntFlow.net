@@ -35,7 +35,7 @@ namespace AntFlowCore.Vo
         public List<string> CollectionValue { get; set; }
 
         [JsonPropertyName("assigneeMap")]
-        public Dictionary<string, string> AssigneeMap { get; set; }
+        public IDictionary<string, string> AssigneeMap { get; set; }
 
         [JsonPropertyName("flowFrom")]
         public string FlowFrom { get; set; }

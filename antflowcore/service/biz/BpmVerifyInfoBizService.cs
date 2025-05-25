@@ -329,7 +329,7 @@ public class BpmVerifyInfoBizService
 
         foreach (var nextElement in nextElements)
         {
-            Dictionary<string, string> nextElementAssigneeMap = nextElement.AssigneeMap;
+            IDictionary<string, string> nextElementAssigneeMap = nextElement.AssigneeMap;
             if (nextElementAssigneeMap == null)
             {
                 continue;

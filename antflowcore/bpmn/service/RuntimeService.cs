@@ -30,7 +30,7 @@ public class RuntimeService
           string procInstId = StrongUuidGenerator.GetNextId();
           string executionId= StrongUuidGenerator.GetNextId();
           BpmnConfCommonElementVo firstAssigneeNode = BpmnFlowUtil.GetFirstAssigneeNode(bpmnConfCommonElementVos);
-          Dictionary<string,string> assigneeMap = firstAssigneeNode.AssigneeMap;
+          IDictionary<string,string> assigneeMap = firstAssigneeNode.AssigneeMap;
           DateTime nowTime = DateTime.Now;
           int signType = firstAssigneeNode.SignType;
           int taskCount=signType==SignTypeEnum.SIGN_TYPE_OR_SIGN.GetCode()||signType==SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode()?1:assigneeMap.Count;

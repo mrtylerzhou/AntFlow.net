@@ -50,7 +50,7 @@ public static class BpmnElementUtils
 
     // Get multiplayer all-sign node element
     public static BpmnConfCommonElementVo GetMultiplayerSignElement(string elementId, string elementName,
-        string collectionName, List<string> collectionValue, Dictionary<string, string> assigneeMap)
+        string collectionName, List<string> collectionValue, IDictionary<string, string> assigneeMap)
     {
         return new BpmnConfCommonElementVo
         {
@@ -66,7 +66,7 @@ public static class BpmnElementUtils
 
     // Get multiplayer all-sign node element (in order)
     public static BpmnConfCommonElementVo GetMultiplayerSignInOrderElement(string elementId, string elementName,
-        string collectionName, List<string> collectionValue, Dictionary<string, string> assigneeMap)
+        string collectionName, List<string> collectionValue, IDictionary<string, string> assigneeMap)
     {
         return new BpmnConfCommonElementVo
         {
@@ -82,7 +82,7 @@ public static class BpmnElementUtils
 
     // Get multiplayer or-sign node element
     public static BpmnConfCommonElementVo GetMultiplayerOrSignElement(string elementId, string elementName,
-        string collectionName, List<string> collectionValue, Dictionary<string, string> assigneeMap)
+        string collectionName, List<string> collectionValue, IDictionary<string, string> assigneeMap)
     {
         return new BpmnConfCommonElementVo
         {
