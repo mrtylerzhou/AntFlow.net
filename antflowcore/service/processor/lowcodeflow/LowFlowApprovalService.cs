@@ -291,15 +291,16 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
 
     public void OnBackToModifyData(UDLFApplyVo vo)
     {
-        throw new NotImplementedException();
+        
     }
 
     public void OnCancellationData(UDLFApplyVo vo)
     {
-        throw new NotImplementedException();
+       
     }
 
     public void OnFinishData(BusinessDataVo vo)
     {
+        //.net版暂未实现hook,需要监听完结的可以直接在这里写代码,或者自己实现策略实现分发
     }
 }

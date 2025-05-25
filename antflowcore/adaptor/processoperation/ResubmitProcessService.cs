@@ -40,11 +40,11 @@ public class ResubmitProcessService: IProcessOperationAdaptor
 
         public void DoProcessButton(BusinessDataVo vo)
         {
-            var bpmBusinessProcess = _bpmBusinessProcessService.GetBpmBusinessProcess(vo.ProcessNumber);
+            BpmBusinessProcess bpmBusinessProcess = _bpmBusinessProcessService.GetBpmBusinessProcess(vo.ProcessNumber);
             vo.BusinessId = bpmBusinessProcess.BusinessId;
 
             //todo
-            var tasks = _taskService
+            List<BpmAfTask> tasks = _taskService
                 .CreateTaskQuery(t =>
                     t.ProcInstId == bpmBusinessProcess.ProcInstId &&
                     t.Assignee == SecurityUtils.GetLogInEmpIdStr());

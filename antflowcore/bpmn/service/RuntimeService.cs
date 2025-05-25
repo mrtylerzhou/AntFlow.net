@@ -16,15 +16,11 @@ public class RuntimeService
      private readonly AFExecutionService _executionService;
 
      public RuntimeService(
-          AfTaskInstService taskInstService,
-          AFTaskService taskService,
-          ITaskListener taskListener,
+          AfTaskInstService taskInstService, AFTaskService taskService, ITaskListener taskListener, 
           AFExecutionService executionService)
      {
-          _taskInstService = taskInstService;
-          _taskService = taskService;
-          _taskListener = taskListener;
-          _executionService = executionService;
+          _taskInstService = taskInstService; _taskService = taskService;
+          _taskListener = taskListener; _executionService = executionService;
      }
      
      public ExecutionEntity StartProcessInstance(BpmnConfCommonVo bpmnConfCommonVo,
@@ -67,6 +63,8 @@ public class RuntimeService
                Assignee = bpmnStartConditions.StartUserId,
                AssigneeName = bpmnStartConditions.StartUserName,
                StartTime = nowTime,
+               EndTime = nowTime,
+               DeleteReason = "发起人节点自动完成",
                FormKey = bpmnConfCommonVo.FormCode,
           };
           historyTaskInsts.Add(startTask);
@@ -84,7 +82,7 @@ public class RuntimeService
                     Owner = bpmnStartConditions.StartUserId,
                     Assignee = key,
                     AssigneeName = value,
-                    CreateTime = nowTime,
+                    CreateTime = nowTime.AddSeconds(1),
                     FormKey = bpmnConfCommonVo.FormCode,
                };
                tasks.Add(bpmAfTask);

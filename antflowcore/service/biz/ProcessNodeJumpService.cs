@@ -122,6 +122,6 @@ public class ProcessNodeJumpService
         }
         _afTaskService.baseRepo.Delete(bpmAfTask);
         _afTaskService.baseRepo.Insert(tasks);
-        _afTaskInstService.baseRepo.Insert(historyTaskInsts);
+        //_afTaskInstService.baseRepo.Insert(historyTaskInsts);
     }
 }

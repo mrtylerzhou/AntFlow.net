@@ -52,14 +52,14 @@ using System.Linq;
 
         public void DoProcessButton(BusinessDataVo vo)
         {
-            var bpmBusinessProcess = _bpmBusinessProcessService.GetBpmBusinessProcess(vo.ProcessNumber);
+            BpmBusinessProcess bpmBusinessProcess = _bpmBusinessProcessService.GetBpmBusinessProcess(vo.ProcessNumber);
             if (bpmBusinessProcess == null)
                 throw new AFBizException("未查询到流程信息!");
 
-            var procInstId = bpmBusinessProcess.ProcInstId;
+            string procInstId = bpmBusinessProcess.ProcInstId;
 
             // 获取当前流程任务列表
-            var taskList = _taskService.baseRepo.Where(t => t.ProcInstId == procInstId).ToList();
+            List<BpmAfTask> taskList = _taskService.baseRepo.Where(t => t.ProcInstId == procInstId).ToList();
             if (!taskList.Any())
                 throw new AFBizException($"未获取到当前流程信息!, 流程编号: {bpmBusinessProcess.ProcessinessKey}");
 
@@ -69,13 +69,13 @@ using System.Linq;
 
             string restoreNodeKey, backToNodeKey;
 
-            var backToModifyType = vo.BackToModifyType ?? ProcessDisagreeTypeEnum.THREE_DISAGREE.Code;
+            int backToModifyType = vo.BackToModifyType ?? ProcessDisagreeTypeEnum.THREE_DISAGREE.Code;
             ProcessDisagreeTypeEnum processDisagreeType = ProcessDisagreeTypeEnum.GetByCode(backToModifyType);
 
 
                 if (ProcessDisagreeTypeEnum.ONE_DISAGREE == processDisagreeType)
                 {
-                    var prevTask = _processConstants.GetPrevTask(taskData.TaskDefKey, procInstId);
+                    BpmAfTaskInst prevTask = _processConstants.GetPrevTask(taskData.TaskDefKey, procInstId);
                     if (prevTask == null)
                         throw new AFBizException("无前置节点, 无法回退上一节点!");
                     restoreNodeKey = taskData.TaskDefKey;
@@ -147,7 +147,7 @@ using System.Linq;
                 bpmBusinessProcess.BackUserId = vo.BackToEmployeeId;
                 _bpmBusinessProcessService.baseRepo.Update(bpmBusinessProcess);
 
-                var taskMgmtVo = new TaskMgmtVO
+                TaskMgmtVO taskMgmtVo = new TaskMgmtVO
                 {
                     TaskIds = new List<string> { taskList[0].Id },
                     ApplyUser = vo.BackToEmployeeId,
