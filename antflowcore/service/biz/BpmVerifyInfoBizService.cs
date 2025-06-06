@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
 using antflowcore.constant.enus;
+using AntFlowCore.Constants;
 using AntFlowCore.Entities;
 using antflowcore.entity;
 using AntFlowCore.Entity;
@@ -345,7 +346,7 @@ public class BpmVerifyInfoBizService
         // 组装审批人信息
         string verifyUserName = emplNames.Any()
             ? string.Join(",", emplNames)
-            : "nothingplaceholder";
+            : StringConstants.DYNAMIC_APPROVER;
 
         var nameSb = new StringBuilder();
         var elementIdSb = new StringBuilder();
