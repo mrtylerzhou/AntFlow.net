@@ -99,7 +99,7 @@ public class LFFormDataPreProcessor : IAntFlowOrderPreProcessor<BpmnConfVo>
                 if (!StringConstants.LOWFLOW_FORM_CONTAINER_TYPE.Equals(lfWidget.Category))
                 {
                     var lfOption = lfWidget.Options;
-                    var formdataField = new BpmnConfLfFormdataField
+                    BpmnConfLfFormdataField formdataField = new BpmnConfLfFormdataField
                     {
                         BpmnConfId = confId,
                         FormDataId = formDataId,
@@ -131,11 +131,22 @@ public class LFFormDataPreProcessor : IAntFlowOrderPreProcessor<BpmnConfVo>
                     else
                     {
                         var rows = lfWidget.Rows ?? new List<FormConfigWrapper.TableRow>();
-                        foreach (var row in rows)
+                        if (rows.Count > 0)
                         {
-                            foreach (var col in row.Cols)
+                            foreach (var row in rows)
                             {
-                                ParseWidgetListRecursively(col.WidgetList, confId, formDataId, result);
+                                foreach (var col in row.Cols)
+                                {
+                                    ParseWidgetListRecursively(col.WidgetList, confId, formDataId, result);
+                                }
+                            }
+                        }
+                        else
+                        {
+                           var cols = lfWidget.Cols??new List<FormConfigWrapper.LFWidget>();
+                            foreach (var col in cols)
+                            {
+                                ParseWidgetListRecursively(col.WidgetList,confId,formDataId,result);
                             }
                         }
                     }
