@@ -129,6 +129,7 @@ using System.Linq;
             int elementSequenceFlowNum = sequenceFlowNum + 1;
 
             var backApprovalElementVo = BpmnElementUtils.GetSignUpElement(elementId, signUpSubElementVo, ElementPropertyEnum.ELEMENT_PROPERTY_SIGN_UP_SERIAL.Code);
+            backApprovalElementVo.CollectionName = fatherElementVo.CollectionName;
             backApprovalElementVo.ElementName = fatherElementVo.ElementName; // 设置元素名称（与签到元素相同）
             backApprovalElementVo.IsSignUpSubElement = 1; // 设置为签到子元素
             backApprovalElementVo.IsBackSignUp = 1; // 设置为回到签到
