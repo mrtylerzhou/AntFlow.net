@@ -84,7 +84,7 @@ public class LFMainField
     /// <summary>
     /// 从 Map 解析出字段列表
     /// </summary>
-    public static List<LFMainField> ParseFromMap(Dictionary<string, object> fieldMap, Dictionary<string, BpmnConfLfFormdataField> fieldConfigMap, long mainId)
+    public static List<LFMainField> ParseFromMap(Dictionary<string, object> fieldMap, Dictionary<string, BpmnConfLfFormdataField> fieldConfigMap, long mainId,string formCode)
     {
         if (fieldMap == null || fieldMap.Count == 0)
             throw new Exception("form data has no value");
@@ -102,6 +102,7 @@ public class LFMainField
 
             var value = fieldEntry.Value;
             var mainField = BuildMainField(value, mainId, 0, fieldConfig);
+            mainField.FormCode= formCode;
             mainFields.Add(mainField);
         }
 

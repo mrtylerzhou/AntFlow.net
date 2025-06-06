@@ -243,7 +243,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
             throw new AFBizException($"confId {confId}, formCode:{vo.FormCode} does not have a field config");
         }
 
-        var mainFields = LFMainField.ParseFromMap(lfFields, fieldConfMap, mainId);
+        var mainFields = LFMainField.ParseFromMap(lfFields, fieldConfMap, mainId,formCode);
         _lfMainFieldService.baseRepo.Insert(mainFields);
 
         vo.BusinessId = mainId.ToString();
@@ -253,7 +253,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
 
     public void OnConsentData(UDLFApplyVo vo)
     {
-        if (vo.OperationType != (int)ButtonTypeEnum.BUTTON_TYPE_RESUBMIT)
+        if (vo.OperationType != (int)ButtonTypeEnum.BUTTON_TYPE_RESUBMIT&&vo.OperationType!=(int)ButtonTypeEnum.BUTTON_TYPE_AGREE)
         {
             return ;
         }
@@ -281,6 +281,24 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
             throw new AFBizException($"lowcode form with formcode:{formCode}, confId:{confId} has no formdata");
         }
 
+        Dictionary<string,object> submitLfFields = vo.LfFields;
+        if (submitLfFields != null && submitLfFields.Any())
+        {
+            if (allFieldConfMap.TryGetValue(confId, out var fieldConfMap))
+            {
+                List<LFMainField> mainFields = LFMainField.ParseFromMap(submitLfFields, fieldConfMap, mainId, vo.FormCode);
+                if (mainFields != null && mainFields.Count > 0)
+                {
+                    // 根据fieldId过滤掉已存在表里的数据lfMainFields
+                    mainFields.RemoveAll(mainField=>lfMainFields.Any(a=>a.FieldId==mainField.FieldId));
+                    _lfMainFieldService.baseRepo.Insert(mainFields);
+                }
+            }
+            else
+            {
+                throw new AFBizException($"confId {confId} does not have a field config");
+            }
+        }
         foreach (var field in lfMainFields)
         {
             string fValue = lfFields[field.FieldId].ToString();
