@@ -161,8 +161,11 @@ public class TaskService
              deleteReason =StringConstants.TASK_FINISH_REASON;
             _executionListener.Notify(execution,IExecutionListener.EVENTNAME_END);
         }
+        TimeSpan taskDuration = nowTime-bpmAfTask.CreateTime;
+        int durationMinutes = taskDuration.Minutes;
         _afTaskInstService.Frsql
             .Update<BpmAfTaskInst>()
+            .Set(a=>a.Duration, durationMinutes)
             .Set(a => a.EndTime, nowTime)
             .Set(a => a.DeleteReason, deleteReason)
             .Where(a => a.Id == taskId)
@@ -194,13 +197,13 @@ public class TaskService
                 FormKey = bpmAfTask.FormKey,
             };
             tasks.Add(newTask);
-            BpmAfTaskInst bpmAfTaskInst = newTask.ToInst();
-            TimeSpan taskDuration = nowTime-bpmAfTask.CreateTime;
-            bpmAfTaskInst.Duration=taskDuration.Minutes;
-            bpmAfTaskInst.EndTime=nowTime;
-            historyTaskInsts.Add(bpmAfTaskInst);
         }
         _afTaskService.InsertTasks(tasks);
+        foreach (BpmAfTask afTask in tasks)
+        {
+            BpmAfTaskInst bpmAfTaskInst = afTask.ToInst();
+            historyTaskInsts.Add(bpmAfTaskInst);
+        }
         _afTaskInstService.baseRepo.Insert(historyTaskInsts);
     }
 }

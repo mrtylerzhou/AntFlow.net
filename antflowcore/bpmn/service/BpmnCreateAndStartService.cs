@@ -38,6 +38,5 @@ public class BpmnCreateAndStartService
             .Set(a => a.ProcInstId,startProcessInstance.ProcessInstanceId)
             .Where(a => a.Id == bpmBusinessProcess.Id)
             .ExecuteAffrows();
-        //toto processing process forward
     }
 }

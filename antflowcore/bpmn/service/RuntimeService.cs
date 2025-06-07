@@ -86,7 +86,6 @@ public class RuntimeService
                     FormKey = bpmnConfCommonVo.FormCode,
                };
                tasks.Add(bpmAfTask);
-               historyTaskInsts.Add(bpmAfTask.ToInst());
                if (signType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode())
                {
                     break;
@@ -94,6 +93,10 @@ public class RuntimeService
           }
          
           _taskService.InsertTasks(tasks);
+          foreach (BpmAfTask bpmAfTask in tasks)
+          {
+               historyTaskInsts.Add(bpmAfTask.ToInst());
+          }
           _taskInstService.baseRepo.Insert(historyTaskInsts);
           ExecutionEntity executionEntity = new ExecutionEntity()
           {

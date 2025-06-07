@@ -61,7 +61,7 @@ public class UserEntrustService :AFBaseCurdRepositoryService<UserEntrust>
 
                 userEntrust.PowerId = idsVo.PowerId;
                 userEntrust.CreateUser = SecurityUtils.GetLogInEmpNameSafe();
-                this.baseRepo.Update(userEntrust);
+                this.baseRepo.Insert(userEntrust);
                 
             }
         }

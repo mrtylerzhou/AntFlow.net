@@ -28,6 +28,19 @@ public class BpmBusinessProcessService: AFBaseCurdRepositoryService<BpmBusinessP
         return bpmBusinessProcesses[0];
     }
 
+    public BpmBusinessProcess GetBpmBusinessProcessByProcInstId(string procinstId)
+    {
+        List<BpmBusinessProcess> processes = this.baseRepo.Where(a => a.ProcInstId==procinstId).ToList();
+        if (processes.Count > 1)
+        {
+            throw new AFBizException($"根据流程实例ID:{procinstId}查询到多个BPM业务流程");
+        }
+        else if (processes.Count < 1)
+        {
+            throw new AFBizException($"根据流程实例ID:{procinstId}未查询到BPM业务流程");
+        }
+        return processes[0];
+    }
     public void Update(BpmBusinessProcess bpmBusinessProcess)
     {
         
