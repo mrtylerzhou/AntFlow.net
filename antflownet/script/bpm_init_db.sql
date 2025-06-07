@@ -981,6 +981,8 @@ CREATE TABLE IF NOT EXISTS  bpm_process_app_application
     condition_url    varchar(500)                       null comment 'URL for accessing conditions or rules related to the application',
     parent_id        int                                null comment 'Parent application ID (if this is a child application)',
     application_url  varchar(500)                       null comment 'Main URL of the application',
+    user_request_uri varchar(500)                       null comment 'get  user info',
+    role_request_uri varchar(500)                       null comment 'get Role info',
     route            varchar(500)                       null comment 'Application route or path',
     process_key      varchar(50)                       null comment 'Process key or identifier',
     create_time      timestamp  not null default CURRENT_TIMESTAMP  comment 'Creation timestamp',
