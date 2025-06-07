@@ -44,6 +44,8 @@ public static class ServiceRegistration
         services.AddSingleton<BpmnNodePersonnelEmplConfService>();
         services.AddSingleton<IBpmnEmployeeInfoProviderService, BpmnEmployeeInfoProviderService>();
         services.AddSingleton<UserService>();
+        services.AddSingleton<RoleService>();
+        services.AddSingleton<DepartmentService>();
         services.AddSingleton<BpmnConfLfFormdataService>();
         services.AddSingleton<BpmnConfLfFormdataFieldService>();
         services.AddSingleton<IAntFlowOrderPreProcessor<BpmnConfVo>,LFFormDataPreProcessor>();
