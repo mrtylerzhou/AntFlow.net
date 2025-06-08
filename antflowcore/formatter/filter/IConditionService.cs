@@ -5,5 +5,5 @@ namespace antflowcore.service.processor.filter;
 
 public interface IConditionService
 {
-    bool CheckMatchCondition(String nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo);
+    bool CheckMatchCondition(BpmnNodeVo nodeVo, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo,bool isDynamicConditionGateway);
 }

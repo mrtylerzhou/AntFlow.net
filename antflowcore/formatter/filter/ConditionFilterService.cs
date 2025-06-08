@@ -42,6 +42,13 @@ public class ConditionFilterService
         bpmnConfVo.Nodes = filterNodes;
     }
 
+    /// <summary>
+    /// reviewed
+    /// </summary>
+    /// <param name="startNode"></param>
+    /// <param name="nodeIdMapNode"></param>
+    /// <param name="bpmnStartConditionsVo"></param>
+    /// <returns></returns>
     private List<BpmnNodeVo> FilterNode(BpmnNodeVo startNode, Dictionary<String, BpmnNodeVo> nodeIdMapNode,
         BpmnStartConditionsVo bpmnStartConditionsVo)
     {
@@ -52,7 +59,10 @@ public class ConditionFilterService
         String nextId = parameters.NodeTo;
         do
         {
-            if ((int)NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY == (startNode.NodeType))
+            if ((int)NodeTypeEnum.NODE_TYPE_GATEWAY==startNode.NodeType&&startNode.IsParallel.HasValue&&startNode.IsParallel.Value){
+                ParallelTreate(startNode,nodeIdMapNode,nodeList,bpmnStartConditionsVo);
+            }
+            if ((int)NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY == startNode.NodeType)
             {
                 BpmnNodeVo aggregationNode = BpmnUtils.GetAggregationNode(startNode, nodeIdMapNode.Values);
                 TreatParallelGatewayRecursively(startNode, aggregationNode, nodeIdMapNode, nodeList,
@@ -65,10 +75,7 @@ public class ConditionFilterService
                 nextId = startNode.Params.NodeTo;
             }
 
-            if (!string.IsNullOrEmpty(nextId))
-            {
-                startNode = nodeIdMapNode[nextId];
-            }
+            startNode = nodeIdMapNode[nextId];
         } while (!String.IsNullOrEmpty(nextId));
 
         List<BpmnNodeVo> list = DeleteConditionNode(nodeList);
@@ -77,6 +84,15 @@ public class ConditionFilterService
         return list;
     }
 
+    /// <summary>
+    /// reviewed
+    /// </summary>
+    /// <param name="outerMostParallelGatewayNode"></param>
+    /// <param name="itsAggregationNode"></param>
+    /// <param name="nodeIdMapNode"></param>
+    /// <param name="nodeList"></param>
+    /// <param name="bpmnStartConditionsVo"></param>
+    /// <exception cref="AFBizException"></exception>
     public void TreatParallelGatewayRecursively(
         BpmnNodeVo outerMostParallelGatewayNode,
         BpmnNodeVo itsAggregationNode,
@@ -105,14 +121,16 @@ public class ConditionFilterService
                  nodeVo != null && nodeVo.NodeId != aggregationNodeNodeId;
                  nodeVo = nodeIdMapNode.TryGetValue(nodeVo.Params.NodeTo, out var nextNode) ? nextNode : null)
             {
-                if ((int)NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY==currentNodeVo.NodeType)
+                if ((int)NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY==nodeVo.NodeType)
                 {
-                    var aggregationNode = BpmnUtils.GetAggregationNode(currentNodeVo, nodeIdMapNode.Values);
-                    TreatParallelGatewayRecursively(currentNodeVo, aggregationNode, nodeIdMapNode, nodeList,
+                    BpmnNodeVo aggregationNode = BpmnUtils.GetAggregationNode(nodeVo, nodeIdMapNode.Values);
+                    TreatParallelGatewayRecursively(nodeVo, aggregationNode, nodeIdMapNode, nodeList,
                         bpmnStartConditionsVo);
                 }
-
-                RecursionTreate(nodeVo, nodeIdMapNode, nodeList, bpmnStartConditionsVo);
+                else
+                {
+                    RecursionTreate(nodeVo, nodeIdMapNode, nodeList, bpmnStartConditionsVo);
+                }
             }
         }
     }
@@ -177,6 +195,11 @@ public class ConditionFilterService
         }
         //recursionTreate(nextNode, nodeIdMapNode, filterNodeList, bpmnStartConditionsVo);
     }
+    /// <summary>
+    /// reviewed
+    /// </summary>
+    /// <param name="nodeList"></param>
+    /// <returns></returns>
     public List<BpmnNodeVo> DeleteConditionNode(List<BpmnNodeVo> nodeList)
     {
         var notConditionNodeMap = new Dictionary<string, BpmnNodeVo>();
@@ -194,7 +217,7 @@ public class ConditionFilterService
             }
         }
 
-        var resultList = new List<BpmnNodeVo>();
+        List<BpmnNodeVo> resultList = new List<BpmnNodeVo>();
 
         foreach (var entry in notConditionNodeMap)
         {
@@ -210,14 +233,17 @@ public class ConditionFilterService
             // Next node is a condition node or assignee node
             if (!notConditionNodeMap.ContainsKey(nextNodeId))
             {
-                var resultNodeId = FindNext(nextNodeId, new List<string>(), notConditionNodeMap, conditionNodeMap);
-
-                if (!string.IsNullOrWhiteSpace(resultNodeId))
+                string resultNodeId = FindNext(nextNodeId, new List<string>(), notConditionNodeMap, conditionNodeMap);
+                if(!string.IsNullOrEmpty(resultNodeId))
                 {
-                    var resultNode = notConditionNodeMap[resultNodeId];
-                    resultNode.NodeFrom = currentNode.NodeId;
+                    BpmnNodeVo bpmnNodeVo = notConditionNodeMap[resultNodeId];
+                    if (!string.IsNullOrEmpty(bpmnNodeVo.NodeFrom)&&notConditionNodeMap.ContainsKey(bpmnNodeVo.NodeFrom)&&
+                        notConditionNodeMap[bpmnNodeVo.NodeFrom].NodeType!=(int)NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY)
+                    {
+                        bpmnNodeVo.NodeFrom = currentNode.NodeId;
+                    }
                 }
-
+                currentNode.NodeTo = new List<string>(){resultNodeId};
                 currentNode.Params.NodeTo = resultNodeId;
             }
 
@@ -278,9 +304,9 @@ public class ConditionFilterService
 
             // Check whether the node meets the given condition
             bool matchCondition = _conditionService.CheckMatchCondition(
-                bpmnNodeVo.NodeId,
+                bpmnNodeVo,
                 bpmnNodeVo.Property.ConditionsConf,
-                bpmnStartConditionsVo);
+                bpmnStartConditionsVo,false);
 
             if (!matchCondition)
             {
@@ -341,4 +367,86 @@ public class ConditionFilterService
 
         return startNode;
     }
+    private void ParallelTreate(BpmnNodeVo node, Dictionary<String, BpmnNodeVo> nodeIdMapNode,
+        List<BpmnNodeVo> filterNodeList, BpmnStartConditionsVo bpmnStartConditionsVo){
+
+
+        List<BpmnNodeVo> beforeFilterNodeList = new List<BpmnNodeVo>();
+        node.NodeTo.ForEach(o => beforeFilterNodeList.Add(nodeIdMapNode[o]));
+        if (beforeFilterNodeList.Count != node.NodeTo.Count) {
+            _logger.LogInformation($"wrong number of conditions node,nodeId:{node.NodeId}");
+            throw new AFBizException("999", "wrong number of conditions node,nodeId");
+        }
+        //determine next node by condition
+        List<BpmnNodeVo> afterFilterNodes = FilterParallelCondition(beforeFilterNodeList, bpmnStartConditionsVo);
+        if (afterFilterNodes==null||afterFilterNodes.Count==0) {
+            throw new AFBizException("999", "had no branch that meet the given condition,please contat the Administrator！");
+        }
+        List<String>nodetos=new List<string>();
+        foreach (BpmnNodeVo afterFilterNode in afterFilterNodes) {
+            List<String> nodeTo = afterFilterNode.NodeTo;
+            if(nodeTo.Count>0){
+                nodetos.Add(nodeTo[0]);
+            }
+        }
+        node.NodeTo=nodetos;
+        node.NodeType=(int)NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY;
+    }
+
+    private List<BpmnNodeVo> FilterParallelCondition(List<BpmnNodeVo> beforeFilterNodeList, BpmnStartConditionsVo bpmnStartConditionsVo)
+    {
+        if (beforeFilterNodeList == null || beforeFilterNodeList.Count == 0)
+        {
+            _logger.LogInformation("condition nodes are empty");
+            return null;
+        }
+
+        // 获取非默认的条件节点，且 Sort 不为空的节点，并按 Sort 排序
+        List<BpmnNodeVo> filterNodeList = beforeFilterNodeList
+            .Where(o => o.Property?.ConditionsConf?.IsDefault == 0 && o.Property.ConditionsConf.Sort != null)
+            .OrderBy(o => o.Property.ConditionsConf.Sort)
+            .ToList();
+
+        List<BpmnNodeVo> filteredNodes = new List<BpmnNodeVo>();
+
+        foreach (BpmnNodeVo bpmnNodeVo in filterNodeList)
+        {
+            if (bpmnNodeVo.NodeType != (int)NodeTypeEnum.NODE_TYPE_CONDITIONS)
+            {
+                _logger.LogInformation("gateway's next node, but not a condition node, continue, nodeId: {NodeId}, nodeType: {NodeType}",
+                    bpmnNodeVo.NodeId, bpmnNodeVo.NodeType);
+                continue;
+            }
+
+            bool matchCondition = _conditionService.CheckMatchCondition(
+                bpmnNodeVo,
+                bpmnNodeVo.Property?.ConditionsConf,
+                bpmnStartConditionsVo,
+                false);
+
+            if (!matchCondition)
+                continue;
+
+            filteredNodes.Add(bpmnNodeVo);
+        }
+
+        if (filteredNodes.Count > 0)
+        {
+            return filteredNodes;
+        }
+
+        // 没有满足条件的，则找默认分支
+        var defaultConditionNodes = beforeFilterNodeList
+            .Where(o => o.Property?.ConditionsConf?.IsDefault == 1)
+            .ToList();
+
+        if (defaultConditionNodes.Count > 0)
+        {
+            return defaultConditionNodes;
+        }
+
+        // 所有条件都不匹配，也没有默认分支，返回 null
+        return null;
+    }
+
 }

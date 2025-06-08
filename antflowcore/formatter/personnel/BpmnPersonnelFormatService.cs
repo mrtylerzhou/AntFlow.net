@@ -131,9 +131,9 @@ public class BpmnPersonnelFormatService: IBpmnPersonnelFormat
             BpmnNodeVo currentNodeVo = mapNodes[nodeTo];
             //treat all nodes between parallel gateway and its aggregation node(not include the latter)
             for (BpmnNodeVo nodeVo = currentNodeVo; nodeVo!=null&&!nodeVo.NodeId.Equals(aggregationNodeNodeId); nodeVo = mapNodes[nodeVo.Params.NodeTo]) {
-                if (NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY==(NodeTypeEnum)currentNodeVo.NodeType) {
-                    BpmnNodeVo aggregationNode = BpmnUtils.GetAggregationNode(currentNodeVo, mapNodes.Values);
-                    TreatParallelGateWayRecursively(currentNodeVo, aggregationNode, mapNodes,setAddNodes, bpmnStartConditions);
+                if (NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY==(NodeTypeEnum)nodeVo.NodeType) {
+                    BpmnNodeVo aggregationNode = BpmnUtils.GetAggregationNode(nodeVo, mapNodes.Values);
+                    TreatParallelGateWayRecursively(nodeVo, aggregationNode, mapNodes,setAddNodes, bpmnStartConditions);
                 }
                 String nextId = nodeVo.Params.NodeTo;
                 ProcessAssigneeNode(nodeVo,mapNodes,setAddNodes,nextId,bpmnStartConditions);

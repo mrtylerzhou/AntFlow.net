@@ -16,9 +16,10 @@ public class ConditionService : IConditionService
     {
         _logger = logger;
     }
-    public bool CheckMatchCondition(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf,
-        BpmnStartConditionsVo bpmnStartConditionsVo)
+    public bool CheckMatchCondition(BpmnNodeVo bpmnNodeVo, BpmnNodeConditionsConfBaseVo conditionsConf,
+        BpmnStartConditionsVo bpmnStartConditionsVo,bool isDynamicConditionGateway)
     {
+        String nodeId=bpmnNodeVo.NodeId;
         List<int> conditionParamTypeList = conditionsConf.ConditionParamTypes;
         if (ObjectUtils.IsEmpty(conditionParamTypeList)) {
             return false;

@@ -350,16 +350,29 @@ public class BpmnConfBizService
         List<BpmnNode> bpmnNodes = _bpmnNodeService.baseRepo.Where(a=>a.ConfId.Equals(bpmnConf.Id)&&a.IsDel==0).ToList();
         bool isOutSideProcess=bpmnConf.IsOutSideProcess!=null&&bpmnConf.IsOutSideProcess==1;
         bool isLowCodeFlow=bpmnConf.IsLowCodeFlow!=null&&bpmnConf.IsLowCodeFlow==1;
-        if(isOutSideProcess||isLowCodeFlow){
+        if(isOutSideProcess||isLowCodeFlow||bpmnConfVo.ExtraFlags!=null){
             foreach (BpmnNode bpmnNode in bpmnNodes) {
                 bpmnNode.IsOutSideProcess=bpmnConf.IsOutSideProcess;
                 bpmnNode.IsLowCodeFlow=bpmnConf.IsLowCodeFlow;
+                bpmnNode.ExtraFlags=bpmnConf.ExtraFlags;
             }
         }
         bpmnConfVo.Nodes=GetBpmnNodeVoList(bpmnNodes, conditionsUrl);
         if (!ObjectUtils.IsEmpty(bpmnConfVo.Nodes))
         {
-            bpmnConfVo.Nodes.ForEach(node => node.FormCode = bpmnConfVo.FormCode);
+            foreach (BpmnNodeVo node in bpmnConfVo.Nodes)
+            {
+                node.FormCode=bpmnConfVo.FormCode;
+                if((int)NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY==node.NodeType){
+                    BpmnNodeVo aggregationNode = BpmnUtils.GetAggregationNode(node, bpmnConfVo.Nodes);
+                    if(aggregationNode==null){
+                        throw new AFBizException("can not find parallel gateway's aggregation node!");
+                    }
+                    aggregationNode.AggregationNode=true;
+                    aggregationNode.DeduplicationExclude=true;
+                }
+            }
+           
         }
         //set viewpage buttons
         SetViewPageButton(bpmnConfVo);

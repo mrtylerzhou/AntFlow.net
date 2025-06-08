@@ -8,6 +8,11 @@ namespace antflowcore.service.processor.filter;
 
 public abstract class AbstractBpmnRemoveFormat : IBpmnRemoveFormat
     {
+        /// <summary>
+        /// reviewed
+        /// </summary>
+        /// <param name="bpmnConfVo"></param>
+        /// <param name="bpmnStartConditions"></param>
         public void RemoveBpmnConf(BpmnConfVo bpmnConfVo, BpmnStartConditionsVo bpmnStartConditions)
         {
             string startNodeId = null;
@@ -51,6 +56,14 @@ public abstract class AbstractBpmnRemoveFormat : IBpmnRemoveFormat
             }
         }
 
+        /// <summary>
+        /// reviewed
+        /// </summary>
+        /// <param name="outerMostParallelGatewayNode"></param>
+        /// <param name="itsAggregationNode"></param>
+        /// <param name="mapNodes"></param>
+        /// <param name="bpmnStartConditions"></param>
+        /// <exception cref="AFBizException"></exception>
         private void TreatParallelGatewayRecursively(BpmnNodeVo outerMostParallelGatewayNode, BpmnNodeVo itsAggregationNode, Dictionary<string, BpmnNodeVo> mapNodes, BpmnStartConditionsVo bpmnStartConditions)
         {
             if (itsAggregationNode == null)
@@ -59,22 +72,26 @@ public abstract class AbstractBpmnRemoveFormat : IBpmnRemoveFormat
             var aggregationNodeNodeId = itsAggregationNode.NodeId;
             foreach (var nodeTo in outerMostParallelGatewayNode.NodeTo)
             {
-                var currentNodeVo = mapNodes[nodeTo];
+                BpmnNodeVo currentNodeVo = mapNodes[nodeTo];
+                BpmnNodeVo prevNode=mapNodes[currentNodeVo.NodeId];
                 // Treat all nodes between parallel gateway and its aggregation node (not include the latter)
                 for (var nodeVo = currentNodeVo; nodeVo.NodeId != aggregationNodeNodeId; nodeVo = mapNodes[nodeVo.Params.NodeTo])
                 {
                     if (nodeVo.NodeType == (int)NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY)
                     {
-                        var aggregationNode = BpmnUtils.GetAggregationNode(nodeVo, mapNodes.Values);
+                        BpmnNodeVo aggregationNode = BpmnUtils.GetAggregationNode(nodeVo, mapNodes.Values);
                         TreatParallelGatewayRecursively(nodeVo, aggregationNode, mapNodes, bpmnStartConditions);
                     }
-
+                    if ((int)NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY==nodeVo.NodeType) {
+                        continue;
+                    }
                     var funcs = TrueFuncs(nodeVo, bpmnStartConditions);
                     foreach (var func in funcs)
                     {
                         if (func())
                             currentNodeVo.Params.NodeTo = nodeVo.Params.NodeTo;
                     }
+                    prevNode=nodeVo;
                 }
             }
         }

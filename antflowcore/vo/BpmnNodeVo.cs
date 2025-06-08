@@ -15,7 +15,12 @@ namespace antflowcore.vo;
 
         [JsonPropertyName("nodeType")]
         public int NodeType { get; set; }
-
+        [JsonPropertyName("isParallel")]
+        public bool? IsParallel { get; set; }
+        [JsonPropertyName("isDynamicCondition")]
+        public bool? IsDynamicCondition { get; set; }
+        [JsonPropertyName("aggregationNode")]
+        public bool? AggregationNode { get; set; }
         [JsonPropertyName("nodeProperty")]
         public int? NodeProperty { get; set; }
 

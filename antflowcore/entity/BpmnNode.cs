@@ -140,5 +140,7 @@ namespace AntFlowCore.Entity
         /// </summary>
         [Column(IsIgnore = true)]
         public int? IsLowCodeFlow { get; set; }
+        [Column(IsIgnore = true)]
+        public int? ExtraFlags { get; set; }
     }
 }
