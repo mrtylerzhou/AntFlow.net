@@ -53,7 +53,7 @@ public class BpmnConfService
         var expression = LinqExtensions.True<BpmnConf, OutSideBpmBusinessParty, DictData>(); 
         expression = expression.And((a, b, c) => a.IsDel == 0);
         expression = expression.WhereIf(vo.EffectiveStatus > 0, (a, b, c) => a.EffectiveStatus == vo.EffectiveStatus);
-        expression = expression.WhereIf(vo.IsOutSideProcess.HasValue ,(a, b, c) => (!a.IsOutSideProcess.HasValue || a.IsOutSideProcess == vo.IsOutSideProcess));
+        expression = expression.WhereIf(vo.IsOutSideProcess.HasValue ,(a, b, c) =>  a.IsOutSideProcess == vo.IsOutSideProcess);
         expression = expression.WhereIf(vo.IsLowCodeFlow.HasValue, (a, b, c) => a.IsLowCodeFlow == vo.IsLowCodeFlow);
         expression = expression.WhereIf(!string.IsNullOrEmpty(vo.Search), (a, b, c) 
             => a.BpmnName.Contains(vo.Search) || a.FormCode.Contains(vo.Search) || a.BpmnCode.Contains(vo.Search));

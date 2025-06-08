@@ -191,7 +191,7 @@ public class BpmnConfBizService
     public ResultAndPage<BpmnConfVo> SelectPage(PageDto pageDto, BpmnConfVo vo)
     {
         Page<BpmnConfVo> page = PageUtils.GetPageByPageDto<BpmnConfVo>(pageDto);
-        var bpmnConfVos = _bpmnConfService.SelectPageList(page,vo);
+        List<BpmnConfVo> bpmnConfVos = _bpmnConfService.SelectPageList(page,vo);
 
         if (bpmnConfVos == null || !bpmnConfVos.Any())
         {
