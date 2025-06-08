@@ -75,7 +75,10 @@ public class ConditionFilterService
                 nextId = startNode.Params.NodeTo;
             }
 
-            startNode = nodeIdMapNode[nextId];
+            if (!string.IsNullOrEmpty(nextId))
+            {
+                startNode = nodeIdMapNode[nextId];
+            }
         } while (!String.IsNullOrEmpty(nextId));
 
         List<BpmnNodeVo> list = DeleteConditionNode(nodeList);
