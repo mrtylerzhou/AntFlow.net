@@ -53,7 +53,7 @@ public class FormFactory
 
         public BusinessDataVo DataFormConversion(string parameters, string formCode)
         {
-            var vo = JsonSerializer.Deserialize<BusinessDataVo>(parameters);
+            BusinessDataVo vo = JsonSerializer.Deserialize<BusinessDataVo>(parameters);
 
             if (string.IsNullOrEmpty(formCode))
             {
@@ -69,8 +69,7 @@ public class FormFactory
                 {
                     vo.FormData = bpmAccessBusinesses.First().FormDataPc;
                 }
-
-                return vo;
+                
             }
 
             if (vo.IsLowCodeFlow == 1)

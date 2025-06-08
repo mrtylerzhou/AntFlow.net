@@ -4,6 +4,7 @@ using antflowcore.entity;
 using AntFlowCore.Entity;
 using AntFlowCore.Enums;
 using antflowcore.exception;
+using antflowcore.factory;
 using antflowcore.service.repository;
 using antflowcore.vo;
 using AntFlowCore.Vo;
@@ -22,6 +23,7 @@ public class OutSideAccessSubmitProcessService : IProcessOperationAdaptor
 
     private readonly OutSideBpmAccessBusinessService _outSideBpmAccessBusinessService;
     private readonly OutSideBpmConditionsTemplateService _outSideBpmConditionsTemplateService;
+    private readonly FormFactory _formFactory;
     private readonly ILogger<OutSideAccessSubmitProcessService> _logger;
 
     public OutSideAccessSubmitProcessService(
@@ -30,6 +32,7 @@ public class OutSideAccessSubmitProcessService : IProcessOperationAdaptor
         UserService employeeService,
         OutSideBpmAccessBusinessService outSideBpmAccessBusinessService,
         OutSideBpmConditionsTemplateService outSideBpmConditionsTemplateService,
+        FormFactory formFactory,
         ILogger<OutSideAccessSubmitProcessService> logger)
     {
         _bpmnConfCommonService = bpmnConfCommonService;
@@ -37,6 +40,7 @@ public class OutSideAccessSubmitProcessService : IProcessOperationAdaptor
         _employeeService = employeeService;
         _outSideBpmAccessBusinessService = outSideBpmAccessBusinessService;
         _outSideBpmConditionsTemplateService = outSideBpmConditionsTemplateService;
+        _formFactory = formFactory;
         _logger = logger;
     }
 
@@ -50,10 +54,16 @@ public class OutSideAccessSubmitProcessService : IProcessOperationAdaptor
         {
             throw new AFBizException("流程已发起！");
         }
-
+        String originalBusinessId=businessDataVo.BusinessId;
+        if (businessDataVo.IsLowCodeFlow.HasValue && businessDataVo.IsLowCodeFlow == 1)
+        {
+            IFormOperationAdaptor<BusinessDataVo> formOperationAdaptor = _formFactory.GetFormAdaptor(businessDataVo);
+            formOperationAdaptor.OnSubmitData(businessDataVo);
+        }
+       
         // Query outside access business info
         OutSideBpmAccessBusiness outSideBpmAccessBusiness = _outSideBpmAccessBusinessService.baseRepo
-            .Where(a => a.Id == Convert.ToInt64(businessDataVo.BusinessId)).First();
+            .Where(a => a.Id == Convert.ToInt64(originalBusinessId)).First();
 
         // New start conditions vo
         var bpmnStartConditionsVo = new BpmnStartConditionsVo();
@@ -120,7 +130,7 @@ public class OutSideAccessSubmitProcessService : IProcessOperationAdaptor
         // Fill info
         _outSideBpmAccessBusinessService.UpdateById(new OutSideBpmAccessBusiness
         {
-            Id = long.Parse(businessDataVo.BusinessId),
+            Id = long.Parse(originalBusinessId),
             ProcessNumber = processNum,
             BpmnConfId = businessDataVo.BpmnConfVo?.Id ?? 0
         });

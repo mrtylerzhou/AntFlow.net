@@ -73,7 +73,7 @@ public class OutSideBpmAccessBusinessService : AFBaseCurdRepositoryService<OutSi
         }
 
         // 组装业务数据对象
-        BusinessDataVo businessDataVo = vo.IsLowCodeFlow == true ? new UDLFApplyVo() : new BusinessDataVo();
+        BusinessDataVo businessDataVo = vo.IsLowCodeFlow ? new UDLFApplyVo() : new BusinessDataVo();
 
         if (businessDataVo is UDLFApplyVo udlf)
         {
