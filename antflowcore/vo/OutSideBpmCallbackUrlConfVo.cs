@@ -18,7 +18,8 @@ namespace AntFlowCore.Vo
         /// </summary>
         [JsonPropertyName("businessPartyId")]
         public long? BusinessPartyId { get; set; }
-
+        [JsonPropertyName("applicationId")]
+        public long? ApplicationId { get; set; }
         /// <summary>
         /// conf id
         /// </summary>

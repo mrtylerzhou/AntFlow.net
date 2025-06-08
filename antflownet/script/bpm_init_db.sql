@@ -1105,6 +1105,7 @@ CREATE TABLE IF NOT EXISTS  t_out_side_bpm_callback_url_conf
     id                    bigint auto_increment comment 'auto increment id'
     primary key,
     business_party_id     bigint       null comment 'business party id',
+    application_id        bigint       null comment 'business partys application id',
     bpmn_conf_id          bigint       null comment 'bpmn confi id',
     form_code         varchar(64) null comment 'formcode',
     bpm_conf_callback_url varchar(500) null comment 'conf callback url',

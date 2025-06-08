@@ -22,6 +22,8 @@ namespace AntFlowCore.Entity
         [Column(Name = "business_party_id")]
         public long BusinessPartyId { get; set; }
 
+        [Column(Name = "application_id")]
+        public long? ApplicationId{ get; set;}
         /// <summary>
         /// BPMN configuration ID.
         /// </summary>

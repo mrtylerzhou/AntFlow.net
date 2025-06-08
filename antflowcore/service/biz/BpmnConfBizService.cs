@@ -93,6 +93,7 @@ public class BpmnConfBizService
         bpmnConf.CreateTime=DateTime.Now;
         bpmnConf.UpdateUser=SecurityUtils.GetLogInEmpNameSafe();
         bpmnConf.UpdateTime=DateTime.Now;
+        bpmnConf.Remark=bpmnConfVo.Remark??"";
         _bpmnConfService.baseRepo.Insert(bpmnConf);
         //notice template
         _bpmnConfNoticeTemplateService.Insert(bpmnCode);

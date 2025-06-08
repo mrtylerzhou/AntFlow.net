@@ -118,7 +118,7 @@ public class OutSideBpmCallbackUrlConfService : AFBaseCurdRepositoryService<OutS
         if (vo.Id is null or 0)
         {
             var count = this.baseRepo
-                .Where(x => x.BusinessPartyId == vo.BusinessPartyId)
+                .Where(x => x.BusinessPartyId == vo.BusinessPartyId&&x.ApplicationId == vo.ApplicationId)
                 .Count();
 
             if (count > 0)
