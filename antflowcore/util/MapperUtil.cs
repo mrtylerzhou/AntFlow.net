@@ -683,7 +683,7 @@ public static class MapperUtil
         {
             BusinessPartyMark = vo.BusinessPartyMark,
             Name = vo.Name,
-            Type = vo.Type??0,
+            Type = vo.Type??2,
             Remark = vo.Remark,
             IsDel = vo.IsDel,
             CreateUser = vo.CreateUser,
