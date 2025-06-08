@@ -1,4 +1,6 @@
-﻿namespace antflowcore.vo;
+﻿using antflowcore.conf.json;
+
+namespace antflowcore.vo;
 
 using System;
 using System.Collections.Generic;
@@ -16,7 +18,7 @@ public class OutSideBpmApproveTemplateVo
     [JsonPropertyName("businessPartyId")]
     public long? BusinessPartyId { get; set; }
 
-    [JsonPropertyName("applicationId")]
+    [JsonPropertyName("applicationId"),JsonConverter(typeof(StringToIntConverter))]
     public int? ApplicationId { get; set; }
 
     [JsonPropertyName("approveTypeId")]
