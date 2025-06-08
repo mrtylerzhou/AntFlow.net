@@ -48,7 +48,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// Time when this record was created.
         /// </summary>
-        [Column(Name = "create_time",IsIgnore = true)]
+        [Column(Name = "create_time")]
         public DateTime? CreateTime { get; set; }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// Time when this record was last updated.
         /// </summary>
-        [Column(Name = "update_time",IsIgnore = true)]
+        [Column(Name = "update_time")]
         public DateTime? UpdateTime { get; set; }
     }
 }

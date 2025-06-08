@@ -24,19 +24,19 @@ public class AdminPersonnelTypeEnum
     }
 
     public static readonly AdminPersonnelTypeEnum ADMIN_PERSONNEL_TYPE_PROCESS = new AdminPersonnelTypeEnum(
-        1, "流程管理员", "processAdminsStr", "processAdmins", "processAdminIds", "YWFLCGL"
+        1, "流程管理员", "ProcessAdminsStr", "ProcessAdmins", "ProcessAdminIds", "YWFLCGL"
     );
 
     public static readonly AdminPersonnelTypeEnum ADMIN_PERSONNEL_TYPE_APPLICATION = new AdminPersonnelTypeEnum(
-        2, "应用管理员", "applicationAdminsStr", "applicationAdmins", "applicationAdminIds", "YWFYYGL"
+        2, "应用管理员", "ApplicationAdminsStr", "ApplicationAdminsStr", "ApplicationAdminIds", "YWFYYGL"
     );
 
     public static readonly AdminPersonnelTypeEnum ADMIN_PERSONNEL_TYPE_INTERFACE = new AdminPersonnelTypeEnum(
-        3, "接口管理员", "interfaceAdminsStr", "interfaceAdmins", "interfaceAdminIds", "YWFJKGL"
+        3, "接口管理员", "InterfaceAdminsStr", "InterfaceAdmins", "InterfaceAdminIds", "YWFJKGL"
     );
 
     public static readonly AdminPersonnelTypeEnum ADMIN_PERSONNEL_TYPE_TEMPLATE = new AdminPersonnelTypeEnum(
-        4, "条件模板管理员", "templateAdminsStr", "templateAdmins", "templateAdminIds", "YWFMBGL"
+        4, "条件模板管理员", "TemplateAdminsStr", "TemplateAdminsStr", "TemplateAdminIds", "YWFMBGL"
     );
 
     private static readonly List<AdminPersonnelTypeEnum> _values = new List<AdminPersonnelTypeEnum>

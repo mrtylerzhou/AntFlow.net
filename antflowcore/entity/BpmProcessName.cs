@@ -31,7 +31,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// Creation Time
         /// </summary>
-        [Column(Name = "create_time",IsIgnore = true)]
+        [Column(Name = "create_time")]
         public DateTime? CreateTime { get; set; }
     }
 }

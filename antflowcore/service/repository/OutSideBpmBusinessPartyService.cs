@@ -215,7 +215,7 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
         if (id != null && id > 0)
         {
             // 删除旧的管理员信息
-            this.baseRepo.Delete(new OutSideBpmBusinessParty() { Id = id });
+            _outSideBpmAdminPersonnelService.baseRepo.Delete(a => a.BusinessPartyId == id);
 
             // 添加管理员
             foreach (AdminPersonnelTypeEnum typeEnum in AdminPersonnelTypeEnum.Values())

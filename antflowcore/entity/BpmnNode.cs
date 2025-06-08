@@ -108,7 +108,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// Gets or sets the time the node was created.
         /// </summary>
-        [Column(Name = "create_time",IsIgnore = true)]
+        [Column(Name = "create_time")]
         public DateTime? CreateTime { get; set; }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// Gets or sets the time the node was last updated.
         /// </summary>
-        [Column(Name = "update_time",IsIgnore = true)]
+        [Column(Name = "update_time")]
         public DateTime? UpdateTime { get; set; }
 
         /// <summary>

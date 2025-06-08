@@ -70,13 +70,13 @@ namespace AntFlowCore.Entities
         /// <summary>
         /// 创建时间
         /// </summary>
-        [Column(Name = "create_time",IsIgnore = true)]
+        [Column(Name = "create_time")]
         public DateTime? CreateTime { get; set; }
 
         /// <summary>
         /// 更新时间
         /// </summary>
-        [Column(Name = "update_time",IsIgnore = true)]
+        [Column(Name = "update_time")]
         public DateTime? UpdateTime { get; set; }
 
         /// <summary>
