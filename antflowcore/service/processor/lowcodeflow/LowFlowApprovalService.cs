@@ -284,24 +284,35 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         Dictionary<string,object> submitLfFields = vo.LfFields;
         if (submitLfFields != null && submitLfFields.Any())
         {
-            if (allFieldConfMap.TryGetValue(confId, out var fieldConfMap))
+            if (!allFieldConfMap.TryGetValue(confId, out var lfFormdataFieldMap))
+            {
+                if (lfFormdataFieldMap == null || lfFormdataFieldMap.Count == 0)
+                {
+                    Dictionary<string,BpmnConfLfFormdataField> name2SelfMap = _lfformdataFieldService.QryFormDataFieldMap(confId);
+                    allFieldConfMap.Add(confId,name2SelfMap);
+                }
+            }
+            if (allFieldConfMap.TryGetValue(confId,out var fieldConfMap))
             {
                 List<LFMainField> mainFields = LFMainField.ParseFromMap(submitLfFields, fieldConfMap, mainId, vo.FormCode);
                 if (mainFields != null && mainFields.Count > 0)
                 {
                     // 根据fieldId过滤掉已存在表里的数据lfMainFields
                     mainFields.RemoveAll(mainField=>lfMainFields.Any(a=>a.FieldId==mainField.FieldId));
-                    _lfMainFieldService.baseRepo.Insert(mainFields);
+                    if(mainFields.Any())
+                    {
+                        _lfMainFieldService.baseRepo.Insert(mainFields);
+                    }
                 }
             }
             else
             {
-                throw new AFBizException($"confId {confId} does not have a field config");
+                throw new AFBizException($"confId {confId}, formCode:{vo.FormCode} does not have a field config");
             }
         }
         foreach (var field in lfMainFields)
         {
-            string fValue = lfFields[field.FieldId].ToString();
+            string fValue = lfFields[field.FieldId]?.ToString()??null;
             field.FieldValue = fValue;
         }
         _lfMainFieldService.baseRepo.Update(lfMainFields);
