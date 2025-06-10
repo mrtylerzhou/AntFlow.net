@@ -140,9 +140,10 @@ public class UserService: AFBaseCurdRepositoryService<User>
      */
     public BaseIdTranStruVo QueryLeaderByEmployeeIdAndLevel(string startUserId, int assignLevelGrade)
     {
+        long startuserIdLong = Convert.ToInt64(startUserId);
         List<Department> departments = Frsql.Select<Department,User>()
             .InnerJoin((a, b) => a.Id == b.DepartmentId)
-            .Where((a,b)=>b.Id==Convert.ToInt64(startUserId))
+            .Where((a,b)=>b.Id==startuserIdLong)
             .ToList();
         if(departments.Count==0)
         {
@@ -160,8 +161,8 @@ public class UserService: AFBaseCurdRepositoryService<User>
             throw new AFBizException($"未能根据用户Id:{startUserId}找到用户所在组织");
         }
         //path即为用户的部门路径,当然实际中用户的系统并不是这样设计的,根据实际情况查出来用户层级部门信息即可,这里和流程核心引擎逻辑没关系,纯业务
-        List<string> tiredDepartmentIds = departmentPath.Split("/").ToList();
-        IEnumerable<long> tiredDepartmentIdsLong = AFCollectionUtil.StringToLongList(tiredDepartmentIds);
+        List<string> tiredDepartmentIds = departmentPath.Split("/").Where(a=>!string.IsNullOrWhiteSpace(a)).ToList();
+        IEnumerable<int> tiredDepartmentIdsLong = AFCollectionUtil.StringToIntList(tiredDepartmentIds);
         List<Department> tiredDepartments = _departmentService.baseRepo.Where(a=>tiredDepartmentIdsLong.Contains(a.Id)).ToList();
         if (tiredDepartments.Count == 0)
         {
@@ -195,9 +196,11 @@ public class UserService: AFBaseCurdRepositoryService<User>
             return new Dictionary<string, string>();
         }
 
-        return users.ToDictionary(
-            a => a.Id.ToString(),
-            a => a.Name,
+        return users
+            .ToLookup(a => a.Id.ToString())
+            .ToDictionary(
+            a => a.Key,
+            a => a.First().Name,
             StringComparer.OrdinalIgnoreCase);
     }
 
