@@ -137,9 +137,14 @@ public class TaskService
                 .ToList<KeyValuePair<string,string>>((a,b,c)=>new KeyValuePair<string, string>(c.Assignee,c.AssigneeName));
             if (signupNodeAssigneeMap.Count <= 0)
             {
-                throw new AFBizException("加批节点未获取到审批人!");
+                var (nextUserElement, nextFlowElement) = BpmnFlowUtil.GetNextAssigneeAndFlowNode(elements, elementToDeal.ElementId);
+                elementToDeal=nextUserElement;
+                assigneeMap=elementToDeal.AssigneeMap;
             }
-            assigneeMap = signupNodeAssigneeMap.ToDictionary(k => k.Key, v => v.Value);
+            else
+            {
+                assigneeMap = signupNodeAssigneeMap.ToDictionary(k => k.Key, v => v.Value);
+            }
         }
         int taskCount=currentSignType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode()?1:assigneeMap?.Count??0;
         BpmAfExecution execution = new BpmAfExecution

@@ -47,15 +47,18 @@ public class ProcessNodeJumpService
             TurnTransition(task.Id, backNodeKey,variables);
         }
     }
-
-    private void TurnTransition(String taskId, String taskToTurnToNodeKey, Dictionary<String, Object> variables)
+    public void TurnTransition(String taskId, String taskToTurnToNodeKey, Dictionary<String, Object> variables)
     {
         BpmAfTask bpmAfTask = _afTaskService.baseRepo.Where(a => a.Id == taskId).First();
         if (bpmAfTask == null)
         {
             throw new AFBizException($"can not find task by id: {taskId}");
         }
-        string verifyComment=variables.ContainsKey(StringConstants.VERIFY_COMMENT)?variables[StringConstants.VERIFY_COMMENT].ToString():"";
+        TurnTransition(bpmAfTask, taskToTurnToNodeKey,null,variables);
+    }
+    public void TurnTransition(BpmAfTask bpmAfTask, String taskToTurnToNodeKey,BpmAfDeployment bpmAfDeployment, Dictionary<String, Object> variables)
+    {
+         string verifyComment=variables.ContainsKey(StringConstants.VERIFY_COMMENT)?variables[StringConstants.VERIFY_COMMENT].ToString():"";
         DateTime nowTime = DateTime.Now;
         _afTaskInstService.Frsql
             .Update<BpmAfTaskInst>()
@@ -70,7 +73,12 @@ public class ProcessNodeJumpService
         string procInstId = bpmAfTask.ProcInstId;
         string procDefId = bpmAfTask.ProcDefId;
 
-        BpmAfDeployment bpmAfDeployment = _afDeploymentService.baseRepo.Where(a=>a.Id == procDefId).First();
+
+        if (bpmAfDeployment == null)
+        {
+            bpmAfDeployment = _afDeploymentService.baseRepo.Where(a => a.Id == procDefId).First();
+        }
+
         if (bpmAfDeployment == null)
         {
             throw new AFBizException($"can not find deployment by id: {procDefId}");
@@ -124,4 +132,5 @@ public class ProcessNodeJumpService
         _afTaskService.baseRepo.Insert(tasks);
         //_afTaskInstService.baseRepo.Insert(historyTaskInsts);
     }
+   
 }
