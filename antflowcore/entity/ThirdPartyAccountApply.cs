@@ -5,7 +5,7 @@ namespace antflowcore.entity;
 /// <summary>
 /// ThirdPartyAccountApply 实体类
 /// </summary>
-[Table(Name = "third_party_account_apply")]
+[Table(Name = "t_biz_account_apply")]
 public class ThirdPartyAccountApply
 {
     /// <summary>

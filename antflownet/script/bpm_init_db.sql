@@ -938,7 +938,7 @@ CREATE TABLE IF NOT EXISTS `t_op_log`
    
     COLLATE = utf8mb4_general_ci;
 
-CREATE TABLE IF NOT EXISTS  `third_party_account_apply`
+CREATE TABLE IF NOT EXISTS  `t_biz_account_apply`
 (
     `id`                 int(11) NOT NULL AUTO_INCREMENT,
     `account_type`       tinyint(4)   DEFAULT NULL COMMENT 'account type',
