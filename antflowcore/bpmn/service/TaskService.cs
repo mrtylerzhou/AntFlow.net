@@ -83,12 +83,11 @@ public class TaskService
         
         if (currentExecution.TaskCount!.Value >= 2)
         {
-            BpmAfExecution afExecution = new BpmAfExecution
-            {
-                Id = currentExecution.Id,
-                TaskCount = currentExecution.TaskCount - 1
-            };
-            _afExecutionService.baseRepo.Update(afExecution);
+            int currentCount = currentExecution.TaskCount - 1 ?? 0;
+            _afExecutionService.Frsql.Update<BpmAfExecution>()
+                .Set(a => a.TaskCount, currentCount)
+                .Where(a => a.Id == currentExecution.Id)
+                .ExecuteAffrows();
             return;
         }
         string content = bpmAfDeployment.Content;
@@ -132,6 +131,11 @@ public class TaskService
             else
             {
                 elementToDeal=nextUserElement;
+            }
+            List<BpmAfTask> bpmAfTasks = _afTaskService.baseRepo.Where(a=>a.ProcInstId==procInstId).ToList();
+            if(bpmAfTasks.Count>0)
+            {
+                return;
             }
         }
 

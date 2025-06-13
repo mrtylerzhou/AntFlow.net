@@ -46,23 +46,28 @@ public class ResubmitProcessService: IProcessOperationAdaptor
             //todo
             List<BpmAfTask> tasks = _taskService
                 .CreateTaskQuery(t =>
-                    t.ProcInstId == bpmBusinessProcess.ProcInstId &&
-                    t.Assignee == SecurityUtils.GetLogInEmpIdStr());
+                    t.ProcInstId == bpmBusinessProcess.ProcInstId);
                 
 
             if (!tasks.Any())
             {
                 throw new AFBizException("当前流程已审批！");
             }
-
+            if (!tasks.Any(t => t.Assignee == SecurityUtils.GetLogInEmpIdStr()))
+            {
+                throw new AFBizException("当前流程已审批！");
+            }
             BpmAfTask task = null;
             if (!string.IsNullOrEmpty(vo.TaskId))
             {
-                task = tasks.FirstOrDefault();
+                task = tasks.First(t => t.Id == vo.TaskId);
             }
             else
             {
-                task = tasks.First();
+                task = tasks[0];
+                if (string.IsNullOrEmpty(task.AssigneeName)) {
+                    task.AssigneeName = SecurityUtils.GetLogInEmpName();
+                }
             }
 
             if (task == null)
