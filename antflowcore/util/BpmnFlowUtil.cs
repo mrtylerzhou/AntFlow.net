@@ -77,7 +77,7 @@ public static class BpmnFlowUtil
         }
         return null;
     }
-    public static (BpmnConfCommonElementVo assigneeNode,BpmnConfCommonElementVo flowNode) GetNextAssigneeAndFlowNode(List<BpmnConfCommonElementVo> commonElements,string currentTaskDefKey)
+    public static (BpmnConfCommonElementVo assigneeNode,BpmnConfCommonElementVo flowNode) GetNextNodeAndFlowNode(List<BpmnConfCommonElementVo> commonElements,string currentTaskDefKey)
     {
         for (var i = 0; i < commonElements.Count; i++)
         {
@@ -92,6 +92,14 @@ public static class BpmnFlowUtil
         throw new AFBizException("logic error,can not find next element,please contact the administrator");
     }
 
+    public static BpmnConfCommonElementVo GetNodeFromCurrentNext(List<BpmnConfCommonElementVo> commonElements,
+        string taskDefKey)
+    {
+        BpmnConfCommonElementVo? bpmnConfCommonElementVo = commonElements
+            .Where(a=>a.FlowFrom==taskDefKey)
+            .SelectMany(a=>commonElements.Where(x=>x.ElementId==a.FlowTo)).ToList().FirstOrDefault();
+        return bpmnConfCommonElementVo;
+    }
     public static BpmnConfCommonElementVo GetLastSequenceFlow(List<BpmnConfCommonElementVo> commonElements)
     {
         List<BpmnConfCommonElementVo> lastElementVos = commonElements.Where(a=>a.ElementType==ElementTypeEnum.ELEMENT_TYPE_SEQUENCE_FLOW.Code&&a.IsLastSequenceFlow==1).ToList();

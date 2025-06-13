@@ -56,7 +56,7 @@ public class TaskService
         {
             throw new ApplicationException($"Task with id {taskId} not found");
         }
-        BpmAfExecution currentExecution = _afExecutionService.baseRepo.Where(a=>a.Id==bpmAfTask.ExecutionId).First();
+        BpmAfExecution currentExecution = _afExecutionService.baseRepo.Where(a=>a.Id==bpmAfTask.ExecutionId&&a.ActId==task.TaskDefKey).First();
         if (currentExecution == null)
         {
             throw new AFBizException("未能找到当前流程执行实例!");
@@ -73,7 +73,7 @@ public class TaskService
         }
         else
         {
-            _afTaskService.baseRepo.Delete(bpmAfTask);
+            _afTaskService.Frsql.Delete<BpmAfTask>().Where(a=>a.Id==taskId).ExecuteAffrows();
         }
         BpmAfDeployment bpmAfDeployment = _afDeploymentService.baseRepo.Where(a=>a.Id==procDefId).First();
         if (bpmAfDeployment == null)
@@ -115,17 +115,34 @@ public class TaskService
             }
             else
             {
-                var (nextUserElement, nextFlowElement) = BpmnFlowUtil.GetNextAssigneeAndFlowNode(elements,taskDefKey);
+                var (nextUserElement, nextFlowElement) = BpmnFlowUtil.GetNextNodeAndFlowNode(elements,taskDefKey);
                 elementToDeal=nextUserElement;
             }
            
         }
         else
         {
-            var (nextUserElement, nextFlowElement) = BpmnFlowUtil.GetNextAssigneeAndFlowNode(elements,taskDefKey);
-            elementToDeal=nextUserElement;
+            var (nextUserElement, nextFlowElement) = BpmnFlowUtil.GetNextNodeAndFlowNode(elements,taskDefKey);
+            if (nextUserElement.FlowTo == nextFlowElement.FlowTo)
+            { 
+                string flowTo = nextFlowElement.FlowTo;
+
+               elementToDeal = BpmnFlowUtil.GetNodeFromCurrentNext(elements,flowTo);
+            }
+            else
+            {
+                elementToDeal=nextUserElement;
+            }
         }
-      
+
+        if (elementToDeal.ElementType == ElementTypeEnum.ELEMENT_TYPE_PARALLEL_GATEWAY.Code)
+        {
+            List<BpmAfTask> bpmAfTasks = _afTaskService.baseRepo.Where(a=>a.ProcInstId==procInstId).ToList();
+            if(bpmAfTasks.Count>0)
+            {
+                return;
+            }
+        }
         IDictionary<string,string> assigneeMap = elementToDeal.AssigneeMap;
         if (elementToDeal.IsSignUpSubElement == 1)
         {
@@ -137,7 +154,7 @@ public class TaskService
                 .ToList<KeyValuePair<string,string>>((a,b,c)=>new KeyValuePair<string, string>(c.Assignee,c.AssigneeName));
             if (signupNodeAssigneeMap.Count <= 0)
             {
-                var (nextUserElement, nextFlowElement) = BpmnFlowUtil.GetNextAssigneeAndFlowNode(elements, elementToDeal.ElementId);
+                var (nextUserElement, nextFlowElement) = BpmnFlowUtil.GetNextNodeAndFlowNode(elements, elementToDeal.ElementId);
                 elementToDeal=nextUserElement;
                 assigneeMap=elementToDeal.AssigneeMap;
             }
