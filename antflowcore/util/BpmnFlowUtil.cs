@@ -7,7 +7,7 @@ namespace antflowcore.util;
 
 public static class BpmnFlowUtil
 {
-    public static BpmnConfCommonElementVo GetFirstAssigneeNode(List<BpmnConfCommonElementVo> commonElements)
+    public static List<BpmnConfCommonElementVo> GetFirstAssigneeNodes(List<BpmnConfCommonElementVo> commonElements)
     {
         if (commonElements.Count == 0)
         {
@@ -32,17 +32,34 @@ public static class BpmnFlowUtil
                 startUserElementId = currentNode.ElementId;
             }
 
+            List<BpmnConfCommonElementVo> firstAssigneeNodes = new List<BpmnConfCommonElementVo>();
             if (!string.IsNullOrEmpty(startUserElementId))
             {
                 //the first assignee node flows from the node which flow from the first user node
                 if (currentNode.FlowFrom == startUserElementId)
                 {
                     BpmnConfCommonElementVo prevNode = commonElements[prevIndex];
-                    if (prevNode.ElementId != currentNode.FlowTo||prevNode.ElementType!=ElementTypeEnum.ELEMENT_TYPE_USER_TASK.Code)
+                    if (prevNode.ElementType == ElementTypeEnum.ELEMENT_TYPE_PARALLEL_GATEWAY.Code)
                     {
-                        throw new AFBizException("logic error,please contact the administrator");
+                        List<BpmnConfCommonElementVo> gatewayFlowToAssigneeNodes = commonElements
+                            .Where(a => a.FlowFrom == prevNode.ElementId)
+                            .SelectMany(a => commonElements.Where(x => x.ElementId == a.FlowTo))
+                            .ToList();
+                        if(gatewayFlowToAssigneeNodes.Count<1||gatewayFlowToAssigneeNodes.Any(a=>a.ElementType!=ElementTypeEnum.ELEMENT_TYPE_USER_TASK.Code))
+                        {
+                            throw new AFBizException("logic error,please contact the administrator");
+                        }
+                        firstAssigneeNodes.AddRange(gatewayFlowToAssigneeNodes);
                     }
-                    return prevNode;
+                    else
+                    {
+                        if (prevNode.ElementType!=ElementTypeEnum.ELEMENT_TYPE_USER_TASK.Code)
+                        {
+                            throw new AFBizException("logic error,please contact the administrator");
+                        }
+                        firstAssigneeNodes.Add(prevNode);
+                    }
+                    return firstAssigneeNodes;
                 }
             }
         } 

@@ -57,7 +57,7 @@ public class BpmnPersonnelFormatService: IBpmnPersonnelFormat
             //最后一个节点的nodeto为空,.net里字典添加null就会报错
             if (!string.IsNullOrEmpty(vo.Params.NodeTo))
             {
-                mapPreNodes.Add(vo.Params.NodeTo, vo);
+                mapPreNodes[vo.Params.NodeTo]=vo;
             }
         }
         if (string.IsNullOrEmpty(startNodeId)) {

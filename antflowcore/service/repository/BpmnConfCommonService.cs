@@ -274,7 +274,7 @@ public class BpmnConfCommonService
                     TreatParallelGateWayRecursively(nowNode, lastNode, aggregationNode, map, resultList,
                         new HashSet<string>());
 
-                    nowNode = map.TryGetValue(aggregationNode.Params.NodeTo, out var nextNode) ? nextNode : null;
+                    nowNode = map.TryGetValue(aggregationNode.Params.NodeTo??"", out var nextNode) ? nextNode : null;
                     lastNode = aggregationNode;
                 }
 
@@ -451,7 +451,8 @@ public class BpmnConfCommonService
         // 解析 JSON 请求参数
         JsonNode? jsonObject = JsonNode.Parse(paramsJson);
         string? processNumber = jsonObject?["processNumber"]?.GetValue<string>();
-        bool isLowCodeFlow = jsonObject?["isLowCodeFlow"]?.GetValue<bool>() ?? false;
+        string? isLowcodeStr = jsonObject?["isLowCodeFlow"]?.ToString();
+        bool isLowCodeFlow = !string.IsNullOrEmpty(isLowcodeStr) && Convert.ToBoolean(isLowcodeStr);
 
         if (string.IsNullOrEmpty(processNumber))
         {
