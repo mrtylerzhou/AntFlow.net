@@ -50,7 +50,11 @@ public class TaskService
         DateTime nowTime = DateTime.Now;
         string deleteReason = StringConstants.DEFAULT_TASK_DELETE_REASON;
         string taskId = task.Id;
-        BpmAfTask bpmAfTask = _afTaskService.baseRepo.Where(a=>a.Id == taskId).First();
+        string procDefId = task.ProcDefId;
+        string taskDefKey = task.TaskDefKey;
+        string procInstId = task.ProcInstId;
+        List<BpmAfTask> afTasks = _afTaskService.baseRepo.Where(a => a.ProcInstId == procInstId).ToList();
+        BpmAfTask bpmAfTask = afTasks.First(a => a.Id == taskId);
       
         if (bpmAfTask == null)
         {
@@ -62,9 +66,8 @@ public class TaskService
             throw new AFBizException("未能找到当前流程执行实例!");
         }
         int? currentSignType = currentExecution.SignType??1;
-        string procDefId = bpmAfTask.ProcDefId;
-        string taskDefKey = bpmAfTask.TaskDefKey;
-        string procInstId = bpmAfTask.ProcInstId;
+        
+       
         if (currentSignType == 2||task.IsNextNodeSignUp)
         {
             _afTaskService.Frsql.Delete<BpmAfTask>()
@@ -124,27 +127,28 @@ public class TaskService
             var (nextUserElement, nextFlowElement) = BpmnFlowUtil.GetNextNodeAndFlowNode(elements,taskDefKey);
             if (nextUserElement.FlowTo == nextFlowElement.FlowTo)
             { 
+                
                 string flowTo = nextFlowElement.FlowTo;
 
-               elementToDeal = BpmnFlowUtil.GetNodeFromCurrentNext(elements,flowTo);
+                elementToDeal = elements.First(a => a.ElementId == flowTo);
             }
             else
             {
                 elementToDeal=nextUserElement;
             }
-            List<BpmAfTask> bpmAfTasks = _afTaskService.baseRepo.Where(a=>a.ProcInstId==procInstId).ToList();
-            if(bpmAfTasks.Count>0)
-            {
-                return;
-            }
+           
         }
 
         if (elementToDeal.ElementType == ElementTypeEnum.ELEMENT_TYPE_PARALLEL_GATEWAY.Code)
         {
-            List<BpmAfTask> bpmAfTasks = _afTaskService.baseRepo.Where(a=>a.ProcInstId==procInstId).ToList();
-            if(bpmAfTasks.Count>0)
+            List<BpmAfTask> otherNodeTasks = afTasks.Where(a => a.Id != taskId).ToList();
+            if(otherNodeTasks.Count>0)
             {
                 return;
+            }
+            else
+            {
+                elementToDeal = BpmnFlowUtil.GetNodeFromCurrentNext(elements,elementToDeal.ElementId);
             }
         }
         IDictionary<string,string> assigneeMap = elementToDeal.AssigneeMap;
