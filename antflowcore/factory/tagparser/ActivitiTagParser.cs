@@ -69,7 +69,7 @@ public class ActivitiTagParser<T>: TagParser<IFormOperationAdaptor<T>,BusinessDa
             {
                 return _inner.PreviewSetCondition(subClassVo);
             }
-            throw new ArgumentException($"The provided argument is not of the expected type {typeof(TSubClass).Name}.");
+            throw new ArgumentException($"The provided argument is not of the expected type {typeof(TSubClass).Name}");
         }
 
         public BpmnStartConditionsVo LaunchParameters(T vo)
@@ -78,7 +78,7 @@ public class ActivitiTagParser<T>: TagParser<IFormOperationAdaptor<T>,BusinessDa
             {
                 return _inner.LaunchParameters(subClassVo);
             }
-            throw new ArgumentException($"The provided argument is not of the expected type {typeof(TSubClass).Name}.");
+            throw new ArgumentException($"The provided argument is not of the expected type {typeof(TSubClass).Name}");
         }
 
         public void OnInitData(T vo)

@@ -112,15 +112,18 @@ using System.Linq;
                 TaskDefKey = taskData.TaskDefKey
             });
 
-            // 添加回退节点
-            _processNodeSubmitService.AddProcessNode(new BpmProcessNodeSubmit
+            if (!string.IsNullOrEmpty(backToNodeKey))
             {
-                State = 1,
-                NodeKey = restoreNodeKey,
-                ProcessInstanceId = taskData.ProcInstId,
-                BackType = backToModifyType,
-                CreateUser = SecurityUtils.GetLogInEmpIdStr()
-            });
+                // 添加回退节点
+                _processNodeSubmitService.AddProcessNode(new BpmProcessNodeSubmit
+                {
+                    State = 1,
+                    NodeKey = restoreNodeKey,
+                    ProcessInstanceId = taskData.ProcInstId,
+                    BackType = backToModifyType,
+                    CreateUser = SecurityUtils.GetLogInEmpIdStr()
+                });
+            }
 
             // 并行任务回退
             foreach (BpmAfTask task in taskList)
@@ -132,7 +135,14 @@ using System.Linq;
                 };
                 _processNodeJump.CommitProcess(task, varMap, backToNodeKey);
             }
-
+            //退回以后的任务
+            List<BpmAfTask> currentTasks = _taskService.baseRepo.Where(t => t.ProcInstId == procInstId).ToList();
+            if (currentTasks.Count > 0)
+            {
+                BpmAfTask firstStartNode = currentTasks.First();
+                List<String> otherNewTaskIds = currentTasks.Where(t => t.Id != firstStartNode.Id).Select(t => t.Id).ToList();
+                _taskService.baseRepo.Delete(t => otherNewTaskIds.Contains(t.Id));
+            }
             vo.BusinessId = bpmBusinessProcess.BusinessId;
 
             if (!vo.IsOutSideAccessProc.Value)

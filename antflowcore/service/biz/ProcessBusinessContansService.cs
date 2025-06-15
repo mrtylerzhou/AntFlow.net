@@ -39,7 +39,7 @@ public class ProcessBusinessContansService
             .Where(a=>a.ProcInstId==procInstId)
             .OrderByDescending(a=>a.StartTime)
             .ToList();
-        BpmAfTaskInst bpmAfTaskInst = bpmAfTaskInsts.First(a => a.TaskDefKey!=taskDefKey);
+        BpmAfTaskInst bpmAfTaskInst = bpmAfTaskInsts.First(a => a.EndTime!=null&&a.TaskDefKey!=taskDefKey);
         return bpmAfTaskInst;
     }
 }

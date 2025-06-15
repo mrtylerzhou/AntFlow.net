@@ -37,7 +37,7 @@ public class BpmProcessNodeSubmitService: AFBaseCurdRepositoryService<BpmProcess
                 CreateUser = SecurityUtils.GetLogInEmpName()
             });
             if (processNodeSubmit.State==0) {
-               //todo complete task
+                _taskService.Complete(task);
             }
             else
             {
