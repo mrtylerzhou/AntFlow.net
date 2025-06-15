@@ -9,9 +9,18 @@ public abstract class AbstractLFConditionJudge: AbstractComparableJudge
     protected bool LfCommonJudge(
         BpmnNodeConditionsConfBaseVo conditionsConf, 
         BpmnStartConditionsVo bpmnStartConditionsVo, 
-        Func<object, object,int, bool> predicate,int currentIndex)
+        Func<object, object,int, bool> predicate,int currentIndex,int currentGroup)
     {
-        IDictionary<string,object> lfConditionsFromDb = conditionsConf.LfConditions;
+        IDictionary<int,IDictionary<string,object>> groupedLfConditionsMap = conditionsConf.GroupedLfConditionsMap;
+        IDictionary<string, object> lfConditionsFromDb = null;
+        if (groupedLfConditionsMap != null && groupedLfConditionsMap.ContainsKey(currentGroup))
+        {
+            lfConditionsFromDb = groupedLfConditionsMap[currentGroup];
+        }
+        else
+        {
+            throw new AFBizException("the process has no no code conditions conf,please contact the administrator to add one");
+        }
         IDictionary<string,object> lfConditionsFromUser = bpmnStartConditionsVo.LfConditions;
 
         if (lfConditionsFromDb == null || !lfConditionsFromDb.Any())

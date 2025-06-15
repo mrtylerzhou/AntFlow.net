@@ -15,7 +15,7 @@ public class LFCollectionConditionJudge : AbstractLFConditionJudge
         _logger = logger;
     }
 
-    public override bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo, int index)
+    public override bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo, int index,int group)
     {
         Func<object, object, int, bool> predicate = (a, b, c) =>
         {
@@ -48,6 +48,6 @@ public class LFCollectionConditionJudge : AbstractLFConditionJudge
             return false;
         };
 
-        return base.LfCommonJudge(conditionsConf, bpmnStartConditionsVo, predicate, index);
+        return base.LfCommonJudge(conditionsConf, bpmnStartConditionsVo, predicate, index,group);
     }
 }

@@ -14,7 +14,7 @@ namespace antflowcore.adaptor.nodetypecondition.judge;
     {
         private static readonly ILogger<AbstractBinaryComparableJudge> _log = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<AbstractBinaryComparableJudge>();
 
-        public override bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo, int index)
+        public override bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo, int index,int group)
         {
             string fieldNameInDb = FieldNameInDb();
             string fieldNameActual = FieldNameInStartConditions();
@@ -40,7 +40,7 @@ namespace antflowcore.adaptor.nodetypecondition.judge;
                 }
 
                 fieldValueInDb = dbField.GetValue(conditionsConf)?.ToString();
-                fieldValueActual = actualField.GetValue(bpmnStartConditionsVo)?.ToString();
+                fieldValueActual = actualField.GetValue(bpmnStartConditionsVo)?.ToString()??"0";
                 fieldValueActualDecimal = decimal.Parse(fieldValueActual);
 
                 if (JudgeOperatorEnum.BinaryOperator().Contains(theOperatorType.Value))

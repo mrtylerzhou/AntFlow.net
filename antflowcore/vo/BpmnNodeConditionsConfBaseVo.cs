@@ -9,11 +9,17 @@ namespace antflowcore.vo
         [JsonPropertyName("conditionParamTypes")]
         public List<int> ConditionParamTypes { get; set; }
 
+        [JsonPropertyName("groupedConditionParamTypes")]
+        public IDictionary<int,List<int>>GroupedConditionParamTypes { get; set; }
+        
         [JsonPropertyName("isDefault")]
         public int? IsDefault { get; set; }
 
         [JsonPropertyName("sort")]
         public int? Sort { get; set; }
+        
+        [JsonPropertyName("groupRelation")]
+        public int? GroupRelation { get; set; }
 
         [JsonPropertyName("templateMarksList")]
         public List<BaseIdTranStruVo> TemplateMarksList { get; set; }
@@ -53,6 +59,12 @@ namespace antflowcore.vo
 
         [JsonPropertyName("numberOperatorList")]
         public List<int> NumberOperatorList { get; set; } = new List<int>();
+        
+        [JsonPropertyName("groupedNumberOperatorListMap")]
+        public IDictionary<int,List<int>> GroupedNumberOperatorListMap { get; set; }=new Dictionary<int, List<int>>();
+        [JsonPropertyName("groupedCondRelations")]
+        public IDictionary<int,int> GroupedCondRelations { get; set; }=new Dictionary<int, int>();
+        
         [JsonPropertyName("extJson")]
         public string ExtJson { get; set; }
 
@@ -73,5 +85,8 @@ namespace antflowcore.vo
 
         [JsonPropertyName("lfConditions")]
         public IDictionary<string, object> LfConditions { get; set; }
+        
+        [JsonPropertyName("groupedLfConditionsMap")]
+        public IDictionary<int,IDictionary<string,object>>? GroupedLfConditionsMap { get; set; }
     }
 }

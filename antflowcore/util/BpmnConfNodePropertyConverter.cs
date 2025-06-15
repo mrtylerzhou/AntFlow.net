@@ -2,9 +2,11 @@
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using antflowcore.constant.enums;
 using antflowcore.constant.enus;
 using AntFlowCore.Constants;
 using antflowcore.exception;
+using antflowcore.util.Extension;
 using antflowcore.vo;
 using Antflowcore.Vo;
 
@@ -19,191 +21,209 @@ public class BpmnConfNodePropertyConverter
             throw new AFBizException("node has no property!");
         }
 
-        List<BpmnNodeConditionsConfVueVo> newModels = propertysVo.ConditionList;
         int? isDefault = propertysVo.IsDefault;
-
-        if (newModels == null)
+        IDictionary<int, IDictionary<string, object>> groupedLfConditionsMap =
+            new Dictionary<int, IDictionary<string, object>>();
+        BpmnNodeConditionsConfBaseVo result = new BpmnNodeConditionsConfBaseVo
         {
-            throw new AFBizException("node has no property!");
-        }
-
-        if (newModels.Count <= 0 && (isDefault == null || isDefault == 0))
+            IsDefault = propertysVo.IsDefault,
+            Sort = propertysVo.Sort,
+            GroupRelation = ConditionRelationShipEnum.GetCodeByValue(propertysVo.GroupRelation),
+        };
+        List<int> conditionTypes = new List<int>();
+        IDictionary<int, List<int>> groupedConditionTypes = new Dictionary<int, List<int>>();
+        int strEnumCode = (int)ConditionTypeEnum.CONDITION_TYPE_LF_STR_CONDITION;
+        bool isLowCodeFlow = false;
+        List<List<BpmnNodeConditionsConfVueVo>> groupedNewModels = propertysVo.ConditionList;
+        if (groupedNewModels.IsEmpty() && (isDefault == 0))
         {
             throw new AFBizException("input nodes is empty");
         }
 
-        BpmnNodeConditionsConfBaseVo result = new BpmnNodeConditionsConfBaseVo
+        int index = 0;
+        foreach (List<BpmnNodeConditionsConfVueVo> newModels in groupedNewModels)
         {
-            IsDefault = propertysVo.IsDefault,
-            Sort = propertysVo.Sort
-        };
-
-        List<int> conditionTypes = new List<int>(newModels.Count);
-        int strEnumCode = (int)ConditionTypeEnum.CONDITION_TYPE_LF_STR_CONDITION;
-        Dictionary<String, Object> wrapperResult = new Dictionary<string, object>();
-        bool isLowCodeFlow = false;
-        foreach (BpmnNodeConditionsConfVueVo newModel in newModels)
-        {
-            var columnId = newModel.ColumnId;
-            if (string.IsNullOrEmpty(columnId))
+            index++;
+            List<int> currentGroupConditionTypes = new List<int>();
+            Dictionary<String, Object> wrapperResult = new Dictionary<string, object>();
+            foreach (BpmnNodeConditionsConfVueVo newModel in newModels)
             {
-                throw new AFBizException("each and every node must have a columnId value");
-            }
-
-            int columnIdInt = int.Parse(columnId);
-            if (strEnumCode == columnIdInt)
-            {
-                if (newModel.Multiple != null && newModel.Multiple.Value)
+                newModel.CondGroup = index;
+                string columnId = newModel.ColumnId;
+                if (string.IsNullOrEmpty(columnId))
                 {
-                    columnIdInt = (int)ConditionTypeEnum.CONDITION_TYPE_LF_COLLECTION_CONDITION;
-                }
-            }
-
-            ConditionTypeEnum? enumByCode = ConditionTypeEnumExtensions.GetEnumByCode(columnIdInt);
-            if (enumByCode == null)
-            {
-                throw new AFBizException("node has no condition type");
-            }
-
-            ConditionTypeAttributes conditionTypeAttributes = enumByCode.Value.GetAttributes();
-            if (enumByCode == null)
-            {
-                throw new AFBizException($"columnId of value:{columnId} is not a valid value");
-            }
-
-            conditionTypes.Add(columnIdInt);
-            var fieldName = conditionTypeAttributes.FieldName;
-            var columnDbname = newModel.ColumnDbname;
-            
-            if (!fieldName.Equals(columnDbname,StringComparison.CurrentCultureIgnoreCase) && !string.IsNullOrEmpty(columnDbname))
-            {
-                //if it is a lowcode flow condition,its name defined in ConditionTypeEnum is a constant,it is lfConditions,it is always not equals to the name specified
-                if (!StringConstants.LOWFLOW_CONDITION_CONTAINER_FIELD_NAME.Equals(fieldName))
-                {
-                    throw new AFBizException($"columnDbname:{columnDbname} is not a valid name");
-                }
-            }
-
-            int fieldType = conditionTypeAttributes.FieldType;
-            Type fieldCls = conditionTypeAttributes.FieldClass;
-
-            if (fieldType == 1) // list
-            {
-                string fixedDownBoxValue = newModel.FixedDownBoxValue;
-                List<BaseKeyValueStruVo> valueStruVoList =
-                    JsonSerializer.Deserialize<List<BaseKeyValueStruVo>>(fixedDownBoxValue);
-                var zdy1 = newModel.Zdy1;
-                if (zdy1.StartsWith("[") && zdy1.EndsWith("]"))
-                {
-                    zdy1 = zdy1.Substring(1, zdy1.Length - 2);
+                    throw new AFBizException("each and every node must have a columnId value");
                 }
 
-                var keys = zdy1.Split(',');
-
-               
-                var field = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(conditionTypeAttributes.FieldName,
-                    BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
-
-                IList values = (IList)Activator.CreateInstance(field.PropertyType);
-                foreach (string key in keys)
+                int columnIdInt = int.Parse(columnId);
+                if (strEnumCode == columnIdInt)
                 {
-                    BaseKeyValueStruVo baseKeyValueStruVo = valueStruVoList.First(v => v.Key == key);
-                    if (fieldCls == typeof(string))
+                    if (newModel.Multiple != null && newModel.Multiple.Value)
                     {
-                        values.Add(baseKeyValueStruVo.Key);
-                    }
-                    else
-                    {
-                        object parsedObject = JsonSerializer.Deserialize(baseKeyValueStruVo?.Key, fieldCls);
-                        values.Add(parsedObject);
+                        columnIdInt = (int)ConditionTypeEnum.CONDITION_TYPE_LF_COLLECTION_CONDITION;
                     }
                 }
 
-                Object valueOrWrapper = null;
-
-                if (enumByCode.Value.IsLowCodeFlow())
+                ConditionTypeEnum? enumByCode = ConditionTypeEnumExtensions.GetEnumByCode(columnIdInt);
+                if (enumByCode == null)
                 {
-                    wrapperResult.Add(columnDbname, values);
-                    valueOrWrapper = wrapperResult;
+                    throw new AFBizException("node has no condition type");
                 }
-                
-                field.SetValue(result, valueOrWrapper ?? values);
-            }
-            else
-            {
-                string zdy1 = newModel.Zdy1;
-                String zdy2 = newModel.Zdy2;
 
-                var field = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(conditionTypeAttributes.FieldName,
-                    BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
-                var opt1 = newModel.Opt1;
-                int? optType = newModel.OptType;
-
-                if (optType != null)
+                ConditionTypeAttributes conditionTypeAttributes = enumByCode.Value.GetAttributes();
+                if (enumByCode == null)
                 {
-                    JudgeOperatorEnum symbol = JudgeOperatorEnum.GetByOpType(optType.Value);
-                    if (symbol == null)
+                    throw new AFBizException($"columnId of value:{columnId} is not a valid value");
+                }
+
+                conditionTypes.Add(columnIdInt);
+
+                string fieldName = conditionTypeAttributes.FieldName;
+                string columnDbname = newModel.ColumnDbname;
+
+                if (!fieldName.Equals(columnDbname, StringComparison.CurrentCultureIgnoreCase) &&
+                    !string.IsNullOrEmpty(columnDbname))
+                {
+                    //if it is a lowcode flow condition,its name defined in ConditionTypeEnum is a constant,it is lfConditions,it is always not equals to the name specified
+                    if (!StringConstants.LOWFLOW_CONDITION_CONTAINER_FIELD_NAME.Equals(fieldName))
                     {
-                        throw new AFBizException($"condition optype of {optType} is undefined!");
+                        throw new AFBizException($"columnDbname:{columnDbname} is not a valid name");
+                    }
+                }
+
+                int fieldType = conditionTypeAttributes.FieldType;
+                Type fieldCls = conditionTypeAttributes.FieldClass;
+
+                if (fieldType == 1) // list
+                {
+                    string fixedDownBoxValue = newModel.FixedDownBoxValue;
+                    List<BaseKeyValueStruVo> valueStruVoList =
+                        JsonSerializer.Deserialize<List<BaseKeyValueStruVo>>(fixedDownBoxValue);
+                    var zdy1 = newModel.Zdy1;
+                    if (zdy1.StartsWith("[") && zdy1.EndsWith("]"))
+                    {
+                        zdy1 = zdy1.Substring(1, zdy1.Length - 2);
                     }
 
-                    var opField = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(StringConstants.NUM_OPERATOR,
+                    var keys = zdy1.Split(',');
+
+
+                    var field = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(conditionTypeAttributes.FieldName,
                         BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
-                    opField.SetValue(result, symbol.Code);
-                }
 
-
-                if (fieldCls == typeof(string))
-                {
-                    Object valueOrWrapper = null;
-                    //处理多值first<b<second这种类型
-                    if (optType != null && JudgeOperatorEnum.BinaryOperator().Contains(optType.Value))
+                    IList values = (IList)Activator.CreateInstance(field.PropertyType);
+                    foreach (string key in keys)
                     {
-                        zdy1 = zdy1 + "," + zdy2; //antflow目前只有一个自定义值,介于之间的提前定义好JudgeOperatorEnum,值用字符串拼接,使用时再分割
+                        BaseKeyValueStruVo baseKeyValueStruVo = valueStruVoList.First(v => v.Key == key);
+                        if (fieldCls == typeof(string))
+                        {
+                            values.Add(baseKeyValueStruVo.Key);
+                        }
+                        else
+                        {
+                            object parsedObject = JsonSerializer.Deserialize(baseKeyValueStruVo?.Key, fieldCls);
+                            values.Add(parsedObject);
+                        }
                     }
+
+                    Object valueOrWrapper = null;
 
                     if (enumByCode.Value.IsLowCodeFlow())
                     {
-                        wrapperResult.Add(columnDbname, zdy1);
+                        isLowCodeFlow = true;
+                        wrapperResult.Add(columnDbname, values);
                         valueOrWrapper = wrapperResult;
+                        groupedLfConditionsMap.Add(index, wrapperResult);
                     }
-
-                    field.SetValue(result, valueOrWrapper ?? zdy1);
+                    else
+                    {
+                        field.SetValue(result, valueOrWrapper ?? values);
+                    }
                 }
                 else
                 {
-                    Object valueOrWrapper = null;
-                    Object actualValue = null;
-                    Object zdy2Value = null;
-                    actualValue = JsonSerializer.Deserialize(zdy2, fieldCls);
-                    if (optType != null && JudgeOperatorEnum.BinaryOperator().Contains(optType.Value))
+                    string zdy1 = newModel.Zdy1;
+                    String zdy2 = newModel.Zdy2;
+
+                    var field = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(conditionTypeAttributes.FieldName,
+                        BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+                    var opt1 = newModel.Opt1;
+                    int? optType = newModel.OptType;
+
+                    if (optType != null)
                     {
-                        zdy1 = zdy1 + "," + zdy2; //antflow目前只有一个自定义值,介于之间的提前定义好JudgeOperatorEnum,值用字符串拼接,使用时再分割
+                        JudgeOperatorEnum symbol = JudgeOperatorEnum.GetByOpType(optType.Value);
+                        if (symbol == null)
+                        {
+                            throw new AFBizException($"condition optype of {optType} is undefined!");
+                        }
+
+                        var opField = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(StringConstants.NUM_OPERATOR,
+                            BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+                        opField.SetValue(result, symbol.Code);
                     }
 
-                    if (enumByCode.Value.IsLowCodeFlow())
+
+                    if (fieldCls == typeof(string))
                     {
-                        wrapperResult.Add(columnDbname, actualValue);
-                        valueOrWrapper = wrapperResult;
+                        Object valueOrWrapper = null;
+                        //处理多值first<b<second这种类型
+                        if (optType != null && JudgeOperatorEnum.BinaryOperator().Contains(optType.Value))
+                        {
+                            zdy1 = zdy1 + "," + zdy2; //antflow目前只有一个自定义值,介于之间的提前定义好JudgeOperatorEnum,值用字符串拼接,使用时再分割
+                        }
+
+                        if (enumByCode.Value.IsLowCodeFlow())
+                        {
+                            isLowCodeFlow = true;
+                            wrapperResult.Add(columnDbname, zdy1);
+                            valueOrWrapper = wrapperResult;
+                            groupedLfConditionsMap.Add(index, wrapperResult);
+                        }
+                        else
+                        {
+                            field.SetValue(result, valueOrWrapper ?? zdy1);
+                        }
                     }
                     else
                     {
-                        field.SetValue(result, valueOrWrapper ?? actualValue);
+                        Object valueOrWrapper = null;
+                        Object actualValue = null;
+                        Object zdy2Value = null;
+                        actualValue = JsonSerializer.Deserialize(zdy2, fieldCls);
+                        if (optType != null && JudgeOperatorEnum.BinaryOperator().Contains(optType.Value))
+                        {
+                            zdy1 = zdy1 + "," + zdy2; //antflow目前只有一个自定义值,介于之间的提前定义好JudgeOperatorEnum,值用字符串拼接,使用时再分割
+                        }
+
+                        if (enumByCode.Value.IsLowCodeFlow())
+                        {
+                            isLowCodeFlow = true;
+                            wrapperResult.Add(columnDbname, actualValue);
+                            valueOrWrapper = wrapperResult;
+                            groupedLfConditionsMap.Add(index, wrapperResult);
+                        }
+                        else
+                        {
+                            field.SetValue(result, valueOrWrapper ?? actualValue);
+                        }
                     }
                 }
             }
+
+            groupedConditionTypes.Add(index, currentGroupConditionTypes);
         }
+
 
         if (isLowCodeFlow)
         {
-            var field = typeof(BpmnNodeConditionsConfBaseVo).GetProperty("LfConditions",
-                BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
-            field.SetValue(result, wrapperResult);
+            result.GroupedLfConditionsMap = groupedLfConditionsMap;
         }
 
-        String extJson = JsonSerializer.Serialize(newModels);
+        String extJson = JsonSerializer.Serialize(groupedNewModels);
         result.ExtJson = extJson;
         result.ConditionParamTypes = conditionTypes;
+        result.GroupedConditionParamTypes = groupedConditionTypes;
         return result;
     }
 
@@ -275,7 +295,8 @@ public class BpmnConfNodePropertyConverter
                 }
                 else
                 {
-                    extField = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(conditionTypeAttributes.FieldName + "List",
+                    extField = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(
+                        conditionTypeAttributes.FieldName + "List",
                         BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
                 }
 
@@ -300,7 +321,6 @@ public class BpmnConfNodePropertyConverter
                             }
                         }
                     }
-
                 }
                 else
                 {
@@ -327,7 +347,6 @@ public class BpmnConfNodePropertyConverter
 
                 String extJsonx = JsonSerializer.Serialize(keyValuePairVos);
                 vueVo.FixedDownBoxValue = extJsonx;
-
             }
             else
             {
@@ -335,9 +354,8 @@ public class BpmnConfNodePropertyConverter
             }
 
             results.Add(vueVo);
-
         }
-        
+
         return results;
     }
 }

@@ -42,6 +42,11 @@ namespace AntFlowCore.Entity
 
         [Column(Name = "operator")]
         public int? TheOperator { get; set; }
+
+        [Column(Name = "cond_relation")]
+        public int? CondRelation { get; set; }
+        [Column(Name = "cond_group")]
+        public int? CondGroup { get; set; }
         /// <summary>
         /// Remarks.
         /// </summary>

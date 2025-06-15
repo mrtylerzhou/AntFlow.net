@@ -14,7 +14,7 @@ public abstract class AbstractLFDateTimeConditionJudge : AbstractLFConditionJudg
         _logger = logger;
     }
 
-    public override bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo,int index)
+    public override bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo,int index,int group)
     {
         Func<object, object,int, bool> predicate = (a, b,c) =>
         {
@@ -41,7 +41,7 @@ public abstract class AbstractLFDateTimeConditionJudge : AbstractLFConditionJudg
             }
         };
 
-        return LfCommonJudge(conditionsConf, bpmnStartConditionsVo, predicate,index);
+        return LfCommonJudge(conditionsConf, bpmnStartConditionsVo, predicate,index,group);
     }
 
     protected abstract string CurrentDateFormatter();

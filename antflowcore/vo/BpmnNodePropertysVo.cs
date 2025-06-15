@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using antflowcore.constant.enums;
 using Antflowcore.Vo;
 
 namespace antflowcore.vo
@@ -50,7 +51,7 @@ namespace antflowcore.vo
         public BpmnNodeConditionsConfBaseVo ConditionsConf { get; set; }
 
         [JsonPropertyName("conditionList")]
-        public List<BpmnNodeConditionsConfVueVo> ConditionList { get; set; }
+        public List<List<BpmnNodeConditionsConfVueVo>> ConditionList { get; set; }
 
         [JsonPropertyName("configurationTableType")]
         public int? ConfigurationTableType { get; set; }
@@ -88,6 +89,11 @@ namespace antflowcore.vo
         [JsonPropertyName("sort")]
         public int? Sort { get; set; }
 
+        /// <summary>
+        /// <see cref="ConditionRelationShipEnum"/>
+        /// </summary>
+        [JsonPropertyName("groupRelation")]
+        public bool GroupRelation { get; set; } = true;
         // 默认构造函数
         public BpmnNodePropertysVo() { }
         

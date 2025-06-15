@@ -2,6 +2,7 @@
 using System;
 using System.Text.Json.Serialization;
 using antflowcore.conf.json;
+using antflowcore.constant.enums;
 
 namespace Antflowcore.Vo
 {
@@ -49,5 +50,13 @@ namespace Antflowcore.Vo
         public int MultipleLimit { get; set; }
         [JsonPropertyName("fixedDownBoxValue")]
         public string FixedDownBoxValue { get; set; }
+        /// <summary>
+        /// <see cref="ConditionRelationShipEnum"/>
+        /// </summary>
+        /// <returns></returns>
+        [JsonPropertyName("condRelation")]
+        public bool CondRelation { get; set; }=false;
+        [JsonPropertyName("condGroup")]
+        public int CondGroup { get; set; }
     }
 }

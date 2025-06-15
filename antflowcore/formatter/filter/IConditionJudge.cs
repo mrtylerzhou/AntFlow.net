@@ -5,5 +5,5 @@ namespace antflowcore.service.processor.filter;
 
 public interface IConditionJudge
 {
-      bool Judge(String nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo,int index);
+      bool Judge(String nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo,int index,int coundGroup);
 }

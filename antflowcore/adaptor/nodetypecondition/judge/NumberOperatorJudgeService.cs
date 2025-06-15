@@ -6,7 +6,7 @@ namespace antflowcore.adaptor.nodetypecondition.judge;
 
 public class NumberOperatorJudgeService: IConditionJudge
 {
-    public bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo,int index)
+    public bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo,int index,int group)
     {
         return true;
     }

@@ -39,6 +39,9 @@ namespace AntFlowCore.Entity
         [Column(Name = "ext_json")]
         public string ExtJson { get; set; }
 
+        [Column(Name = "group_relation")]
+        public int? GroupRelation { get; set; }
+
         /// <summary>
         /// Additional remarks.
         /// </summary>

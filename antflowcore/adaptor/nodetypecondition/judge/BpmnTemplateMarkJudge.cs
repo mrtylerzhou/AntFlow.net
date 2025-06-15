@@ -8,7 +8,7 @@ namespace antflowcore.adaptor.nodetypecondition.judge;
 
 public class BpmnTemplateMarkJudge: IConditionJudge
 {
-    public bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo,int index)
+    public bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo,int index,int group)
     {
         int? templateMarkId = bpmnStartConditionsVo.TemplateMarkId;
         if (templateMarkId == null)

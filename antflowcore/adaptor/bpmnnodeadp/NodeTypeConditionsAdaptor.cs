@@ -4,12 +4,14 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using antflowcore.adaptor.nodetypecondition;
+using antflowcore.constant.enums;
 using antflowcore.constant.enus;
 using AntFlowCore.Constants;
 using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.service.repository;
 using antflowcore.util;
+using antflowcore.util.Extension;
 using antflowcore.vo;
 using Antflowcore.Vo;
 
@@ -34,7 +36,7 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
     {
         BpmnNodeConditionsConf bpmnNodeConditionsConf =
             _bpmnNodeConditionsConfService.baseRepo.Where(a => a.BpmnNodeId == bpmnNodeVo.Id).First();
-        
+
 
         if (bpmnNodeConditionsConf == null)
         {
@@ -42,13 +44,23 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
         }
 
         string extJson = bpmnNodeConditionsConf.ExtJson;
-        List<BpmnNodeConditionsConfVueVo> extFields = JsonSerializer.Deserialize<List<BpmnNodeConditionsConfVueVo>>(extJson);
-        var name2confVueMap = extFields.ToDictionary(b => b.ColumnDbname, b => b);
+        //List<BpmnNodeConditionsConfVueVo> extFields = JsonSerializer.Deserialize<List<BpmnNodeConditionsConfVueVo>>(extJson);
+        List<List<BpmnNodeConditionsConfVueVo>>? extFieldsGroup =
+            JsonSerializer.Deserialize<List<List<BpmnNodeConditionsConfVueVo>>>(extJson);
+        var name2confVueMap = extFieldsGroup
+            .SelectMany(list => list)
+            .GroupBy(x => $"{x.ColumnDbname}_{x.CondGroup}")
+            .ToDictionary(
+                g => g.Key,
+                g => g.First() // 保留第一个
+            );
 
         BpmnNodeConditionsConfBaseVo bpmnNodeConditionsConfBaseVo = new BpmnNodeConditionsConfBaseVo
         {
             IsDefault = bpmnNodeConditionsConf.IsDefault,
-            Sort = bpmnNodeConditionsConf.Sort
+            Sort = bpmnNodeConditionsConf.Sort,
+            ExtJson = extJson,
+            GroupRelation = bpmnNodeConditionsConf.GroupRelation,
         };
 
         if (bpmnNodeConditionsConf.IsDefault == 1)
@@ -60,8 +72,10 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
         }
 
         List<BpmnNodeConditionsParamConf> nodeConditionsParamConfs = _bpmnNodeConditionsParamConfService.baseRepo
-            .Where(a=>a.BpmnNodeConditionsId==bpmnNodeConditionsConf.Id).ToList();
-        
+            .Where(a => a.BpmnNodeConditionsId == bpmnNodeConditionsConf.Id)
+            .OrderBy(a => a.CondGroup)
+            .ToList();
+
 
         if (nodeConditionsParamConfs.Any())
         {
@@ -69,84 +83,153 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
                 .Select(c => c.ConditionParamType)
                 .ToList();
 
-            IDictionary<String,Object> wrappedValue=null;
-            bool isLowCodeFlow=false;
+            var groupedCondRelations = bpmnNodeConditionsConfBaseVo.GroupedCondRelations;
+
+            foreach (var item in nodeConditionsParamConfs)
+            {
+                int? condGroup = item.CondGroup;
+                int? condRelation = item.CondRelation;
+
+                // 可选：判断 null 抛异常
+                if (condGroup == null || condRelation == null)
+                {
+                    throw new Exception("logic error, please contact the Administrator");
+                }
+
+                if (condGroup.HasValue && condRelation.HasValue)
+                {
+                    groupedCondRelations[condGroup.Value] = condRelation.Value;
+                }
+            }
+
+            // 分组 + 收集为 List<int>
+            bpmnNodeConditionsConfBaseVo.GroupedConditionParamTypes = nodeConditionsParamConfs
+                .Where(x => x.CondGroup.HasValue)
+                .GroupBy(x => x.CondGroup.Value)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(x => x.ConditionParamType).ToList()
+                );
+
+            IDictionary<int, IDictionary<String, Object>> groupedWrappedValue =
+                new Dictionary<int, IDictionary<string, object>>();
+            bool isLowCodeFlow = false;
             foreach (BpmnNodeConditionsParamConf nodeConditionsParamConf in nodeConditionsParamConfs)
             {
+                IDictionary<String, Object> wrappedValue = null;
                 ConditionTypeEnum? conditionTypeEnum =
                     ConditionTypeEnumExtensions.GetEnumByCode(nodeConditionsParamConf.ConditionParamType);
-                if(conditionTypeEnum==null){
-                    throw  new AFBizException($"can not get ConditionTypeEnum by code:{nodeConditionsParamConf.ConditionParamType}");
+                if (conditionTypeEnum == null)
+                {
+                    throw new AFBizException(
+                        $"can not get ConditionTypeEnum by code:{nodeConditionsParamConf.ConditionParamType}");
                 }
+
                 ConditionTypeAttributes conditionTypeAttributes = conditionTypeEnum.Value.GetAttributes();
+                int? condGroup = nodeConditionsParamConf.CondGroup;
                 string conditionParamJson = nodeConditionsParamConf.ConditionParamJsom;
                 int? theOperator = nodeConditionsParamConf.TheOperator;
+                String paramKey = nodeConditionsParamConf.ConditionParamName + "_" + nodeConditionsParamConf.CondGroup;
                 if (!string.IsNullOrEmpty(conditionParamJson))
                 {
                     if (conditionTypeAttributes.FieldType == 1) // List
                     {
-                        Type genericTypeToDeserialize = typeof(List<>).MakeGenericType(conditionTypeAttributes.FieldClass);
+                        Type genericTypeToDeserialize =
+                            typeof(List<>).MakeGenericType(conditionTypeAttributes.FieldClass);
                         var objects = JsonSerializer.Deserialize(conditionParamJson, genericTypeToDeserialize);
                         if (conditionTypeEnum.Value.IsLowCodeFlow())
                         {
-                            String columnDbname = name2confVueMap[nodeConditionsParamConf.ConditionParamName].ColumnDbname;
-                            if(wrappedValue==null){
-                                wrappedValue=new SortedDictionary<string,object>();
+                            String columnDbname = name2confVueMap[paramKey].ColumnDbname;
+                            if (wrappedValue == null)
+                            {
+                                wrappedValue = new SortedDictionary<string, object>();
                             }
-                            wrappedValue.Add(columnDbname,objects);
+
+                            wrappedValue[columnDbname] = objects;
+                            if (groupedWrappedValue.ContainsKey(condGroup.Value))
+                            {
+                                groupedWrappedValue[condGroup.Value].Add(columnDbname, objects);
+                            }
+                            else
+                            {
+                                groupedWrappedValue.Add(condGroup.Value, wrappedValue);
+                            }
                         }
 
                         var field = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(conditionTypeAttributes.FieldName,
                             BindingFlags.Public | BindingFlags.Instance);
-                        field.SetValue(bpmnNodeConditionsConfBaseVo, wrappedValue??objects);
+                        field.SetValue(bpmnNodeConditionsConfBaseVo, wrappedValue ?? objects);
                     }
                     else if (conditionTypeAttributes.FieldType == 2) // Object
                     {
-                        object obj = conditionTypeAttributes.FieldClass==typeof(string)
+                        object obj = conditionTypeAttributes.FieldClass == typeof(string)
                             ? conditionParamJson
                             : JsonSerializer.Deserialize(conditionParamJson, conditionTypeAttributes.FieldClass);
 
                         if (conditionTypeEnum.Value.IsLowCodeFlow())
                         {
-                            isLowCodeFlow=true;
-                            String columnDbname = name2confVueMap[nodeConditionsParamConf.ConditionParamName].ColumnDbname;
-                            if(wrappedValue==null){
-                                wrappedValue=new SortedDictionary<string, object>();
+                            isLowCodeFlow = true;
+                            String columnDbname = name2confVueMap[paramKey].ColumnDbname;
+                            if (wrappedValue == null)
+                            {
+                                wrappedValue = new SortedDictionary<string, object>();
                             }
-                            wrappedValue.Add(columnDbname,obj);
+
+                            wrappedValue.Add(columnDbname, obj);
+                            if (groupedWrappedValue.ContainsKey(condGroup.Value))
+                            {
+                                groupedWrappedValue[condGroup.Value].Add(columnDbname, obj);
+                            }
+                            else
+                            {
+                                groupedWrappedValue.Add(condGroup.Value, wrappedValue);
+                            }
                         }
                         else
                         {
-                            var field = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(conditionTypeAttributes.FieldName,
+                            var field = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(
+                                conditionTypeAttributes.FieldName,
                                 BindingFlags.Public | BindingFlags.Instance);
-                            field.SetValue(bpmnNodeConditionsConfBaseVo, wrappedValue??obj); 
+                            field.SetValue(bpmnNodeConditionsConfBaseVo, wrappedValue ?? obj);
                         }
-                        
                     }
                 }
 
                 // Set response
-                var service = (IBpmnNodeConditionsAdaptor)Activator.CreateInstance(conditionTypeAttributes.AdaptorClass);
+                var service =
+                    (IBpmnNodeConditionsAdaptor)Activator.CreateInstance(conditionTypeAttributes.AdaptorClass);
                 service.SetConditionsResps(bpmnNodeConditionsConfBaseVo);
                 if (theOperator.HasValue)
                 {
                     bpmnNodeConditionsConfBaseVo.NumberOperatorList.Add(theOperator.Value);
+                    IDictionary<int, List<int>> groupedNumberOperatorListMap =
+                        bpmnNodeConditionsConfBaseVo.GroupedNumberOperatorListMap;
+                    if (groupedNumberOperatorListMap.ContainsKey(nodeConditionsParamConf.CondGroup.Value))
+                    {
+                        groupedNumberOperatorListMap[nodeConditionsParamConf.CondGroup.Value].Add(theOperator.Value);
+                    }
+                    else
+                    {
+                        List<int> numberOperatorList = new List<int>();
+                        numberOperatorList.Add(theOperator.Value);
+                        groupedNumberOperatorListMap[nodeConditionsParamConf.CondGroup.Value] = numberOperatorList;
+                    }
                 }
             }
 
             if (isLowCodeFlow)
             {
-                var field = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(StringConstants.LOWFLOW_CONDITION_CONTAINER_FIELD_NAME,
-                    BindingFlags.Public | BindingFlags.Instance);
-                field.SetValue(bpmnNodeConditionsConfBaseVo,wrappedValue);
+                bpmnNodeConditionsConfBaseVo.GroupedLfConditionsMap = groupedWrappedValue;
             }
         }
 
         SetProperty(bpmnNodeVo, bpmnNodeConditionsConfBaseVo);
 
-        List<BpmnNodeConditionsConfVueVo> bpmnNodeConditionsConfVueVos = BpmnConfNodePropertyConverter.ToVue3Model(bpmnNodeConditionsConfBaseVo);
-        Dictionary<string,BpmnNodeConditionsConfVueVo> voMap = bpmnNodeConditionsConfVueVos.ToDictionary(v => v.ColumnDbname, v => v);
-
+        List<BpmnNodeConditionsConfVueVo> bpmnNodeConditionsConfVueVos =
+            BpmnConfNodePropertyConverter.ToVue3Model(bpmnNodeConditionsConfBaseVo);
+        Dictionary<string, BpmnNodeConditionsConfVueVo> voMap =
+            bpmnNodeConditionsConfVueVos.ToDictionary(v => v.ColumnDbname, v => v);
+        List<BpmnNodeConditionsConfVueVo> extFields = extFieldsGroup.SelectMany(group => group).ToList();
         foreach (BpmnNodeConditionsConfVueVo extField in extFields)
         {
             string columnDbname = extField.ColumnDbname;
@@ -160,24 +243,24 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
             if (voMap.Any())
             {
                 //由于前端定义的是首字母小写,
-                string first = voMap.Keys.First(a=>a.Equals(columnDbname,StringComparison.CurrentCultureIgnoreCase));
+                string first = voMap.Keys.First(a => a.Equals(columnDbname, StringComparison.CurrentCultureIgnoreCase));
                 var vueVo = voMap.GetValueOrDefault(first);
                 if (vueVo == null)
                 {
                     throw new AFBizException("Logic error!");
                 }
 
-                extField.FixedDownBoxValue = vueVo.FixedDownBoxValue;
+                //extField.FixedDownBoxValue = vueVo.FixedDownBoxValue;
             }
         }
 
         bpmnNodeVo.Property.IsDefault = bpmnNodeConditionsConf.IsDefault;
         bpmnNodeVo.Property.Sort = bpmnNodeConditionsConf.Sort;
-        bpmnNodeVo.Property.ConditionList = extFields;
-
+        bpmnNodeVo.Property.GroupRelation =
+            ConditionRelationShipEnum.GetValueByCode(bpmnNodeConditionsConf.GroupRelation);
+        bpmnNodeVo.Property.ConditionList = extFieldsGroup;
         return bpmnNodeVo;
     }
-
 
 
     private void SetProperty(BpmnNodeVo bpmnNodeVo, BpmnNodeConditionsConfBaseVo bpmnNodeConditionsConfBaseVo)
@@ -194,17 +277,19 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
         BpmnNodeConditionsConfBaseVo bpmnNodeConditionsConfBaseVo = null;
         if (bpmnNodePropertysVo != null)
         {
-            bpmnNodeConditionsConfBaseVo=BpmnConfNodePropertyConverter.FromVue3Model(bpmnNodePropertysVo);
+            bpmnNodeConditionsConfBaseVo = BpmnConfNodePropertyConverter.FromVue3Model(bpmnNodePropertysVo);
         }
         else
         {
-            bpmnNodeConditionsConfBaseVo=new BpmnNodeConditionsConfBaseVo();
+            bpmnNodeConditionsConfBaseVo = new BpmnNodeConditionsConfBaseVo();
         }
+
         BpmnNodeConditionsConf bpmnNodeConditionsConf = new BpmnNodeConditionsConf
         {
             BpmnNodeId = bpmnNodeVo.Id,
             IsDefault = bpmnNodeConditionsConfBaseVo.IsDefault,
             Sort = bpmnNodeConditionsConfBaseVo.Sort,
+            GroupRelation = bpmnNodeConditionsConfBaseVo.GroupRelation,
             ExtJson = bpmnNodeConditionsConfBaseVo.ExtJson,
             CreateTime = DateTime.Now,
             Remark = "",
@@ -224,76 +309,104 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
         if (nodeConditionsId > 0)
         {
             var extJson = bpmnNodeConditionsConfBaseVo.ExtJson;
-            List<BpmnNodeConditionsConfVueVo> extFields = JsonSerializer.Deserialize<List<BpmnNodeConditionsConfVueVo>>(extJson);
-            foreach (var extField in extFields)
+            List<List<BpmnNodeConditionsConfVueVo>>? extFieldsArray = JsonSerializer.Deserialize<List<List<BpmnNodeConditionsConfVueVo>>>(extJson);
+            int index = 0;
+            foreach (List<BpmnNodeConditionsConfVueVo> extFields in extFieldsArray)
             {
-                string columnId = extField.ColumnId;
-                String columnDbname = extField.ColumnDbname;
-                ConditionTypeEnum? conditionTypeEnum = ConditionTypeEnumExtensions.GetEnumByCode(int.Parse(columnId));
-                if (conditionTypeEnum == null)
+                index++;
+                foreach (var extField in extFields)
                 {
-                    throw new AFBizException($"Cannot get node ConditionTypeEnum by code: {columnId}");
-                }
-                ConditionTypeAttributes conditionTypeAttributes = ConditionTypeEnumExtensions.GetAttributes(conditionTypeEnum.Value);
-                PropertyInfo? fieldInfo = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(conditionTypeAttributes.FieldName);
-                if (fieldInfo == null)
-                {
-                    throw new AFBizException("fieldInfo is null");
-                }
-                var conditionParam =  fieldInfo.GetValue(bpmnNodeConditionsConfBaseVo);
-                if (conditionParam != null)
-                {
-                    if(conditionTypeEnum.Value.IsLowCodeFlow()){
-                        IDictionary containerWrapper = (IDictionary) conditionParam;
-                        conditionParam= containerWrapper[columnDbname];
-                       
-                    }
-                    string conditionParamJson = conditionParam is string
-                        ? conditionParam.ToString()
-                        : JsonSerializer.Serialize(conditionParam);
-
-                   
-                    if (conditionTypeAttributes.FieldType == 1)
+                    string columnId = extField.ColumnId;
+                    String columnDbname = extField.ColumnDbname;
+                    ConditionTypeEnum? conditionTypeEnum =
+                        ConditionTypeEnumExtensions.GetEnumByCode(int.Parse(columnId));
+                    if (conditionTypeEnum == null)
                     {
-                        JsonNode? jsonNode = JsonSerializer.Deserialize<JsonNode>(conditionParamJson);
-                        if (jsonNode == null||jsonNode is JsonArray { Count: 0 })
+                        throw new AFBizException($"Cannot get node ConditionTypeEnum by code: {columnId}");
+                    }
+
+                    ConditionTypeAttributes conditionTypeAttributes =
+                        ConditionTypeEnumExtensions.GetAttributes(conditionTypeEnum.Value);
+                    PropertyInfo? fieldInfo =
+                        typeof(BpmnNodeConditionsConfBaseVo).GetProperty(conditionTypeAttributes.FieldName);
+                    if (fieldInfo == null)
+                    {
+                        throw new AFBizException("fieldInfo is null");
+                    }
+
+                    Object conditionParam = null;
+                    if(conditionTypeEnum.Value.IsLowCodeFlow())
+                    {
+                        IDictionary<int,IDictionary<string,object>> groupedLfConditionsMap = bpmnNodeConditionsConfBaseVo.GroupedLfConditionsMap;
+                        if (groupedLfConditionsMap.ContainsKey(index))
                         {
-                            continue;
+                            conditionParam = groupedLfConditionsMap[index];
                         }
                     }
-                    var numberOperator = extField.OptType;
-                    _bpmnNodeConditionsParamConfService.baseRepo.Insert(new BpmnNodeConditionsParamConf
+                    else
                     {
-                        BpmnNodeConditionsId = nodeConditionsId,
-                        ConditionParamType = (int)conditionTypeEnum,
-                        ConditionParamName = extField.ColumnDbname,
-                        ConditionParamJsom = conditionParamJson,
-                        CreateUser = SecurityUtils.GetLogInEmpNameSafe(),
-                        Remark = "",
-                        TheOperator = numberOperator,
-                        CreateTime = DateTime.Now
-                    });
+                        fieldInfo.GetValue(bpmnNodeConditionsConfBaseVo);
+                    }
+                    if (conditionParam != null)
+                    {
+                        if (conditionTypeEnum.Value.IsLowCodeFlow())
+                        {
+                            IDictionary containerWrapper = (IDictionary)conditionParam;
+                            conditionParam = containerWrapper[columnDbname];
+                        }
 
-                    //if condition value doest not a collection and doest not a string type,it must have an operator
-                    if (conditionTypeAttributes.FieldType == 2 && !(conditionParam is string))
-                    {
-                        
+                        string conditionParamJson = conditionParam is string
+                            ? conditionParam.ToString()
+                            : JsonSerializer.Serialize(conditionParam);
+
+
+                        if (conditionTypeAttributes.FieldType == 1)
+                        {
+                            JsonNode? jsonNode = JsonSerializer.Deserialize<JsonNode>(conditionParamJson);
+                            if (jsonNode == null || jsonNode is JsonArray { Count: 0 })
+                            {
+                                continue;
+                            }
+                        }
+
+                        var numberOperator = extField.OptType;
                         _bpmnNodeConditionsParamConfService.baseRepo.Insert(new BpmnNodeConditionsParamConf
                         {
                             BpmnNodeConditionsId = nodeConditionsId,
-                            ConditionParamType = (int)ConditionTypeEnum.CONDITION_TYPE_NUMBER_OPERATOR,
-                            ConditionParamName = ConditionTypeEnum.CONDITION_TYPE_NUMBER_OPERATOR.GetAttributes().FieldName,
-                            ConditionParamJsom = JsonSerializer.Serialize(numberOperator),
+                            ConditionParamType = (int)conditionTypeEnum,
+                            ConditionParamName = extField.ColumnDbname,
+                            ConditionParamJsom = conditionParamJson,
+                            TheOperator = numberOperator,
+                            CondGroup = extField.CondGroup,
+                            CondRelation = ConditionRelationShipEnum.GetCodeByValue(extField.CondRelation),
                             CreateUser = SecurityUtils.GetLogInEmpNameSafe(),
+                            Remark = "",
                             CreateTime = DateTime.Now
                         });
+
+                        //if condition value doest not a collection and doest not a string type,it must have an operator
+                        if (conditionTypeAttributes.FieldType == 2 && !(conditionParam is string))
+                        {
+                            _bpmnNodeConditionsParamConfService.baseRepo.Insert(new BpmnNodeConditionsParamConf
+                            {
+                                BpmnNodeConditionsId = nodeConditionsId,
+                                ConditionParamType = (int)ConditionTypeEnum.CONDITION_TYPE_NUMBER_OPERATOR,
+                                ConditionParamName = ConditionTypeEnum.CONDITION_TYPE_NUMBER_OPERATOR.GetAttributes().FieldName,
+                                ConditionParamJsom = JsonSerializer.Serialize(numberOperator),
+                                CondGroup = extField.CondGroup,
+                                CondRelation = ConditionRelationShipEnum.GetCodeByValue(extField.CondRelation),
+                                CreateUser = SecurityUtils.GetLogInEmpNameSafe(),
+                                CreateTime = DateTime.Now
+                            });
+                        }
+
+                        long confId = bpmnNodeVo.ConfId;
+                        _lfFormdataFieldService.Frsql
+                            .Update<BpmnConfLfFormdataField>()
+                            .Set(a => a.IsConditionField, 1)
+                            .Where(a => a.BpmnConfId == confId && a.FieldId == columnDbname)
+                            .ExecuteAffrows();
                     }
-                    long confId = bpmnNodeVo.ConfId;
-                    _lfFormdataFieldService.Frsql
-                        .Update<BpmnConfLfFormdataField>()
-                        .Set(a => a.IsConditionField, 1)
-                        .Where(a => a.BpmnConfId == confId && a.FieldId == columnDbname)
-                        .ExecuteAffrows();
                 }
             }
         }
