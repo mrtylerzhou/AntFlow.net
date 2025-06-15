@@ -387,6 +387,7 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
                 Description = a.t2.Description,
                 ProcessState = a.t1.ProcessState,
                 ProcessKey = a.t1.ProcessinessKey,
+                ProcessCode =a.t1.ProcessinessKey,
                 TaskStype = a.t1.ProcessState,
                 ProcessDigest = a.t1.ProcessDigest,
             })
