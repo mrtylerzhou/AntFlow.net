@@ -176,12 +176,13 @@ public class TaskService
         {
             Id = currentExecution.Id,
             ProcInstId = procInstId,
-            //BusinessKey = bpmnStartConditions.BusinessId, //todo注意观察此字段更新时是否会丢失
+            BusinessKey = currentExecution.BusinessKey,
             ProcDefId = procDefId,
             ActId = elementToDeal.ElementId,
             Name = elementToDeal.ElementName,
             StartTime = nowTime,
             StartUserId = SecurityUtils.GetLogInEmpId(),
+            SignType = currentExecution.SignType,
             TaskCount =taskCount,
         };
        
