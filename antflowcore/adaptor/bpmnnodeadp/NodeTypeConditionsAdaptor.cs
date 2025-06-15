@@ -228,7 +228,7 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
         List<BpmnNodeConditionsConfVueVo> bpmnNodeConditionsConfVueVos =
             BpmnConfNodePropertyConverter.ToVue3Model(bpmnNodeConditionsConfBaseVo);
         Dictionary<string, BpmnNodeConditionsConfVueVo> voMap =
-            bpmnNodeConditionsConfVueVos.ToDictionary(v => v.ColumnDbname, v => v);
+            bpmnNodeConditionsConfVueVos.GroupBy(a=>a.ColumnDbname).ToDictionary(a=>a.Key,a=>a.First());
         List<BpmnNodeConditionsConfVueVo> extFields = extFieldsGroup.SelectMany(group => group).ToList();
         foreach (BpmnNodeConditionsConfVueVo extField in extFields)
         {
