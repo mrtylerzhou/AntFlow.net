@@ -345,7 +345,7 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
                     }
                     else
                     {
-                        fieldInfo.GetValue(bpmnNodeConditionsConfBaseVo);
+                        conditionParam=fieldInfo.GetValue(bpmnNodeConditionsConfBaseVo);
                     }
                     if (conditionParam != null)
                     {
