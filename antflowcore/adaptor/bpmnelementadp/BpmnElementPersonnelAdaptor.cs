@@ -22,7 +22,7 @@ namespace antflowcore.adaptor.bpmnelementadp;
 
             int? signType = property.SignType;
 
-            var assigneeMap = new Dictionary<string, string>();
+            var assigneeMap = new SortedDictionary<string, string>();
             var assignee = new List<string>();
             foreach (var assigneeVo in assigneeList)
             {

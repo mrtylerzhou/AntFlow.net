@@ -92,6 +92,12 @@ public static class BpmnFlowUtil
         throw new AFBizException("logic error,can not find next element,please contact the administrator");
     }
 
+    /// <summary>
+    /// 获取从当前节点流向的(即当前节点下一节点)的下一个节点
+    /// </summary>
+    /// <param name="commonElements"></param>
+    /// <param name="taskDefKey"></param>
+    /// <returns></returns>
     public static BpmnConfCommonElementVo GetNodeFromCurrentNext(List<BpmnConfCommonElementVo> commonElements,
         string taskDefKey)
     {
@@ -100,6 +106,7 @@ public static class BpmnFlowUtil
             .SelectMany(a=>commonElements.Where(x=>x.ElementId==a.FlowTo)).ToList().FirstOrDefault();
         return bpmnConfCommonElementVo;
     }
+    
     public static BpmnConfCommonElementVo GetLastSequenceFlow(List<BpmnConfCommonElementVo> commonElements)
     {
         List<BpmnConfCommonElementVo> lastElementVos = commonElements.Where(a=>a.ElementType==ElementTypeEnum.ELEMENT_TYPE_SEQUENCE_FLOW.Code&&a.IsLastSequenceFlow==1).ToList();

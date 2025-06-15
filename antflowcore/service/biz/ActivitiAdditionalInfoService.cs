@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Text.Json;
 using antflowcore.entity;
 using antflowcore.service.repository;
+using antflowcore.util;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
 
@@ -59,15 +60,14 @@ public class ActivitiAdditionalInfoService
 
     public static List<BpmnConfCommonElementVo> GetNextElementList(string elementId, List<BpmnConfCommonElementVo> activitiList)
     {
-        IEnumerable<BpmnConfCommonElementVo> bpmnConfCommonElementVos = activitiList.Where(a=>a.ElementId==elementId);
-        List<BpmnConfCommonElementVo> flowToSequences = activitiList.Where(a=>elementId.Equals(a.FlowFrom)).ToList();
-        List<string> flowTos = flowToSequences.Select(a=>a.FlowTo).ToList();
-        if (!flowTos.Any())
+        List<BpmnConfCommonElementVo> bpmnConfCommonElementVos =
+            activitiList.Where(a => a.ElementId == elementId).ToList();
+        if(bpmnConfCommonElementVos.Count==0)
         {
             return null;
         }
 
-        List<BpmnConfCommonElementVo> nextElementVos = activitiList.Where(a=>flowTos.Contains(a.ElementId)).ToList();
-        return nextElementVos;
+        BpmnConfCommonElementVo bpmnConfCommonElementVo = BpmnFlowUtil.GetNodeFromCurrentNext(activitiList, bpmnConfCommonElementVos[0].ElementId);
+        return bpmnConfCommonElementVo == null ? null : new List<BpmnConfCommonElementVo> { bpmnConfCommonElementVo };
     }
 }

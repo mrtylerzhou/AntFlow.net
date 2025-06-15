@@ -260,9 +260,14 @@ public class BpmVerifyInfoBizService
        
         Dictionary<string, List<BpmAfTaskInst>> variableInstanceMap = _actitiAdditionalInfoService.GetVariableInstanceMap(historicProcessInstance.Id);
 
-        // Perform the final append operation
-        DoAddBpmVerifyInfoVo(sort, taskVo.ElementId, activitiList, nodeApproveds,
-            bpmVerifyInfoVos, bpmVariable.Id);
+        String[] elementIds = taskVo.ElementId.Split(",");
+        for (var i = 0; i < elementIds.Length; i++)
+        {
+            // Perform the final append operation
+            DoAddBpmVerifyInfoVo(sort, elementIds[i], activitiList, nodeApproveds,
+                bpmVerifyInfoVos, bpmVariable.Id,i==elementIds.Length-1);
+        }
+       
     }
 
     private Dictionary<string, List<BaseIdTranStruVo>> GetNodeApproveds(long variableId)
@@ -315,7 +320,8 @@ public class BpmVerifyInfoBizService
 
     private void DoAddBpmVerifyInfoVo(int sort, string elementId, List<BpmnConfCommonElementVo> activitiList,
             Dictionary<string, List<BaseIdTranStruVo>> nodeApproveds,
-            List<BpmVerifyInfoVo> bpmVerifyInfoVos, long variableId)
+            List<BpmVerifyInfoVo> bpmVerifyInfoVos, long variableId,
+            bool includeParallelGateway)
     {
         List<BpmnConfCommonElementVo> nextElements =
             ActivitiAdditionalInfoService.GetNextElementList(elementId, activitiList);
@@ -324,7 +330,11 @@ public class BpmVerifyInfoBizService
         {
             return;
         }
-
+        BpmnConfCommonElementVo bpmnConfCommonElementVo = nextElements[0];
+        bool isParallelGateway= bpmnConfCommonElementVo.ElementType == ElementTypeEnum.ELEMENT_TYPE_PARALLEL_GATEWAY.Code;
+        if(!includeParallelGateway&&isParallelGateway){
+            return;
+        }
         var empIds = new List<string>();
         var emplNames = new List<string>();
 
@@ -379,7 +389,7 @@ public class BpmVerifyInfoBizService
         };
 
         // 添加到审批信息列表
-        if (!string.IsNullOrEmpty(bpmVerifyInfoVo.VerifyUserName) && bpmVerifyInfoVo.TaskName != "EndEvent")
+        if (!isParallelGateway&&!string.IsNullOrEmpty(bpmVerifyInfoVo.VerifyUserName) && bpmVerifyInfoVo.TaskName != "EndEvent")
         {
             bpmVerifyInfoVos.Add(bpmVerifyInfoVo);
             sort++;
@@ -391,8 +401,13 @@ public class BpmVerifyInfoBizService
             var nextNextElement = ActivitiAdditionalInfoService.GetNextElementList(nextElement.ElementId, activitiList);
             if (nextNextElement != null)
             {
+                if (!includeParallelGateway && isParallelGateway)
+                {
+                    break;
+                }
+
                 DoAddBpmVerifyInfoVo(sort, nextElement.ElementId, activitiList, nodeApproveds, bpmVerifyInfoVos,
-                    variableId);
+                    variableId, includeParallelGateway);
             }
         }
     }

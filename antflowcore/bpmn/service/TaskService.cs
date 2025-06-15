@@ -206,6 +206,7 @@ public class TaskService
         }
         List<BpmAfTaskInst> historyTaskInsts = new List<BpmAfTaskInst>();
         List<BpmAfTask> tasks=new List<BpmAfTask>();
+        
         foreach (var (key, value) in assigneeMap)
         {
             if (verifyUserIds.Contains(key))
@@ -227,6 +228,10 @@ public class TaskService
                 FormKey = bpmAfTask.FormKey,
             };
             tasks.Add(newTask);
+            if (currentSignType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode())
+            {
+                break;
+            }
         }
         _afTaskService.InsertTasks(tasks);
         foreach (BpmAfTask afTask in tasks)
