@@ -373,7 +373,7 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
         BasePagingInfo basePagingInfo = page.ToPagingInfo();
         List<TaskMgmtVO> taskMgmtVos = _freeSql
             .Select<BpmBusinessProcess,BpmAfTaskInst>()
-            .LeftJoin((b,h) => h.ProcInstId == b.ProcInstId&&h.TaskDefKey=="task1418018332271"&&h.Priority==1)
+            .LeftJoin((b,h) => h.ProcInstId == b.ProcInstId&&h.TaskDefKey=="task1418018332271"&&h.Priority==0)
             .Where((b,a)=>b.CreateUser==taskMgmtVO.ApplyUser&&b.IsDel==0)
             .WithTempQuery(a=>new TaskMgmtVO
             {
