@@ -240,120 +240,136 @@ public class BpmnConfNodePropertyConverter
         }
 
         List<BpmnNodeConditionsConfVueVo> results = new List<BpmnNodeConditionsConfVueVo>();
-        List<int> conditionParamTypes = baseVo.ConditionParamTypes;
-
-        foreach (int conditionParamType in conditionParamTypes)
+        IDictionary<int, List<int>> groupedConditionParamTypes = baseVo.GroupedConditionParamTypes;
+        String extJson = baseVo.ExtJson;
+        Dictionary<int, List<BpmnNodeConditionsConfVueVo>> groupedConditionsConf =
+            new Dictionary<int, List<BpmnNodeConditionsConfVueVo>>();
+        if (!string.IsNullOrEmpty(extJson))
         {
-            BpmnNodeConditionsConfVueVo vueVo = new BpmnNodeConditionsConfVueVo();
-            ConditionTypeEnum? enumByCode = ConditionTypeEnumExtensions.GetEnumByCode(conditionParamType);
-            if (enumByCode == null)
-            {
-                throw new AFBizException("node has no condition type");
-            }
+            List<List<BpmnNodeConditionsConfVueVo>> extFieldsArray =
+                JsonSerializer.Deserialize<List<List<BpmnNodeConditionsConfVueVo>>>(extJson);
+            groupedConditionsConf = groupedConditionsConf = extFieldsArray
+                .SelectMany(list => list)
+                .GroupBy(item => item.CondGroup)
+                .ToDictionary(g => g.Key, g => g.ToList());
+        }
 
-            ConditionTypeAttributes conditionTypeAttributes =
-                ConditionTypeEnumExtensions.GetAttributes(enumByCode.Value);
-            vueVo.ColumnDbname = conditionTypeAttributes.FieldName;
-            int fieldType = conditionTypeAttributes.FieldType;
-            vueVo.ShowName = conditionTypeAttributes.Description;
-
-            if (fieldType == 1)
+        foreach (KeyValuePair<int, List<int>> groupedConditionParamType in groupedConditionParamTypes)
+        {
+            int group = groupedConditionParamType.Key;
+            List<int> conditionParamTypes = groupedConditionParamTypes[group];
+            foreach (int conditionParamType in conditionParamTypes)
             {
-                var field = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(conditionTypeAttributes.FieldName,
-                    BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
-                IDictionary wrappedValues = null;
-                List<object> objects = new List<object>();
-                if (enumByCode.Value.IsLowCodeFlow())
+                BpmnNodeConditionsConfVueVo vueVo = new BpmnNodeConditionsConfVueVo();
+                ConditionTypeEnum? enumByCode = ConditionTypeEnumExtensions.GetEnumByCode(conditionParamType);
+                if (enumByCode == null)
                 {
-                    var value = field.GetValue(baseVo);
-                    if (value != null && value is IDictionary idc)
+                    throw new AFBizException("node has no condition type");
+                }
+
+                ConditionTypeAttributes conditionTypeAttributes =
+                    ConditionTypeEnumExtensions.GetAttributes(enumByCode.Value);
+                vueVo.ColumnDbname = conditionTypeAttributes.FieldName;
+                int fieldType = conditionTypeAttributes.FieldType;
+                vueVo.ShowName = conditionTypeAttributes.Description;
+
+                if (fieldType == 1)
+                {
+                    var field = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(conditionTypeAttributes.FieldName,
+                        BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+                    IDictionary wrappedValues = null;
+                    List<object> objects = new List<object>();
+                    if (enumByCode.Value.IsLowCodeFlow())
                     {
-                        wrappedValues = idc;
-                        ICollection values = wrappedValues.Values;
-                        foreach (object o in values)
+                        var value = field.GetValue(baseVo);
+                        if (value != null && value is IDictionary idc)
                         {
-                            objects.Add(o);
+                            wrappedValues = idc;
+                            ICollection values = wrappedValues.Values;
+                            foreach (object o in values)
+                            {
+                                objects.Add(o);
+                            }
                         }
                     }
-                }
-                else
-                {
-                    var value = field.GetValue(baseVo);
-                    if (value != null)
+                    else
                     {
-                        objects.Add(value);
-                    }
-                }
-
-                var join = string.Join(",", objects);
-                vueVo.Zdy1 = join;
-
-                PropertyInfo? extField = null;
-                if (enumByCode.Value.IsLowCodeFlow())
-                {
-                    extField = field;
-                }
-                else
-                {
-                    extField = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(
-                        conditionTypeAttributes.FieldName + "List",
-                        BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
-                }
-
-                List<BaseIdTranStruVo> extFields = null;
-                if (enumByCode.Value.IsLowCodeFlow())
-                {
-                    String extJson = baseVo.ExtJson;
-                    if (!string.IsNullOrEmpty(extJson))
-                    {
-                        JsonArray? jsonArray = JsonSerializer.Deserialize<JsonArray>(extJson);
-                        if (jsonArray != null)
+                        var value = field.GetValue(baseVo);
+                        if (value != null)
                         {
-                            JsonObject? jsonObject = jsonArray[0]?.AsObject();
-                            if (jsonObject != null &&
-                                jsonObject.TryGetPropertyValue("fixedDownBoxValue", out JsonNode? valueNode))
+                            objects.Add(value);
+                        }
+                    }
+
+                    var join = string.Join(",", objects);
+                    vueVo.Zdy1 = join;
+
+                    PropertyInfo? extField = null;
+                    if (enumByCode.Value.IsLowCodeFlow())
+                    {
+                        extField = field;
+                    }
+                    else
+                    {
+                        extField = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(
+                            conditionTypeAttributes.FieldName + "List",
+                            BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+                    }
+
+                    List<BaseIdTranStruVo> extFields = null;
+                    if (enumByCode.Value.IsLowCodeFlow())
+                    {
+                        if (!string.IsNullOrEmpty(extJson))
+                        {
+                            JsonArray? jsonArray = JsonSerializer.Deserialize<JsonArray>(extJson);
+                            if (jsonArray != null)
                             {
-                                string? fixedDownBoxValue = valueNode?.ToString();
-                                if (!string.IsNullOrEmpty(fixedDownBoxValue))
+                                JsonObject? jsonObject = jsonArray[0]?.AsObject();
+                                if (jsonObject != null &&
+                                    jsonObject.TryGetPropertyValue("fixedDownBoxValue", out JsonNode? valueNode))
                                 {
-                                    vueVo.FixedDownBoxValue = fixedDownBoxValue;
+                                    string? fixedDownBoxValue = valueNode?.ToString();
+                                    if (!string.IsNullOrEmpty(fixedDownBoxValue))
+                                    {
+                                        vueVo.FixedDownBoxValue = fixedDownBoxValue;
+                                    }
                                 }
                             }
                         }
                     }
+                    else
+                    {
+                        object? value = extField.GetValue(baseVo);
+                        if (value != null && value is List<BaseIdTranStruVo> list)
+                        {
+                            extFields = list;
+                        }
+                    }
+
+                    if (extFields == null || !extFields.Any())
+                    {
+                        continue;
+                    }
+
+                    List<BaseKeyValueStruVo> keyValuePairVos = new List<BaseKeyValueStruVo>();
+                    foreach (BaseIdTranStruVo baseIdTranStruVo in extFields)
+                    {
+                        BaseKeyValueStruVo keyValuePairVo = new BaseKeyValueStruVo();
+                        keyValuePairVo.Key = baseIdTranStruVo.Id;
+                        keyValuePairVo.Value = baseIdTranStruVo.Name;
+                        keyValuePairVos.Add(keyValuePairVo);
+                    }
+
+                    String extJsonx = JsonSerializer.Serialize(keyValuePairVos);
+                    vueVo.FixedDownBoxValue = extJsonx;
                 }
                 else
                 {
-                    object? value = extField.GetValue(baseVo);
-                    if (value != null && value is List<BaseIdTranStruVo> list)
-                    {
-                        extFields = list;
-                    }
+                    //todo
                 }
 
-                if (extFields == null || !extFields.Any())
-                {
-                    continue;
-                }
-
-                List<BaseKeyValueStruVo> keyValuePairVos = new List<BaseKeyValueStruVo>();
-                foreach (BaseIdTranStruVo baseIdTranStruVo in extFields)
-                {
-                    BaseKeyValueStruVo keyValuePairVo = new BaseKeyValueStruVo();
-                    keyValuePairVo.Key = baseIdTranStruVo.Id;
-                    keyValuePairVo.Value = baseIdTranStruVo.Name;
-                    keyValuePairVos.Add(keyValuePairVo);
-                }
-
-                String extJsonx = JsonSerializer.Serialize(keyValuePairVos);
-                vueVo.FixedDownBoxValue = extJsonx;
+                results.Add(vueVo);
             }
-            else
-            {
-                //todo
-            }
-
-            results.Add(vueVo);
         }
 
         return results;
