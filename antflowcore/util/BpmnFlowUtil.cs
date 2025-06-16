@@ -106,7 +106,14 @@ public static class BpmnFlowUtil
             .SelectMany(a=>commonElements.Where(x=>x.ElementId==a.FlowTo)).ToList().FirstOrDefault();
         return bpmnConfCommonElementVo;
     }
-    
+    public static List<BpmnConfCommonElementVo> GetNodeFromCurrentNexts(List<BpmnConfCommonElementVo> commonElements,
+        string taskDefKey)
+    {
+        List<BpmnConfCommonElementVo> bpmnConfCommonElementVos = commonElements
+            .Where(a => a.FlowFrom == taskDefKey)
+            .SelectMany(a => commonElements.Where(x => x.ElementId == a.FlowTo)).ToList();
+        return bpmnConfCommonElementVos;
+    }
     public static BpmnConfCommonElementVo GetLastSequenceFlow(List<BpmnConfCommonElementVo> commonElements)
     {
         List<BpmnConfCommonElementVo> lastElementVos = commonElements.Where(a=>a.ElementType==ElementTypeEnum.ELEMENT_TYPE_SEQUENCE_FLOW.Code&&a.IsLastSequenceFlow==1).ToList();

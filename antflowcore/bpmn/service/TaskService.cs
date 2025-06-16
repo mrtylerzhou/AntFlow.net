@@ -95,6 +95,7 @@ public class TaskService
         }
         string content = bpmAfDeployment.Content;
         List<BpmnConfCommonElementVo> elements = JsonSerializer.Deserialize<List<BpmnConfCommonElementVo>>(content);
+        List<BpmnConfCommonElementVo> elementToDealList = new List<BpmnConfCommonElementVo>();
         BpmnConfCommonElementVo elementToDeal = null;
         List<string> verifyUserIds = new List<string>();
         if (currentSignType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode())
@@ -148,10 +149,19 @@ public class TaskService
             }
             else
             {
-                elementToDeal = BpmnFlowUtil.GetNodeFromCurrentNext(elements,elementToDeal.ElementId);
+                List<BpmnConfCommonElementVo> bpmnConfCommonElementVos = BpmnFlowUtil.GetNodeFromCurrentNexts(elements,elementToDeal.ElementId);
+                elementToDealList.AddRange(bpmnConfCommonElementVos);
             }
         }
-        IDictionary<string,string> assigneeMap = elementToDeal.AssigneeMap;
+
+        if (elementToDealList.Count <= 0)
+        {
+            elementToDealList.Add(elementToDeal);
+        }
+        foreach (BpmnConfCommonElementVo bpmnConfCommonElementVo in elementToDealList)
+        {
+            elementToDeal = bpmnConfCommonElementVo;
+             IDictionary<string,string> assigneeMap = elementToDeal.AssigneeMap;
         if (elementToDeal.IsSignUpSubElement == 1)
         {
             List<KeyValuePair<string,string>> signupNodeAssigneeMap = this._signUpPersonnelService.Frsql
@@ -241,5 +251,7 @@ public class TaskService
             historyTaskInsts.Add(bpmAfTaskInst);
         }
         _afTaskInstService.baseRepo.Insert(historyTaskInsts);
+        }
+       
     }
 }

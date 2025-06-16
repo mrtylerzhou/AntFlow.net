@@ -1,10 +1,14 @@
-﻿using antflowcore.bpmn;
+﻿using System.Text.Json;
+using antflowcore.bpmn;
 using antflowcore.bpmn.service;
+using antflowcore.constant.enus;
 using AntFlowCore.Constants;
 using antflowcore.entity;
 using AntFlowCore.Entity;
+using antflowcore.exception;
 using antflowcore.service.biz;
 using antflowcore.util;
+using AntFlowCore.Vo;
 
 namespace antflowcore.service.repository;
 
@@ -13,14 +17,17 @@ public class BpmProcessNodeSubmitService: AFBaseCurdRepositoryService<BpmProcess
    
     private readonly TaskService _taskService;
     private readonly ProcessNodeJumpService _processNodeJumpService;
+    private readonly AFDeploymentService _afDeploymentService;
 
     public BpmProcessNodeSubmitService(
         TaskService taskService,
         ProcessNodeJumpService processNodeJumpService,
+        AFDeploymentService afDeploymentService,
         IFreeSql freeSql) : base(freeSql)
     {
         _taskService = taskService;
         _processNodeJumpService = processNodeJumpService;
+        _afDeploymentService = afDeploymentService;
     }
 
     public void ProcessComplete(BpmAfTask task)
@@ -36,7 +43,25 @@ public class BpmProcessNodeSubmitService: AFBaseCurdRepositoryService<BpmProcess
                 BackType = 0,
                 CreateUser = SecurityUtils.GetLogInEmpName()
             });
-            if (processNodeSubmit.State==0) {
+            bool nextElementParallelGateway=false;
+            if (processNodeSubmit.BackType == 2 || processNodeSubmit.BackType == 4)
+            {
+                BpmAfDeployment bpmAfDeployment = _afDeploymentService.baseRepo.Where(a => a.Id == task.ProcDefId).First();
+                if (bpmAfDeployment == null)
+                {
+                    throw new AFBizException($"can not find deployment by id: {task.ProcDefId}");
+                }
+                string content = bpmAfDeployment.Content;
+                List<BpmnConfCommonElementVo> elements = JsonSerializer.Deserialize<List<BpmnConfCommonElementVo>>(content);
+                var (assigneeNode, flowNode) = BpmnFlowUtil.GetNextNodeAndFlowNode(elements, task.TaskDefKey);
+                if(assigneeNode!=null)
+                {
+                    nextElementParallelGateway = assigneeNode.ElementType == ElementTypeEnum.ELEMENT_TYPE_PARALLEL_GATEWAY.Code;
+                }
+            }
+          
+            if (processNodeSubmit.State==0
+                ||(nextElementParallelGateway&&(processNodeSubmit.BackType==2||processNodeSubmit.BackType==4))) {
                 _taskService.Complete(task);
             }
             else
