@@ -75,6 +75,7 @@ public class RuntimeService
                     AssigneeName = bpmnStartConditions.StartUserName,
                     StartTime = nowTime,
                     EndTime = nowTime,
+                    Priority = 0,
                     DeleteReason = "发起人节点自动完成",
                     FormKey = bpmnConfCommonVo.FormCode,
                };

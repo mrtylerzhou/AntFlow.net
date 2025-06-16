@@ -1753,6 +1753,8 @@ create index AF_IDX_PROCINSTID
     on bpm_af_task (proc_inst_id);
 create index AF_IDX_TASK_DEF_KEY
     on bpm_af_task (task_def_key);
+create index AF_IDX_TASK_ASSIGNEE
+    on bpm_af_task (assignee);
 create table bpm_af_execution
 (
     id                   varchar(64)             not null
