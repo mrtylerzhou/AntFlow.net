@@ -115,7 +115,8 @@ namespace AntFlowCore.Vo
         public string BackToEmployeeName { get; set; }
         [JsonPropertyName("backToModifyType")]
         public int? BackToModifyType { get; set; }
-
+        [JsonPropertyName("backToNodeId"),JsonConverter(typeof(IntToStringConverter))]
+        public String BackToNodeId { get; set; }
         // Third party process
         [JsonPropertyName("formData")]
         public string FormData { get; set; }

@@ -44,7 +44,7 @@ public class BpmProcessNodeSubmitService: AFBaseCurdRepositoryService<BpmProcess
                 CreateUser = SecurityUtils.GetLogInEmpName()
             });
             bool nextElementParallelGateway=false;
-            if (processNodeSubmit.BackType == 2 || processNodeSubmit.BackType == 4)
+            if (processNodeSubmit.BackType == 1||processNodeSubmit.BackType == 2 || processNodeSubmit.BackType == 4)
             {
                 BpmAfDeployment bpmAfDeployment = _afDeploymentService.baseRepo.Where(a => a.Id == task.ProcDefId).First();
                 if (bpmAfDeployment == null)
@@ -61,7 +61,7 @@ public class BpmProcessNodeSubmitService: AFBaseCurdRepositoryService<BpmProcess
             }
           
             if (processNodeSubmit.State==0
-                ||(nextElementParallelGateway&&(processNodeSubmit.BackType==2||processNodeSubmit.BackType==4))) {
+                ||(nextElementParallelGateway&&(processNodeSubmit.BackType == 1||processNodeSubmit.BackType==2||processNodeSubmit.BackType==4))) {
                 _taskService.Complete(task);
             }
             else

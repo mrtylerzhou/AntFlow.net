@@ -28,6 +28,7 @@ using System.Linq;
         private readonly ProcessNodeJumpService _processNodeJump;
         private readonly FormFactory _formFactory;
         private readonly TaskMgmtService _taskMgmtService;
+        private readonly BpmVariableService _bpmVariableService;
         private readonly ProcessBusinessContansService _processConstants;
 
         public BackToModifyService(
@@ -38,6 +39,7 @@ using System.Linq;
             ProcessNodeJumpService processNodeJump,
             FormFactory formFactory,
             TaskMgmtService taskMgmtService,
+            BpmVariableService bpmVariableService,
             ProcessBusinessContansService processConstants)
         {
             _bpmBusinessProcessService = bpmBusinessProcessService;
@@ -47,6 +49,7 @@ using System.Linq;
             _processNodeJump = processNodeJump;
             _formFactory = formFactory;
             _taskMgmtService = taskMgmtService;
+            _bpmVariableService = bpmVariableService;
             _processConstants = processConstants;
         }
 
@@ -91,6 +94,18 @@ using System.Linq;
                     restoreNodeKey = taskData.TaskDefKey;
                     backToNodeKey = ProcessNodeEnum.START_TASK_KEY.Description;
                 }
+                else if(ProcessDisagreeTypeEnum.FOUR_DISAGREE == processDisagreeType)
+                {
+                    String elementId = _bpmVariableService.GetElementIdsdByNodeId(vo.ProcessNumber, vo.BackToNodeId)[0];
+                    backToNodeKey = elementId;
+                    List<BpmnConfCommonElementVo> elements = BpmnFlowUtil.GetElementVosByDeployId(taskData.ProcDefId);
+                    var (assigneeNode, flowNode) = BpmnFlowUtil.GetNextNodeAndFlowNode(elements, elementId);
+                    restoreNodeKey = assigneeNode.ElementId;
+                }else if (ProcessDisagreeTypeEnum.FIVE_DISAGREE == processDisagreeType)
+                {
+                    restoreNodeKey = taskData.TaskDefKey;
+                    backToNodeKey = _bpmVariableService.GetElementIdsdByNodeId(vo.ProcessNumber, vo.BackToNodeId)[0];
+                }
                 else
                 {
                     throw new AFBizException("未支持的打回类型!");
@@ -125,15 +140,46 @@ using System.Linq;
                 });
             }
 
-            // 并行任务回退
-            foreach (BpmAfTask task in taskList)
+            List<BpmnConfCommonElementVo> elementList = BpmnFlowUtil.GetElementVosByDeployId(taskData.ProcDefId);
+            int backToNodeIndex = elementList.FindIndex(t => t.ElementId == backToNodeKey);
+            int currentNodeIndex = elementList.FindIndex(t => t.ElementId == taskData.TaskDefKey);
+            bool isBackSpanParallelGateWay = false;
+            for (var i = 0; i < elementList.Count; i++)
+            {
+                BpmnConfCommonElementVo bpmnConfCommonElementVo = elementList[i];
+                if(bpmnConfCommonElementVo.ElementType == ElementTypeEnum.ELEMENT_TYPE_PARALLEL_GATEWAY.Code)
+                {
+                   if(i>backToNodeIndex && i<=currentNodeIndex)
+                   {
+                       isBackSpanParallelGateWay = true;
+                       break;
+                   }
+                }
+            }
+
+            if (isBackSpanParallelGateWay)
             {
                 Dictionary<string, object> varMap = new Dictionary<string, object>
                 {
-                    { StringConstants.TASK_ASSIGNEE_NAME, task.AssigneeName },
+                    { StringConstants.TASK_ASSIGNEE_NAME, taskData.AssigneeName },
                     {StringConstants.VERIFY_COMMENT,vo.ApprovalComment},
                 };
-                _processNodeJump.CommitProcess(task, varMap, backToNodeKey);
+                _processNodeJump.CommitProcess(taskData, varMap, backToNodeKey);
+            }
+            else
+            {
+                taskList = taskList.Distinct(new TaskDataEqualityComparer()).ToList();
+                // 并行任务回退
+                foreach (BpmAfTask task in taskList)
+                {
+               
+                    Dictionary<string, object> varMap = new Dictionary<string, object>
+                    {
+                        { StringConstants.TASK_ASSIGNEE_NAME, task.AssigneeName },
+                        {StringConstants.VERIFY_COMMENT,vo.ApprovalComment},
+                    };
+                    _processNodeJump.CommitProcess(task, varMap, backToNodeKey);
+                }
             }
             //退回以后的任务
             List<BpmAfTask> currentTasks = _taskService.baseRepo.Where(t => t.ProcInstId == procInstId).ToList();

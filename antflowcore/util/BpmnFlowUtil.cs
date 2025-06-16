@@ -1,12 +1,17 @@
-﻿using antflowcore.constant.enus;
+﻿using System.Collections.Concurrent;
+using System.Text.Json;
+using antflowcore.constant.enus;
 using AntFlowCore.Constants;
+using antflowcore.entity;
 using antflowcore.exception;
+using antflowcore.service.repository;
 using AntFlowCore.Vo;
 
 namespace antflowcore.util;
 
 public static class BpmnFlowUtil
 {
+  private static readonly ConcurrentDictionary<string,List<BpmnConfCommonElementVo>> cachedCommonElements = new ConcurrentDictionary<string, List<BpmnConfCommonElementVo>>();
     public static List<BpmnConfCommonElementVo> GetFirstAssigneeNodes(List<BpmnConfCommonElementVo> commonElements)
     {
         if (commonElements.Count == 0)
@@ -123,5 +128,24 @@ public static class BpmnFlowUtil
         }
 
         return lastElementVos[0];
+    }
+    public static List<BpmnConfCommonElementVo> GetElementVosByDeployId(string deployId)
+    {
+        if (cachedCommonElements.Count > 100)
+        {
+            cachedCommonElements.Clear();
+        }else if(cachedCommonElements.TryGetValue(deployId, out var vosByDeployId))
+        {
+            return vosByDeployId;
+        }
+        AFDeploymentService afDeploymentService = ServiceProviderUtils.GetService<AFDeploymentService>();
+        BpmAfDeployment bpmAfDeployment = afDeploymentService.baseRepo.Where(a => a.Id == deployId).First();
+        if (bpmAfDeployment == null)
+        {
+            throw new AFBizException($"can not find deployment by id: {deployId}");
+        }
+        string content = bpmAfDeployment.Content;
+        List<BpmnConfCommonElementVo> elements = JsonSerializer.Deserialize<List<BpmnConfCommonElementVo>>(content);
+        return elements;
     }
 }
