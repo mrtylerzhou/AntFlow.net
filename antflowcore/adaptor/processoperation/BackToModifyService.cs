@@ -157,7 +157,7 @@ using System.Linq;
                 }
             }
 
-            if (isBackSpanParallelGateWay)
+            if (!isBackSpanParallelGateWay)
             {
                 Dictionary<string, object> varMap = new Dictionary<string, object>
                 {
@@ -186,7 +186,12 @@ using System.Linq;
             if (currentTasks.Count > 0)
             {
                 BpmAfTask firstStartNode = currentTasks.First();
-                List<String> otherNewTaskIds = currentTasks.Where(t => t.Id != firstStartNode.Id).Select(t => t.Id).ToList();
+                List<BpmAfTask> otherNewTasks = currentTasks.Where(t => t.Id != firstStartNode.Id).ToList();
+                if (!isBackSpanParallelGateWay)
+                {
+                    otherNewTasks=otherNewTasks.Where(t=>t.TaskDefKey!=firstStartNode.TaskDefKey).ToList();
+                }
+                List<string> otherNewTaskIds = otherNewTasks.Select(t => t.Id).ToList();
                 _taskService.baseRepo.Delete(t => otherNewTaskIds.Contains(t.Id));
             }
             vo.BusinessId = bpmBusinessProcess.BusinessId;
