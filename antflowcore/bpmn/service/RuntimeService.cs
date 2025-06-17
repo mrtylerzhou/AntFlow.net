@@ -34,9 +34,14 @@ public class RuntimeService
           IDictionary<string, IDictionary<string, string>> node2AssigneeMap =
                new Dictionary<string, IDictionary<string, string>>();
           List < BpmAfExecution > executions = new List<BpmAfExecution>();
-          foreach (BpmnConfCommonElementVo firstAssigneeNode in firstAssigneeNodes)
+          for (var i = 0; i < firstAssigneeNodes.Count; i++)
           {
-               IDictionary<string, string> assigneeMap =firstAssigneeNode.AssigneeMap;
+               if (i > 0)
+               {
+                    break;
+               }
+               BpmnConfCommonElementVo firstAssigneeNode = firstAssigneeNodes[i]; 
+                 IDictionary<string, string> assigneeMap =firstAssigneeNode.AssigneeMap;
                string executionId = StrongUuidGenerator.GetNextId();
                DateTime nowTime = DateTime.Now;
                int signType = firstAssigneeNode.SignType;
@@ -80,9 +85,8 @@ public class RuntimeService
                     FormKey = bpmnConfCommonVo.FormCode,
                };
                historyTaskInsts.Add(startTask);
-               for (var i = 0; i < assigneeMap.Count; i++)
+               foreach (var (key, value) in assigneeMap)
                {
-                    var (key, value) = assigneeMap.ElementAt(i);
                     BpmAfTask bpmAfTask = new BpmAfTask()
                     {
                          Id = StrongUuidGenerator.GetNextId(),
@@ -103,7 +107,7 @@ public class RuntimeService
                          break;
                     }
                }
-
+               
                _taskService.InsertTasks(tasks);
                foreach (BpmAfTask bpmAfTask in tasks)
                {
