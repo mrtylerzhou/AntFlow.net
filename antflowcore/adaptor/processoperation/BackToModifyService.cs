@@ -182,7 +182,7 @@ using System.Linq;
                 }
             }
             //退回以后的任务
-            List<BpmAfTask> currentTasks = _taskService.baseRepo.Where(t => t.ProcInstId == procInstId).ToList();
+            List<BpmAfTask> currentTasks = _taskService.baseRepo.Where(t => t.ProcInstId == procInstId).OrderByDescending(a=>a.CreateTime).ToList();
             if (currentTasks.Count > 0)
             {
                 BpmAfTask firstStartNode = currentTasks.First();

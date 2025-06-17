@@ -158,99 +158,114 @@ public class TaskService
         {
             elementToDealList.Add(elementToDeal);
         }
+
         foreach (BpmnConfCommonElementVo bpmnConfCommonElementVo in elementToDealList)
         {
             elementToDeal = bpmnConfCommonElementVo;
-             IDictionary<string,string> assigneeMap = elementToDeal.AssigneeMap;
-        if (elementToDeal.IsSignUpSubElement == 1)
-        {
-            List<KeyValuePair<string,string>> signupNodeAssigneeMap = this._signUpPersonnelService.Frsql
-                .Select<BpmBusinessProcess,BpmVariable,BpmVariableSignUpPersonnel>()
-                .InnerJoin((a,b,c)=>a.BusinessNumber==b.ProcessNum)
-                .InnerJoin((a,b,c)=>b.Id==c.VariableId)
-                .Where((a,b,c)=>a.ProcInstId==procInstId)
-                .ToList<KeyValuePair<string,string>>((a,b,c)=>new KeyValuePair<string, string>(c.Assignee,c.AssigneeName));
-            if (signupNodeAssigneeMap.Count <= 0)
+            IDictionary<string, string> assigneeMap = elementToDeal.AssigneeMap;
+            if (elementToDeal.IsSignUpSubElement == 1)
             {
-                var (nextUserElement, nextFlowElement) = BpmnFlowUtil.GetNextNodeAndFlowNode(elements, elementToDeal.ElementId);
-                elementToDeal=nextUserElement;
-                assigneeMap=elementToDeal.AssigneeMap;
+                List<KeyValuePair<string, string>> signupNodeAssigneeMap = this._signUpPersonnelService.Frsql
+                    .Select<BpmBusinessProcess, BpmVariable, BpmVariableSignUpPersonnel>()
+                    .InnerJoin((a, b, c) => a.BusinessNumber == b.ProcessNum)
+                    .InnerJoin((a, b, c) => b.Id == c.VariableId)
+                    .Where((a, b, c) => a.ProcInstId == procInstId)
+                    .ToList<KeyValuePair<string, string>>((a, b, c) =>
+                        new KeyValuePair<string, string>(c.Assignee, c.AssigneeName));
+                if (signupNodeAssigneeMap.Count <= 0)
+                {
+                    var (nextUserElement, nextFlowElement) =
+                        BpmnFlowUtil.GetNextNodeAndFlowNode(elements, elementToDeal.ElementId);
+                    elementToDeal = nextUserElement;
+                    assigneeMap = elementToDeal.AssigneeMap;
+                }
+                else
+                {
+                    assigneeMap = signupNodeAssigneeMap.ToDictionary(k => k.Key, v => v.Value);
+                }
             }
-            else
+
+            int taskCount = elementToDeal.SignType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode()
+                ? 1
+                : assigneeMap?.Count ?? 0;
+            string newExecutionId=StrongUuidGenerator.GetNextId();
+            BpmAfExecution execution = new BpmAfExecution
             {
-                assigneeMap = signupNodeAssigneeMap.ToDictionary(k => k.Key, v => v.Value);
-            }
-        }
-        int taskCount=currentSignType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode()?1:assigneeMap?.Count??0;
-        BpmAfExecution execution = new BpmAfExecution
-        {
-            Id = currentExecution.Id,
-            ProcInstId = procInstId,
-            BusinessKey = currentExecution.BusinessKey,
-            ProcDefId = procDefId,
-            ActId = elementToDeal.ElementId,
-            Name = elementToDeal.ElementName,
-            StartTime = nowTime,
-            StartUserId = SecurityUtils.GetLogInEmpId(),
-            SignType = currentExecution.SignType,
-            TaskCount =taskCount,
-        };
-       
-        _afExecutionService.baseRepo.Update(execution);
-        if (elementToDeal.ElementType == ElementTypeEnum.ELEMENT_TYPE_END_EVENT.Code)
-        {
-             deleteReason =StringConstants.TASK_FINISH_REASON;
-            _executionListener.Notify(execution,IExecutionListener.EVENTNAME_END);
-        }
-        TimeSpan taskDuration = nowTime-bpmAfTask.CreateTime;
-        int durationMinutes = taskDuration.Minutes;
-        _afTaskInstService.Frsql
-            .Update<BpmAfTaskInst>()
-            .Set(a=>a.Duration, durationMinutes)
-            .Set(a => a.EndTime, nowTime)
-            .Set(a => a.DeleteReason, deleteReason)
-            .Where(a => a.Id == taskId)
-            .ExecuteAffrows();
-        if (deleteReason.Equals(StringConstants.TASK_FINISH_REASON))
-        {
-            return;
-        }
-        List<BpmAfTaskInst> historyTaskInsts = new List<BpmAfTaskInst>();
-        List<BpmAfTask> tasks=new List<BpmAfTask>();
-        
-        foreach (var (key, value) in assigneeMap)
-        {
-            if (verifyUserIds.Contains(key))
-            {
-                continue;
-            }
-            BpmAfTask newTask = new BpmAfTask()
-            {
-                Id = StrongUuidGenerator.GetNextId(),
+                Id = newExecutionId,
                 ProcInstId = procInstId,
+                BusinessKey = currentExecution.BusinessKey,
                 ProcDefId = procDefId,
-                ExecutionId = currentExecution.Id,
+                ActId = elementToDeal.ElementId,
                 Name = elementToDeal.ElementName,
-                TaskDefKey = elementToDeal.ElementId,
-                Owner = bpmAfTask.Owner,
-                Assignee = key,
-                AssigneeName = value,
-                CreateTime = nowTime,
-                FormKey = bpmAfTask.FormKey,
+                StartTime = nowTime,
+                StartUserId = SecurityUtils.GetLogInEmpId(),
+                SignType =elementToDeal.SignType,
+                TaskCount = taskCount,
             };
-            tasks.Add(newTask);
-            if (currentSignType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode())
+
+            _afExecutionService.baseRepo.Insert(execution);
+            if (elementToDeal.ElementType == ElementTypeEnum.ELEMENT_TYPE_END_EVENT.Code)
             {
-                break;
+                deleteReason = StringConstants.TASK_FINISH_REASON;
+                _executionListener.Notify(execution, IExecutionListener.EVENTNAME_END);
             }
-        }
-        _afTaskService.InsertTasks(tasks);
-        foreach (BpmAfTask afTask in tasks)
-        {
-            BpmAfTaskInst bpmAfTaskInst = afTask.ToInst();
-            historyTaskInsts.Add(bpmAfTaskInst);
-        }
-        _afTaskInstService.baseRepo.Insert(historyTaskInsts);
+
+            TimeSpan taskDuration = nowTime - bpmAfTask.CreateTime;
+            int durationMinutes = taskDuration.Minutes;
+            _afTaskInstService.Frsql
+                .Update<BpmAfTaskInst>()
+                .Set(a => a.Duration, durationMinutes)
+                .Set(a => a.EndTime, nowTime)
+                .Set(a => a.DeleteReason, deleteReason)
+                .Where(a => a.Id == taskId)
+                .ExecuteAffrows();
+            if (deleteReason.Equals(StringConstants.TASK_FINISH_REASON))
+            {
+                return;
+            }
+
+            List<BpmAfTaskInst> historyTaskInsts = new List<BpmAfTaskInst>();
+            List<BpmAfTask> tasks = new List<BpmAfTask>();
+
+            foreach (var (key, value) in assigneeMap)
+            {
+                if (verifyUserIds.Contains(key))
+                {
+                    continue;
+                }
+
+                BpmAfTask newTask = new BpmAfTask()
+                {
+                    Id = StrongUuidGenerator.GetNextId(),
+                    ProcInstId = procInstId,
+                    ProcDefId = procDefId,
+                    ExecutionId = newExecutionId,
+                    Name = elementToDeal.ElementName,
+                    TaskDefKey = elementToDeal.ElementId,
+                    Owner = bpmAfTask.Owner,
+                    Assignee = key,
+                    AssigneeName = value,
+                    CreateTime = nowTime,
+                    FormKey = bpmAfTask.FormKey,
+                };
+                tasks.Add(newTask);
+                if (currentSignType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode())
+                {
+                    break;
+                }
+            }
+
+            _afTaskService.InsertTasks(tasks);
+            foreach (BpmAfTask afTask in tasks)
+            {
+                BpmAfTaskInst bpmAfTaskInst = afTask.ToInst();
+                historyTaskInsts.Add(bpmAfTaskInst);
+            }
+
+            _afTaskService.Frsql.Delete<BpmAfExecution>()
+                .Where(a => a.Id == currentExecution.Id)
+                .ExecuteAffrows();
+            _afTaskInstService.baseRepo.Insert(historyTaskInsts);
         }
        
     }

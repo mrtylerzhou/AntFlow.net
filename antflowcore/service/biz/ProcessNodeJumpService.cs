@@ -90,7 +90,7 @@ public class ProcessNodeJumpService
         IDictionary<string,string> assigneeMap = turnToElement.AssigneeMap;
         BpmAfExecution execution = new BpmAfExecution
         {
-            Id = bpmAfTask.ExecutionId,
+            Id = StrongUuidGenerator.GetNextId(),
             ProcInstId = procInstId,
             //BusinessKey = bpmnStartConditions.BusinessId, //todo注意观察此字段更新时是否会丢失
             ProcDefId = procDefId,
@@ -100,7 +100,11 @@ public class ProcessNodeJumpService
             StartUserId = SecurityUtils.GetLogInEmpId(),
             TaskCount = assigneeMap?.Count,
         };
-        _executionService.baseRepo.Update(execution);
+        _executionService.Frsql
+            .Delete<BpmAfExecution>()
+            .Where(a => a.ProcInstId == procInstId)
+            .ExecuteAffrows();
+        _executionService.baseRepo.Insert(execution);
         
         List<BpmAfTaskInst> historyTaskInsts = new List<BpmAfTaskInst>();
         List<BpmAfTask> tasks=new List<BpmAfTask>();
