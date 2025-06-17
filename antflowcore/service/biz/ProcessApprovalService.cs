@@ -514,57 +514,62 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
     }
     private Expression<Func<TaskMgmtVO, bool>> CommonCond(TaskMgmtVO paramVo)
     {
-        Expression<Func<TaskMgmtVO, bool>> exp = a => 1==1;
+        var param = Expression.Parameter(typeof(TaskMgmtVO), "a");
+        var left = Expression.Constant(1);
+        var right = Expression.Constant(1);
+        var body = Expression.Equal(left, right);
+        var exp = Expression.Lambda<Func<TaskMgmtVO, bool>>(body, param);
+        
         if (!string.IsNullOrEmpty(paramVo.Search))
         {
-            exp.And(a => a.Search.Contains(paramVo.Search));
+            exp=exp.And(a => a.Search.Contains(paramVo.Search));
         }
 
         if (paramVo.ApplyUserId != 0)
         {
-            exp.And(a => a.ApplyUserId == paramVo.ApplyUserId);
+            exp=exp.And(a => a.ApplyUserId == paramVo.ApplyUserId);
         }
 
         if (!string.IsNullOrEmpty(paramVo.Description))
         {
-            exp.And(a => a.Description.Contains(paramVo.Description));
+            exp=exp.And(a => a.Description.Contains(paramVo.Description));
         }
 
         if (!string.IsNullOrEmpty(paramVo.ProcessNumber))
         {
-            exp.And(a => a.ProcessNumber == paramVo.ProcessNumber);
+            exp=exp.And(a => a.ProcessNumber == paramVo.ProcessNumber);
         }
 
         if (paramVo.ProcessState != null)
         {
-            exp.And(a => a.ProcessState == paramVo.ProcessState);
+            exp=exp.And(a => a.ProcessState == paramVo.ProcessState);
         }
 
         if (!string.IsNullOrEmpty(paramVo.StartTime) && !string.IsNullOrEmpty(paramVo.EndTime))
         {
             DateTime start = DateTime.Parse(paramVo.StartTime);
             DateTime end = DateTime.Parse(paramVo.EndTime);
-            exp.And(a => a.RunTime.Value.Date.Between(start, end));
+            exp=exp.And(a => a.RunTime.Value.Date.Between(start, end));
         }
 
         if (paramVo.ProcessKeyList != null && !paramVo.ProcessKeyList.Any())
         {
-            exp.And(a => paramVo.ProcessKeyList.Contains(a.ProcessKey));
+            exp=exp.And(a => paramVo.ProcessKeyList.Contains(a.ProcessKey));
         }
 
         if (paramVo.ProcessNumbers != null && paramVo.ProcessNumbers.Any())
         {
-            exp.And(a => !paramVo.ProcessNumbers.Contains(a.ProcessNumber));
+            exp=exp.And(a => !paramVo.ProcessNumbers.Contains(a.ProcessNumber));
         }
 
         if (paramVo.VersionProcessKeys != null && !paramVo.VersionProcessKeys.Any())
         {
-            exp.And(a => !paramVo.VersionProcessKeys.Contains(a.ProcessKey));
+            exp=exp.And(a => !paramVo.VersionProcessKeys.Contains(a.ProcessKey));
         }
 
         if (!string.IsNullOrEmpty(paramVo.ProcessDigest))
         {
-            exp.And(a => !a.ProcessDigest.Contains(paramVo.ProcessDigest));
+            exp=exp.And(a => !a.ProcessDigest.Contains(paramVo.ProcessDigest));
         }
 
         return exp;
