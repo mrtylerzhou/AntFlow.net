@@ -384,7 +384,7 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
                 RunTime = a.t2.StartTime,
                 BusinessId = a.t1.BusinessId,
                 ProcessNumber = a.t1.BusinessNumber,
-                Description = a.t2.Description,
+                Description = a.t1.Description,
                 ProcessState = a.t1.ProcessState,
                 ProcessKey = a.t1.ProcessinessKey,
                 ProcessCode =a.t1.ProcessinessKey,
