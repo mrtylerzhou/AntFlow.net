@@ -36,10 +36,6 @@ public class RuntimeService
           List < BpmAfExecution > executions = new List<BpmAfExecution>();
           for (var i = 0; i < firstAssigneeNodes.Count; i++)
           {
-               if (i > 0)
-               {
-                    break;
-               }
                BpmnConfCommonElementVo firstAssigneeNode = firstAssigneeNodes[i]; 
                  IDictionary<string, string> assigneeMap =firstAssigneeNode.AssigneeMap;
                string executionId = StrongUuidGenerator.GetNextId();
@@ -67,24 +63,27 @@ public class RuntimeService
                _executionService.baseRepo.Insert(execution);
                List<BpmAfTask> tasks = new List<BpmAfTask>();
                List<BpmAfTaskInst> historyTaskInsts = new List<BpmAfTaskInst>();
-               BpmAfTaskInst startTask = new BpmAfTaskInst
+               if (i == 0)
                {
-                    Id = StrongUuidGenerator.GetNextId(),
-                    ProcInstId = procInstId,
-                    ProcDefId = deploymentId,
-                    ExecutionId = executionId,
-                    Name = StringConstants.START_USER_NODE_NAME,
-                    TaskDefKey = ProcessNodeEnum.START_TASK_KEY.Description,
-                    Owner = bpmnStartConditions.StartUserId,
-                    Assignee = bpmnStartConditions.StartUserId,
-                    AssigneeName = bpmnStartConditions.StartUserName,
-                    StartTime = nowTime,
-                    EndTime = nowTime,
-                    Priority = 0,
-                    DeleteReason = "发起人节点自动完成",
-                    FormKey = bpmnConfCommonVo.FormCode,
-               };
-               historyTaskInsts.Add(startTask);
+                    BpmAfTaskInst startTask = new BpmAfTaskInst
+                    {
+                         Id = StrongUuidGenerator.GetNextId(),
+                         ProcInstId = procInstId,
+                         ProcDefId = deploymentId,
+                         ExecutionId = executionId,
+                         Name = StringConstants.START_USER_NODE_NAME,
+                         TaskDefKey = ProcessNodeEnum.START_TASK_KEY.Description,
+                         Owner = bpmnStartConditions.StartUserId,
+                         Assignee = bpmnStartConditions.StartUserId,
+                         AssigneeName = bpmnStartConditions.StartUserName,
+                         StartTime = nowTime,
+                         EndTime = nowTime,
+                         Priority = 0,
+                         DeleteReason = "发起人节点自动完成",
+                         FormKey = bpmnConfCommonVo.FormCode,
+                    };
+                    historyTaskInsts.Add(startTask);
+               }
                foreach (var (key, value) in assigneeMap)
                {
                     BpmAfTask bpmAfTask = new BpmAfTask()
