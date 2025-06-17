@@ -34,7 +34,7 @@ public class BpmProcessNameService: AFBaseCurdRepositoryService<BpmProcessName>
         BpmProcessNameRelevancyService bpmProcessNameRelevancyService = ServiceProviderUtils.GetService<BpmProcessNameRelevancyService>();
         bool flag = bpmProcessNameRelevancyService.SelectCount(bpmnConfByCode.FormCode);
     
-        if (processName?.Id != null)
+        if (processName?.Id!=0)
         {
             if (!flag)
             {
@@ -78,10 +78,7 @@ public class BpmProcessNameService: AFBaseCurdRepositoryService<BpmProcessName>
         {
             return bpmProcessNames[0];
         }
-        else
-        {
-            return new BpmProcessName();
-        }
+        return new BpmProcessName();
     }
 
     public BpmProcessVo Get(string processKey)
