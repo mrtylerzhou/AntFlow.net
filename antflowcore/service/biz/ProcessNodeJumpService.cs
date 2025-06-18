@@ -90,23 +90,11 @@ public class ProcessNodeJumpService
         int signType = turnToElement.SignType;
         IDictionary<string,string> assigneeMap = turnToElement.AssigneeMap;
         string executionId=StrongUuidGenerator.GetNextId();
-        BpmAfExecution execution = new BpmAfExecution
-        {
-            Id = executionId,
-            ProcInstId = procInstId,
-            //BusinessKey = bpmnStartConditions.BusinessId, //todo注意观察此字段更新时是否会丢失
-            ProcDefId = procDefId,
-            ActId = turnToElement.ElementId,
-            Name = turnToElement.ElementName,
-            StartTime = nowTime,
-            StartUserId = SecurityUtils.GetLogInEmpId(),
-            TaskCount = assigneeMap?.Count,
-        };
+        
         _executionService.Frsql
             .Delete<BpmAfExecution>()
-            .Where(a => a.ProcInstId == procInstId)
+            .Where(a => a.Id == bpmAfTask.ExecutionId)
             .ExecuteAffrows();
-        _executionService.baseRepo.Insert(execution);
         
         List<BpmAfTaskInst> historyTaskInsts = new List<BpmAfTaskInst>();
         List<BpmAfTask> tasks=new List<BpmAfTask>();
@@ -140,6 +128,19 @@ public class ProcessNodeJumpService
             historyTaskInsts.Add(bpmAfTaskInst);
             index++;
         }
+        BpmAfExecution execution = new BpmAfExecution
+        {
+            Id = executionId,
+            ProcInstId = procInstId,
+            //BusinessKey = bpmnStartConditions.BusinessId, //todo注意观察此字段更新时是否会丢失
+            ProcDefId = procDefId,
+            ActId = turnToElement.ElementId,
+            Name = turnToElement.ElementName,
+            StartTime = nowTime,
+            StartUserId = SecurityUtils.GetLogInEmpId(),
+            TaskCount = signType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode()?1:assigneeMap.Count,
+        };
+        _executionService.baseRepo.Insert(execution);
         _afTaskService.baseRepo.Delete(bpmAfTask);
         _afTaskService.baseRepo.Insert(tasks);
         //_afTaskInstService.baseRepo.Insert(historyTaskInsts);

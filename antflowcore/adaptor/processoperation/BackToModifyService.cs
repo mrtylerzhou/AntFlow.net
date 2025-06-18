@@ -29,6 +29,7 @@ using System.Linq;
         private readonly FormFactory _formFactory;
         private readonly TaskMgmtService _taskMgmtService;
         private readonly BpmVariableService _bpmVariableService;
+        private readonly AFExecutionService _afExecutionService;
         private readonly ProcessBusinessContansService _processConstants;
 
         public BackToModifyService(
@@ -40,6 +41,7 @@ using System.Linq;
             FormFactory formFactory,
             TaskMgmtService taskMgmtService,
             BpmVariableService bpmVariableService,
+            AFExecutionService afExecutionService,
             ProcessBusinessContansService processConstants)
         {
             _bpmBusinessProcessService = bpmBusinessProcessService;
@@ -50,6 +52,7 @@ using System.Linq;
             _formFactory = formFactory;
             _taskMgmtService = taskMgmtService;
             _bpmVariableService = bpmVariableService;
+            _afExecutionService = afExecutionService;
             _processConstants = processConstants;
         }
 
@@ -68,8 +71,11 @@ using System.Linq;
 
             BpmAfTask taskData = taskList.FirstOrDefault(t => SecurityUtils.GetLogInEmpIdStr() == t.Assignee);
             if (taskData == null)
+            {
                 throw new AFBizException("当前流程已审批！");
+            }
 
+            List<BpmAfTask> otherNodeTasks = taskList.Where(a=>a.TaskDefKey!=taskData.TaskDefKey).ToList();
             string restoreNodeKey, backToNodeKey;
 
             int backToModifyType = vo.BackToModifyType ?? ProcessDisagreeTypeEnum.THREE_DISAGREE.Code;
@@ -189,10 +195,29 @@ using System.Linq;
                 List<BpmAfTask> otherNewTasks = currentTasks.Where(t => t.Id != firstStartNode.Id).ToList();
                 if (!isBackSpanParallelGateWay)
                 {
-                    otherNewTasks=otherNewTasks.Where(t=>t.TaskDefKey!=firstStartNode.TaskDefKey).ToList();
+                    //获取到不在同一个节点上的任务
+                    otherNewTasks=otherNewTasks.Where(a => !otherNodeTasks.Select(x=>x.TaskDefKey).Contains(a.TaskDefKey)).ToList();
                 }
-                List<string> otherNewTaskIds = otherNewTasks.Select(t => t.Id).ToList();
-                _taskService.baseRepo.Delete(t => otherNewTaskIds.Contains(t.Id));
+
+                if (otherNewTasks.Count > 0)
+                {
+                    List<string> otherNewTaskIds = new List<string>(otherNewTasks.Count);
+                    List<string> otherNewExecutionIds = new List<string>(otherNewTasks.Count);
+                    foreach (BpmAfTask otherNewTask in otherNewTasks)
+                    {
+                        otherNewTaskIds.Add(otherNewTask.Id);
+                        otherNewExecutionIds.Add(otherNewTask.ExecutionId);
+                    }
+
+                    _taskService.Frsql.Delete<BpmAfTask>()
+                        .Where(a => otherNewTaskIds.Contains(a.Id))
+                        .ExecuteAffrows();
+                    _afExecutionService.Frsql.Delete<BpmAfExecution>()
+                        .Where(a => otherNewExecutionIds.Contains(a.Id))
+                        .ExecuteAffrows();
+
+                }
+               
             }
             vo.BusinessId = bpmBusinessProcess.BusinessId;
 
