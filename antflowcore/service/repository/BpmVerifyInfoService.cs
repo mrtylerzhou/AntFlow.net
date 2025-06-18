@@ -102,7 +102,11 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
 
     public List<BpmVerifyInfoVo> FindTaskInfo(String procInstId)
     {
-        List<BpmVerifyInfoVo> currentTasks = _afTaskService.baseRepo.Where(a => a.ProcInstId == procInstId).ToList().Select(t => new BpmVerifyInfoVo()
+        List<BpmVerifyInfoVo> currentTasks = _afTaskService
+            .baseRepo.Where(a => a.ProcInstId == procInstId)
+            .OrderByDescending(a=>a.CreateTime)
+            .ToList()
+            .Select(t => new BpmVerifyInfoVo()
             {
                 Id = t.Id,
                 TaskName = t.Name,
