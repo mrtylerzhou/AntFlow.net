@@ -235,7 +235,7 @@ using System.Linq;
 
                 TaskMgmtVO taskMgmtVo = new TaskMgmtVO
                 {
-                    TaskIds = new List<string> { taskList[0].Id },
+                    TaskIds = [taskList[0].Id],
                     ApplyUser = vo.BackToEmployeeId,
                     ApplyUserName = vo.BackToEmployeeName,
                 };

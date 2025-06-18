@@ -64,7 +64,7 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
         // 获取 act_ru_task 表的 PROC_INST_ID_
         string procInstId = bpmBusinessProcess.ProcInstId;
 
-        var tasks = FindTaskInfo(procInstId) ?? new List<BpmVerifyInfoVo>();
+        List<BpmVerifyInfoVo> tasks = FindTaskInfo(procInstId);
         if (tasks.Count == 0)
         {
             return string.Empty;
@@ -102,7 +102,7 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
 
     public List<BpmVerifyInfoVo> FindTaskInfo(String procInstId)
     {
-        List<BpmVerifyInfoVo> bpmVerifyInfos = _afTaskService.baseRepo.Where(a => a.ProcInstId == procInstId).ToList().Select(t => new BpmVerifyInfoVo()
+        List<BpmVerifyInfoVo> currentTasks = _afTaskService.baseRepo.Where(a => a.ProcInstId == procInstId).ToList().Select(t => new BpmVerifyInfoVo()
             {
                 Id = t.Id,
                 TaskName = t.Name,
@@ -114,7 +114,7 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>
                 VerifyDate = null,
             }
         ).ToList();
-        return bpmVerifyInfos;
+        return currentTasks;
     }
     public List<BpmVerifyInfoVo> FindTaskInfo(BpmBusinessProcess bpmBusinessProcess)
     {

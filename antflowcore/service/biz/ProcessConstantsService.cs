@@ -57,7 +57,7 @@ public class ProcessConstantsService
         }
 
         List<BpmAfTaskInst> bpmAfTaskInsts = _afTaskInstService.baseRepo
-            .Where(a => a.ProcInstId == procInstId && a.TaskDefKey == taskDefKey)
+            .Where(a => a.ProcInstId == procInstId && a.TaskDefKey == taskDefKey&&a.EndTime!=null)
             .OrderByDescending(a => a.StartTime).ToList();
         BpmAfTaskInst? bpmAfTaskInst = bpmAfTaskInsts.Where(a => a.TaskDefKey != taskDefKey).FirstOrDefault();
         return bpmAfTaskInst;
