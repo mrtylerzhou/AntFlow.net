@@ -87,10 +87,12 @@ public class ProcessNodeJumpService
         string content = bpmAfDeployment.Content;
         List<BpmnConfCommonElementVo> elements = JsonSerializer.Deserialize<List<BpmnConfCommonElementVo>>(content);
         BpmnConfCommonElementVo turnToElement = elements.First(a => a.ElementId==taskToTurnToNodeKey);
+        int signType = turnToElement.SignType;
         IDictionary<string,string> assigneeMap = turnToElement.AssigneeMap;
+        string executionId=StrongUuidGenerator.GetNextId();
         BpmAfExecution execution = new BpmAfExecution
         {
-            Id = StrongUuidGenerator.GetNextId(),
+            Id = executionId,
             ProcInstId = procInstId,
             //BusinessKey = bpmnStartConditions.BusinessId, //todo注意观察此字段更新时是否会丢失
             ProcDefId = procDefId,
@@ -108,14 +110,19 @@ public class ProcessNodeJumpService
         
         List<BpmAfTaskInst> historyTaskInsts = new List<BpmAfTaskInst>();
         List<BpmAfTask> tasks=new List<BpmAfTask>();
+        int index = 0;
         foreach (var (key, value) in assigneeMap)
         {
+            if (index > 0 && signType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode())
+            {
+                break;
+            }
             BpmAfTask newTask = new BpmAfTask()
             {
                 Id = StrongUuidGenerator.GetNextId(),
                 ProcInstId = procInstId,
                 ProcDefId = procDefId,
-                ExecutionId = bpmAfTask.ExecutionId,
+                ExecutionId = executionId,
                 Name = turnToElement.ElementName,
                 TaskDefKey = turnToElement.ElementId,
                 Owner = bpmAfTask.Owner,
@@ -131,10 +138,12 @@ public class ProcessNodeJumpService
             bpmAfTaskInst.EndTime=nowTime;
             bpmAfTaskInst.Description = StringConstants.BACK_TO_MODIFY_DESC;
             historyTaskInsts.Add(bpmAfTaskInst);
+            index++;
         }
         _afTaskService.baseRepo.Delete(bpmAfTask);
         _afTaskService.baseRepo.Insert(tasks);
         //_afTaskInstService.baseRepo.Insert(historyTaskInsts);
+       
     }
    
 }
