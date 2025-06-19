@@ -64,7 +64,7 @@ public class SubmitProcessService: IProcessOperationAdaptor
             CreateTime = DateTime.Now,
             ProcessState = (int)ProcessStateEnum.HANDLING_STATE,
             EntryId = entryId,
-            Description = applyName+"_"+processName,
+            Description = applyName+"-"+processName,
             DataSourceId = businessDataVo.DataSourceId,
             ProcessDigest = businessDataVo.ProcessDigest,
             Version = businessDataVo.BpmnCode

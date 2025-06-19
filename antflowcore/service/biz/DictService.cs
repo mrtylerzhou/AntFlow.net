@@ -126,7 +126,7 @@ public class DictService
 
             if (!string.IsNullOrEmpty(taskMgmtVO.Description))
             {
-                expression.And(a =>
+               expression= expression.And(a =>
                     a.DictType.Contains(taskMgmtVO.Description) || a.Value.Contains(taskMgmtVO.Description));
             }
 
