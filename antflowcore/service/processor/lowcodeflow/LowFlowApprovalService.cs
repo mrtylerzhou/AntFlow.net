@@ -1,5 +1,7 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Nodes;
 using antflowcore.adaptor;
+using antflowcore.constant.enums;
 using antflowcore.constant.enus;
 using antflowcore.entity;
 using AntFlowCore.Entity;
@@ -163,7 +165,32 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
                         break;
 
                     case var ftype when ftype == LFFieldTypeEnum.NUMBER:
-                        actualValue = int.Parse(field.FieldValue);
+                        if (LFControlTypeEnum.SELECT.Name == currentFieldProp.FieldName)
+                        {
+                            try
+                            {
+                                JsonNode? jsonNode = JsonNode.Parse(field.FieldValue);
+                                if (jsonNode == null)
+                                {
+                                    actualValue="";//select默认值为空字符串
+                                }else if(jsonNode is JsonArray jsonArray)
+                                {
+                                    actualValue =jsonArray.ToString();
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                //如果本身是字符串类型,不能反序列化,直接取原来值
+                                _logger.LogWarning($"field value can not be parsed to number,fieldName:{fieldName},formCode:{formCode},confId:{confId}",e);
+                                actualValue=field.FieldValue;
+                            }
+                           
+                        }
+                        else
+                        {
+                            //以上对select做了特殊处理,如果不是select,直接取值
+                            actualValue=field.FieldValueNumber;
+                        }
                         break;
 
                     case var ftype when ftype == LFFieldTypeEnum.DATE_TIME:

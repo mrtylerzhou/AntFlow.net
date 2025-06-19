@@ -1,4 +1,5 @@
-﻿using antflowcore.constant.enus;
+﻿using antflowcore.constant.enums;
+using antflowcore.constant.enus;
 using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.util;
@@ -138,7 +139,14 @@ public class LFMainField
                 mainField.FieldValue = fieldValueStr;
                 break;
             case var fieldType when fieldType == LFFieldTypeEnum.NUMBER:
-                mainField.FieldValue = int.TryParse(fieldValueStr, out var num) ? num.ToString() : null;
+                if (LFControlTypeEnum.SELECT.Name == fieldConfig.FieldName)
+                {
+                    mainField.FieldValue = fieldValueStr;
+                }
+                else
+                {
+                    mainField.FieldValueNumber = double.TryParse(fieldValueStr, out var fieldValueNumber) ? fieldValueNumber : null;
+                }
                 break;
             case var fieldType when fieldType == LFFieldTypeEnum.DATE || fieldType == LFFieldTypeEnum.DATE_TIME:
                 mainField.FieldValueDt = DateTime.TryParse(fieldValueStr, out var dt) ? dt : null;
