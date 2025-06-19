@@ -428,7 +428,9 @@ public class ConditionFilterService
                 false);
 
             if (!matchCondition)
+            {
                 continue;
+            }
 
             filteredNodes.Add(bpmnNodeVo);
         }

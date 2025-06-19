@@ -89,7 +89,9 @@ public static class MapperUtil
             UpdateTime = node.UpdateTime,
             NodeFroms = node.NodeFroms,
             IsOutSideProcess = node.IsOutSideProcess,
-            IsLowCodeFlow = node.IsLowCodeFlow
+            IsLowCodeFlow = node.IsLowCodeFlow,
+            IsDynamicCondition = node.IsDynamicCondition,
+            IsParallel = node.IsParallel,
         };
     }
 

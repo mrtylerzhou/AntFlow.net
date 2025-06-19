@@ -129,6 +129,12 @@ namespace AntFlowCore.Entity
         [Column(Name = "node_froms")]
         public string NodeFroms { get; set; }
 
+        //0 for no and 1 for yes
+        [Column(Name = "is_dynamicCondition")]
+        public bool? IsDynamicCondition { get; set; }
+        //whether current node is a parallel node 0 for no and 1 for yes
+        [Column(Name = "is_parallel")]
+        public bool? IsParallel { get; set; }
         /// <summary>
         /// Gets or sets a flag indicating whether this node is part of an outside process.
         /// </summary>
