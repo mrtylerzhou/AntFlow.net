@@ -127,7 +127,7 @@ public class DictService
             if (!string.IsNullOrEmpty(taskMgmtVO.Description))
             {
                expression= expression.And(a =>
-                    a.DictType.Contains(taskMgmtVO.Description) || a.Value.Contains(taskMgmtVO.Description));
+                    a.Label.Contains(taskMgmtVO.Description) || a.Value.Contains(taskMgmtVO.Description));
             }
 
             BasePagingInfo basePagingInfo = page.ToPagingInfo();
