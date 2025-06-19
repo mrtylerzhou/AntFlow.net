@@ -104,7 +104,7 @@ public class LFFormDataPreProcessor : IAntFlowOrderPreProcessor<BpmnConfVo>
                         BpmnConfId = confId,
                         FormDataId = formDataId,
                         FieldType = lfOption.FieldType,
-                        FieldId = lfWidget.Id,
+                        FieldId = lfOption.Name,
                         FieldName = lfOption.Label
                     };
                     result.Add(formdataField);
