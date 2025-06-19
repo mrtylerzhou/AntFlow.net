@@ -43,7 +43,7 @@ CREATE TABLE if not exists `t_bpmn_node`
     `annotation`        varchar(255)                 DEFAULT NULL COMMENT 'annotation on this conf',
     `is_deduplication`  int(11)             NOT NULL DEFAULT '0' COMMENT 'whether this node should be deduplicated,0:No,1:Yes',
     `deduplicationExclude` tinyint             default 0                 null comment '0 for no,default value,and 1 for yes',
-    `is_dynamicCondition` tinyint default 0 not null comment '是否是动态条件节点,0,否,1是',
+    `is_dynamicCondition` tinyint default 0  null comment '是否是动态条件节点,0,否,1是',
     `is_parallel`          tinyint          default 0                 null,
     `is_sign_up`        int(11)             NOT NULL DEFAULT '0' COMMENT 'whether this node can be sign up,0:No,1:Yes',
     `remark`            varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
