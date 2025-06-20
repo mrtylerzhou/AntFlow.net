@@ -262,10 +262,13 @@ public static class ServiceRegistration
         services.AddSingleton<RuntimeService>();
         
         services.AddSingleton<BpmnCreateAndStartService>();
-        
-        
+       
+        services.AddSingleton<ICallbackAdaptor<CallbackReqVo,CallbackRespVo>,ProcBaseCallBackAdp>();
+        services.AddSingleton<ICallbackAdaptor<CallbackReqVo,CallbackRespVo>,ProcSubmitCallbackAdp>();
+        services.AddSingleton<ThirdPartyCallbackFactory>();
         //=================================不可越过的三八线==============================
         IAdaptorFactory adaptorFactory = AdaptorFactoryProxy.GetProxyInstance();
         services.AddSingleton(adaptorFactory);
+        services.AddHttpClient();
     }
 }

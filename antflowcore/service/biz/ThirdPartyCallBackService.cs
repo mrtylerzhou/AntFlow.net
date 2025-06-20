@@ -1,23 +1,25 @@
 ﻿using antflowcore.constant.enus;
 using antflowcore.factory;
 using antflowcore.vo;
+using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
 
 namespace antflowcore.service.biz;
 
 public class ThirdPartyCallBackService
 {
+    private readonly ThirdPartyCallbackFactory _thirdPartyCallbackFactory;
     private readonly ILogger<ThirdPartyCallBackService> _logger;
 
-    public ThirdPartyCallBackService(ILogger<ThirdPartyCallBackService> logger)
+    public ThirdPartyCallBackService(ThirdPartyCallbackFactory thirdPartyCallbackFactory,
+        ILogger<ThirdPartyCallBackService> logger)
     {
+        _thirdPartyCallbackFactory = thirdPartyCallbackFactory;
         _logger = logger;
     }
-    public void DoCallback(String url, CallbackTypeEnum callbackTypeEnum, BpmnConfVo bpmnConfVo,
+    public void DoCallback(CallbackTypeEnum callbackTypeEnum, BpmnConfVo bpmnConfVo,
         String processNum, String businessId,String verifyUserName){
-        _logger.LogInformation("准备执行外部工作流回调：{} , processNumber:{} , callBackUrl:{} , 操作人：{}",CallbackTypeEnum.PROC_END_CALL_BACK.Desc ,processNum, url, verifyUserName);
-        //回调通知业务方
-       
-        //todo 回调待实现
+        _logger.LogInformation("准备执行外部工作流回调, processNumber:{} , callBackUrl:{} , 操作人：{}",CallbackTypeEnum.PROC_END_CALL_BACK.GetDesc() ,processNum, verifyUserName);
+        _thirdPartyCallbackFactory.DoCallbackAsync<CallbackRespVo>(callbackTypeEnum,bpmnConfVo, processNum, businessId);
     }
 }

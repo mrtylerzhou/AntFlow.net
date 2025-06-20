@@ -4,7 +4,9 @@ using antflowcore.bpmn.listener;
 using antflowcore.entity;
 using AntFlowCore.Enums;
 using antflowcore.factory;
+using antflowcore.util;
 using AntFlowCore.Vo;
+using static antflowcore.constant.enus.CallbackTypeEnum;
 
 namespace antflowcore.service.biz;
 
@@ -12,15 +14,18 @@ public class ButtonOperationService
 {
     private readonly IFreeSql _freeSql;
     private readonly ITaskListener _taskListener;
+    private readonly ThirdPartyCallBackService _thirdPartyCallBackService;
     private readonly IAdaptorFactory _adaptorFactory;
 
     public ButtonOperationService(
         IFreeSql freeSql,
         ITaskListener taskListener,
+        ThirdPartyCallBackService thirdPartyCallBackService,
         IAdaptorFactory adaptorFactory)
     {
         _freeSql = freeSql;
         _taskListener = taskListener;
+        _thirdPartyCallBackService = thirdPartyCallBackService;
         _adaptorFactory = adaptorFactory;
     }
 
@@ -34,8 +39,21 @@ public class ButtonOperationService
             processOperation.DoProcessButton(vo);
            
             if (vo.IsOutSideAccessProc == true)
-            {//todo outside call back
-                
+            {
+                String verifyUserName = SecurityUtils.GetLogInEmpName();
+                if (vo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_AGREE)
+                {
+                    _thirdPartyCallBackService.DoCallback( PROC_COMMIT_CALL_BACK, vo.BpmnConfVo,
+                        vo.ProcessNumber, vo.BusinessId,verifyUserName);
+                }else if (vo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_SUBMIT)
+                {
+                    _thirdPartyCallBackService.DoCallback( PROC_STARTED_CALL_BACK, vo.BpmnConfVo,
+                        vo.ProcessNumber, vo.BusinessId,verifyUserName); 
+                }else if (vo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_DIS_AGREE)
+                {
+                    _thirdPartyCallBackService.DoCallback( PROC_END_CALL_BACK, vo.BpmnConfVo,
+                        vo.ProcessNumber, vo.BusinessId,verifyUserName);
+                } 
             }
             else
             {
