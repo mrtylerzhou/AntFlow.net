@@ -127,7 +127,6 @@ public static class ServiceRegistration
         services.AddSingleton<DefaultTemplateService>();
         services.AddSingleton<OutSideBpmApproveTemplateService>();
         services.AddSingleton<OutSideBpmAdminPersonnelService>();
-        services.AddSingleton<EmployeeService>();
         services.AddSingleton<OutSideBpmBaseService>();
         
         #region IBpmnPersonnelProviderService with different register ways
@@ -266,6 +265,11 @@ public static class ServiceRegistration
         services.AddSingleton<ICallbackAdaptor<CallbackReqVo,CallbackRespVo>,ProcBaseCallBackAdp>();
         services.AddSingleton<ICallbackAdaptor<CallbackReqVo,CallbackRespVo>,ProcSubmitCallbackAdp>();
         services.AddSingleton<ThirdPartyCallbackFactory>();
+        services.AddSingleton<BpmVariableMessageListenerService>();
+        services.AddSingleton<BpmProcessNoticeService>();
+        services.AddSingleton<UserMessageStatusService>();
+        services.AddSingleton<MessageService>();
+        services.AddSingleton<MailUtils>();
         //=================================不可越过的三八线==============================
         IAdaptorFactory adaptorFactory = AdaptorFactoryProxy.GetProxyInstance();
         services.AddSingleton(adaptorFactory);

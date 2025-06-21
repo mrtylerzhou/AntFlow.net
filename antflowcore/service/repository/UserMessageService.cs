@@ -17,4 +17,14 @@ public class UserMessageService :AFBaseCurdRepositoryService<UserMessage>
             this.baseRepo.Update(userMessage);
         }
     }
+
+    public void InsertMessage(UserMessage message)
+    {
+        this.baseRepo.Insert(message);
+    }
+
+    public void SaveBatch(List<UserMessage> list)
+    {
+        this.baseRepo.Insert(list);
+    }
 }

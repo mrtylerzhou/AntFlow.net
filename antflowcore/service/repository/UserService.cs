@@ -233,4 +233,62 @@ public class UserService: AFBaseCurdRepositoryService<User>
             .ToList<BaseIdTranStruVo>(a=>new BaseIdTranStruVo(a.Id.ToString(),a.Name));
         return results;
     }
+    public List<Employee> QryLiteEmployeeInfoByIds(IEnumerable<string> ids)
+    {
+        var baseIdTranStruVos = this.QueryUserByIds(ids);
+        return EmployeeUtil.BasicEmployeeInfos(baseIdTranStruVos);
+    }
+
+    public Employee QryLiteEmployeeInfoById(string id)
+    {
+        var baseIdTranStruVo = this.GetById(id);
+        return EmployeeUtil.BasicEmployeeInfo(baseIdTranStruVo);
+    }
+
+    public Employee GetEmployeeDetailById(string id)
+    {
+        
+        Employee employee = this
+            .baseRepo
+            .Where(a=>a.Id == Convert.ToInt64(id))
+            .ToOne<Employee>(a=>new Employee()
+            {
+                Id = a.Id.ToString(),
+                Username = a.Name,
+            });
+        return employee;
+    }
+
+    public List<Employee> GetEmployeeDetailByIds(IEnumerable<string> ids)
+    {
+        List<long> longIds = ids.Select(a=>Convert.ToInt64(a)).ToList();
+        List<User> users = this.baseRepo
+            .Where(a => longIds.Contains(a.Id))
+            .ToList();
+        List<Employee> employees = users.Select(a=>new Employee()
+            {
+                Id = a.Id.ToString(),
+                Username = a.Name,
+            })
+            .ToList();
+        return employees;
+    }
+
+   
+
+    public List<BaseIdTranStruVo> GetLevelLeadersByEmployeeIdAndTier(string employeeId, int tier)
+    {
+        //todo 
+        return new List<BaseIdTranStruVo>();
+    }
+
+    /// <summary>
+    /// 查询有效的用户,如果有效则返回数量
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    public long CheckEmployeeEffective(string userId)
+    {
+        return this.baseRepo.Where(a=>a.Id==Convert.ToInt64(userId)).Count();
+    }
 }

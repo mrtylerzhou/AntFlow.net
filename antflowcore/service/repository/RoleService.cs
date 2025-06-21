@@ -11,6 +11,11 @@ public class RoleService: AFBaseCurdRepositoryService<Role>
     {
     }
 
+    /// <summary>
+    /// 虽然User对象字段非常多,但是只需要Id和Name字段,如果有特殊业务可以选择出更多字段
+    /// </summary>
+    /// <param name="roleIds"></param>
+    /// <returns></returns>
     public List<User> QueryUserByRoleIds(ICollection<String> roleIds)
     {
         IEnumerable<long> roleIdsLong = AFCollectionUtil.StringToLongList(roleIds);

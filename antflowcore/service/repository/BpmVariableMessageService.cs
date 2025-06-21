@@ -1,14 +1,17 @@
-﻿using System.Runtime.InteropServices.JavaScript;
+﻿using System.Reflection;
 using System.Text.Json;
+using antflowcore.constant.enums;
+using antflowcore.constant.enus;
+using AntFlowCore.Entities;
 using antflowcore.entity;
 using AntFlowCore.Entity;
 using AntFlowCore.Enums;
 using antflowcore.exception;
+using antflowcore.service.biz;
 using antflowcore.util;
+using antflowcore.util.Extension;
 using antflowcore.vo;
 using AntFlowCore.Vo;
-using Microsoft.CodeAnalysis;
-using Microsoft.VisualBasic;
 
 namespace antflowcore.service.repository;
 
@@ -17,6 +20,13 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
     private readonly BpmVariableService _variableService;
     private readonly BpmnConfService _bpmnConfService;
     private readonly BpmBusinessProcessService _bpmBusinessProcessService;
+    private readonly AfTaskInstService _afTaskInstService;
+    private readonly AFTaskService _taskService;
+    private readonly RoleService _roleService;
+    private readonly UserService _userService;
+    private readonly BpmProcessNoticeService _bpmProcessNoticeService;
+    private readonly BpmProcessForwardService _bpmProcessForwardService;
+    private readonly ProcessBusinessContansService _processBusinessContansService;
     private readonly BpmVariableApproveRemindService _bpmVariableApproveRemindService;
 
     public BpmVariableMessageService(
@@ -24,12 +34,26 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
         BpmVariableService variableService,
         BpmnConfService bpmnConfService,
         BpmBusinessProcessService bpmBusinessProcessService,
+        AfTaskInstService afTaskInstService,
+        AFTaskService taskService,
+        RoleService roleService,
+        UserService userService,
+        BpmProcessNoticeService bpmProcessNoticeService,
+        BpmProcessForwardService bpmProcessForwardService,
+        ProcessBusinessContansService processBusinessContansService,
         BpmVariableApproveRemindService bpmVariableApproveRemindService
     ) : base(freeSql)
     {
         _variableService = variableService;
         _bpmnConfService = bpmnConfService;
         _bpmBusinessProcessService = bpmBusinessProcessService;
+        _afTaskInstService = afTaskInstService;
+        _taskService = taskService;
+        _roleService = roleService;
+        _userService = userService;
+        _bpmProcessNoticeService = bpmProcessNoticeService;
+        _bpmProcessForwardService = bpmProcessForwardService;
+        _processBusinessContansService = processBusinessContansService;
         _bpmVariableApproveRemindService = bpmVariableApproveRemindService;
     }
 
@@ -49,7 +73,7 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
         EventTypeEnum? eventTypeEnum =
             EventTypeEnumExtensions.GetEnumByOperationType(businessDataVo.OperationType.Value);
 
-        if (eventTypeEnum == null||eventTypeEnum==0)
+        if (eventTypeEnum == null || eventTypeEnum == 0)
         {
             return null;
         }
@@ -70,8 +94,8 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
             FormCode = businessDataVo.FormCode,
             EventType = (int)eventTypeEnum,
             ForwardUsers = businessDataVo.UserIds,
-            SignUpUsers = businessDataVo.SignUpUsers.Select(a=>a.Id).ToList(),
-            MessageType =eventTypeEnum.IsInNode()?2:1,
+            SignUpUsers = businessDataVo.SignUpUsers.Select(a => a.Id).ToList(),
+            MessageType = eventTypeEnum.IsInNode() ? 2 : 1,
             EventTypeEnum = eventTypeEnum.Value,
             Type = type,
         };
@@ -152,36 +176,86 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
             throw new AFBizException($"can not get BpmBusinessProcess by process Numbeer:{vo.ProcessNumber}");
         }
 
+        vo.ProcessInsId = businessProcess.ProcInstId;
+        vo.StartUser = businessProcess.CreateUser;
+        vo.ApplyDate = businessProcess.CreateTime?.ToString("yyyy-MM-dd");
+        vo.ApplyTime = businessProcess.CreateTime?.ToString("yyyy-MM-dd HH:mm:ss");
 
-        //todo 
+        List<BpmAfTaskInst> bpmAfTaskInsts = _afTaskInstService.baseRepo.Where(a => a.ProcInstId == vo.ProcessInsId)
+            .ToList();
+        vo.Approveds = bpmAfTaskInsts.Where(a => !string.IsNullOrEmpty(a.Assignee)).Select(a => a.Assignee).ToList();
+        //if the current node approver is empty, then get it from login user info
+        if (string.IsNullOrEmpty(vo.Assignee))
+        {
+
+            vo.Assignee = SecurityUtils.GetLogInEmpId();
+        }
+
+        //if the event type is in node event, then get the node info from activiti process engine
+        if (vo.EventTypeEnum.IsInNode())
+        {
+            //get current task list by process instance id
+            List<BpmAfTask> tasks = _taskService.baseRepo
+                .Where(a => a.ProcInstId == vo.ProcessInsId).ToList();
+            if (!tasks.IsEmpty())
+            {
+                //if node is empty then get from task's definition
+                if (string.IsNullOrEmpty(vo.ElementId))
+                {
+                    vo.ElementId = tasks[0].TaskDefKey;
+                }
+
+                //if task id is empty then get it from current tasks
+                if (string.IsNullOrEmpty(vo.TaskId))
+                {
+                    vo.TaskId = tasks[0].Id;
+                }
+
+                //if link type is empty then set it default to 1
+                vo.Type ??= 1;
+                List<BpmnConfCommonElementVo> elements = BpmnFlowUtil.GetElementVosByDeployId(tasks[0].ProcDefId);
+                var (nextUserElement, nextFlowElement) =
+                    BpmnFlowUtil.GetNextNodeAndFlowNode(elements, tasks[0].TaskDefKey);
+                if (nextUserElement != null &&
+                    nextUserElement.ElementType == ElementTypeEnum.ELEMENT_TYPE_END_EVENT.Code)
+                {
+                    //next element's id
+                    String nextElementId = nextUserElement.ElementId;
+                    vo.NextNodeApproveds = nextUserElement.AssigneeMap?.Select(a => a.Key).ToList();
+                }
+            }
+        }
 
         return vo;
     }
+
     public void InsertVariableMessage(long variableId, BpmnConfCommonVo bpmnConfCommonVo)
     {
         // Variable message list
-        var bpmVariableMessages = new List<BpmVariableMessage>();
+        List<BpmVariableMessage> bpmVariableMessages = new List<BpmVariableMessage>();
 
         // Process node approval remind list
-        var bpmVariableApproveReminds = new List<BpmVariableApproveRemind>();
+        List<BpmVariableApproveRemind> bpmVariableApproveReminds = new List<BpmVariableApproveRemind>();
 
         // Add out-of-node variable message config
         if (bpmnConfCommonVo.TemplateVos != null && bpmnConfCommonVo.TemplateVos.Any())
         {
-            bpmVariableMessages.AddRange(GetBpmVariableMessages(variableId, bpmnConfCommonVo.TemplateVos, string.Empty, 1));
+            bpmVariableMessages.AddRange(GetBpmVariableMessages(variableId, bpmnConfCommonVo.TemplateVos, string.Empty,
+                1));
         }
 
         // Add in-node message config
         if (bpmnConfCommonVo.ElementList != null && bpmnConfCommonVo.ElementList.Any())
         {
-            foreach (var elementVo in bpmnConfCommonVo.ElementList)
+            foreach (BpmnConfCommonElementVo elementVo in bpmnConfCommonVo.ElementList)
             {
                 if (elementVo.TemplateVos == null || !elementVo.TemplateVos.Any())
                 {
                     continue;
                 }
 
-                bpmVariableMessages.AddRange(GetBpmVariableMessages(variableId, elementVo.TemplateVos, elementVo.ElementId, 2));
+                bpmVariableMessages.AddRange(GetBpmVariableMessages(variableId, elementVo.TemplateVos,
+                    elementVo.ElementId, 2));
 
                 // Add process node approval remind list
                 if (elementVo.ApproveRemindVo != null && elementVo.ApproveRemindVo.Days != null)
@@ -209,7 +283,8 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
         }
     }
 
-    private List<BpmVariableMessage> GetBpmVariableMessages(long variableId, List<BpmnTemplateVo> templateVos, string elementId, int messageType)
+    private List<BpmVariableMessage> GetBpmVariableMessages(long variableId, List<BpmnTemplateVo> templateVos,
+        string elementId, int messageType)
     {
         return templateVos
             .Select(o => new BpmVariableMessage
@@ -223,4 +298,376 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
             .ToList();
     }
 
+    /**
+
+    * check whether to to send messages by template
+    *
+    * @param vo
+    * @return
+    */
+    public bool CheckIsSendByTemplate(BpmVariableMessageVo vo)
+    {
+
+        BpmVariable bpmVariable = _variableService.baseRepo
+            .Where(a => a.ProcessNum == vo.ProcessNumber)
+            .ToOne();
+
+        if (bpmVariable == null)
+        {
+            return false;
+        }
+
+        int? messageType = vo.MessageType;
+        if (messageType == null)
+        {
+            return false;
+        }
+
+        //out of node messages
+        long count = this.baseRepo
+            .Where(a => a.VariableId == bpmVariable.Id
+                        && a.MessageType == messageType
+                        && a.EventType == vo.EventType)
+            .Count();
+        return count > 0;
+    }
+
+    /// <summary>
+    /// end templated messages in sync way
+    /// </summary>
+    /// <param name="vo"></param>
+    /// <returns></returns>
+    public void SendTemplateMessages(BpmVariableMessageVo vo)
+    {
+        DoSendTemplateMessages(vo);
+    }
+
+    /**
+   * do send templated messages
+   *
+   * @param vo
+   */
+    private void DoSendTemplateMessages(BpmVariableMessageVo vo)
+    {
+
+
+        //if next node's approvers is empty then query current tasks instead
+        if (vo.NextNodeApproveds.IsEmpty())
+        {
+            List<BpmAfTask> tasks = _taskService.baseRepo
+                .Where(a => a.ProcInstId == vo.ProcessInsId).ToList();
+
+            if (!tasks.IsEmpty())
+            {
+                vo.NextNodeApproveds = tasks.Select(a => a.Assignee).ToList();
+            }
+        }
+
+        if (vo.MessageType == 1)
+        {
+            //out of node messages
+            List<BpmVariableMessage> bpmVariableMessages = this.baseRepo
+                .Where(a =>
+                    a.VariableId == vo.VariableId
+                    && a.MessageType == 1
+                    && a.EventType == vo.EventType).ToList();
+
+            if (!bpmVariableMessages.IsEmpty())
+            {
+                foreach (BpmVariableMessage bpmVariableMessage in bpmVariableMessages)
+                {
+                    DoSendTemplateMessages(bpmVariableMessage, vo);
+                }
+            }
+        }
+        else if (vo.MessageType == 1)
+        {
+            //in node messages
+            List<BpmVariableMessage> bpmVariableMessages = this.baseRepo
+                .Where(a =>
+                    a.VariableId == vo.VariableId
+                    && a.MessageType == 1
+                    && a.EventType == vo.EventType
+                    && a.ElementId == vo.ElementId).ToList();
+
+            if (!bpmVariableMessages.IsEmpty())
+            {
+                foreach (BpmVariableMessage bpmVariableMessage in bpmVariableMessages)
+                {
+                    DoSendTemplateMessages(bpmVariableMessage, vo);
+                }
+            }
+        }
+    }
+    /**
+    * do send templated messages
+    *
+    * @param bpmVariableMessage
+    */
+    private void DoSendTemplateMessages(BpmVariableMessage bpmVariableMessage, BpmVariableMessageVo vo) {
+
+        BpmnTemplateVo bpmnTemplateVo = new BpmnTemplateVo();
+        if (!string.IsNullOrEmpty(bpmVariableMessage.Content)) {
+            bpmnTemplateVo = JsonSerializer.Deserialize<BpmnTemplateVo>(bpmVariableMessage.Content);
+        }
+
+
+        //query sender's info
+        List<String> sendToUsers = GetSendToUsers(vo, bpmnTemplateVo);
+
+
+        //if senders is empty then return
+        if (sendToUsers.IsEmpty()) {
+            return;
+        }
+
+        List<Employee> employeeDetailByIds = _userService.GetEmployeeDetailByIds(sendToUsers.Distinct().ToList());
+        if(employeeDetailByIds.IsEmpty()){
+            return;
+        }
+
+        //send messages
+        SendMessage(vo, bpmnTemplateVo, employeeDetailByIds);
+
+    }
+     private List<String> GetSendToUsers(BpmVariableMessageVo vo, BpmnTemplateVo bpmnTemplateVo)
+     {
+         List<String> sendUsers = new List<string>();
+        //specified assignees
+        if (!bpmnTemplateVo.EmpIdList.IsEmpty()) {
+            sendUsers.AddRange(bpmnTemplateVo.EmpIdList);
+        }
+
+        //specified roles
+        if (!bpmnTemplateVo.RoleIdList.IsEmpty()) {
+            List<User> users = _roleService.QueryUserByRoleIds(bpmnTemplateVo.RoleIdList);
+            if (!users.IsEmpty())
+            {
+                sendUsers.AddRange(users.Select(u => u.Id.ToString()));
+            }
+        }
+
+        //todo functions
+        //node sign up users
+        if (!vo.SignUpUsers.IsEmpty()) {
+            sendUsers.AddRange(vo.SignUpUsers);
+        }
+
+        //forwarded
+        List<String> forwardUsers = null;
+        List<BpmProcessForward> bpmProcessForwards = _bpmProcessForwardService.baseRepo
+            .Where(a=>a.ProcessInstanceId==vo.ProcessInsId).ToList();
+            
+        if (!vo.ForwardUsers.IsEmpty() && !bpmProcessForwards.IsEmpty()) {
+            forwardUsers =new List<String>();
+            forwardUsers.AddRange(vo.ForwardUsers);
+            forwardUsers.AddRange(bpmProcessForwards.Select(o => o.ForwardUserId).Distinct().ToList());
+            forwardUsers = forwardUsers.Distinct().ToList();
+        } else if (vo.ForwardUsers.IsEmpty() && !bpmProcessForwards.IsEmpty())
+        {
+            forwardUsers = new List<string>();
+            forwardUsers.AddRange(bpmProcessForwards.Select(o => o.ForwardUserId).Distinct().ToList());
+            forwardUsers = forwardUsers.Distinct().ToList();
+        } else if (!vo.ForwardUsers.IsEmpty() && bpmProcessForwards.IsEmpty())
+        {
+            forwardUsers = new List<string>();
+            forwardUsers.AddRange(vo.ForwardUsers);
+            forwardUsers = forwardUsers.Distinct().ToList();
+        }
+        vo.ForwardUsers=forwardUsers;
+
+        //inform users
+        if (!bpmnTemplateVo.InformIdList.IsEmpty()) {
+            foreach (String informId in bpmnTemplateVo.InformIdList) {
+                InformEnum? informEnum = InformEnumExtensions.GetEnumByCode(int.Parse(informId));
+                //todo check whether the result is valid
+                string? fileName = informEnum?.GetFileName();
+                Object filObject = null;
+                if (!string.IsNullOrEmpty(fileName))
+                {
+                    filObject = vo.GetType().GetProperty(fileName);
+                }
+                if (filObject is IList<string>) {
+                    sendUsers.AddRange((List<string>) filObject);
+                } else if (filObject!=null) {
+                    sendUsers.Add(filObject.ToString());
+                }
+            }
+        }
+        return sendUsers;
+    }
+     private void SendMessage(BpmVariableMessageVo vo, BpmnTemplateVo bpmnTemplateVo, List<Employee> employees) {
+        //query all types of the messages
+        List<MessageSendTypeEnum> messageSendTypeEnums = _bpmProcessNoticeService.ProcessNoticeList(vo.FormCode)
+            .Select(o => MessageSendTypeEnum.GetEnumByCode(o.Type)).ToList();
+
+
+        Dictionary<int, String> wildcardCharacterMap = GetWildcardCharacterMap(vo);
+        InformationTemplateVo templateVo = new InformationTemplateVo
+        {
+            Id = bpmnTemplateVo.TemplateId,
+            WildcardCharacterMap =wildcardCharacterMap
+        };
+        InformationTemplateVo informationTemplateVo = InformationTemplateUtils.TranslateInformationTemplate(templateVo);
+
+        //get message urls
+        Dictionary<String, String> urlMap = GetUrlMap(vo, informationTemplateVo);
+       urlMap.TryGetValue("emailUrl", out string? emailUrl);
+       urlMap.TryGetValue("appUrl", out string? appUrl);
+
+        foreach (MessageSendTypeEnum messageSendTypeEnum in messageSendTypeEnums) {
+            if (messageSendTypeEnum==null) {
+                continue;
+            }
+
+            List<UserMsgBathVo> userMsgBathVos = employees
+                .Select(o => GetUserMsgBathVo(o, informationTemplateVo.MailTitle,
+                    informationTemplateVo.MailContent,
+                    vo.TaskId, emailUrl, appUrl, MessageSendTypeEnum.MAIL))
+                .ToList();
+            if (messageSendTypeEnum == MessageSendTypeEnum.MAIL)
+            {
+                    UserMsgUtils.SendMessageBathNoUserMessage(userMsgBathVos);
+            }else if (messageSendTypeEnum == MessageSendTypeEnum.MESSAGE)
+            {
+                userMsgBathVos.ForEach(a=>a.MessageSendTypeEnums=new List<MessageSendTypeEnum>{MessageSendTypeEnum.MESSAGE});
+                UserMsgUtils.SendMessageBathNoUserMessage(userMsgBathVos);
+            }else if (messageSendTypeEnum == MessageSendTypeEnum.PUSH)
+            {
+                userMsgBathVos.ForEach(a=>a.MessageSendTypeEnums=new List<MessageSendTypeEnum>{MessageSendTypeEnum.PUSH});
+                UserMsgUtils.SendMessageBathNoUserMessage(userMsgBathVos);
+            }
+        }
+    }
+
+    private UserMsgBathVo GetUserMsgBathVo(
+        Employee employee,
+        string title,
+        string content,
+        string taskId,
+        string emailUrl,
+        string appUrl,
+        MessageSendTypeEnum messageSendTypeEnum)
+    {
+        var userMsgVo = new UserMsgVo
+        {
+            UserId = employee.Id,
+            Email = employee.Email,
+            Mobile = employee.Mobile,
+            Title = title,
+            Content = content,
+            EmailUrl = emailUrl,
+            Url = emailUrl,
+            AppPushUrl = appUrl,
+            TaskId = taskId
+        };
+
+        return new UserMsgBathVo
+        {
+            UserMsgVo = userMsgVo,
+            MessageSendTypeEnums = new List<MessageSendTypeEnum> { messageSendTypeEnum }
+        };
+    }
+
+    private Dictionary<int, string> GetWildcardCharacterMap(BpmVariableMessageVo vo)
+    {
+        var wildcardCharacterMap = new Dictionary<int, string>();
+
+        foreach (var wildcardCharacterEnum in Enum.GetValues(typeof(WildcardCharacterEnum)).Cast<WildcardCharacterEnum>())
+        {
+            var filName = wildcardCharacterEnum.FilName;
+            if (string.IsNullOrWhiteSpace(filName))
+                continue;
+
+            // 反射获取 vo 的属性值
+            var propertyInfo = vo.GetType().GetProperty(filName, BindingFlags.Public | BindingFlags.Instance);
+            if (propertyInfo == null) continue;
+
+            var property = propertyInfo.GetValue(vo);
+            if (property != null)
+            {
+                if (wildcardCharacterEnum.IsSearchEmpl)
+                {
+                    if (property is IEnumerable<string> list)
+                    {
+                        var propertyList = list.ToList();
+                        if (!propertyList.Any())
+                            continue;
+
+                        var employees = _userService.QueryUserByIds(propertyList);
+                        var emplNames = employees.Select(e => e.Name).ToList();
+                        if (emplNames.Any())
+                        {
+                            wildcardCharacterMap[wildcardCharacterEnum.Code] = string.Join(",", emplNames);
+                        }
+                    }
+                    else
+                    {
+                        var stringValue = property.ToString();
+                        if (stringValue != "0")
+                        {
+                            var employee = _userService.GetById(stringValue);
+                            if (employee != null)
+                            {
+                                wildcardCharacterMap[wildcardCharacterEnum.Code] = employee.Name;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    wildcardCharacterMap[wildcardCharacterEnum.Code] = property.ToString();
+                }
+            }
+        }
+
+        return wildcardCharacterMap;
+    }
+    public Dictionary<string, string> GetUrlMap(BpmVariableMessageVo vo, InformationTemplateVo informationTemplateVo)
+    {
+        var urlMap = new Dictionary<string, string>();
+
+        string emailUrl = string.Empty;
+        string appUrl = string.Empty;
+
+        if (informationTemplateVo.JumpUrl != null &&
+            (informationTemplateVo.JumpUrl == JumpUrlEnum.PROCESS_APPROVE.Code ||
+             informationTemplateVo.JumpUrl == JumpUrlEnum.PROCESS_VIEW.Code))
+        {
+            int type = informationTemplateVo.JumpUrl == 1 ? 2 : 1;
+
+            var processInfo = new ProcessInforVo
+            {
+                ProcessinessKey = vo.BpmnCode,
+                BusinessNumber = vo.ProcessNumber,
+                FormCode = vo.FormCode,
+                Type = type
+            };
+
+            bool isOutside = vo.IsOutside;
+
+            emailUrl = _processBusinessContansService.GetRoute(
+                MessageSendTypeEnum.MAIL.Code,
+                processInfo,
+                isOutside
+            );
+
+            appUrl = _processBusinessContansService.GetRoute(
+                MessageSendTypeEnum.PUSH.Code,
+                processInfo,
+                isOutside
+            );
+        }
+        else if (informationTemplateVo.JumpUrl != null &&
+                 informationTemplateVo.JumpUrl == JumpUrlEnum.PROCESS_BACKLOG.Code)
+        {
+            emailUrl = "/user/workflow/upcoming?page=1&pageSize=10";
+            appUrl = "";
+        }
+
+        urlMap["emailUrl"] = emailUrl;
+        urlMap["appUrl"] = appUrl;
+
+        return urlMap;
+    }
 }

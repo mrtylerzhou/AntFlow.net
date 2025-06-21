@@ -16,7 +16,7 @@ public class OutSideBpmConditionsTemplateService : AFBaseCurdRepositoryService<O
     private readonly OutSideBpmBaseService _outSideBpmBaseService;
     private readonly OutSideBpmBusinessPartyService _outSideBpmBusinessPartyService;
     private readonly BpmProcessAppApplicationService _bpmProcessAppApplicationService;
-    private readonly EmployeeService _employeeService;
+    private readonly UserService _employeeService;
     private readonly BpmnConfService _bpmnConfService;
     private readonly BpmnNodeService _bpmnNodeService;
     private readonly BpmnNodeConditionsConfService _bpmnNodeConditionsConfService;
@@ -26,7 +26,7 @@ public class OutSideBpmConditionsTemplateService : AFBaseCurdRepositoryService<O
         OutSideBpmBaseService outSideBpmBaseService,
         OutSideBpmBusinessPartyService outSideBpmBusinessPartyService,
         BpmProcessAppApplicationService bpmProcessAppApplicationService,
-        EmployeeService employeeService,
+        UserService employeeService,
         BpmnConfService bpmnConfService,
         BpmnNodeService bpmnNodeService,
         BpmnNodeConditionsConfService bpmnNodeConditionsConfService,

@@ -37,13 +37,13 @@ namespace AntFlowCore.Enums
             switch (informEnum)
             {
                 case InformEnum.APPLICANT:
-                    return "startUser";
+                    return "StartUser";
                 case InformEnum.ALL_APPROVER:
-                    return "approveds";
+                    return "Approveds";
                 case InformEnum.AT_APPROVER:
-                    return "assignee";
+                    return "Assignee";
                 case InformEnum.BY_TRANSPOND:
-                    return "forwardUsers";
+                    return "ForwardUsers";
                 default:
                     return null;
             }

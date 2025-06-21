@@ -11,12 +11,12 @@ public class OutSideBpmCallbackUrlConfService : AFBaseCurdRepositoryService<OutS
 {
    
     private readonly OutSideBpmAdminPersonnelService _outSideBpmAdminPersonnelService;
-    private readonly EmployeeService _employeeService;
+    private readonly UserService _employeeService;
 
     public OutSideBpmCallbackUrlConfService(
        
         OutSideBpmAdminPersonnelService outSideBpmAdminPersonnelService,
-        EmployeeService employeeService,
+        UserService employeeService,
         IFreeSql freeSql) : base(freeSql)
     {
         _outSideBpmAdminPersonnelService = outSideBpmAdminPersonnelService;

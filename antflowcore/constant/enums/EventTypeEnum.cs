@@ -60,7 +60,16 @@ namespace AntFlowCore.Enums
             {
                 throw new AFBizException($"can not get EventTypeEnum by code {eventType}");
             }
-            return EventTypeMappings[eventType.Value].IsInNode;
+
+            return IsInNode(eventType.Value);
+        }
+        public static bool IsInNode(this EventTypeEnum eventType)
+        {
+            if (eventType == null)
+            {
+                throw new AFBizException($"can not get EventTypeEnum by code {eventType}");
+            }
+            return EventTypeMappings[eventType].IsInNode;
         }
     }
 }

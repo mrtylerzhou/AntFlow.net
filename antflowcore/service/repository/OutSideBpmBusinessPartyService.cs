@@ -16,12 +16,12 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
 {
     private readonly OutSideBpmAdminPersonnelService _outSideBpmAdminPersonnelService;
     private readonly OutSideBpmCallbackUrlConfService _outSideBpmCallbackUrlConfService;
-    private readonly EmployeeService _employeeService;
+    private readonly UserService _employeeService;
 
     public OutSideBpmBusinessPartyService(
         OutSideBpmAdminPersonnelService outSideBpmAdminPersonnelService,
         OutSideBpmCallbackUrlConfService outSideBpmCallbackUrlConfService,
-        EmployeeService employeeService,
+        UserService employeeService,
         IFreeSql freeSql) : base(freeSql)
     {
         _outSideBpmAdminPersonnelService = outSideBpmAdminPersonnelService;
