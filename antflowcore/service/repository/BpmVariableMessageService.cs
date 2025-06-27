@@ -323,7 +323,7 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
             return false;
         }
 
-        //out of node messages
+        //如果节点存在自定义通知类型,则默认走自定义的,需要注意的是即便不设置只要开启了通知,流程仍然会通知,内部有一套默认通知机制.自定义通知主要是为了增加灵活性,慎用
         long count = this.baseRepo
             .Where(a => a.VariableId == bpmVariable.Id
                         && a.MessageType == messageType
@@ -386,10 +386,17 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
             List<BpmVariableMessage> bpmVariableMessages = this.baseRepo
                 .Where(a =>
                     a.VariableId == vo.VariableId
-                    && a.MessageType == 1
-                    && a.EventType == vo.EventType
-                    && a.ElementId == vo.ElementId).ToList();
-
+                    && a.EventType == vo.EventType)
+                .ToList();
+            if (!string.IsNullOrEmpty(vo.ElementId))
+            {
+                List<BpmVariableMessage> currentNodeVariableMessages = bpmVariableMessages.Where(a => a.ElementId == vo.ElementId).ToList();
+                if(!currentNodeVariableMessages.IsEmpty())
+                {
+                    //如果当前节点有节点内通知消息,则覆盖全局通用的,否则使用全局的
+                    bpmVariableMessages = currentNodeVariableMessages;
+                }
+            }
             if (!bpmVariableMessages.IsEmpty())
             {
                 foreach (BpmVariableMessage bpmVariableMessage in bpmVariableMessages)
@@ -501,7 +508,11 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
         List<MessageSendTypeEnum> messageSendTypeEnums = _bpmProcessNoticeService.ProcessNoticeList(vo.FormCode)
             .Select(o => MessageSendTypeEnum.GetEnumByCode(o.Type)).ToList();
 
-
+        List<BaseNumIdStruVo> messageSendTypeList = bpmnTemplateVo.MessageSendTypeList;
+        if(!messageSendTypeEnums.IsEmpty()&&!messageSendTypeList.IsEmpty())//如果有模板自身的通知方式,则使用模板自身的通知方式,前提是有默认通知,即默认通知关闭以后节点也不会再通知
+        {
+            messageSendTypeEnums=messageSendTypeList.Select(o => MessageSendTypeEnum.GetEnumByCode((int)o.Id)).ToList();
+        }
         Dictionary<int, String> wildcardCharacterMap = GetWildcardCharacterMap(vo);
         InformationTemplateVo templateVo = new InformationTemplateVo
         {

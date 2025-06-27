@@ -52,7 +52,7 @@ public class InformationTemplateService: AFBaseCurdRepositoryService<Information
         return PageUtils.GetResultAndPage(page.Of(results,basePagingInfo));
     }
 
-    public void Edit(InformationTemplateVo informationTemplateVo)
+    public long Edit(InformationTemplateVo informationTemplateVo)
     {
         Expression<Func<InformationTemplate, bool>> expression = a =>
             a.IsDel == 0 && a.Name == informationTemplateVo.Name;
@@ -104,6 +104,7 @@ public class InformationTemplateService: AFBaseCurdRepositoryService<Information
         }
 
         this.baseRepo.Update(informationTemplate);
+        return informationTemplate.Id;
     }
 
     public List<DefaultTemplateVo> GetList()

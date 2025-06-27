@@ -17,7 +17,7 @@ public class BpmnTemplateService: AFBaseCurdRepositoryService<BpmnTemplate>
         if (ObjectUtils.IsEmpty(templateVos)) {
             return;
         }
-        List<BpmnTemplate> bpmnTemplateList=MapVos(templateVos,confId);
+        List<BpmnTemplate> bpmnTemplateList=MapVos(templateVos,confId,bpmnConfVo.FormCode);
         int executeAffrows = Frsql.Insert(bpmnTemplateList).ExecuteAffrows();
         if (executeAffrows <= 0)
         {
@@ -31,7 +31,7 @@ public class BpmnTemplateService: AFBaseCurdRepositoryService<BpmnTemplate>
             return;
         }
 
-        List<BpmnTemplate> bpmnTemplates = MapVos(templateVos, bpmnNodeVo.ConfId);
+        List<BpmnTemplate> bpmnTemplates = MapVos(templateVos, bpmnNodeVo.ConfId,bpmnNodeVo.FormCode);
         int executeAffrows = Frsql.Insert(bpmnTemplates).ExecuteAffrows();
         if (executeAffrows <= 0)
         {
@@ -39,7 +39,7 @@ public class BpmnTemplateService: AFBaseCurdRepositoryService<BpmnTemplate>
         }
     }
 
-    private List<BpmnTemplate> MapVos(List<BpmnTemplateVo> templateVos, long confId)
+    private List<BpmnTemplate> MapVos(List<BpmnTemplateVo> templateVos, long confId,string formCode)
     {
         List<BpmnTemplate> bpmnTemplates=new List<BpmnTemplate>();
         string logInEmpNameSafe = SecurityUtils.GetLogInEmpNameSafe();
@@ -51,6 +51,8 @@ public class BpmnTemplateService: AFBaseCurdRepositoryService<BpmnTemplate>
             bpmnTemplate.Emps=string.Join(",", bpmnTemplateVo.EmpList);
             bpmnTemplate.Roles=string.Join(",", bpmnTemplateVo.RoleList);
             bpmnTemplate.Funcs = string.Join(",", bpmnTemplateVo.FuncList);
+            bpmnTemplate.MessageSendType = string.Join(",", bpmnTemplateVo.MessageSendTypeList?.Select(x=>x.Id)??new List<long>());
+            bpmnTemplate.FormCode = formCode;
             bpmnTemplate.CreateUser=logInEmpNameSafe;
             bpmnTemplates.Add(bpmnTemplate);
         }

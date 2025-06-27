@@ -59,6 +59,11 @@ namespace AntFlowCore.Entity
         [Column(Name = "template_id")]
         public long TemplateId { get; set; }
 
+        [Column(Name = "message_send_type")]
+        public string MessageSendType { get; set; }
+        [Column(Name = "form_code")]
+        public string FormCode { get; set; }
+
         /// <summary>
         /// Deletion status (0 for no, 1 for yes).
         /// </summary>

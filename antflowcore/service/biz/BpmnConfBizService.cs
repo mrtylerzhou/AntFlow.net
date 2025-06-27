@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices.JavaScript;
 using antflowcore.adaptor;
+using antflowcore.constant.enums;
 using antflowcore.constant.enus;
 using antflowcore.dto;
 using antflowcore.entity;
@@ -35,6 +36,7 @@ public class BpmnConfBizService
     private readonly InformationTemplateService _informationTemplateService;
     private readonly BpmnNodeLfFormdataFieldControlService _lfFormdataFieldControlService;
     private readonly BpmnViewPageButtonService _viewPageButtonService;
+    private readonly BpmnViewPageButtonBizService _viewPageButtonBizService;
     private readonly TaskMgmtService _taskMgmtService;
   
 
@@ -55,6 +57,7 @@ public class BpmnConfBizService
         InformationTemplateService informationTemplateService,
         BpmnNodeLfFormdataFieldControlService lfFormdataFieldControlService,
         BpmnViewPageButtonService viewPageButtonService,
+        BpmnViewPageButtonBizService viewPageButtonBizService,
         TaskMgmtService taskMgmtService
         )
     {
@@ -74,6 +77,7 @@ public class BpmnConfBizService
         _informationTemplateService = informationTemplateService;
         _lfFormdataFieldControlService = lfFormdataFieldControlService;
         _viewPageButtonService = viewPageButtonService;
+        _viewPageButtonBizService = viewPageButtonBizService;
         _taskMgmtService = taskMgmtService;
      
     }
@@ -102,7 +106,8 @@ public class BpmnConfBizService
             throw new AFBizException($"conf id for formcode:{formCode} can not be null");
         }
         bpmnConfVo.Id=confId;
-        //todo 
+        _viewPageButtonBizService.EditBpmnViewPageButton(bpmnConfVo,confId); 
+        _bpmnTemplateService.EditBpmnTemplate(bpmnConfVo,confId);
         int? isOutSideProcess = bpmnConfVo.IsOutSideProcess;
         int? isLowCodeFlow = bpmnConfVo.IsLowCodeFlow;
         
@@ -151,6 +156,7 @@ public class BpmnConfBizService
             
             bpmnNodeVo.Id=bpmnNodeId;
             bpmnNodeVo.ConfId=confId;
+            bpmnNodeVo.FormCode = formCode;
             BpmnNodeAdpConfEnum? bpmnNodeAdpConfEnum = GetBpmnNodeAdpConfEnum(bpmnNodeVo);
             //if it can not get the node's adapter,continue
             if (bpmnNodeAdpConfEnum==null) {
@@ -390,8 +396,7 @@ public class BpmnConfBizService
             .Where(a => a.ConfId == bpmnConfVo.Id && a.IsDel == 0 && a.NodeId == null).ToList();
         bpmnConfVo.TemplateVos  = bpmnTemplates.Select(o =>
         {
-            BpmnTemplateVo vo = o.MapToVo();
-            BuildBpmnTemplateVo(vo);
+            BpmnTemplateVo vo = BuildBpmnTemplateVo(o);
             return vo;
         }).ToList();
     }
@@ -501,14 +506,14 @@ public class BpmnConfBizService
                 g => g.Key,
                 g => g.Select(o =>
                 {
-                    var vo = o.MapToVo();
-                    BuildBpmnTemplateVo(vo);
+                    BpmnTemplateVo vo = BuildBpmnTemplateVo(o);
                     return vo;
                 }).ToList()
             );
     }
-    private void BuildBpmnTemplateVo(BpmnTemplateVo vo)
+    private BpmnTemplateVo BuildBpmnTemplateVo(BpmnTemplate entity)
     {
+        BpmnTemplateVo vo = entity.MapToVo();
         vo.EventValue = EventTypeEnumExtensions.GetDescByCode(vo.Event);
 
         if (!string.IsNullOrEmpty(vo.Informs))
@@ -536,9 +541,20 @@ public class BpmnConfBizService
                 .ToList();
         }
 
+        if (!string.IsNullOrEmpty(entity.MessageSendType))
+        {
+            String[] messageSendTypesStr = entity.MessageSendType.Split(",");
+            List<BaseNumIdStruVo> baseNumIdStruVos = messageSendTypesStr.Select(a => new BaseNumIdStruVo()
+            {
+                Id = long.Parse(a),
+                Name = MessageSendTypeEnum.GetEnumByCode(int.Parse(a)).Description,
+            }).ToList();
+            vo.MessageSendTypeList = baseNumIdStruVos;
+        }
         vo.TemplateName = _informationTemplateService.baseRepo
             .Where(a=>a.Id==vo.TemplateId).ToOne()?
             .Name ?? string.Empty;
+        return vo;
     }
 
     private  Dictionary<long, List<BpmnNodeButtonConf>> GetBpmnNodeButtonConfMap(List<long> idList)

@@ -1,4 +1,5 @@
 ﻿using System;
+using AntFlowCore.Enums;
 using FreeSql;
 using FreeSql.DataAnnotations;
 
@@ -72,6 +73,13 @@ namespace AntFlowCore.Entity
         /// </summary>
         public int Status { get; set; }
 
+        /// <summary>
+        /// <see cref="EventTypeEnum"/>
+        /// </summary>
+        [Column(Name = "event")]
+        public int? Evt { get; set; }
+        [Column(Name = "event_name")]
+        public string EventName { get; set; }
         /// <summary>
         /// Deletion status (0: not deleted, 1: deleted).
         /// </summary>

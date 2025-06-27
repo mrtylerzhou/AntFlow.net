@@ -20,7 +20,7 @@ namespace AntFlowCore.Enums
 
     public static class EventTypeEnumExtensions
     {
-        private static readonly Dictionary<EventTypeEnum, EventTypeProperties> EventTypeMappings = new()
+        public static readonly Dictionary<EventTypeEnum, EventTypeProperties> EventTypeMappings = new()
         {
             { EventTypeEnum.PROCESS_INITIATOR, new EventTypeProperties(true, "流程发起", (int)ProcessOperationEnum.BUTTON_TYPE_SUBMIT, 1, new List<int>()) },
             { EventTypeEnum.PROCESS_CANCELLATION, new EventTypeProperties(false, "作废操作", (int)ProcessOperationEnum.BUTTON_TYPE_ABANDON, 0, new List<int> { (int)InformEnum.APPLICANT }) },
@@ -73,7 +73,7 @@ namespace AntFlowCore.Enums
         }
     }
 }
- class EventTypeProperties
+public class EventTypeProperties
 {
     public bool IsInNode { get; }
     public string Description { get; }

@@ -61,6 +61,10 @@ namespace antflowcore.vo
         [JsonPropertyName("templateName")]
         public string TemplateName { get; set; }
 
+        [JsonPropertyName("messageSendTypeList")]
+        public List<BaseNumIdStruVo> MessageSendTypeList { get; set; }
+        [JsonPropertyName("formCode")]
+        public string FormCode { get; set; }
         public int IsDel { get; set; }
 
         [JsonPropertyName("createTime")]
