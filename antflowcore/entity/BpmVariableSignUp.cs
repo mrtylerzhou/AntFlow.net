@@ -1,84 +1,69 @@
-﻿using FreeSql;
-using System;
-using FreeSql.DataAnnotations;
+﻿namespace antflowcore.entity;
 
-namespace AntFlowCore.Entity
+using System;
+
+/// <summary>
+/// Represents the variable sign-up entity.
+/// </summary>
+public class BpmVariableSignUp
 {
     /// <summary>
-    /// Represents the variable sign-up entity.
+    /// Auto-increment ID.
     /// </summary>
-    [Table(Name = "t_bpm_variable_sign_up")]
-    public class BpmVariableSignUp
-    {
-        /// <summary>
-        /// Auto-increment ID.
-        /// </summary>
-        [Column(IsPrimary = true, IsIdentity = true)]
-        public long Id { get; set; }
+    public long Id { get; set; }
 
-        /// <summary>
-        /// Variable ID.
-        /// </summary>
-        [Column(Name = "variable_id")]
-        public long VariableId { get; set; }
+    /// <summary>
+    /// Variable ID.
+    /// </summary>
+    public long VariableId { get; set; }
 
-        /// <summary>
-        /// Element ID.
-        /// </summary>
-        [Column(Name = "element_id")]
-        public string ElementId { get; set; }
+    /// <summary>
+    /// Element ID.
+    /// </summary>
+    public string ElementId { get; set; }
 
-        /// <summary>
-        /// Node ID.
-        /// </summary>
-        [Column(Name = "node_id")]
-        public string NodeId { get; set; }
+    /// <summary>
+    /// Node ID.
+    /// </summary>
+    public string NodeId { get; set; }
 
-        /// <summary>
-        /// After sign-up way (1: comeback to sign-up user; 2: not callback to sign-up user).
-        /// </summary>
-        [Column(Name = "after_sign_up_way")]
-        public int? AfterSignUpWay { get; set; }
+    /// <summary>
+    /// After sign-up way (1: comeback to sign-up user; 2: not callback to sign-up user).
+    /// </summary>
+    public int? AfterSignUpWay { get; set; }
 
-        /// <summary>
-        /// Sign-up elements as JSON.
-        /// </summary>
-        [Column(Name = "sub_elements")]
-        public string SubElements { get; set; }
+    /// <summary>
+    /// Sign-up elements as JSON.
+    /// </summary>
+    public string SubElements { get; set; }
 
-        /// <summary>
-        /// Remark.
-        /// </summary>
-        public string Remark { get; set; }
+    /// <summary>
+    /// Remark.
+    /// </summary>
+    public string Remark { get; set; }
 
-        /// <summary>
-        /// 0 for normal, 1 for delete.
-        /// </summary>
-        [Column(Name = "is_del")]
-        public int IsDel { get; set; }
+    /// <summary>
+    /// 0 for normal, 1 for delete.
+    /// </summary>
+    public int IsDel { get; set; }
 
-        /// <summary>
-        /// Create user.
-        /// </summary>
-        [Column(Name = "create_user")]
-        public string CreateUser { get; set; }
+    /// <summary>
+    /// Create user.
+    /// </summary>
+    public string CreateUser { get; set; }
 
-        /// <summary>
-        /// Create time.
-        /// </summary>
-        [Column(Name = "create_time")]
-        public DateTime? CreateTime { get; set; }
+    /// <summary>
+    /// Create time.
+    /// </summary>
+    public DateTime? CreateTime { get; set; }
 
-        /// <summary>
-        /// Update user.
-        /// </summary>
-        [Column(Name = "update_user")]
-        public string UpdateUser { get; set; }
+    /// <summary>
+    /// Update user.
+    /// </summary>
+    public string UpdateUser { get; set; }
 
-        /// <summary>
-        /// Update time.
-        /// </summary>
-        [Column(Name = "update_time")]
-        public DateTime? UpdateTime { get; set; }
-    }
+    /// <summary>
+    /// Update time.
+    /// </summary>
+    public DateTime? UpdateTime { get; set; }
 }

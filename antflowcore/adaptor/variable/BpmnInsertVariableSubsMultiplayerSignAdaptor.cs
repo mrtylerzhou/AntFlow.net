@@ -1,5 +1,6 @@
 ﻿using antflowcore.constant.enus;
 using AntFlowCore.Entities;
+using antflowcore.entity;
 using antflowcore.service.repository;
 using AntFlowCore.Vo;
 
@@ -25,7 +26,8 @@ public class BpmnInsertVariableSubsMultiplayerSignAdaptor: IBpmnInsertVariableSu
             ElementName = elementVo.ElementName,
             NodeId = elementVo.NodeId,
             CollectionName = elementVo.CollectionName,
-            SignType = (int)SignTypeEnum.SIGN_TYPE_SIGN
+            SignType = (int)SignTypeEnum.SIGN_TYPE_SIGN,
+            CreateTime = DateTime.Now,
         };
 
         _bpmVariableMultiplayerService.baseRepo.Insert(variableMultiplayer);
@@ -39,7 +41,8 @@ public class BpmnInsertVariableSubsMultiplayerSignAdaptor: IBpmnInsertVariableSu
                 VariableMultiplayerId = variableMultiplayerId,
                 Assignee = o,
                 AssigneeName = assigneeMap != null && assigneeMap.ContainsKey(o) ? assigneeMap[o] : "",
-                UndertakeStatus = 0
+                UndertakeStatus = 0,
+                CreateTime = DateTime.Now,
             })
             .ToList();
 

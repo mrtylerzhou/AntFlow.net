@@ -60,7 +60,8 @@ public class BpmnNodeButtonConfService: AFBaseCurdRepositoryService<BpmnNodeButt
                 BpmnNodeId = bpmnNodeId,
                 ButtonPageType =(int)ButtonTypeEnum.BUTTON_TYPE_SUBMIT,
                 ButtonType = (int)ButtonTypeEnum.BUTTON_TYPE_SUBMIT,
-                ButtonName = ButtonTypeEnumExtensions.GetDescByCode((int)ButtonTypeEnum.BUTTON_TYPE_SUBMIT)
+                ButtonName = ButtonTypeEnumExtensions.GetDescByCode((int)ButtonTypeEnum.BUTTON_TYPE_SUBMIT),
+                CreateTime = DateTime.Now,
             });
         }
     }
@@ -73,7 +74,8 @@ public class BpmnNodeButtonConfService: AFBaseCurdRepositoryService<BpmnNodeButt
                 BpmnNodeId = bpmnNodeId,
                 ButtonPageType = (int)buttonPageTypeEnum,
                 ButtonType = o,
-                ButtonName = ButtonTypeEnumExtensions.GetDescByCode(o)
+                ButtonName = ButtonTypeEnumExtensions.GetDescByCode(o),
+                CreateTime = DateTime.Now,
             })
             .ToList();
     }

@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using antflowcore.adaptor.variable;
 using antflowcore.constant.enus;
+using antflowcore.entity;
 using AntFlowCore.Entity;
 using antflowcore.service.repository;
 using antflowcore.util;
@@ -100,7 +101,8 @@ namespace antflowcore.service.biz;
                         ElementName = elementVo.ElementName,
                         ElementFromId = elementVo.FlowFrom,
                         ElementToId = elementVo.FlowTo,
-                        SequenceFlowType = 1
+                        SequenceFlowType = 1,
+                        CreateTime = DateTime.Now,
                     });
                 }
             }
@@ -147,7 +149,8 @@ namespace antflowcore.service.biz;
                     ElementId = elementId,
                     ButtonPageType = (int)ButtonPageTypeEnum.INITIATE,
                     ButtonType = o.ButtonType,
-                    ButtonName = o.ButtonName
+                    ButtonName = o.ButtonName,
+                    CreateTime = DateTime.Now,
                 }).ToList();
 
                 _bpmVariableButtonService.baseRepo.Insert(startPageButtons);
@@ -161,7 +164,8 @@ namespace antflowcore.service.biz;
                     ElementId = elementId,
                     ButtonPageType = (int)ButtonPageTypeEnum.AUDIT,
                     ButtonType = o.ButtonType,
-                    ButtonName = o.ButtonName
+                    ButtonName = o.ButtonName,
+                    CreateTime = DateTime.Now,
                 }).ToList();
 
                 _bpmVariableButtonService.baseRepo.Insert(approvalPageButtons);

@@ -1,4 +1,6 @@
-﻿namespace antflowcore.service.repository;
+﻿using antflowcore.entity;
+
+namespace antflowcore.service.repository;
 
 public class DepartmentService: AFBaseCurdRepositoryService<Department>
 {

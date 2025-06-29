@@ -1,17 +1,14 @@
-﻿using FreeSql.DataAnnotations;
-
-namespace antflowcore.entity;
-
-[Table(Name = "t_user_role")]
-public class UserRole
+﻿namespace AntFlowCore.Entity
 {
     /// <summary>
-    /// 主键ID
+    /// 用户角色关联表
     /// </summary>
-    public long? Id { get; set; }
+    public class UserRole
+    {
+        public long? Id { get; set; }
 
-    [Column(Name = "user_id")]
-    public long? UserId { get; set; }
-    [Column(Name = "role_id")]
-    public long? RoleId { get; set; }
+        public long? UserId { get; set; }
+
+        public long? RoleId { get; set; }
+    }
 }

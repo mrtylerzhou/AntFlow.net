@@ -1,4 +1,5 @@
 ﻿using AntFlowCore.Entities;
+using antflowcore.entity;
 using antflowcore.service.repository;
 using AntFlowCore.Vo;
 
@@ -26,7 +27,8 @@ public class BpmnInsertVariableSubsSingleAdaptor: IBpmnInsertVariableSubs
             Assignee = elementVo.AssigneeParamValue,
             AssigneeName = assigneeMap != null && assigneeMap.ContainsKey(elementVo.AssigneeParamValue)
                 ? assigneeMap[elementVo.AssigneeParamValue]??""
-                : ""
+                : "",
+            CreateTime = DateTime.Now,
         };
 
         _bpmVariableSingleService.baseRepo.Insert(variableSingle);

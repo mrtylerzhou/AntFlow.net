@@ -49,6 +49,7 @@ public class Program
         builder.Services.AddScoped<UnitOfWorkManager>();//freesql uow
         builder.Services.AntFlowServiceSetUp();//注册AntFlow本身使用到的服务
         var app = builder.Build();
+        app.Services.AddFreeSqlFluentConfig();
         app.MapOpenApi();
         app.UseCors("CorsPolicy");//解决跨域
         ServiceProviderUtils.Initialize(app.Services);

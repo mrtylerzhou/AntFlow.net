@@ -68,6 +68,7 @@ public class ButtonOperationService
                 {
                     foreach (BpmAfTask bpmAfTask in bpmAfTasks)
                     {
+                        bpmAfTask.ProcessNumber = vo.ProcessNumber;
                         _taskListener.Notify(bpmAfTask,ITaskListener.EVENTNAME_COMPLETE);
                     }
                 }else if (vo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_SUBMIT)

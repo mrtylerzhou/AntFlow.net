@@ -12,7 +12,8 @@ public class BpmnConfNoticeTemplateService : AFBaseCurdRepositoryService<BpmnCon
     public long Insert(String bpmnCode) {
         BpmnConfNoticeTemplate bpmnConfNoticeTemplate = new BpmnConfNoticeTemplate()
         {
-            BpmnCode = bpmnCode
+            BpmnCode = bpmnCode,
+            CreateTime = DateTime.Now,
         };
         this.baseRepo.Insert(bpmnConfNoticeTemplate);
         long id = bpmnConfNoticeTemplate.Id;
@@ -25,7 +26,8 @@ public class BpmnConfNoticeTemplateService : AFBaseCurdRepositoryService<BpmnCon
             {
                 BpmnCode = bpmnCode,
                 NoticeTemplateType = (int)msgNoticeTypeEnum,
-                NoticeTemplateDetail = MsgNoticeTypeEnumExtensions.GetDefaultValueByCode((int)msgNoticeTypeEnum)
+                NoticeTemplateDetail = MsgNoticeTypeEnumExtensions.GetDefaultValueByCode((int)msgNoticeTypeEnum),
+                CreateTime = DateTime.Now,
             };
             list.Add(detail);
         }

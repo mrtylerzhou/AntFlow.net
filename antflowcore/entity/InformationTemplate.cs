@@ -1,20 +1,16 @@
 ﻿using System;
 using AntFlowCore.Enums;
-using FreeSql;
-using FreeSql.DataAnnotations;
 
 namespace AntFlowCore.Entity
 {
     /// <summary>
     /// Information template entity.
     /// </summary>
-    [Table(Name = "t_information_template")]
     public class InformationTemplate
     {
         /// <summary>
         /// Auto-incrementing ID.
         /// </summary>
-        [Column(IsPrimary = true, IsIdentity = true)]
         public long Id { get; set; }
 
         /// <summary>
@@ -30,37 +26,31 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// System title.
         /// </summary>
-        [Column(Name = "system_title")]
         public string SystemTitle { get; set; }
 
         /// <summary>
         /// System content.
         /// </summary>
-        [Column(Name = "system_content")]
         public string SystemContent { get; set; }
 
         /// <summary>
         /// Email title.
         /// </summary>
-        [Column(Name = "mail_title")]
         public string MailTitle { get; set; }
 
         /// <summary>
         /// Email content.
         /// </summary>
-        [Column(Name = "mail_content")]
         public string MailContent { get; set; }
 
         /// <summary>
         /// SMS content.
         /// </summary>
-        [Column(Name = "note_content")]
         public string NoteContent { get; set; }
 
         /// <summary>
         /// Jump URL type (1: process approval page, 2: process detail page, 3: todolist page).
         /// </summary>
-        [Column(Name = "jump_url")]
         public int JumpUrl { get; set; }
 
         /// <summary>
@@ -76,38 +66,33 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// <see cref="EventTypeEnum"/>
         /// </summary>
-        [Column(Name = "event")]
         public int? Evt { get; set; }
-        [Column(Name = "event_name")]
+
         public string EventName { get; set; }
+
         /// <summary>
         /// Deletion status (0: not deleted, 1: deleted).
         /// </summary>
-        [Column(Name = "is_del")]
         public int IsDel { get; set; }
 
         /// <summary>
         /// Creation time.
         /// </summary>
-        [Column(Name = "create_time")]
         public DateTime? CreateTime { get; set; }
 
         /// <summary>
         /// User who created this record.
         /// </summary>
-        [Column(Name = "create_user")]
         public string CreateUser { get; set; }
 
         /// <summary>
         /// Last update time.
         /// </summary>
-        [Column(Name = "update_time")]
         public DateTime? UpdateTime { get; set; }
 
         /// <summary>
         /// User who last updated this record.
         /// </summary>
-        [Column(Name = "update_user")]
         public string UpdateUser { get; set; }
     }
 }

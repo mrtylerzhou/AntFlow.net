@@ -1667,8 +1667,6 @@ create table t_bpm_dynamic_condition_choosen
 create index indx_process_number
     on t_bpm_dynamic_condition_choosen (process_number);
 
-alter table t_bpmn_node_conditions_param_conf
-    add operator int null after condition_param_jsom;
 create table bpm_af_deployment
 (
     id            varchar(64)  not null

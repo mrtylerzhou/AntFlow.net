@@ -27,7 +27,7 @@ public class BpmnTaskListener: ITaskListener
     public void Notify(BpmAfTask delegateTask,string eventName)
     {
         BpmBusinessProcess bpmBusinessProcess = _bpmBusinessProcessService.baseRepo
-            .Where(a=>a.ProcessinessKey==delegateTask.ProcessNumber)
+            .Where(a=>a.BusinessNumber==delegateTask.ProcessNumber)
             .ToOne();
         if (bpmBusinessProcess == null)
         {
