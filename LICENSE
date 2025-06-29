@@ -1,4 +1,4 @@
-apache License
+ Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
 
@@ -173,23 +173,23 @@ apache License
       incurred by, or claims asserted against, such Contributor by reason
       of your accepting any such warranty or additional liability.
 
-    Antflow.net Usage Statement and Licensing Terms
+   END OF TERMS AND CONDITIONS
 
-    Fully Open Source and Commercial Use Allowed
-    All source code of Antflow.net is completely open source without reservation. Commercial use is permitted under the terms of this open-source license, and such use will not constitute infringement.
+   APPENDIX: How to apply the Apache License to your work.
 
-    Attribution Requirement
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Attribution Requirement
     Systems developed based on this software must display the following attribution in a prominent location, such as:
 
-        Website footer
-
-        My To-do
-
-        My Completed
-
-        My Initiated
-
-        Workflow Designer
+        Website footer or all processes related  pages or Workflow Designer
 
     Required attribution content (must not be modified):
 
@@ -204,24 +204,7 @@ apache License
     Exemptions and Paid License Option
 
         The above terms apply starting from version 1.0 of Antflow.net. Versions prior to 1.0 are exempt from these restrictions.
-
-        You may support the author with a one-time payment of 399 CNY to obtain a license that waives the above restrictions (excluding resale as a standalone product).
-
-   END OF TERMS AND CONDITIONS
-
-   APPENDIX: How to apply the Apache License to your work.
-
-      To apply the Apache License to your work, attach the following
-      boilerplate notice, with the fields enclosed by brackets "[]"
-      replaced with your own identifying information. (Don't include
-      the brackets!)  The text should be enclosed in the appropriate
-      comment syntax for the file format. We also recommend that a
-      file or class name and description of purpose be included on the
-      same "printed page" as the copyright notice for easier
-      identification within third-party archives.
-
-   Copyright 2021 Appsmith Inc.
-
+ 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
@@ -234,3 +217,4 @@ apache License
    See the License for the specific language governing permissions and
    limitations under the License.
    
+   In any case, you must not make any such use of this software as to develop software which may be considered competitive with this software.
