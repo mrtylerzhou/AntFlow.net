@@ -17,7 +17,7 @@ public class Program
     public static void Main(string[] args)
     {
         EnumBase<LFFieldTypeEnum>.InitializeEnumBaseTypes();
-        var builder = WebApplication.CreateBuilder(args);
+        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
         ServiceCollectionHolder.SetServiceCollection(builder.Services);
         builder.Services.AddHttpContextAccessor(); 
         builder.Services.AddControllers().AddAFApplicationComponents(); //Add Custom  Mvc Controller
@@ -48,7 +48,7 @@ public class Program
         builder.Services.AddFreeRepository();//freesql仓储
         builder.Services.AddScoped<UnitOfWorkManager>();//freesql uow
         builder.Services.AntFlowServiceSetUp();//注册AntFlow本身使用到的服务
-        var app = builder.Build();
+        WebApplication app = builder.Build();
         app.Services.AddFreeSqlFluentConfig();
         app.MapOpenApi();
         app.UseCors("CorsPolicy");//解决跨域

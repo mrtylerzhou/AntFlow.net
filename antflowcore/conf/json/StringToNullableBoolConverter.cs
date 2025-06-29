@@ -17,7 +17,7 @@ public class StringToNullableBoolConverter : JsonConverter<bool?>
        
         if (reader.TokenType == JsonTokenType.String)
         {
-            var str = reader.GetString();
+            string? str = reader.GetString();
             if (bool.TryParse(str, out var result))
                 return result;
             return null;
