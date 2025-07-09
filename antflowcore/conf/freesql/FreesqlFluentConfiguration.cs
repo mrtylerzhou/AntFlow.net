@@ -627,6 +627,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.ForwardUserId).Name("forward_user_id");
                 a.Property(b => b.ForwardUserName).Name("forward_user_name");
                 a.Property(b => b.ProcessInstanceId).Name("processInstance_Id");
+                a.Property(b => b.CreateTime).Name("create_time");    
                 a.Property(b => b.CreateUserId).Name("create_user_id");
                 a.Property(b => b.IsDel).Name("is_del");
                 a.Property(b => b.IsRead).Name("is_read");
