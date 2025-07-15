@@ -3,6 +3,7 @@ using antflowcore.constant.enums;
 using antflowcore.entity;
 using antflowcore.exception;
 using antflowcore.service.repository;
+using antflowcore.util;
 using AntFlowCore.Vo;
 
 namespace antflowcore.service.biz;
@@ -31,6 +32,13 @@ public class ProcessBusinessContansService
     {
         _executionService.baseRepo.Delete(a=>a.ProcInstId==processInstanceId);
         _taskService.baseRepo.Delete(a=>a.ProcInstId==processInstanceId);
+        _taskInstService.Frsql
+            .Update<BpmAfTaskInst>()
+            .Set(a => a.EndTime, DateTime.Now)
+            .Set(a => a.DeleteReason, "process ending")
+            .Where(a => a.ProcInstId == processInstanceId && a.EndTime == null &&
+                        a.Assignee == SecurityUtils.GetLogInEmpId())
+            .ExecuteAffrows();
     }
     public BpmAfTaskInst GetPrevTask(String taskDefKey,String procInstId){
         if(string.IsNullOrEmpty(taskDefKey)){

@@ -107,6 +107,7 @@ public class BpmVerifyInfoBizService
 
 
         int sort = 0;
+        bool noApproval = false;
         var bpmVerifyInfoSortVos = new List<BpmVerifyInfoVo>();
 
         foreach (var bpmVerifyInfoVo in bpmVerifyInfoVos)
@@ -115,6 +116,7 @@ public class BpmVerifyInfoBizService
             {
                 bpmVerifyInfoVo.TaskName = lastHistoricTaskInstance?.Name;
                 bpmVerifyInfoVo.VerifyStatusName = "审批拒绝";
+                noApproval = true; //有审批拒绝，则流程结束
             }
 
             if (bpmVerifyInfoVo.VerifyStatus == 5)
@@ -212,7 +214,10 @@ public class BpmVerifyInfoBizService
         {
             if (!finishFlag)
             {
-                AddBpmVerifyInfoVo(processNumber, sort, bpmVerifyInfoVos, historicProcessInstance, taskVo);
+                if (!noApproval)
+                {
+                    AddBpmVerifyInfoVo(processNumber, sort, bpmVerifyInfoVos, historicProcessInstance, taskVo);
+                }
             }
 
             if (processState == (int)ProcessStateEnum.HANDLING_STATE)

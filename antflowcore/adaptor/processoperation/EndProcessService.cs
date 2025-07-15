@@ -89,13 +89,10 @@ namespace antflowcore.adaptor.processoperation;
             }
 
             var taskData = taskList.First();
-
+            bpmBusinessProcess.ProcessState=processState;
             // Update process state
-            _bpmBusinessProcessService.UpdateBusinessProcess(new BpmBusinessProcess
-            {
-                BusinessNumber = bpmBusinessProcess.BusinessNumber,
-                ProcessState = processState
-            });
+            _bpmBusinessProcessService.baseRepo
+                .Update(bpmBusinessProcess);
 
             // Save verify info
             _verifyInfoService.AddVerifyInfo(new BpmVerifyInfo

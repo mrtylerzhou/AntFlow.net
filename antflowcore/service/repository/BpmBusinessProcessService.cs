@@ -56,15 +56,5 @@ public class BpmBusinessProcessService: AFBaseCurdRepositoryService<BpmBusinessP
     {
         baseRepo.Insert(bpmBusinessProcess);
     }
-
-    public void UpdateBusinessProcess(BpmBusinessProcess bpmBusinessProcess)
-    {
-        List<BpmBusinessProcess> bpmBusinessProcesses = this.baseRepo.Where(a=>a.BusinessNumber==bpmBusinessProcess.BusinessNumber).ToList();
-        foreach (BpmBusinessProcess businessProcess in bpmBusinessProcesses)
-        {
-            businessProcess.ProcessState = bpmBusinessProcess.ProcessState;
-            businessProcess.Description=bpmBusinessProcess.Description;
-        }
-        this.baseRepo.Update(bpmBusinessProcesses);
-    }
+    
 }
