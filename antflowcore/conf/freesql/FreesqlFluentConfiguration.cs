@@ -1,4 +1,4 @@
-﻿using antflowcore.entity;
+using antflowcore.entity;
 using AntFlowCore.Entity;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -861,6 +861,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.UpdateTime).Name("update_time");
             }).ConfigEntity<BpmVariableViewPageButton>(a =>
             {
+                a.Name("t_bpm_variable_view_page_button"); // 表名
                 a.Property(b => b.Id).IsPrimary(true).IsIdentity(true);
                 a.Property(b => b.VariableId).Name("variable_id");
                 a.Property(b => b.ViewType).Name("view_type");
