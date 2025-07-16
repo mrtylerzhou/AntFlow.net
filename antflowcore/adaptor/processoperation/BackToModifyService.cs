@@ -1,4 +1,4 @@
-﻿using antflowcore.constant.enus;
+using antflowcore.constant.enus;
 using AntFlowCore.Constants;
 using antflowcore.entity;
 using AntFlowCore.Entity;
@@ -125,6 +125,7 @@ using System.Linq;
                 VerifyUserName = SecurityUtils.GetLogInEmpName(),
                 VerifyUserId = SecurityUtils.GetLogInEmpIdStr(),
                 VerifyStatus = (int)ProcessSubmitStateEnum.PROCESS_UPDATE_TYPE,
+                VerifyDate= DateTime.Now,
                 ProcessCode = bpmBusinessProcess.BusinessNumber,
                 RunInfoId = bpmBusinessProcess.ProcInstId,
                 VerifyDesc = vo.ApprovalComment,
@@ -142,7 +143,8 @@ using System.Linq;
                     NodeKey = restoreNodeKey,
                     ProcessInstanceId = taskData.ProcInstId,
                     BackType = backToModifyType,
-                    CreateUser = SecurityUtils.GetLogInEmpIdStr()
+                    CreateUser = SecurityUtils.GetLogInEmpIdStr(),
+                    CreateTime = DateTime.Now
                 });
             }
 
