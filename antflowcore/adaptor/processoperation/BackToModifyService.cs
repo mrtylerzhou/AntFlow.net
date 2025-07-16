@@ -1,4 +1,4 @@
-﻿using antflowcore.constant.enus;
+using antflowcore.constant.enus;
 using AntFlowCore.Constants;
 using antflowcore.entity;
 using AntFlowCore.Entity;
@@ -142,7 +142,8 @@ using System.Linq;
                     NodeKey = restoreNodeKey,
                     ProcessInstanceId = taskData.ProcInstId,
                     BackType = backToModifyType,
-                    CreateUser = SecurityUtils.GetLogInEmpIdStr()
+                    CreateUser = SecurityUtils.GetLogInEmpIdStr(),
+                    CreateTime = DateTime.Now
                 });
             }
 
