@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using antflowcore.bpmn;
 using antflowcore.bpmn.service;
 using antflowcore.constant.enus;
@@ -41,7 +41,8 @@ public class BpmProcessNodeSubmitService: AFBaseCurdRepositoryService<BpmProcess
                 NodeKey = task.TaskDefKey,
                 ProcessInstanceId = task.ProcInstId,
                 BackType = 0,
-                CreateUser = SecurityUtils.GetLogInEmpName()
+                CreateUser = SecurityUtils.GetLogInEmpName(),
+                CreateTime = DateTime.Now
             });
             bool nextElementParallelGateway=false;
             if (processNodeSubmit.BackType == 1||processNodeSubmit.BackType == 2 || processNodeSubmit.BackType == 4)
