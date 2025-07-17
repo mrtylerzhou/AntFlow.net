@@ -65,6 +65,12 @@ public class UserService: AFBaseCurdRepositoryService<User>
         return leader.ToBaseIdTranStruVo();
     }
 
+    /// <summary>
+    /// 根据发起人查找发起人的hrbp,如果用户系统里没有这个概念,可以不用,忽略掉这个方法即可
+    /// </summary>
+    /// <param name="startUserId"></param>
+    /// <returns></returns>
+    /// <exception cref="AFBizException"></exception>
     
     public BaseIdTranStruVo QueryEmployeeHrpbByEmployeeId(string startUserId)
     {
@@ -88,6 +94,12 @@ public class UserService: AFBaseCurdRepositoryService<User>
         return hrbp.ToBaseIdTranStruVo();
     }
 
+    /// <summary>
+    /// 查找用户指定层级的领导,比如用户有直属领导,上上级领导,上上上级领导.这样就可以做成层级(grade)
+    /// </summary>
+    /// <param name="employeeId"></param>
+    /// <param name="grade"></param>
+    /// <returns></returns>
     public  List<BaseIdTranStruVo> QueryLeadersByEmployeeIdAndGrade(String employeeId,int grade)
     {
        return QueryLeadersByEmployeeIdAndTier(employeeId, grade);
@@ -204,12 +216,23 @@ public class UserService: AFBaseCurdRepositoryService<User>
             StringComparer.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// 根据用户id查找用户信息
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
     public BaseIdTranStruVo GetById(string userId)
     {
         User first = baseRepo.Where(a=>a.Id==Convert.ToInt64(userId)).First();
         return new BaseIdTranStruVo{Id = first.Id.ToString(),Name = first.Name};
     }
 
+    /// <summary>
+    /// 分页查询用户列表
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="taskMgmtVo"></param>
+    /// <returns></returns>
     public  ResultAndPage<BaseIdTranStruVo> SelectUserPageList(Page<BaseIdTranStruVo> page, TaskMgmtVO taskMgmtVo)
     {
         Expression<Func<User, bool>> expression = a => 1 == 1;
@@ -259,6 +282,11 @@ public class UserService: AFBaseCurdRepositoryService<User>
         return employee;
     }
 
+    /// <summary>
+    /// 此方法用于流程通知,工作流流转只需要用户的id和name,通知需要的信息会多一些,比如邮件通知,就需要查出用户的邮箱地址,短信通知就要查出用户手机号,实体字段非常多,用户不必全部填充.
+    /// </summary>
+    /// <param name="ids"></param>
+    /// <returns></returns>
     public List<Employee> GetEmployeeDetailByIds(IEnumerable<string> ids)
     {
         List<long> longIds = ids.Select(a=>Convert.ToInt64(a)).ToList();
@@ -283,7 +311,7 @@ public class UserService: AFBaseCurdRepositoryService<User>
     }
 
     /// <summary>
-    /// 查询有效的用户,如果有效则返回数量
+    /// 查询有效的用户,如果有效则返回数量,如果用户系统里没有标识用户是否有效,直接返回大于0的数即可.
     /// </summary>
     /// <param name="userId"></param>
     /// <returns></returns>
