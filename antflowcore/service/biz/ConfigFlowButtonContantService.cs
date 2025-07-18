@@ -17,6 +17,7 @@ public class ConfigFlowButtonContantService
     private readonly BpmVariableViewPageButtonService _bpmVariableViewPageButtonService;
     private readonly AFDeploymentService _afDeploymentService;
     private readonly AfTaskInstService _afTaskInstService;
+    private readonly BpmVariableSignUpService _bpmVariableSignUpService;
     private readonly ILogger<ConfigFlowButtonContantService> _logger;
 
     public ConfigFlowButtonContantService(BpmBusinessProcessService bpmbusinessProcessService,
@@ -24,6 +25,7 @@ public class ConfigFlowButtonContantService
         BpmVariableViewPageButtonService bpmVariableViewPageButtonService,
         AFDeploymentService afDeploymentService,
         AfTaskInstService afTaskInstService,
+        BpmVariableSignUpService bpmVariableSignUpService,
         ILogger<ConfigFlowButtonContantService> logger)
     {
         _bpmbusinessProcessService = bpmbusinessProcessService;
@@ -31,6 +33,7 @@ public class ConfigFlowButtonContantService
         _bpmVariableViewPageButtonService = bpmVariableViewPageButtonService;
         _afDeploymentService = afDeploymentService;
         _afTaskInstService = afTaskInstService;
+        _bpmVariableSignUpService = bpmVariableSignUpService;
         _logger = logger;
     }
     public Dictionary<string, List<ProcessActionButtonVo>> GetButtons(string processNum, string elementId,
@@ -38,9 +41,9 @@ public class ConfigFlowButtonContantService
     {
         var buttonMap = new Dictionary<string, List<ProcessActionButtonVo>>();
 
-        var initiateButtons = new List<ProcessActionButtonVo>();
-        var auditButtons = new List<ProcessActionButtonVo>();
-        var toViewButtons = new List<ProcessActionButtonVo>();
+        List<ProcessActionButtonVo> initiateButtons = new List<ProcessActionButtonVo>();
+        List<ProcessActionButtonVo> auditButtons = new List<ProcessActionButtonVo>();
+        List<ProcessActionButtonVo> toViewButtons = new List<ProcessActionButtonVo>();
 
         var bpmBusinessProcess = _bpmbusinessProcessService.GetBpmBusinessProcess(processNum);
 
@@ -90,7 +93,7 @@ public class ConfigFlowButtonContantService
 
             var procInstId = bpmBusinessProcess?.ProcInstId ?? string.Empty;
 
-            if (IsMoreNode(procInstId, elementId))
+            if (_bpmVariableSignUpService.IsMoreNode(procInstId, elementId))
             {
                 // 添加承办按钮
                 var undertake = new ProcessActionButtonVo

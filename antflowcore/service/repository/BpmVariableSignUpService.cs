@@ -54,7 +54,7 @@ public class BpmVariableSignUpService: AFBaseCurdRepositoryService<BpmVariableSi
         multiplayer.UnderTakeStatus = c.UndertakeStatus;
         return multiplayer;
     }
-    private bool IsMoreNode(String processNum, String elementId) {
+    public bool IsMoreNode(String processNum, String elementId) {
         List<BpmVariableMultiplayer> bpmVariableMultiplayers = Frsql.Select<BpmVariableMultiplayer, BpmVariable, BpmVariableMultiplayerPersonnel>()
             .LeftJoin((a, b, c) => a.VariableId == b.Id)
             .LeftJoin((a, b, c) => c.VariableMultiplayerId == a.Id)

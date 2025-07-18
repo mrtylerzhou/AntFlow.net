@@ -54,11 +54,7 @@ public class UndertakeProcessService : IProcessOperationAdaptor
             }
 
             _bpmVariableMultiplayerPersonnelService.Undertake(vo.ProcessNumber, task.TaskDefKey);
-            BpmAfExecution execution = new BpmAfExecution()
-            {
-                TaskCount = 1,
-                Id = task.ExecutionId
-            };
+            
             _afExecutionService.Frsql.Update<BpmAfExecution>()
                 .Set(a => a.TaskCount == 1)
                 .Where(a => a.Id == task.ExecutionId)

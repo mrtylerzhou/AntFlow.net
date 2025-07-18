@@ -30,13 +30,11 @@ public class BpmVariableMultiplayerPersonnelService: AFBaseCurdRepositoryService
                 throw new AFBizException("current user is not login");
             }
 
-            BpmVariableMultiplayerPersonnel dto = new BpmVariableMultiplayerPersonnel
-            {
-                UndertakeStatus = 1
-            };
+
             this.Frsql.Update<BpmVariableMultiplayerPersonnel>()
-                .SetDto(dto)
-                .Where(a => a.VariableMultiplayerId == bpmVariableMultiplayers[0].Id);
+                .Set(a => a.UndertakeStatus, 1)
+                .Where(a => a.VariableMultiplayerId == bpmVariableMultiplayers[0].Id)
+                .ExecuteAffrows();
         }
     }
 }
