@@ -45,7 +45,7 @@ public class ConfigFlowButtonContantService
         List<ProcessActionButtonVo> auditButtons = new List<ProcessActionButtonVo>();
         List<ProcessActionButtonVo> toViewButtons = new List<ProcessActionButtonVo>();
 
-        var bpmBusinessProcess = _bpmbusinessProcessService.GetBpmBusinessProcess(processNum);
+        BpmBusinessProcess bpmBusinessProcess = _bpmbusinessProcessService.GetBpmBusinessProcess(processNum);
 
         if (bpmBusinessProcess == null || bpmBusinessProcess.ProcessState == null
                                        || bpmBusinessProcess.ProcessState ==
@@ -93,7 +93,7 @@ public class ConfigFlowButtonContantService
 
             var procInstId = bpmBusinessProcess?.ProcInstId ?? string.Empty;
 
-            if (_bpmVariableSignUpService.IsMoreNode(procInstId, elementId))
+            if (_bpmVariableSignUpService.IsMoreNode(processNum, elementId))
             {
                 // 添加承办按钮
                 var undertake = new ProcessActionButtonVo

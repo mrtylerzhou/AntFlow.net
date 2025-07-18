@@ -58,6 +58,7 @@ public class BpmVariableSignUpService: AFBaseCurdRepositoryService<BpmVariableSi
         List<BpmVariableMultiplayer> bpmVariableMultiplayers = Frsql.Select<BpmVariableMultiplayer, BpmVariable, BpmVariableMultiplayerPersonnel>()
             .LeftJoin((a, b, c) => a.VariableId == b.Id)
             .LeftJoin((a, b, c) => c.VariableMultiplayerId == a.Id)
+            .Where(a=>a.t1.ElementId==elementId&&a.t2.ProcessNum==processNum)
             .ToList((a, b, c) => new
             {
                 Multiplayer = a,
