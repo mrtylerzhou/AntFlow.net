@@ -156,4 +156,16 @@ public class InformationTemplateService: AFBaseCurdRepositoryService<Information
     {
         throw new NotImplementedException();
     }
+
+    public InformationTemplateVo GetInformationTemplateById(long id)
+    {
+        InformationTemplate informationTemplate = this.baseRepo.Where(a => a.Id == id).ToOne();
+        if(informationTemplate==null) {
+            throw new AFBizException("模板消息通知模板不存在");
+        }
+        InformationTemplateVo templateVo = informationTemplate.MapToVo();
+        templateVo.JumpUrlValue = JumpUrlEnum.GetDescByCode(informationTemplate.JumpUrl);
+        templateVo.StatusValue = informationTemplate.Status == 0 ? "启用" : "禁用";
+        return templateVo;
+    }
 }

@@ -16,7 +16,7 @@ namespace antflowcore.controller;
 using System.Collections.Generic;
 using System.Linq;
 
-[Route("api/[controller]")]
+[Route("informationTemplates")]
 public class InformationTemplateController
 {
     private readonly InformationTemplateService _informationTemplateService;
@@ -34,7 +34,11 @@ public class InformationTemplateController
     {
         return _informationTemplateService.List(pageDto, informationTemplateVo);
     }
-
+    [HttpGet("getInformationTemplateById")]
+    public Result<InformationTemplateVo> GetInformationTemplateById(long id)
+    {
+        return ResultHelper.Success(_informationTemplateService.GetInformationTemplateById(id));
+    }
     [HttpPost("updateById")]
     public Result<string> UpdateById([FromBody] InformationTemplateVo informationTemplateVo)
     {
