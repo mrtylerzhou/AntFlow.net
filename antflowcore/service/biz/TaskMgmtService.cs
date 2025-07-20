@@ -1,12 +1,15 @@
 ﻿using System.Collections;
 using System.Reflection;
 using antflowcore.adaptor;
+using antflowcore.constant.enums;
 using antflowcore.constant.enus;
 using antflowcore.dto;
 using antflowcore.entity;
+using AntFlowCore.Entity;
 using antflowcore.factory;
 using antflowcore.service.repository;
 using antflowcore.util;
+using antflowcore.vo;
 using AntFlowCore.Vo;
 
 namespace antflowcore.service.biz;
@@ -15,16 +18,19 @@ public class TaskMgmtService
 {
     private readonly AFTaskService _taskService;
     private readonly AfTaskInstService _taskInstService;
+    private readonly BpmProcessNoticeService _bpmProcessNoticeService;
     private readonly BpmnConfService _bpmnConfService;
     private IEnumerable services = ServiceProviderUtils.GetServicesByOpenGenericType(typeof(IFormOperationAdaptor<>));
     public TaskMgmtService(
         AFTaskService taskService,
         AfTaskInstService taskInstService,
+        BpmProcessNoticeService bpmProcessNoticeService,
         BpmnConfService bpmnConfService
         )
     {
         _taskService = taskService;
         _taskInstService = taskInstService;
+        _bpmProcessNoticeService = bpmProcessNoticeService;
         _bpmnConfService = bpmnConfService;
     }
 
@@ -95,13 +101,35 @@ public class TaskMgmtService
         if (bpmnConfs.Count > 0)
         {
             Dictionary<string, int?> formCode2Flags = bpmnConfs.ToDictionary(b => b.FormCode, x => x.ExtraFlags,StringComparer.Ordinal);
-
+            IDictionary<String, List<BpmProcessNotice>> processNoticeMap = _bpmProcessNoticeService.ProcessNoticeMap(formCodes);
             foreach (var diyProcessInfoDTO in diyProcessInfoDTOS)
             {
                 if (formCode2Flags.TryGetValue(diyProcessInfoDTO.Key, out int? flags))
                 {
                     bool hasStartUserChooseModules = BpmnConfFlagsEnum.HasFlag(flags, BpmnConfFlagsEnum.HAS_STARTUSER_CHOOSE_MODULES);
                     diyProcessInfoDTO.HasStarUserChooseModule = hasStartUserChooseModules;
+                }
+
+                string formCode = diyProcessInfoDTO.Key;
+                if (processNoticeMap.TryGetValue(formCode, out var bpmProcessNotices) && bpmProcessNotices.Any())
+                {
+                    var processNotices = new List<BaseNumIdStruVo>();
+                    foreach (ProcessNoticeEnum processNoticeEnum in ProcessNoticeEnum.Values)
+                    {
+                        var type = processNoticeEnum.Code;
+                        var descByCode = processNoticeEnum.Desc;
+
+                        var struVo = new BaseNumIdStruVo
+                        {
+                            Id = type,
+                            Name = descByCode,
+                            Active = bpmProcessNotices.Any(n => n.Type == type)
+                        };
+
+                        processNotices.Add(struVo);
+                    }
+                           
+                    diyProcessInfoDTO.ProcessNotices = processNotices;
                 }
             }
         }

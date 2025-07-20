@@ -32,4 +32,16 @@ public class BpmProcessNoticeService: AFBaseCurdRepositoryService<BpmProcessNoti
             }
         }
     }
+
+    public IDictionary<String,List<BpmProcessNotice>> ProcessNoticeMap(List<string> formCodes)
+    {
+        List<BpmProcessNotice> bpmProcessNotices = this.baseRepo
+            .Where(a => formCodes.Contains(a.ProcessKey))
+            .ToList();
+        Dictionary<string,List<BpmProcessNotice>> grouped = bpmProcessNotices
+            .GroupBy(x => x.ProcessKey)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        return grouped;
+    }
 }
