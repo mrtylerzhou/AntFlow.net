@@ -322,14 +322,26 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
         {
             return false;
         }
-
+    
         //如果节点存在自定义通知类型,则默认走自定义的,需要注意的是即便不设置只要开启了通知,流程仍然会通知,内部有一套默认通知机制.自定义通知主要是为了增加灵活性,慎用
-        long count = this.baseRepo
-            .Where(a => a.VariableId == bpmVariable.Id
-                        && a.MessageType == messageType
-                        && a.EventType == vo.EventType)
-            .Count();
-        return count > 0;
+        if (messageType == 2)
+        {
+            long count = this.baseRepo
+                .Where(a=> a.VariableId == bpmVariable.Id
+                           &&a.ElementId == vo.ElementId
+                           && a.MessageType == messageType
+                           && a.EventType == vo.EventType).Count();
+            return count > 0;
+        }else if (messageType == 1)
+        {
+            long count = this.baseRepo
+                .Where(a=> a.VariableId == bpmVariable.Id
+                           && a.MessageType == messageType
+                           && a.EventType == vo.EventType).Count();
+            return count > 0;
+        }
+
+        return false;
     }
 
     /// <summary>
