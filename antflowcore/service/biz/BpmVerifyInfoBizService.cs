@@ -231,7 +231,7 @@ public class BpmVerifyInfoBizService
             TaskName = "流程结束",
             VerifyStatus = endVerifyStatus
         });
-
+        bpmVerifyInfoVos= bpmVerifyInfoVos.Where(a => a.NodeType != (int)NodeTypeEnum.NODE_TYPE_COPY).ToList();
         return bpmVerifyInfoVos;
     }
 
@@ -382,7 +382,7 @@ public class BpmVerifyInfoBizService
             }
         }
 
-        var bpmVerifyInfoVo = new BpmVerifyInfoVo
+        BpmVerifyInfoVo bpmVerifyInfoVo = new BpmVerifyInfoVo
         {
             ElementId = elementIdSb.ToString(),
             TaskName = nameSb.ToString(),
@@ -390,6 +390,7 @@ public class BpmVerifyInfoBizService
             VerifyStatus = 0,
             VerifyUserIds = empIds,
             VerifyUserName = verifyUserName,
+            NodeType = bpmnConfCommonElementVo.NodeType,
             Sort = sort
         };
 
