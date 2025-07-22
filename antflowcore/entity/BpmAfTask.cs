@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.VisualBasic.CompilerServices;
 
 namespace antflowcore.entity;
 
@@ -47,6 +48,9 @@ public class BpmAfTask
     /// </summary>
     public string TaskDefKey { get; set; }
 
+    public string NodeId { get; set; }
+    public int NodeType { get; set; }
+    
     /// <summary>
     /// 任务所有者
     /// </summary>

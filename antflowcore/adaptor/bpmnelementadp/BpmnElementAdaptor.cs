@@ -17,8 +17,9 @@ using System.Linq;
         // 格式化 BpmnNodeVo 为 BpmnConfCommonElementVo 列表
         public  virtual void DoFormatNodesToElements(List<BpmnConfCommonElementVo> bpmnConfCommonElementVos, BpmnNodeVo nodeVo, int nodeCode, int sequenceFlowNum, Dictionary<string, int> numMap)
         {
-            var elementVo = FormatNodesToElements(bpmnConfCommonElementVos, nodeVo, nodeCode, sequenceFlowNum, numMap);
+            BpmnConfCommonElementVo elementVo = FormatNodesToElements(bpmnConfCommonElementVos, nodeVo, nodeCode, sequenceFlowNum, numMap);
             elementVo.NodeId = nodeVo.Id.ToString();
+            elementVo.NodeType = nodeVo.NodeType;
             // 处理签到元素
             DoSignUp(bpmnConfCommonElementVos, elementVo, numMap);
         }

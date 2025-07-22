@@ -189,7 +189,7 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmnDeduplicationFormat, BpmnDeduplicationFormatService>();
         services.AddSingleton<IBpmnOptionalDuplicatesAdaptor, BpmnOptionalDuplicateService>();
         services.AddSingleton<IBpmnRemoveFormat, BpmnRemoveFormatService>();
-        services.AddSingleton<IBpmnRemoveFormat, BpmnRemoveCopyFormatService>();
+        //services.AddSingleton<IBpmnRemoveFormat, BpmnRemoveCopyFormatService>();
 
 
         services.AddSingleton<BpmnRemoveConfFormatFactory>();

@@ -486,24 +486,23 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
     List<TaskMgmtVO> ViewPcForwardList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO){
         BasePagingInfo basePagingInfo = page.ToPagingInfo();
         List<TaskMgmtVO> taskMgmtVos = _freeSql
-            .Select<BpmAfTaskInst, BpmBusinessProcess,BpmProcessForward>()
-            .LeftJoin((a,b,c)=>a.ProcInstId == b.ProcInstId)
-            .LeftJoin((a,b,c)=>a.ProcInstId==c.ProcessInstanceId)
-            .Where((a,b,c)=>c.ForwardUserId==taskMgmtVO.ApplyUser&&b.IsDel==0&&c.IsDel==0)
+            .Select<BpmBusinessProcess,BpmProcessForward>()
+            .LeftJoin((a,b)=>a.ProcInstId==b.ProcessInstanceId)
+            .Where((a,b)=>b.ForwardUserId==taskMgmtVO.ApplyUser&&b.IsDel==0&&b.IsDel==0)
             .WithTempQuery(a=>new TaskMgmtVO()
             {
                 ProcessInstanceId = a.t1.ProcInstId,
-                ProcessKey = a.t2.ProcessinessKey,
-                UserId = a.t2.CreateUser,
-                CreateTime = a.t1.StartTime,
-                BusinessId = a.t2.BusinessId,
-                Description = a.t2.Description,
-                TaskStype = a.t2.ProcessState,
-                ProcessNumber = a.t2.BusinessNumber,
-                RunTime = a.t1.StartTime,
-                ProcessState = a.t2.ProcessState,
-                IsRead = a.t3.IsRead,
-                ProcessDigest = a.t2.ProcessDigest,
+                ProcessKey = a.t1.ProcessinessKey,
+                UserId = a.t1.CreateUser,
+                CreateTime = a.t1.CreateTime,
+                BusinessId = a.t1.BusinessId,
+                Description = a.t1.Description,
+                TaskStype = a.t1.ProcessState,
+                ProcessNumber = a.t1.BusinessNumber,
+                RunTime = a.t1.CreateTime,
+                ProcessState = a.t1.ProcessState,
+                IsRead = a.t2.IsRead,
+                ProcessDigest = a.t1.ProcessDigest,
             })
             .Where(CommonCond(taskMgmtVO))
             .OrderByDescending(a=>a.CreateTime)

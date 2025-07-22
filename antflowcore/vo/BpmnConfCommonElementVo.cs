@@ -12,6 +12,8 @@ namespace AntFlowCore.Vo
 
         [JsonPropertyName("nodeId")]
         public string NodeId { get; set; }
+        [JsonPropertyName(("nodeType"))]
+        public int NodeType { get; set; }
 
         [JsonPropertyName("elementName")]
         public string ElementName { get; set; }

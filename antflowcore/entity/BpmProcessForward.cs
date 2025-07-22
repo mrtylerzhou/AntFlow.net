@@ -56,4 +56,5 @@ public class BpmProcessForward
     /// Process number.
     /// </summary>
     public string ProcessNumber { get; set; }
+    public string NodeId { get; set; }
 }

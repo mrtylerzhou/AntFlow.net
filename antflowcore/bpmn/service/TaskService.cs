@@ -10,6 +10,7 @@ using antflowcore.service.repository;
 using antflowcore.util;
 using antflowcore.vo;
 using AntFlowCore.Vo;
+using FreeSql;
 
 namespace antflowcore.bpmn.service;
 
@@ -212,11 +213,17 @@ public class TaskService
 
             TimeSpan taskDuration = nowTime - bpmAfTask.CreateTime;
             int durationMinutes = taskDuration.Minutes;
-            _afTaskInstService.Frsql
+            IUpdate<BpmAfTaskInst> update = _afTaskInstService.Frsql
                 .Update<BpmAfTaskInst>()
                 .Set(a => a.Duration, durationMinutes)
                 .Set(a => a.EndTime, nowTime)
-                .Set(a => a.DeleteReason, deleteReason)
+                .Set(a => a.DeleteReason, deleteReason);
+            if(bpmAfTask.NodeType==(int)NodeTypeEnum.NODE_TYPE_COPY)
+            {
+                update.Set(a => a.Assignee, task.Assignee);
+                update.Set(a => a.AssigneeName, task.AssigneeName);
+            }
+            update
                 .Where(a => a.Id == taskId)
                 .ExecuteAffrows();
             if (deleteReason.Equals(StringConstants.TASK_FINISH_REASON))
@@ -242,6 +249,8 @@ public class TaskService
                     ExecutionId = newExecutionId,
                     Name = elementToDeal.ElementName,
                     TaskDefKey = elementToDeal.ElementId,
+                    NodeId = elementToDeal.NodeId,
+                    NodeType = elementToDeal.NodeType,
                     Owner = bpmAfTask.Owner,
                     Assignee = key,
                     AssigneeName = value,

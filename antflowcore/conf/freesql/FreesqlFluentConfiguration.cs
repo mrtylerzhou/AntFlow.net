@@ -80,6 +80,8 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.Name).Name("name");
                 a.Property(b => b.ParentTaskId).Name("parent_task_id");
                 a.Property(b => b.TaskDefKey).Name("task_def_key");
+                a.Property(b=>b.NodeId).Name("node_id");
+                a.Property(b=>b.NodeType).Name("node_type");
                 a.Property(b => b.Owner).Name("owner");
                 a.Property(b => b.Assignee).Name("assignee");
                 a.Property(b => b.AssigneeName).Name("assignee_name");
@@ -633,6 +635,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.IsRead).Name("is_read");
                 a.Property(b => b.TaskId).Name("task_id");
                 a.Property(b => b.ProcessNumber).Name("process_number");
+                a.Property(b=>b.NodeId).Name("node_id");
             }).ConfigEntity<BpmProcessName>(a =>
             {
                 a.Name("bpm_process_name");
