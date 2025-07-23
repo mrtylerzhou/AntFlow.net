@@ -1739,6 +1739,8 @@ create table bpm_af_task
     owner            varchar(255)            null,
     assignee         varchar(255)            null,
     assignee_name     varchar(255)            null,
+    node_id          varchar(64)             null comment 'current node''s virtual node id',
+    node_type        int                     null comment 'current element''s virual node nodetype',
     delegation       varchar(64)             null,
     priority         int                     null,
     create_time      timestamp(3)            null,
