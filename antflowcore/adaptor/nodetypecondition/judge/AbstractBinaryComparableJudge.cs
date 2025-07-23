@@ -14,7 +14,7 @@ namespace antflowcore.adaptor.nodetypecondition.judge;
     {
         private static readonly ILogger<AbstractBinaryComparableJudge> _log = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<AbstractBinaryComparableJudge>();
 
-        public override bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo, int index,int group)
+        public override bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo,int group)
         {
             string fieldNameInDb = FieldNameInDb();
             string fieldNameActual = FieldNameInStartConditions();

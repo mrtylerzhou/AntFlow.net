@@ -8,7 +8,7 @@ namespace antflowcore.adaptor.nodetypecondition.judge;
 
 public class ThirdAccountJudgeService: IConditionJudge
 {
-    public bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo,int index,int group)
+    public bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo,int group)
     {
         if (ObjectUtils.IsEmpty(conditionsConf.AccountType)) {
             throw new AFBizException("the process has no third party account conf,please contact the administrator to add one");

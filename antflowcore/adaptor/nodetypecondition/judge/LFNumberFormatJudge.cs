@@ -15,10 +15,14 @@ public class LFNumberFormatJudge : AbstractLFConditionJudge
         _logger = logger;
     }
 
-    public override bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo, int index,int group)
+    public override bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo,int group)
     {
         Func<object, object, int, bool> predicate = (a, b, c) =>
         {
+            if (a == null)
+            {
+                return false;
+            }
             var split = a.ToString().Split(',');
             var valueInDbBig1 = decimal.Parse(split[0], CultureInfo.InvariantCulture);
             decimal? valueInDbBig2 = null;
@@ -34,6 +38,6 @@ public class LFNumberFormatJudge : AbstractLFConditionJudge
             return CompareJudge(valueInDbBig1, valueInDbBig2, userValue, c);
         };
 
-        return base.LfCommonJudge(conditionsConf, bpmnStartConditionsVo, predicate, index,group);
+        return base.LfCommonJudge(conditionsConf, bpmnStartConditionsVo, predicate,group);
     }
 }

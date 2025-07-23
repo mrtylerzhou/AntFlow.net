@@ -9,9 +9,10 @@ public abstract class AbstractLFConditionJudge: AbstractComparableJudge
     protected bool LfCommonJudge(
         BpmnNodeConditionsConfBaseVo conditionsConf, 
         BpmnStartConditionsVo bpmnStartConditionsVo, 
-        Func<object, object,int, bool> predicate,int currentIndex,int currentGroup)
+        Func<object, object,int, bool> predicate,int currentGroup)
     {
         IDictionary<int,IDictionary<string,object>> groupedLfConditionsMap = conditionsConf.GroupedLfConditionsMap;
+        IDictionary<int,List<int>> groupedNumberOperatorListMap = conditionsConf.GroupedNumberOperatorListMap;
         IDictionary<string, object> lfConditionsFromDb = null;
         if (groupedLfConditionsMap != null && groupedLfConditionsMap.ContainsKey(currentGroup))
         {
@@ -35,14 +36,11 @@ public abstract class AbstractLFConditionJudge: AbstractComparableJudge
 
         bool isMatch = false;
         int iterIndex=0;
-        List<int> numberOperatorList = conditionsConf.NumberOperatorList;
+        List<int> numberOperatorList = groupedNumberOperatorListMap[currentGroup];
         //operator type
         foreach (var kvp in lfConditionsFromDb)
         {
-            if(iterIndex!=currentIndex){
-                iterIndex++;
-                continue;
-            }
+           
             string key = kvp.Key;
             if (!lfConditionsFromUser.TryGetValue(key, out var valueFromUser) || valueFromUser == null)
             {
