@@ -271,6 +271,7 @@ public static class ServiceRegistration
         services.AddSingleton<MessageService>();
         services.AddSingleton<MailUtils>();
         services.AddSingleton<BpmnViewPageButtonBizService>();
+        services.AddSingleton<ProcessDeptBizService>();
         //=================================不可越过的三八线==============================
         IAdaptorFactory adaptorFactory = AdaptorFactoryProxy.GetProxyInstance();
         services.AddSingleton(adaptorFactory);

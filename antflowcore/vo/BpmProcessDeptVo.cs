@@ -123,6 +123,7 @@ namespace AntFlowCore.Vo
 
         [JsonPropertyName("viewOfficeList")]
         public List<BaseIdTranStruVo> ViewOfficeList { get; set; }
+        public List<BpmnTemplateVo> TemplateVos { get; set; }
     }
     
 }

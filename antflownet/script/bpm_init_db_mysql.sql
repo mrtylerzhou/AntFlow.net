@@ -399,14 +399,16 @@ CREATE TABLE if not exists `bpm_process_node_submit`
     AUTO_INCREMENT = 1
     COMMENT ='process node submit';
 
-CREATE TABLE if not exists `bpm_process_notice`
+create table bpm_process_notice
 (
-    `id`          int(11) NOT NULL AUTO_INCREMENT,
-    `type`        tinyint(11)      DEFAULT NULL COMMENT 'auto send notice 1.email 2:sms 3:app push',
-    `process_key` varchar(50) DEFAULT NULL COMMENT 'process key',
-    PRIMARY KEY (`id`) USING BTREE
-    ) ENGINE = InnoDB
-    COMMENT ='process notice table';
+    id          int auto_increment
+        primary key,
+    type        tinyint(11) null comment 'auto send notice 1.email 2:sms 3:app push',
+    process_key varchar(50) null comment 'process key',
+    constraint bpm_process_notice_unq
+        unique (process_key, type)
+)
+    comment 'process notice table';
 
 CREATE TABLE if not exists `bpm_taskconfig`
 (
