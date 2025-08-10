@@ -15,6 +15,7 @@ using antflowcore.service;
 using antflowcore.service.biz;
 using antflowcore.service.repository;
 using antflowcore.service.formprocess;
+using antflowcore.service.interf;
 using antflowcore.service.processor;
 using antflowcore.service.processor.filter;
 using antflowcore.service.processor.lowcodeflow;
@@ -272,6 +273,7 @@ public static class ServiceRegistration
         services.AddSingleton<MailUtils>();
         services.AddSingleton<BpmnViewPageButtonBizService>();
         services.AddSingleton<ProcessDeptBizService>();
+        services.AddSingleton<ITenantIdHolder, MultiTenantIdHolder>();
         //=================================不可越过的三八线==============================
         IAdaptorFactory adaptorFactory = AdaptorFactoryProxy.GetProxyInstance();
         services.AddSingleton(adaptorFactory);

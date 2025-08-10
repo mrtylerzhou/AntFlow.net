@@ -1,11 +1,12 @@
 ﻿using antflowcore.entity;
 using AntFlowCore.Entity;
+using antflowcore.service.interf;
 using antflowcore.util;
 using antflowcore.vo;
 
 namespace antflowcore.service.repository;
 
-public class AFTaskService: AFBaseCurdRepositoryService<BpmAfTask>
+public class AFTaskService: AFBaseCurdRepositoryService<BpmAfTask>,IAFTaskService
 {
     public AFTaskService(IFreeSql freeSql) : base(freeSql)
     {

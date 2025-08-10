@@ -48,5 +48,7 @@ namespace AntFlowCore.Constants
         public const string BACK_TO_MODIFY_DESC = "打回修改";
         public const string ADMIN_RIGHTS = "3060101";
         public const string DYNAMIC_APPROVER = "--";
+        public const String TENANT_ID="tenantId";
+        public const String DEFAULT_TENANT="default";
     }
 }

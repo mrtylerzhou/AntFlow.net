@@ -525,6 +525,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.AfterSignUpWay).Name("after_sign_up_way");
                 a.Property(b => b.SignUpType).Name("sign_up_type");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");

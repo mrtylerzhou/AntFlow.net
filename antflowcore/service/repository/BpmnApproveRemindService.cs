@@ -1,10 +1,11 @@
 ﻿using AntFlowCore.Entity;
+using antflowcore.service.interf;
 using antflowcore.util;
 using antflowcore.vo;
 
 namespace antflowcore.service.repository;
 
-public class BpmnApproveRemindService: AFBaseCurdRepositoryService<BpmnApproveRemind>
+public class BpmnApproveRemindService: AFBaseCurdRepositoryService<BpmnApproveRemind>,IBpmnApproveRemindService
 {
     public BpmnApproveRemindService(IFreeSql freeSql) : base(freeSql)
     {
