@@ -36,6 +36,7 @@ public class BpmnNodeSignUpConf
     /// Deletion Status (0: normal, 1: deleted)
     /// </summary>
     public int IsDel { get; set; }
+    public int? TenantId { get; set; }
 
     /// <summary>
     /// Created By

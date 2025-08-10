@@ -39,7 +39,7 @@ public class BpmVariableMultiplayerPersonnel
     /// 是否删除，0表示否，1表示是
     /// </summary>
     public int IsDel { get; set; }
-
+    public int? TenantId { get; set; }
     /// <summary>
     /// 创建用户
     /// </summary>

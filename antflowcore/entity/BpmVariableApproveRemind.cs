@@ -36,7 +36,7 @@ public class BpmVariableApproveRemind
     /// 删除标志
     /// </summary>
     public int IsDel { get; set; }
-
+    public int? TenantId { get; set; }
     /// <summary>
     /// 创建用户
     /// </summary>

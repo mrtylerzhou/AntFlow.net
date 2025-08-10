@@ -29,6 +29,7 @@ public class BpmnViewPageButton
     public string Remark { get; set; }
 
     public int IsDel { get; set; }
+    public string TenantId { get; set; }
 
     public string CreateUser { get; set; }
 

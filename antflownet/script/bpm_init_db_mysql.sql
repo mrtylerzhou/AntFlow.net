@@ -14,6 +14,7 @@
     `business_party_id`   int(11)                      DEFAULT NULL COMMENT 'its belong to business party',
     `extra_flags`         int                                           null,
     `remark`              varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `is_del`              tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:in use,1:delete',
     `create_user`         varchar(32)                  DEFAULT '' COMMENT 'as its name says',
     `create_time`         timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
@@ -47,6 +48,7 @@ CREATE TABLE if not exists `t_bpmn_node`
     `is_parallel`          tinyint          default 0                 null,
     `is_sign_up`        int(11)             NOT NULL DEFAULT '0' COMMENT 'whether this node can be sign up,0:No,1:Yes',
     `remark`            varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `is_del`            tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:No,1:yes',
     `create_user`       varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time`       timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
@@ -66,6 +68,7 @@ CREATE TABLE if not exists `t_bpmn_node_business_table_conf`
     `table_field_type`         int(11)                      DEFAULT NULL COMMENT 'table field type',
     `sign_type`                int(11)             NOT NULL COMMENT 'ign type 1:all sign,2: or sign',
     `remark`                   varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `is_del`                   tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
     `create_user`              varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time`              timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
@@ -80,6 +83,7 @@ CREATE TABLE if not exists `t_bpmn_conf_notice_template`
 (
     `id`          int(8)              NOT NULL AUTO_INCREMENT,
     `bpmn_code`   varchar(60)         NOT NULL DEFAULT '' COMMENT 'bpmn code',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `is_del`      tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
     `create_user` varchar(50)                  DEFAULT '' COMMENT '创建人',
     `create_time` timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
@@ -99,6 +103,7 @@ CREATE TABLE if not exists `t_bpmn_view_page_button`
     `button_type` int(11)             NOT NULL COMMENT 'button type,see ButtonTypeEnum for details',
     `button_name` varchar(60)                  DEFAULT '' COMMENT 'button,s name',
     `remark`      varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `is_del`      tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
     `create_user` varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time` timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
@@ -122,6 +127,7 @@ CREATE TABLE if not exists `t_bpmn_template`
     `form_code`         varchar(50)                           null,
     `message_send_type` varchar(50)                           null comment 'message send type,via email,text message or app push and so on',
     `is_del`      tinyint(4) NOT NULL DEFAULT '0' COMMENT '0:No,1:Yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_time` timestamp  NULL     DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
     `create_user` varchar(50)        DEFAULT '' COMMENT 'create user',
     `update_time` timestamp  NULL     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
@@ -146,6 +152,7 @@ CREATE TABLE if not exists `t_information_template`
     `event`          int                                    null,
     `event_name`     varchar(50)              null,
     `is_del`         tinyint(4)   NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_time`    timestamp    NOT NULL     DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
     `create_user`    varchar(50)          DEFAULT '' COMMENT 'as its name says',
     `update_time`    timestamp         DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
@@ -163,6 +170,7 @@ CREATE TABLE if not exists `bpm_business`
     `create_user_name` varchar(50)  DEFAULT NULL COMMENT 'as its name says',
     `create_user`      varchar(50)   DEFAULT NULL COMMENT 'as its name says',
     `process_key`      varchar(50) DEFAULT NULL COMMENT 'as its name says',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `is_del`           int(11)      DEFAULT '0',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
@@ -181,6 +189,8 @@ CREATE TABLE if not exists `bpm_flowrun_entrust`
     `is_read`     int(11)          DEFAULT '2' COMMENT 'is read 1:yes,2:no',
     `proc_def_id` varchar(100)     DEFAULT NULL COMMENT 'proces deployment id',
     `is_view`     int(11) NOT NULL DEFAULT '0',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
+    `is_del`           int(11)      DEFAULT '0',
     PRIMARY KEY (`id`) USING BTREE,
     KEY `BPM_IDX_ID` (`runinfoid`, `original`, `actual`) USING BTREE
     ) ENGINE = InnoDB
@@ -198,6 +208,8 @@ CREATE TABLE if not exists `bpm_flowruninfo`
     `createactor`   varchar(50)  DEFAULT NULL COMMENT 'create user',
     `createdepart`  varchar(100) DEFAULT NULL COMMENT 'create user,s depart',
     `createdate`    timestamp  NOT NULL     DEFAULT CURRENT_TIMESTAMP NULL COMMENT 'create time',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
+    `is_del`           int(11)      DEFAULT '0',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
     COMMENT ='process run time info';
@@ -210,6 +222,8 @@ CREATE TABLE if not exists `bpm_manual_notify`
     `last_time`   timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'latest remind time',
     `create_time` timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `update_time` timestamp    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
+    `is_del`           int(11)      DEFAULT '0',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
     COMMENT ='manual notify';
@@ -222,6 +236,7 @@ CREATE TABLE if not exists `t_bpmn_approve_remind`
     `template_id` bigint(20)          DEFAULT NULL COMMENT 'template id',
     `days`        varchar(255)        DEFAULT NULL COMMENT 'durations in day',
     `is_del`      tinyint(4) NOT NULL DEFAULT '0' COMMENT '0:No,1:Yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_time` timestamp  NULL     DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
     `create_user` varchar(50)        DEFAULT '' COMMENT 'create user',
     `update_time` timestamp       DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
@@ -237,6 +252,7 @@ CREATE TABLE if not exists `t_bpmn_conf_notice_template_detail`
     `notice_template_type`   int(4)              NOT NULL DEFAULT '1' COMMENT 'notice type',
     `notice_template_detail` varchar(512)                 DEFAULT NULL COMMENT 'content',
     `is_del`                 tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user`            varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time`            timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
     `update_user`            varchar(50)                  DEFAULT '' COMMENT 'as its name says',
@@ -259,6 +275,7 @@ CREATE TABLE if not exists `t_bpmn_node_conditions_conf`
     `ext_json`     varchar(2000)                                 null comment '前端vue3版本conditionlist参数模型',
     `remark`       varchar(255)        DEFAULT '' COMMENT 'remark',
     `is_del`       tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user`  varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time`  timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
     `update_user`  varchar(50)                  DEFAULT '' COMMENT 'as its name says',
@@ -280,6 +297,7 @@ CREATE TABLE if not exists `t_bpmn_node_conditions_param_conf`
     `cond_group`            int                 null comment 'group that a condition belongs to',
     `remark`                  varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
     `is_del`                  tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user`             varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time`             timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
     `update_user`             varchar(50)                  DEFAULT '' COMMENT 'as its name says',
@@ -297,6 +315,7 @@ CREATE TABLE if not exists `t_bpmn_node_sign_up_conf`
     `sign_up_type`      int(11)             NOT NULL DEFAULT '1' COMMENT 'sign up way 1: all sign in sequencial,2:all sign,3:or sign',
     `remark`            varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
     `is_del`            tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user`       varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time`       timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
     `update_user`       varchar(50)                  DEFAULT '' COMMENT 'as its name says',
@@ -312,6 +331,7 @@ CREATE TABLE if not exists `t_bpmn_node_to`
     `node_to`      varchar(60)         NOT NULL DEFAULT '' COMMENT 'node to',
     `remark`       varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
     `is_del`       tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user`  varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time`  timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
     `update_user`  varchar(50)                  DEFAULT '' COMMENT 'as its name says',
@@ -336,6 +356,7 @@ CREATE TABLE if not exists `bpm_process_dept`
     `update_time`  timestamp   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `process_key`  varchar(50)         DEFAULT NULL COMMENT 'process key',
     `is_del`       tinyint(11)             DEFAULT '0',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `is_all`       tinyint(11)             DEFAULT '0' COMMENT 'it to all',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
@@ -353,6 +374,7 @@ CREATE TABLE if not exists `bpm_process_forward`
     `task_id`            varchar(50)           DEFAULT NULL COMMENT 'taskid',
     `is_read`            int(2)                DEFAULT '0' COMMENT 'is read',
     `is_del`             int(11)               DEFAULT '0',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `update_time`        timestamp     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `process_number`     varchar(50) NOT NULL DEFAULT '' COMMENT 'process number',
     PRIMARY KEY (`id`) USING BTREE,
@@ -371,6 +393,8 @@ CREATE TABLE if not exists `bpm_process_node_overtime`
     `node_key`    varchar(50)  DEFAULT NULL COMMENT 'node id',
     `process_key` varchar(50)  DEFAULT NULL COMMENT 'process key',
     `notice_time` int(11)      DEFAULT NULL COMMENT 'update time',
+    `is_del`             int(11)               DEFAULT '0',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
     COMMENT ='process approve overtime notice';
@@ -381,6 +405,8 @@ CREATE TABLE if not exists `bpm_process_node_record`
     `processInstance_id` varchar(64)         DEFAULT NULL COMMENT 'process instance id',
     `task_id`            varchar(50)         DEFAULT NULL COMMENT 'taskid',
     `create_time`        timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `is_del`             int(11)               DEFAULT '0',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
     COMMENT ='process over time node record';
@@ -394,6 +420,8 @@ CREATE TABLE if not exists `bpm_process_node_submit`
     `create_time`        timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `create_user`        varchar(50)          DEFAULT NULL COMMENT 'creator',
     `state`              tinyint(11)             DEFAULT NULL COMMENT 'state',
+    `is_del`             int(11)               DEFAULT '0',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
@@ -405,6 +433,8 @@ create table bpm_process_notice
         primary key,
     type        tinyint(11) null comment 'auto send notice 1.email 2:sms 3:app push',
     process_key varchar(50) null comment 'process key',
+    `is_del`             int(11)               DEFAULT '0',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     constraint bpm_process_notice_unq
         unique (process_key, type)
 )
@@ -419,6 +449,8 @@ CREATE TABLE if not exists `bpm_taskconfig`
     `number`        int(11)      DEFAULT NULL COMMENT 'number',
     `status`        tinyint(11)      DEFAULT NULL COMMENT 'status',
     `original_type` tinyint(2)       DEFAULT NULL COMMENT 'orginal type',
+    `is_del`             int(11)               DEFAULT '0',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     PRIMARY KEY (`id`) USING BTREE,
     KEY `BPM_IDX__TASK_CONFIG` (`proc_def_id_`, `task_def_key_`) USING BTREE
     ) ENGINE = InnoDB
@@ -437,6 +469,7 @@ CREATE TABLE if not exists `t_bpm_variable`
     `is_new_data`              int(11)                      DEFAULT '0' COMMENT 'is new data 0:no 1:yes',
     `remark`                   varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
     `is_del`                   tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user`              varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time`              timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
     `update_user`              varchar(50)                  DEFAULT '' COMMENT 'as its name says',
@@ -455,6 +488,7 @@ CREATE TABLE if not exists `t_bpm_variable_approve_remind`
     `content`     text                NOT NULL COMMENT 'approve content',
     `remark`      varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
     `is_del`      tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user` varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time` timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
     `update_user` varchar(50)                  DEFAULT '' COMMENT 'as its name says',
@@ -474,6 +508,7 @@ CREATE TABLE if not exists `t_bpm_variable_button`
     `button_name`      varchar(60)         NOT NULL DEFAULT '' COMMENT 'button name',
     `remark`           varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
     `is_del`           tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user`      varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time`      timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
     `update_user`      varchar(50)                  DEFAULT '' COMMENT 'as its name says',
@@ -494,6 +529,7 @@ CREATE TABLE if not exists `t_bpm_variable_message`
     `content`      text                NOT NULL COMMENT 'content',
     `remark`       varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
     `is_del`       tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user`  varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time`  timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
     `update_user`  varchar(50)                  DEFAULT '' COMMENT 'as its name says',
@@ -515,6 +551,7 @@ CREATE TABLE if not exists `t_bpm_variable_multiplayer`
     `sign_type`       int(11)             NOT NULL COMMENT 'sign type 1: all sign 2:or sign',
     `remark`          varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
     `is_del`          tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user`     varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time`     timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
     `update_user`     varchar(50)                  DEFAULT '' COMMENT 'as its name says',
@@ -535,6 +572,7 @@ CREATE TABLE if not exists `t_bpm_variable_multiplayer_personnel`
     `undertake_status`        int(11)             NOT NULL COMMENT 'is undertaked(0:no,1:yes)',
     `remark`                  varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
     `is_del`                  tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user`             varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time`             timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
     `update_user`             varchar(50)                  DEFAULT '' COMMENT 'as its name says',
@@ -557,6 +595,7 @@ CREATE TABLE if not exists `t_bpm_variable_sequence_flow`
     `sequence_flow_conditions` varchar(100)        NOT NULL DEFAULT '' COMMENT 'sequence flow condition',
     `remark`                   varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
     `is_del`                   tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user`              varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time`              timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
     `update_user`              varchar(50)                  DEFAULT '' COMMENT 'as its name says',
@@ -576,6 +615,7 @@ CREATE TABLE if not exists `t_bpm_variable_sign_up`
     `sub_elements`      text                NOT NULL COMMENT 'sub elements stored in json',
     `remark`            varchar(255)        DEFAULT '' COMMENT 'remark',
     `is_del`            tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user`       varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time`       timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
     `update_user`       varchar(50)                  DEFAULT '' COMMENT 'as its name says',
@@ -596,6 +636,7 @@ CREATE TABLE if not exists `t_bpm_variable_sign_up_personnel`
     `assignee_name`    varchar(60)   NOT NULL DEFAULT '' COMMENT 'assigneeName',
     `remark`      varchar(255)        DEFAULT '' COMMENT 'remark',
     `is_del`      tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user` varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time` timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
     `update_user` varchar(50)                  DEFAULT '' COMMENT 'as its name says',
@@ -620,6 +661,7 @@ CREATE TABLE if not exists `t_bpm_variable_single`
     `assignee_name`       varchar(60)         NOT NULL DEFAULT '' COMMENT 'assigneeName',
     `remark`              varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
     `is_del`              tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user`         varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time`         timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
     `update_user`         varchar(50)                  DEFAULT '' COMMENT 'as its name says',
@@ -641,6 +683,7 @@ CREATE TABLE if not exists `t_bpm_variable_view_page_button`
     `button_name` varchar(60)         NOT NULL DEFAULT '' COMMENT 'button name',
     `remark`      varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
     `is_del`      tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user` varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time` timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
     `update_user` varchar(50)                  DEFAULT '' COMMENT 'as its name says',
@@ -667,6 +710,8 @@ CREATE TABLE if not exists `bpm_verify_info`
     `business_id`      varchar(128)        DEFAULT NULL COMMENT 'business id',
     `original_id`      varchar(64)          DEFAULT NULL COMMENT 'orig approver name',
     `process_code`     varchar(64)         DEFAULT NULL COMMENT 'process number',
+    `is_del`      tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     PRIMARY KEY (`id`) USING BTREE,
     KEY `BPM_IDX__INFOR` (`business_type`, `business_id`) USING BTREE,
     KEY `process_code_index` (`process_code`) USING BTREE
@@ -682,6 +727,7 @@ CREATE TABLE if not exists `t_default_template`
     `event`       int(11)             DEFAULT NULL COMMENT 'event',
     `template_id` bigint(20)          DEFAULT NULL COMMENT 'template id',
     `is_del`      tinyint(4) NOT NULL DEFAULT '0' COMMENT '（0:no 1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_time` timestamp  NOT NULL     DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `create_user` varchar(255)        DEFAULT '' COMMENT 'as its name says',
     `update_time` timestamp      DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
@@ -703,6 +749,8 @@ CREATE TABLE if not exists `t_user_email_send`
     `update_time` timestamp     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `create_user` varchar(50)  NOT NULL,
     `update_user` varchar(50)  NOT NULL,
+    `is_del`      tinyint(4) NOT NULL DEFAULT '0' COMMENT '（0:no 1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     PRIMARY KEY (`id`) USING BTREE,
     KEY `sender` (`receiver`) USING BTREE
     ) ENGINE = InnoDB
@@ -741,6 +789,8 @@ CREATE TABLE if not exists `t_user_entrust`
     `update_time`   timestamp     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `create_user`   varchar(50)  NOT NULL,
     `update_user`   varchar(50)  NOT NULL,
+    `is_del`      tinyint(4) NOT NULL DEFAULT '0' COMMENT '（0:no 1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     PRIMARY KEY (`id`) USING BTREE,
     UNIQUE KEY `s_r_id` (`sender`, `receiver_id`, `power_id`) USING BTREE,
     KEY `user_id` (`sender`, `power_id`) USING BTREE
@@ -765,6 +815,8 @@ CREATE TABLE if not exists `t_user_message_status`
     `update_time`            timestamp    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `create_user`            varchar(50) NOT NULL,
     `update_user`            varchar(50) NOT NULL,
+    `is_del`      tinyint(4) NOT NULL DEFAULT '0' COMMENT '（0:no 1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     PRIMARY KEY (`id`) USING BTREE,
     KEY `user_id` (`user_id`) USING BTREE
     ) ENGINE = InnoDB
@@ -779,6 +831,7 @@ CREATE TABLE if not exists `t_bpmn_node_button_conf`
     `button_name`      varchar(60)                  DEFAULT '' COMMENT 'button name',
     `remark`           varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
     `is_del`           tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no 1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user`      varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time`      timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'asits name says',
     `update_user`      varchar(50)                  DEFAULT '' COMMENT 'as its name says',
@@ -803,6 +856,7 @@ CREATE TABLE if not exists `bpm_business_process`
     `create_user`      varchar(64)  DEFAULT NULL,
     `process_digest`   text COMMENT 'process digest',
     `is_del`           tinyint(1)   DEFAULT '0' COMMENT '0: no 1: yes）',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `data_source_id`   bigint(10)   DEFAULT NULL COMMENT 'data source id',
     `PROC_INST_ID_`    varchar(64)  DEFAULT '' COMMENT 'process instance id',
     `back_user_id`     varchar(64)      DEFAULT NULL COMMENT 'back to user id',
@@ -828,6 +882,7 @@ CREATE TABLE if not exists `bpm_process_name_relevancy`
     `process_name_id` bigint(20)      DEFAULT NULL COMMENT 'process name id',
     `process_key`     varchar(50)     DEFAULT NULL COMMENT 'process key',
     `is_del`          int(11)         DEFAULT '0',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_time`     timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`) USING BTREE,
     KEY `process_key_index` (`process_key`) USING BTREE,
@@ -845,6 +900,7 @@ CREATE TABLE if not exists `t_bpmn_node_personnel_conf`
     `sign_type`    tinyint(11) DEFAULT NULL COMMENT 'sign type 1: all sign 2:or sign',
     `remark`       varchar(100) DEFAULT NULL COMMENT 'remark',
     `is_del`       tinyint(1) DEFAULT NULL COMMENT '0:no,1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user`  varchar(50)  DEFAULT NULL COMMENT 'as its name says',
     `create_time`  timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
     `update_user`  varchar(50)  DEFAULT NULL COMMENT 'as its name says',
@@ -862,6 +918,7 @@ CREATE TABLE if not exists `t_bpmn_node_personnel_empl_conf`
     `empl_name`             varchar(50) null comment 'approver name',
     `remark`                varchar(100) DEFAULT NULL COMMENT 'remark',
     `is_del`                tinyint(255) DEFAULT NULL COMMENT '0:no,1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user`           varchar(30)  DEFAULT NULL COMMENT 'as its name says',
     `create_time`           timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
     `update_user`           varchar(30)  DEFAULT NULL COMMENT 'as its name says',
@@ -877,6 +934,8 @@ CREATE TABLE IF NOT EXISTS `bpm_process_operation`
     `process_key`  varchar(50) DEFAULT NULL COMMENT 'process key',
     `process_node` varchar(50) DEFAULT NULL COMMENT 'process node id',
     `type`         int(2)      DEFAULT NULL COMMENT '1:batch submit 2:entrust',
+    `is_del`                tinyint(255) DEFAULT NULL COMMENT '0:no,1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
@@ -889,6 +948,8 @@ CREATE TABLE if not exists `bpm_process_node_back`
     node_id     bigint       null comment '节点id',
     `back_type`   int(11)      DEFAULT NULL COMMENT 'back type',
     `process_key` varchar(100) DEFAULT NULL COMMENT 'process key',
+    `is_del`                tinyint(255) DEFAULT NULL COMMENT '0:no,1:yes',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
     COMMENT ='process node back table';
@@ -899,6 +960,7 @@ CREATE TABLE if not exists `bpm_process_name`
     `id`           bigint(20) NOT NULL AUTO_INCREMENT,
     `process_name` varchar(50)     DEFAULT NULL COMMENT 'process name',
     `is_del`       int(11)         DEFAULT '0',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_time`  timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
@@ -917,6 +979,7 @@ CREATE TABLE if not exists `t_user_message`
     params      varchar(255) null comment '发送类型',
     is_read     tinyint(255) null comment '0为未读 1为已读',
     is_del         tinyint(255) null comment '0为未删除 1为已删除',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     create_time datetime     null,
     update_time datetime     null,
     create_user varchar(50)  null,
@@ -943,6 +1006,8 @@ CREATE TABLE IF NOT EXISTS `t_op_log`
     `hardware`       varchar(50)  DEFAULT NULL COMMENT 'hardware info',
     `system_version` varchar(50)  DEFAULT NULL COMMENT 'app version',
     `remark`         varchar(255) DEFAULT NULL COMMENT 'remark',
+    `is_del`       int(11)         DEFAULT '0',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     PRIMARY KEY (`id`)
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
@@ -955,6 +1020,8 @@ CREATE TABLE IF NOT EXISTS  `t_biz_account_apply`
     `account_type`       tinyint(4)   DEFAULT NULL COMMENT 'account type',
     `account_owner_name` varchar(50)  DEFAULT NULL COMMENT 'account owner',
     `remark`             varchar(200) DEFAULT NULL COMMENT 'remark',
+    `is_del`       int(11)         DEFAULT '0',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     PRIMARY KEY (`id`)
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
@@ -1028,6 +1095,7 @@ CREATE TABLE IF NOT EXISTS `bpm_process_application_type` (
      `application_id` BIGINT COMMENT 'Application ID',
      `category_id` BIGINT COMMENT 'Category ID',
      `is_del` INT COMMENT 'Deletion flag (0 for not deleted, 1 for deleted)',
+     `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
      `sort` INT COMMENT 'Sort order',
      `state` INT COMMENT 'Is frequently used (0 for no, 1 for yes)',
      `history_id` BIGINT COMMENT 'History ID',
@@ -1041,6 +1109,7 @@ CREATE TABLE IF NOT EXISTS `bpm_process_category` (
      `id` BIGINT AUTO_INCREMENT COMMENT 'Primary key',
      `process_type_name` VARCHAR(255) COMMENT 'Process type name',
     `is_del` TINYINT(1) COMMENT 'Deletion flag (0 for not deleted, 1 for deleted)',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `state` INT COMMENT 'State of the category (specific meaning depends on application logic)',
     `sort` INT COMMENT 'Sort order',
     `is_app` TINYINT(1) COMMENT 'Is for app (0 for no, 1 for yes)',
@@ -1057,6 +1126,8 @@ CREATE TABLE IF NOT EXISTS `bpm_process_permissions` (
     `create_time` timestamp not null default current_timestamp COMMENT 'Create time',
     `process_key` VARCHAR(50) COMMENT 'Process key',
     `office_id` BIGINT COMMENT 'Office ID',
+    `is_del` int(11) NOT NULL DEFAULT '0' COMMENT '0 for normal 1 for delete',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='process permission';
 
@@ -1211,6 +1282,7 @@ CREATE TABLE IF NOT EXISTS  `t_quick_entry` (
     `title` VARCHAR(100) NOT NULL,
     `effective_source` VARCHAR(255),
     `is_del` TINYINT DEFAULT 0,
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `route` VARCHAR(500) NOT NULL,
     `sort` tinyint DEFAULT 0,
     `create_time` timestamp DEFAULT CURRENT_TIMESTAMP,
@@ -1224,6 +1296,7 @@ CREATE TABLE  IF NOT EXISTS `t_quick_entry_type` (
    `quick_entry_id` BIGINT NOT NULL,
    `type` INT NOT NULL COMMENT 'Type 1 for PC and 2 for app',
    `is_del` TINYINT DEFAULT 0 COMMENT 'Delete flag',
+   `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
    `create_time` timestamp DEFAULT CURRENT_TIMESTAMP,
    `type_name` VARCHAR(255) NOT NULL COMMENT 'Type name',
     INDEX `idx_quick_entry_id` (`quick_entry_id`)
@@ -1235,6 +1308,7 @@ CREATE TABLE IF NOT EXISTS  `t_sys_version` (
     `create_time` timestamp DEFAULT CURRENT_TIMESTAMP,
     `update_time` timestamp  default current_timestamp on update current_timestamp,
     `is_del` TINYINT DEFAULT 0 COMMENT '0 for normal, 1 for deleted',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `version` VARCHAR(100) NOT NULL COMMENT 'Version',
     `description` varchar(255) COMMENT 'Version description',
     `index` INT COMMENT 'Index',
@@ -1257,6 +1331,7 @@ CREATE TABLE IF NOT EXISTS `t_bpmn_node_role_conf` (
     `sign_type` INT(11) NOT NULL COMMENT 'sign type 1 all sign,2 or sign',
     `remark` VARCHAR(255) DEFAULT NULL COMMENT 'remark',
     `is_del` TINYINT(1) NOT NULL DEFAULT '0' COMMENT '0:normal,1:deleted',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user` VARCHAR(50) NOT NULL COMMENT 'create user',
     `create_time` timestamp DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
     `update_user` VARCHAR(50) DEFAULT NULL COMMENT 'update user',
@@ -1274,9 +1349,9 @@ create table if NOT EXISTS t_bpmn_node_role_outside_emp_conf
     create_user varchar(50) charset utf8           null,
     `create_time` timestamp DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
     update_user varchar(255) charset utf8          null,
-    column_8    int                                null,
     `update_time` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
-    `is_del` TINYINT(1) NOT NULL DEFAULT '0' COMMENT '0:normal,1:deleted'
+    `is_del` TINYINT(1) NOT NULL DEFAULT '0' COMMENT '0:normal,1:deleted',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId'
     )
     comment 'approver info for a specified outsie business party''s specified role';
 
@@ -1291,6 +1366,7 @@ CREATE TABLE IF NOT EXISTS  `t_bpmn_node_loop_conf` (
     `loop_end_grade` INT(11) NULL COMMENT 'end level',
     `remark` VARCHAR(255) NULL COMMENT 'remark',
     `is_del` TINYINT(1) NOT NULL DEFAULT '0' COMMENT '0:not deleted,1:deleted',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user` VARCHAR(50) NULL COMMENT 'create user',
     `create_time` timestamp DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
     `update_user` VARCHAR(50) NULL COMMENT 'update user',
@@ -1305,6 +1381,7 @@ CREATE TABLE IF NOT EXISTS `t_bpmn_node_assign_level_conf` (
     `assign_level_grade` tinyint(11) NULL COMMENT 'level',
     `remark` VARCHAR(255) NULL COMMENT 'remark',
     `is_del` TINYINT(1) NOT NULL DEFAULT '0' COMMENT '0:not deleted,1:deleted',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user` VARCHAR(255) NULL COMMENT 'create user',
     `create_time` timestamp DEFAULT CURRENT_TIMESTAMP  COMMENT 'create time',
     `update_user` VARCHAR(255) NULL COMMENT 'update user',
@@ -1318,6 +1395,7 @@ CREATE TABLE `t_bpmn_node_hrbp_conf` (
   `hrbp_conf_type` INT(11) NULL COMMENT 'hrbp type 1-hrbp,2-hrbp leader,this is only for extensibility purpose,if your system do not have hrbp leader,you can ignore this field if your system have other concept,for example hrbp manager,you can use this field to store hrbp manager(eg 3 for hrbp manager)',
   `remark` VARCHAR(255) NULL COMMENT 'remark',
   `is_del` INT(11) NULL COMMENT '0 for normal,1 for deleted',
+  `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
   `create_user` VARCHAR(255) NULL COMMENT 'create user',
   `create_time` DATETIME NULL COMMENT 'create time',
   `update_user` VARCHAR(255) NULL COMMENT 'update user',
@@ -1455,6 +1533,7 @@ create table t_bpmn_conf_lf_formdata
     bpmn_conf_id bigint not null,
     formdata longtext null,
     is_del tinyint default 0 not null,
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     create_user varchar(255) null,
     create_time timestamp default current_timestamp,
     update_user varchar(255) null,
@@ -1473,6 +1552,7 @@ create table if not exists t_bpmn_conf_lf_formdata_field
     field_type tinyint null,
     is_condition tinyint default 0 null comment '是否是流程条件,0否,1是',
     is_del tinyint default 0 not null,
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     create_user varchar(255) null,
     create_time timestamp default current_timestamp,
     update_user varchar(255) null,
@@ -1491,6 +1571,7 @@ create table if not exists t_bpmn_node_lf_formdata_field_control
     field_name varchar(255) null comment '字段名',
     field_perm  varchar(10)  null comment '字段权限,是否显示,是否可编辑',
     is_del tinyint default 0 not null,
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     create_user varchar(255) null,
     create_time timestamp default current_timestamp,
     update_user varchar(255) null,
@@ -1508,6 +1589,7 @@ create table t_lf_main
     conf_id bigint null,
     form_code varchar(255) null,
     is_del tinyint default 0 not null,
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     create_user varchar(255) null,
     create_time timestamp default current_timestamp,
     update_user varchar(255) null,
@@ -1534,6 +1616,7 @@ create table t_lf_main_field
     field_value_text longtext null,
     sort int default 0 not null,
     is_del tinyint default 0 not null,
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     create_user varchar(255) null,
     create_time timestamp default current_timestamp,
     update_user varchar(255) null,
@@ -1549,6 +1632,7 @@ create table t_dict_main
     dict_name   varchar(100) default ''                null comment '字典名称',
     dict_type   varchar(100) default ''                null comment '字典类型',
     is_del      tinyint      default 0                 not null,
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     create_user varchar(255)                           null,
     create_time timestamp    default CURRENT_TIMESTAMP not null,
     update_user varchar(255)                           null,
@@ -1570,6 +1654,7 @@ create table t_dict_data
     list_class  varchar(100)                           null comment '表格回显样式',
     is_default  char         default 'N'               null comment '是否默认（Y是 N否）',
     is_del      tinyint      default 0                 not null,
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     create_user varchar(255)                           null,
     create_time timestamp    default CURRENT_TIMESTAMP,
     update_user varchar(255)                           null,
@@ -1590,6 +1675,7 @@ CREATE TABLE `t_bpmn_conf_lf_formdata`  (
    `bpmn_conf_id` bigint(20) NOT NULL,
    `formdata` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
    `is_del` tinyint(4) NOT NULL DEFAULT 0,
+   `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
    `create_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
    `create_time` timestamp DEFAULT CURRENT_TIMESTAMP,
    `update_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
@@ -1614,6 +1700,7 @@ CREATE TABLE `t_bpmn_conf_lf_formdata_field`  (
   `field_type` tinyint(4) NULL DEFAULT NULL,
   `is_condition` tinyint(4) NULL DEFAULT 0 COMMENT '是否是流程条件,0否,1是',
   `is_del` tinyint(4) NOT NULL DEFAULT 0,
+  `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
   `create_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `create_time` timestamp DEFAULT CURRENT_TIMESTAMP,
   `update_user` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
@@ -1645,6 +1732,7 @@ create table t_bpmn_node_labels
     label_value varchar(64) null comment 'a user defined tag',
     remark            varchar(255)        default ''                not null comment '备注',
     is_del            tinyint(1) unsigned default 0                 not null comment '0:正常,1:删除',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     create_user       varchar(32)         default ''                null comment '创建人（邮箱前缀）',
     create_time       timestamp           default CURRENT_TIMESTAMP not null comment '创建时间',
     update_user       varchar(32)         default ''                null comment '更新人（邮箱前缀）',
@@ -1662,6 +1750,8 @@ create table t_bpm_dynamic_condition_choosen
     process_number varchar(255) null comment '流程编号',
     node_id varchar(100) null comment '被选中条件节点的id',
     node_from      varchar(100) null,
+    is_del            tinyint(1) unsigned default 0                 not null comment '0:正常,1:删除',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     constraint t_bpm_dynamic_condition_choosen_pk
         primary key (id)
 )
@@ -1678,6 +1768,7 @@ create table bpm_af_deployment
     content         longtext     null,
     `remark`              varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
     `is_del`              tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:in use,1:delete',
+    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_user`         varchar(32)                  DEFAULT '' COMMENT 'as its name says',
     `create_time`         timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
     `update_user`         varchar(32)                  DEFAULT '' COMMENT '更新人',
@@ -1801,6 +1892,7 @@ create table t_bpmn_node_customize_conf
     sign_type    int          not null comment 'sign type 1 all sign,2 or sign',
     remark       varchar(255) null comment 'remark',
     is_del       int          null comment '0 for normal,1 for deleted',
+    tenant_id            varchar(255) default '' null,
     create_user  varchar(255) null comment 'create user',
     create_time  datetime     null comment 'create time',
     update_user  varchar(255) null comment 'update user',

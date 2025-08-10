@@ -42,7 +42,7 @@ public class LFMainField
     /// 逻辑删除标记（0：未删除，1：已删除）
     /// </summary>
     public int IsDel { get; set; }
-
+    public int? TenantId { get; set; }
     /// <summary>
     /// 创建人
     /// </summary>

@@ -46,7 +46,7 @@ public class BpmVariable
     /// Indicates whether the record is deleted (0 normal, 1 deleted).
     /// </summary>
     public int IsDel { get; set; }
-
+    public int? TenantId { get; set; }
     /// <summary>
     /// Create user.
     /// </summary>

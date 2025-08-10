@@ -28,7 +28,7 @@ public class BpmnConfNoticeTemplateDetail
     /// Is deleted (0 for no, 1 for yes).
     /// </summary>
     public int IsDel { get; set; }
-
+    public int? TenantId { get; set; }
     /// <summary>
     /// Created by user.
     /// </summary>

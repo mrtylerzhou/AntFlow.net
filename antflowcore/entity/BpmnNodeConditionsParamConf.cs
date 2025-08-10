@@ -14,6 +14,7 @@ public class BpmnNodeConditionsParamConf
     public int? CondGroup { get; set; }
     public string Remark { get; set; }
     public int IsDel { get; set; }
+    public int? TenantId { get; set; }
     public string CreateUser { get; set; }
     public DateTime? CreateTime { get; set; }
     public string UpdateUser { get; set; }

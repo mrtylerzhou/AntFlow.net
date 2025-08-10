@@ -46,4 +46,5 @@ public class BpmBusiness
     /// Logical delete flag (0: not deleted, 1: deleted).
     /// </summary>
     public int IsDel { get; set; }
+    public int? TenantId { get; set; }
 }

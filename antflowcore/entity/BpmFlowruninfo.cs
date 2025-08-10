@@ -48,4 +48,9 @@ public class BpmFlowruninfo
     /// Creation date.
     /// </summary>
     public DateTime? CreateDate { get; set; }
+    /// <summary>
+    /// Logical delete flag (0: not deleted, 1: deleted).
+    /// </summary>
+    public int IsDel { get; set; }
+    public int? TenantId { get; set; }
 }

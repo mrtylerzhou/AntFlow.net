@@ -22,7 +22,7 @@ public class BpmProcessCategory
     /// Deletion state (0 for normal, 1 for deleted).
     /// </summary>
     public int IsDel { get; set; }
-
+    public int? TenantId { get; set; }
     /// <summary>
     /// State of the category.
     /// </summary>

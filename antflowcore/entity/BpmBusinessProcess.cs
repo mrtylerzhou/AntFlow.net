@@ -76,7 +76,7 @@ public class BpmBusinessProcess
     /// Is deleted: 0=no, 1=yes
     /// </summary>
     public int IsDel { get; set; }
-
+    public int? TenantId { get; set; }
     /// <summary>
     /// Data source ID (no meaning at the moment)
     /// </summary>

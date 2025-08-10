@@ -35,7 +35,8 @@ namespace AntFlowCore.Entity
 
         [JsonPropertyName("is_del")]
         public bool IsDel { get; set; }
-
+        [JsonPropertyName("tenant_id")]
+        public int? TenantId { get; set; }
         [JsonPropertyName("create_time")]
         public DateTime? CreateTime { get; set; }
 
