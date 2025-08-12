@@ -202,6 +202,7 @@ public class TaskService
                 StartUserId = SecurityUtils.GetLogInEmpId(),
                 SignType =elementToDeal.SignType,
                 TaskCount = taskCount,
+                TenantId = MultiTenantUtil.GetCurrentTenantId(),
             };
 
             _afExecutionService.baseRepo.Insert(execution);
@@ -256,6 +257,7 @@ public class TaskService
                     AssigneeName = value,
                     CreateTime = nowTime,
                     FormKey = bpmAfTask.FormKey,
+                    TenantId = MultiTenantUtil.GetCurrentTenantId(),
                 };
                 tasks.Add(newTask);
                 if (currentSignType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode())

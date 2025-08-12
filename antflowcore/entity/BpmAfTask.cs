@@ -140,6 +140,7 @@ public static class BpmAfTaskExtensions
             StartTime = bpmAfTask.CreateTime,
             Description = bpmAfTask.Description,
             FormKey = bpmAfTask.FormKey,
+            TenantId = bpmAfTask.TenantId,
         };
         return inst;
     }
