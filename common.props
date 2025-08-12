@@ -1,0 +1,15 @@
+﻿<Project>
+	<Import Project="version.props" />
+	
+	<PropertyGroup>
+		<!-- 忽略CS8618和CS0169警告 -->
+		<NoWarn>CS8618;CS8604;;CS8601;;CS8629;CS0169</NoWarn>
+		<!--生成xml的文档注释-->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<TargetFramework>$(MicrosoftTargetFramework)</TargetFramework>
+		<Version>$(Version)</Version>
+		<LangVersion>$(LangVersion)</LangVersion>
+	</PropertyGroup>
+</Project>

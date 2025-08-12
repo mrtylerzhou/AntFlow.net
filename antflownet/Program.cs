@@ -1,15 +1,16 @@
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using antflowcore.aop;
+﻿using antflowcore.aop;
 using antflowcore.conf.di;
 using antflowcore.conf.freesql;
 using antflowcore.conf.json;
 using antflowcore.conf.middleware;
 using antflowcore.conf.serviceregistration;
-using antflowcore.constant.enus; 
+using antflowcore.constant.enus;
 using antflowcore.util;
-
 using FreeSql;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
+using System.Text.Json;
+
 namespace antflownet;
 
 public class Program
@@ -22,6 +23,27 @@ public class Program
         builder.Services.AddHttpContextAccessor(); 
         builder.Services.AddControllers().AddAFApplicationComponents(); //Add Custom  Mvc Controller
         builder.Services.AddOpenApi();
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "antflownet", Version = "v1" });
+
+            Assembly[] assemblies =
+            [
+                Assembly.Load("antflowcore"),
+                Assembly.Load("antflownet"),
+            ];
+            foreach (var assembly in assemblies)
+            {
+                var xmlFile = $"{assembly.GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+                if (File.Exists(xmlPath))
+                {
+                    c.IncludeXmlComments(xmlPath);
+                }
+            }
+        });
         //解决跨域
         builder.Services.AddCors(options =>
         {
@@ -57,9 +79,15 @@ public class Program
         app.UseMiddleware<HeaderMiddleware>();
         app.UseMiddleware<GlobalExceptionMiddleware>();
         //app.MapGet("/testvalue", () => service.testValue());
-        app.MapControllers(); 
+        app.MapControllers();
 
-        app.MapGet("/", () => $"Hello Antflow!");
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
+
+        //app.MapGet("/", () => $"Hello Antflow!");
         app.Run();
     }
 }
