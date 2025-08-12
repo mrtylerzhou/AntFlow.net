@@ -13,7 +13,7 @@ namespace antflowcore.entity
         public string ListClass { get; set; }
         public string IsDefault { get; set; }
         public int? IsDel { get; set; }
-        public int? TenantId { get; set; }
+        public string TenantId { get; set; }
         public DateTime? CreateTime { get; set; }
         public string CreateUser { get; set; }
         public DateTime? UpdateTime { get; set; }

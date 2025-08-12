@@ -21,7 +21,7 @@ public class BpmProcessNameRelevancy
     /// 删除标志
     /// </summary>
     public int IsDel { get; set; }
-    public int? TenantId { get; set; }
+    public string TenantId { get; set; }
 
     /// <summary>
     /// 创建时间

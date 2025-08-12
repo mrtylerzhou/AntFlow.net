@@ -42,7 +42,7 @@ namespace AntFlowCore.Entity
         /// 0 for normal, 1 for delete.
         /// </summary>
         public int IsDel { get; set; }
-        public int? TenantId { get; set; }
+        public string TenantId { get; set; }
 
         /// <summary>
         /// Create user.

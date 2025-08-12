@@ -21,7 +21,7 @@ public class BpmProcessName
     /// Deletion Status (0: Normal, 1: Deleted)
     /// </summary>
     public int IsDel { get; set; }
-    public int? TenantId { get; set; }
+    public string TenantId { get; set; }
     /// <summary>
     /// Creation Time
     /// </summary>

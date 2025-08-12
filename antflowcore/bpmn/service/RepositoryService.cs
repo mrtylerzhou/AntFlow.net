@@ -40,6 +40,7 @@ public class RepositoryService
             CreateUser = SecurityUtils.GetLogInEmpName(),
             UpdateUser = SecurityUtils.GetLogInEmpName(),
             UpdateTime = DateTime.Now,
+            TenantId = MultiTenantUtil.GetCurrentTenantId(),
         };
         _deploymentService.baseRepo.Insert(deployment);
         return deployment.Id;

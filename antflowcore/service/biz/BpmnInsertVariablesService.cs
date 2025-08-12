@@ -50,7 +50,8 @@ namespace antflowcore.service.biz;
                 ProcessDesc = bpmnConfCommonVo.ProcessDesc??"",
                 ProcessStartConditions = JsonSerializer.Serialize(bpmnStartConditions),
                 CreateUser = SecurityUtils.GetLogInEmpIdSafe(),
-                CreateTime = DateTime.Now
+                CreateTime = DateTime.Now,
+                TenantId = MultiTenantUtil.GetCurrentTenantId(),
             };
 
             _bpmVariableService.baseRepo.Insert(bpmVariable);
@@ -64,12 +65,12 @@ namespace antflowcore.service.biz;
 
             foreach (var elementVo in elementList)
             {
-                var elementType = elementVo.ElementType;
-                var elementProperty = elementVo.ElementProperty;
+                int elementType = elementVo.ElementType;
+                int elementProperty = elementVo.ElementProperty;
                 
                 if (elementType == ElementTypeEnum.ELEMENT_TYPE_USER_TASK.Code)
                 {
-                    var bpmnInsertVariableSubs = ElementPropertyEnum.GetVariableSubClassByCode(elementProperty);
+                    Type bpmnInsertVariableSubs = ElementPropertyEnum.GetVariableSubClassByCode(elementProperty);
                     if (bpmnInsertVariableSubs != null)
                     {
                         IBpmnInsertVariableSubs insertVariableSubsService = (IBpmnInsertVariableSubs)ServiceProviderUtils.GetService(bpmnInsertVariableSubs);

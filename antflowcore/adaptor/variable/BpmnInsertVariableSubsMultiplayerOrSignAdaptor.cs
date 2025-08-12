@@ -2,6 +2,7 @@
 using AntFlowCore.Entities;
 using antflowcore.entity;
 using antflowcore.service.repository;
+using antflowcore.util;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
 
@@ -30,7 +31,8 @@ public class BpmnInsertVariableSubsMultiplayerOrSignAdaptor: IBpmnInsertVariable
             NodeId = elementVo.NodeId,
             ElementName = elementVo.ElementName,
             CollectionName = elementVo.CollectionName,
-            SignType = (int)SignTypeEnum.SIGN_TYPE_OR_SIGN
+            SignType = (int)SignTypeEnum.SIGN_TYPE_OR_SIGN,
+            TenantId = MultiTenantUtil.GetCurrentTenantId(),
         };
         _bpmVariableMultiplayerService.baseRepo.Insert(variableMultiplayer);
        

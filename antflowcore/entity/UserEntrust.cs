@@ -65,6 +65,6 @@ namespace AntFlowCore.Entity
         /// Deletion Status (0: Not Deleted, 1: Deleted)
         /// </summary>
         public int IsDel { get; set; }
-        public int? TenantId { get; set; }
+        public string TenantId { get; set; }
     }
 }

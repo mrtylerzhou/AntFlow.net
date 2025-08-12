@@ -33,7 +33,7 @@ public class BpmnNode
     public string Remark { get; set; }
 
     public int IsDel { get; set; }
-    public int? TenantId { get; set; }
+    public string TenantId { get; set; }
 
     public string CreateUser { get; set; }
 

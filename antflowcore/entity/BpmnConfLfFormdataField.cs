@@ -43,7 +43,7 @@ public class BpmnConfLfFormdataField
     /// Delete flag (0 = false, 1 = true).
     /// </summary>
     public int IsDel { get; set; }
-    public int? TenantId { get; set; }
+    public string TenantId { get; set; }
 
     /// <summary>
     /// Created by user.
