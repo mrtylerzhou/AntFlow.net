@@ -4,6 +4,7 @@ using antflowcore.dto;
 using antflowcore.entity;
 using AntFlowCore.Entity;
 using antflowcore.exception;
+using antflowcore.service.interf.repository;
 using antflowcore.util;
 using AntFlowCore.Vo;
 using AntOffice.Base.Util;
@@ -11,7 +12,7 @@ using FreeSql.Internal.Model;
 
 namespace antflowcore.service.repository;
 
-public class BpmProcessAppApplicationService : AFBaseCurdRepositoryService<BpmProcessAppApplication>
+public class BpmProcessAppApplicationService : AFBaseCurdRepositoryService<BpmProcessAppApplication>,IBpmProcessAppApplicationService
 {
     // app's frequently used function's id
     private const int appCommonId = 2;

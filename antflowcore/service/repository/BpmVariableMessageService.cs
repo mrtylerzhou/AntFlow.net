@@ -8,6 +8,7 @@ using AntFlowCore.Entity;
 using AntFlowCore.Enums;
 using antflowcore.exception;
 using antflowcore.service.biz;
+using antflowcore.service.interf.repository;
 using antflowcore.util;
 using antflowcore.util.Extension;
 using antflowcore.vo;
@@ -15,7 +16,7 @@ using AntFlowCore.Vo;
 
 namespace antflowcore.service.repository;
 
-public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariableMessage>
+public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariableMessage>,IBpmVariableMessageService
 {
     private readonly BpmVariableService _variableService;
     private readonly BpmnConfService _bpmnConfService;

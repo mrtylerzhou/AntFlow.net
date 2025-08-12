@@ -1,8 +1,9 @@
 ﻿using AntFlowCore.Entity;
+using antflowcore.service.interf.repository;
 
 namespace antflowcore.service.repository;
 
-public class UserMessageService :AFBaseCurdRepositoryService<UserMessage>
+public class UserMessageService :AFBaseCurdRepositoryService<UserMessage>,IUserMessageService
 {
     public UserMessageService(IFreeSql freeSql) : base(freeSql)
     {

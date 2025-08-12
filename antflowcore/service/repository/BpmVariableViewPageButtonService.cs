@@ -1,9 +1,10 @@
 ﻿using antflowcore.entity;
 using AntFlowCore.Entity;
+using antflowcore.service.interf.repository;
 
 namespace antflowcore.service.repository;
 
-public class BpmVariableViewPageButtonService: AFBaseCurdRepositoryService<BpmVariableViewPageButton>
+public class BpmVariableViewPageButtonService: AFBaseCurdRepositoryService<BpmVariableViewPageButton>,IBpmVariableViewPageButtonService
 {
     public BpmVariableViewPageButtonService(IFreeSql freeSql) : base(freeSql)
     {

@@ -2,11 +2,12 @@
 using antflowcore.entity;
 using AntFlowCore.Entity;
 using antflowcore.exception;
+using antflowcore.service.interf.repository;
 using antflowcore.util;
 
 namespace antflowcore.service.repository;
 
-public class BpmVariableMultiplayerPersonnelService: AFBaseCurdRepositoryService<BpmVariableMultiplayerPersonnel>
+public class BpmVariableMultiplayerPersonnelService: AFBaseCurdRepositoryService<BpmVariableMultiplayerPersonnel>,IBpmVariableMultiplayerPersonnelService
 {
     public BpmVariableMultiplayerPersonnelService(IFreeSql freeSql) : base(freeSql)
     {

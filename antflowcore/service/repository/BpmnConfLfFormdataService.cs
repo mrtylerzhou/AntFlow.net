@@ -1,10 +1,11 @@
 ﻿using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.service.biz;
+using antflowcore.service.interf.repository;
 
 namespace antflowcore.service.repository;
 
-public class BpmnConfLfFormdataService: AFBaseCurdRepositoryService<BpmnConfLfFormdata>
+public class BpmnConfLfFormdataService: AFBaseCurdRepositoryService<BpmnConfLfFormdata>,IBpmnConfLfFormdataService
 {
     public BpmnConfLfFormdataService(IFreeSql freeSql) : base(freeSql)
     {

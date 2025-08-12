@@ -4,13 +4,14 @@ using AntFlowCore.Entities;
 using antflowcore.entity;
 using AntFlowCore.Entity;
 using antflowcore.exception;
+using antflowcore.service.interf.repository;
 using antflowcore.util;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 
 namespace antflowcore.service.repository;
 
-public class UserEntrustService :AFBaseCurdRepositoryService<UserEntrust>
+public class UserEntrustService :AFBaseCurdRepositoryService<UserEntrust>,IUserEntrustService
 {
     public UserEntrustService(IFreeSql freeSql) : base(freeSql)
     {

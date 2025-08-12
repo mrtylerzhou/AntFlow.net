@@ -1,12 +1,13 @@
 ﻿using System.Collections.Concurrent;
 using antflowcore.entity;
 using AntFlowCore.Entity;
+using antflowcore.service.interf.repository;
 using antflowcore.util;
 using AntFlowCore.Vo;
 
 namespace antflowcore.service.repository;
 
-public class BpmProcessNameService: AFBaseCurdRepositoryService<BpmProcessName>
+public class BpmProcessNameService: AFBaseCurdRepositoryService<BpmProcessName>,IBpmProcessNameService
 {
     private readonly BpmProcessNameRelevancyService _bpmProcessNameRelevancyService;
 

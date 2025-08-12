@@ -5,13 +5,14 @@ using antflowcore.entity;
 using AntFlowCore.Entity;
 using AntFlowCore.Enums;
 using antflowcore.exception;
+using antflowcore.service.interf.repository;
 using antflowcore.util;
 using AntFlowCore.Vo;
 using FreeSql.Internal.Model;
 
 namespace antflowcore.service.repository;
 
-public class InformationTemplateService: AFBaseCurdRepositoryService<InformationTemplate>
+public class InformationTemplateService: AFBaseCurdRepositoryService<InformationTemplate>,IInformationTemplateService
 {
     private readonly BpmnApproveRemindService _bpmnApproveRemindService;
     private readonly DefaultTemplateService _defaultTemplateService;
@@ -99,6 +100,7 @@ public class InformationTemplateService: AFBaseCurdRepositoryService<Information
             //add
             informationTemplate.CreateUser=SecurityUtils.GetLogInEmpNameSafe();
             informationTemplate.UpdateUser=SecurityUtils.GetLogInEmpNameSafe();
+            informationTemplate.TenantId = MultiTenantUtil.GetCurrentTenantId();
             this.baseRepo.Insert(informationTemplate);
             informationTemplate.Name=("LCTZ_" + String.Format("%03d", informationTemplate.Id));
         }

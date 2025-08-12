@@ -4,6 +4,7 @@ using AntFlowCore.Entities;
 using antflowcore.entity;
 using AntFlowCore.Entity;
 using antflowcore.exception;
+using antflowcore.service.interf.repository;
 using antflowcore.util;
 using AntFlowCore.Util;
 using antflowcore.vo;
@@ -12,7 +13,7 @@ using FreeSql.Internal.Model;
 
 namespace antflowcore.service.repository;
 
-public class UserService: AFBaseCurdRepositoryService<User>
+public class UserService: AFBaseCurdRepositoryService<User>,IUserService
 {
     private readonly RoleService _roleService;
     private readonly DepartmentService _departmentService;

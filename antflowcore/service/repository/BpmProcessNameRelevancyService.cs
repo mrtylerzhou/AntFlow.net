@@ -1,8 +1,9 @@
 ﻿using AntFlowCore.Entity;
+using antflowcore.service.interf.repository;
 
 namespace antflowcore.service.repository;
 
-public class BpmProcessNameRelevancyService: AFBaseCurdRepositoryService<BpmProcessNameRelevancy>
+public class BpmProcessNameRelevancyService: AFBaseCurdRepositoryService<BpmProcessNameRelevancy>,IBpmProcessNameRelevancyService
 {
     public BpmProcessNameRelevancyService(IFreeSql freeSql) : base(freeSql)
     {

@@ -2,11 +2,12 @@
 using AntFlowCore.Entities;
 using antflowcore.entity;
 using AntFlowCore.Entity;
+using antflowcore.service.interf.repository;
 using antflowcore.util;
 
 namespace antflowcore.service.repository;
 
-public class RoleService: AFBaseCurdRepositoryService<Role>
+public class RoleService: AFBaseCurdRepositoryService<Role>,IRoleService
 {
     public RoleService(IFreeSql freeSql) : base(freeSql)
     {

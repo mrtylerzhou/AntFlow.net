@@ -1,9 +1,10 @@
 ﻿using antflowcore.entity;
 using AntFlowCore.Entity;
+using antflowcore.service.interf.repository;
 
 namespace antflowcore.service.repository;
 
-public class BpmnNodeService : AFBaseCurdRepositoryService<BpmnNode>
+public class BpmnNodeService : AFBaseCurdRepositoryService<BpmnNode>,IBpmnNodeService
 {
     public BpmnNodeService(IFreeSql freeSql) : base(freeSql)
     {

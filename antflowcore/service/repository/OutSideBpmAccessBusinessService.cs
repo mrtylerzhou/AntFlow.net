@@ -4,6 +4,7 @@ using antflowcore.entity;
 using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.service.biz;
+using antflowcore.service.interf.repository;
 using antflowcore.util;
 using antflowcore.vo;
 using AntFlowCore.Vo;
@@ -11,7 +12,7 @@ using Microsoft.VisualBasic;
 
 namespace antflowcore.service.repository;
 
-public class OutSideBpmAccessBusinessService : AFBaseCurdRepositoryService<OutSideBpmAccessBusiness>
+public class OutSideBpmAccessBusinessService : AFBaseCurdRepositoryService<OutSideBpmAccessBusiness>,IOutSideBpmAccessBusinessService
 {
     public OutSideBpmAccessBusinessService(IFreeSql freeSql) : base(freeSql)
     {

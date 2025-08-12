@@ -1,8 +1,9 @@
 ﻿using AntFlowCore.Entity;
+using antflowcore.service.interf.repository;
 
 namespace antflowcore.service.repository;
 
-public class DefaultTemplateService: AFBaseCurdRepositoryService<DefaultTemplate>
+public class DefaultTemplateService: AFBaseCurdRepositoryService<DefaultTemplate>,IDefaultTemplateService
 {
     public DefaultTemplateService(IFreeSql freeSql) : base(freeSql)
     {

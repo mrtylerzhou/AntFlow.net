@@ -1,6 +1,7 @@
 ﻿using antflowcore.dto;
 using antflowcore.entity;
 using antflowcore.exception;
+using antflowcore.service.interf.repository;
 using antflowcore.util;
 using antflowcore.vo;
 using FreeSql.Internal.Model;
@@ -8,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace antflowcore.service.repository;
 
- public class OutSideBpmApproveTemplateService :AFBaseCurdRepositoryService<OutSideBpmApproveTemplate>
+ public class OutSideBpmApproveTemplateService :AFBaseCurdRepositoryService<OutSideBpmApproveTemplate>,IOutSideBpmApproveTemplateService
     {
         public OutSideBpmApproveTemplateService(IFreeSql freeSql) : base(freeSql)
         {

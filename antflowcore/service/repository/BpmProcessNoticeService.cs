@@ -1,5 +1,6 @@
 ﻿using AntFlowCore.Entity;
 using antflowcore.exception;
+using antflowcore.service.interf.repository;
 using antflowcore.util;
 using antflowcore.util.Extension;
 using antflowcore.vo;
@@ -7,7 +8,7 @@ using AntFlowCore.Vo;
 
 namespace antflowcore.service.repository;
 
-public class BpmProcessNoticeService: AFBaseCurdRepositoryService<BpmProcessNotice>
+public class BpmProcessNoticeService: AFBaseCurdRepositoryService<BpmProcessNotice>,IBpmProcessNoticeService
 {
     public BpmProcessNoticeService(IFreeSql freeSql) : base(freeSql)
     {
