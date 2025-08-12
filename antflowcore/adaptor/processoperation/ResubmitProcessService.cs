@@ -93,16 +93,18 @@ public class ResubmitProcessService: IProcessOperationAdaptor
                 TaskDefKey = task.TaskDefKey,
                 VerifyStatus = (int)ProcessSubmitStateEnum.PROCESS_AGRESS_TYPE,
                 VerifyDesc = string.IsNullOrEmpty(vo.ApprovalComment) ? "同意" : vo.ApprovalComment,
-                ProcessCode = vo.ProcessNumber
+                ProcessCode = vo.ProcessNumber,
+                TenantId = MultiTenantUtil.GetCurrentTenantId(),
             };
 
           
             if (vo != null && !string.IsNullOrEmpty(vo.ProcessDigest))
             {
-                _bpmBusinessProcessService.Update(new BpmBusinessProcess
-                {
-                    ProcessDigest = vo.ProcessDigest
-                });
+                _bpmBusinessProcessService.Frsql
+                    .Update<BpmBusinessProcess>()
+                    .Set(a => a.ProcessDigest, vo.ProcessDigest)
+                    .Where(a => a.BusinessNumber.Equals(vo.ProcessNumber))
+                    .ExecuteAffrows();
             }
 
             if (vo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_JP)
