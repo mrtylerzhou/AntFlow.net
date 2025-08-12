@@ -109,7 +109,8 @@ namespace antflowcore.adaptor.processoperation;
                 TaskName = taskData.Name,
                 TaskId = taskData.Id,
                 TaskDefKey = taskData.TaskDefKey,
-                RunInfoId = bpmBusinessProcess.ProcInstId
+                RunInfoId = bpmBusinessProcess.ProcInstId,
+                TenantId = MultiTenantUtil.GetCurrentTenantId(),
             });
 
             // Stop a process

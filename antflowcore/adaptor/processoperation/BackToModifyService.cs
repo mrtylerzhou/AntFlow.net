@@ -131,7 +131,8 @@ using System.Linq;
                 VerifyDesc = vo.ApprovalComment,
                 TaskName = taskData.Name,
                 TaskId = taskData.Id,
-                TaskDefKey = taskData.TaskDefKey
+                TaskDefKey = taskData.TaskDefKey,
+                TenantId = MultiTenantUtil.GetCurrentTenantId(),
             });
 
             if (!string.IsNullOrEmpty(backToNodeKey))
@@ -144,7 +145,8 @@ using System.Linq;
                     ProcessInstanceId = taskData.ProcInstId,
                     BackType = backToModifyType,
                     CreateUser = SecurityUtils.GetLogInEmpIdStr(),
-                    CreateTime = DateTime.Now
+                    CreateTime = DateTime.Now,
+                    TenantId = MultiTenantUtil.GetCurrentTenantId(),
                 });
             }
 
