@@ -1,6 +1,7 @@
 ﻿using antflowcore.constant.enus;
 using antflowcore.entity;
 using AntFlowCore.Entity;
+using antflowcore.util;
 
 namespace antflowcore.service.repository;
 
@@ -28,6 +29,7 @@ public class BpmnConfNoticeTemplateService : AFBaseCurdRepositoryService<BpmnCon
                 NoticeTemplateType = (int)msgNoticeTypeEnum,
                 NoticeTemplateDetail = MsgNoticeTypeEnumExtensions.GetDefaultValueByCode((int)msgNoticeTypeEnum),
                 CreateTime = DateTime.Now,
+                TenantId = MultiTenantUtil.GetCurrentTenantId(),
             };
             list.Add(detail);
         }

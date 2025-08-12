@@ -98,6 +98,7 @@ public class BpmnConfBizService
         bpmnConf.UpdateUser=SecurityUtils.GetLogInEmpNameSafe();
         bpmnConf.UpdateTime=DateTime.Now;
         bpmnConf.Remark=bpmnConfVo.Remark??"";
+        bpmnConf.TenantId = MultiTenantUtil.GetCurrentTenantId();
         _bpmnConfService.baseRepo.Insert(bpmnConf);
         //notice template
         _bpmnConfNoticeTemplateService.Insert(bpmnCode);
@@ -142,6 +143,7 @@ public class BpmnConfBizService
             bpmnNode.CreateTime=DateTime.Now;
             bpmnNode.CreateUser=SecurityUtils.GetLogInEmpNameSafe();
             bpmnNode.Remark ??= "";
+            bpmnNode.TenantId = MultiTenantUtil.GetCurrentTenantId();
             _bpmnNodeService.baseRepo.Insert(bpmnNode);
             long bpmnNodeId = bpmnNode.Id;
             if(bpmnNodeId.IsNullOrZero()){

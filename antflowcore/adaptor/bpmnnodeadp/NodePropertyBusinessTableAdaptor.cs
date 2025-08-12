@@ -52,7 +52,8 @@ public class NodePropertyBusinessTableAdaptor : BpmnNodeAdaptor
                 CreateTime = DateTime.Now,
                 CreateUser = SecurityUtils.GetLogInEmpName(),
                 UpdateTime = DateTime.Now,
-                UpdateUser = SecurityUtils.GetLogInEmpName()
+                UpdateUser = SecurityUtils.GetLogInEmpName(),
+                TenantId = MultiTenantUtil.GetCurrentTenantId(),
             };
 
             _bpmnNodeBusinessTableConfService.baseRepo.Insert(bpmnNodeBusinessTableConf);

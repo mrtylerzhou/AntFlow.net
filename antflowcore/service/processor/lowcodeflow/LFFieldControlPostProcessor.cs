@@ -25,15 +25,15 @@ public class LFFieldControlPostProcessor : IAntFlowOrderPostProcessor<BpmnConfVo
             if (confVo == null)
                 return;
 
-            var isLowCodeFlow = confVo.IsLowCodeFlow;
-            var lowCodeFlowFlag = isLowCodeFlow == 1;
+            int? isLowCodeFlow = confVo.IsLowCodeFlow;
+            bool lowCodeFlowFlag = isLowCodeFlow == 1;
 
             if (!lowCodeFlowFlag)
                 return;
 
-            var bpmnNodeVos = confVo.Nodes;
-            var lfFormDataId = confVo.LfFormDataId;
-            var fieldControls = new List<BpmnNodeLfFormdataFieldControl>();
+            List<BpmnNodeVo> bpmnNodeVos = confVo.Nodes;
+            long? lfFormDataId = confVo.LfFormDataId;
+            List<BpmnNodeLfFormdataFieldControl> fieldControls = new List<BpmnNodeLfFormdataFieldControl>();
 
             foreach (var bpmnNodeVo in bpmnNodeVos)
             {
@@ -51,7 +51,8 @@ public class LFFieldControlPostProcessor : IAntFlowOrderPostProcessor<BpmnConfVo
                         FieldId = lfFieldControlVO.FieldId,
                         FieldName = lfFieldControlVO.FieldName,
                         Perm = lfFieldControlVO.Perm,
-                        CreateUser = SecurityUtils.GetLogInEmpName()
+                        CreateUser = SecurityUtils.GetLogInEmpName(),
+                        TenantId = MultiTenantUtil.GetCurrentTenantId(),
                     };
 
                     fieldControls.Add(fieldControl);

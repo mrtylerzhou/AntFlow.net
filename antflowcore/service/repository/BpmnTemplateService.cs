@@ -54,6 +54,7 @@ public class BpmnTemplateService: AFBaseCurdRepositoryService<BpmnTemplate>
             bpmnTemplate.MessageSendType = string.Join(",", bpmnTemplateVo.MessageSendTypeList?.Select(x=>x.Id)??new List<long>());
             bpmnTemplate.FormCode = formCode;
             bpmnTemplate.CreateUser=logInEmpNameSafe;
+            bpmnTemplate.TenantId = MultiTenantUtil.GetCurrentTenantId();
             bpmnTemplates.Add(bpmnTemplate);
         }
         return bpmnTemplates;

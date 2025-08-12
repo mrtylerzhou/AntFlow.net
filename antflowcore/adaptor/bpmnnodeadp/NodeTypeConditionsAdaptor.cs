@@ -293,7 +293,8 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
             ExtJson = bpmnNodeConditionsConfBaseVo.ExtJson,
             CreateTime = DateTime.Now,
             Remark = "",
-            CreateUser = SecurityUtils.GetLogInEmpNameSafe()
+            CreateUser = SecurityUtils.GetLogInEmpNameSafe(),
+            TenantId = MultiTenantUtil.GetCurrentTenantId(),
         };
 
         _bpmnNodeConditionsConfService.baseRepo.Insert(bpmnNodeConditionsConf);
@@ -381,7 +382,8 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
                             CondRelation = ConditionRelationShipEnum.GetCodeByValue(extField.CondRelation),
                             CreateUser = SecurityUtils.GetLogInEmpNameSafe(),
                             Remark = "",
-                            CreateTime = DateTime.Now
+                            CreateTime = DateTime.Now,
+                            TenantId = MultiTenantUtil.GetCurrentTenantId(),
                         });
 
                         //if condition value doest not a collection and doest not a string type,it must have an operator
@@ -396,7 +398,8 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
                                 CondGroup = extField.CondGroup,
                                 CondRelation = ConditionRelationShipEnum.GetCodeByValue(extField.CondRelation),
                                 CreateUser = SecurityUtils.GetLogInEmpNameSafe(),
-                                CreateTime = DateTime.Now
+                                CreateTime = DateTime.Now,
+                                TenantId = MultiTenantUtil.GetCurrentTenantId(),
                             });
                         }
 

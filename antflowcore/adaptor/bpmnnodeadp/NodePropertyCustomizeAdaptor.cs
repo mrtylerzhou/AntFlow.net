@@ -1,6 +1,7 @@
 ﻿using antflowcore.constant.enus;
 using antflowcore.entity;
 using antflowcore.service.repository;
+using antflowcore.util;
 using antflowcore.vo;
 using Microsoft.Extensions.Logging;
 
@@ -38,6 +39,7 @@ public class NodePropertyCustomizeAdaptor: BpmnNodeAdaptor
         {
             BpmnNodeId = bpmnNodeVo.Id,
             SignType = bpmnNodePropertysVo.SignType,
+            TenantId = MultiTenantUtil.GetCurrentTenantId(),
         };
         _bpmnNodeCustomizeConfService.baseRepo.Insert(customizeConf);
     }

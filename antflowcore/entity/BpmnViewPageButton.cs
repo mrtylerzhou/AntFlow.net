@@ -50,7 +50,8 @@ public class BpmnViewPageButton
             CreateUser = SecurityUtils.GetLogInEmpNameSafe(),
             CreateTime = DateTime.Now,
             UpdateUser = SecurityUtils.GetLogInEmpNameSafe(),
-            UpdateTime = DateTime.Now
+            UpdateTime = DateTime.Now,
+            TenantId = MultiTenantUtil.GetCurrentTenantId(),
         };
     }
 }
