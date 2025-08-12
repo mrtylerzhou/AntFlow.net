@@ -72,7 +72,7 @@ public class TaskService
         if (currentSignType == 2||task.IsNextNodeSignUp)
         {
             _afTaskService.Frsql.Delete<BpmAfTask>()
-                .Where(a => a.TaskDefKey == taskDefKey)
+                .Where(a => a.TaskDefKey == taskDefKey&&a.ProcInstId==procInstId)
                 .ExecuteAffrows();
         }
         else

@@ -42,7 +42,8 @@ public class BpmProcessNodeSubmitService: AFBaseCurdRepositoryService<BpmProcess
                 ProcessInstanceId = task.ProcInstId,
                 BackType = 0,
                 CreateUser = SecurityUtils.GetLogInEmpName(),
-                CreateTime = DateTime.Now
+                CreateTime = DateTime.Now,
+                TenantId = MultiTenantUtil.GetCurrentTenantId(),
             });
             bool nextElementParallelGateway=false;
             if (processNodeSubmit.BackType == 1||processNodeSubmit.BackType == 2 || processNodeSubmit.BackType == 4)
