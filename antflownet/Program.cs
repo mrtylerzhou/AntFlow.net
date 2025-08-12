@@ -87,7 +87,7 @@ public class Program
             app.UseSwaggerUI();
         }
 
-        //app.MapGet("/", () => $"Hello Antflow!");
+        app.MapGet("/", () => $"Hello Antflow!");
         app.Run();
     }
 }

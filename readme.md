@@ -1,3 +1,12 @@
+<p align="center">
+ <img src="https://img.shields.io/badge/.net-9.0-blue" alt="Downloads">
+ <img src="https://img.shields.io/badge/Vue-3.5-yellow.svg" alt="Downloads">
+ <img src="https://img.shields.io/badge/Natasha-blue.svg" alt="Downloads">
+ <img src="https://img.shields.io/badge/freesql-yellow.svg" alt="Downloads">
+ <img src="https://img.shields.io/badge/license-Apache 2.0-green.svg" alt="Downloads">
+
+</p>
+
 ## **DotNet💖workflow，AntFlow.Net让工作流开发像普通CURD一样简单,即便没有流程开发经验的程序员也能快速开发流程!让NET项目如虎添翼!**
 
 **AntFlow.NET** 是一款仿钉钉的开源低代码工作流引擎,，采用纯血 .NET 技术栈编写，无缝融入 .NET 应用生态。
@@ -8,9 +17,12 @@
 * **FreeSql** ：高性能、强类型的 ORM 框架
 * **Natasha** ：动态编译与运行支持
 
+ <img src="https://img.shields.io/badge/AntFlow可用于个人或者公司项目,禁止将源码二次开源(联系作者获得授权的除外)-注意-purple.svg" alt="Downloads">
+
 📢📢📢 操作手册来了，查看项目antflownet目录下的docs文件夹下的操作手册文档。
 
 ❓❓❓ mysql以外数据库如何初始化表？如何将demo用户表和角色表替换为自己系统里的表？请查看antflownet模块下scripts里面的文档。
+
 
 ### 特色优势
 
