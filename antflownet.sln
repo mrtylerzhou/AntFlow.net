@@ -1,8 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35707.178 d17.12
+VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01-Solution Items", "01-Solution Items", "{2564D474-360A-489C-96A0-29A16716C37C}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Packages.props = Directory.Packages.props
+		LICENSE = LICENSE
+		readme.md = readme.md
+		common.props = common.props
+		version.props = version.props
+	EndProjectSection
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "antflownet", "antflownet\antflownet.csproj", "{F3DDB696-40FA-48D6-9F28-85D2D21FE5C2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "antflowcore", "antflowcore\antflowcore.csproj", "{53F76189-A4BC-40BA-B089-957FCFAD612E}"
@@ -24,5 +33,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BE459D61-45ED-43A6-8CBD-66C9D5D8C898}
 	EndGlobalSection
 EndGlobal
