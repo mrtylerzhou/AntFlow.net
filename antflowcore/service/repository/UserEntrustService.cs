@@ -6,6 +6,7 @@ using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.service.interf.repository;
 using antflowcore.util;
+using antflowcore.util.Extension;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 
@@ -34,7 +35,7 @@ public class UserEntrustService :AFBaseCurdRepositoryService<UserEntrust>,IUserE
     {
         foreach (var idsVo in dataVo.Ids)
         {
-            var userEntrust = new UserEntrust
+            UserEntrust userEntrust = new UserEntrust
             {
                 UpdateUser = SecurityUtils.GetLogInEmpNameSafe(),
                 BeginTime = dataVo.BeginTime,
@@ -62,6 +63,7 @@ public class UserEntrustService :AFBaseCurdRepositoryService<UserEntrust>,IUserE
 
                 userEntrust.PowerId = idsVo.PowerId;
                 userEntrust.CreateUser = SecurityUtils.GetLogInEmpNameSafe();
+                userEntrust.TenantId = MultiTenantUtil.GetCurrentTenantId();
                 this.baseRepo.Insert(userEntrust);
                 
             }
@@ -85,8 +87,20 @@ public class UserEntrustService :AFBaseCurdRepositoryService<UserEntrust>,IUserE
 
         DateTime now = DateTime.Now;
         List<UserEntrust> list = this.baseRepo.Where(x => x.PowerId == powerId && x.Sender == employeeId).ToList();
+        if (string.IsNullOrEmpty(MultiTenantUtil.GetCurrentTenantId()))
+        {
+            List<UserEntrust> currentOnes =
+                list.Where(a => a.TenantId == MultiTenantUtil.GetCurrentTenantId()).ToList();
+            //如果当前租户有添加,则取当前租户的,如果没有,则尝试取全局的
+            if(currentOnes.IsEmpty()&&!MultiTenantUtil.StrictTenantMode())
+            {
 
-        foreach (var u in list)
+                list = list.Where(a => !string.IsNullOrEmpty(a.TenantId)).ToList();
+            }else{
+                list=currentOnes;
+            }
+        }
+        foreach (UserEntrust u in list)
         {
             if (u.BeginTime.HasValue && u.EndTime.HasValue && 
                 now >= u.BeginTime.Value.Date && now <= u.EndTime.Value.Date.AddDays(1).AddTicks(-1))
@@ -114,7 +128,7 @@ public class UserEntrustService :AFBaseCurdRepositoryService<UserEntrust>,IUserE
         Expression<Func<UserEntrust,User, bool>> expression = (a,b) => 1 == 1;
         if (!string.IsNullOrEmpty(userId))
         {
-            expression.And((a,b) => a.Sender==userId||a.ReceiverId==userId);
+            LambadaExpressionExtensions.And(expression, (a,b) => a.Sender==userId||a.ReceiverId==userId);
         }
 
         List<Entrust> entrusts = this.Frsql

@@ -28,7 +28,7 @@ public static class MultiTenantUtil
     public static bool StrictTenantMode()
     {
         IConfiguration configuration = ServiceProviderUtils.GetService<IConfiguration>();
-        var value = configuration["antflow:multitenant:strict"];
+        var value = configuration["antflow.multitenant.strict"];
         return string.Equals(value, "true", StringComparison.OrdinalIgnoreCase);
     }
 }
