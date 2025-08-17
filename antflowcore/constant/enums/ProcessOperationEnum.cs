@@ -17,7 +17,16 @@ namespace AntFlowCore.Enums
         BUTTON_TYPE_FORWARD = 15,          // 转发
         BUTTON_TYPE_BACK_TO_MODIFY = 18,   // 打回修改
         BUTTON_TYPE_JP = 19,               // 加批
-        BUTTON_TYPE_ZB = 21                // 转办
+        BUTTON_TYPE_ZB = 21,                // 转办
+        BUTTON_TYPE_CHOOSE_ASSIGNEE=22,//自选审批人
+        BUTTON_TYPE_BACK_TO_ANY_NODE=23,//退回任意节点
+        BUTTON_TYPE_REMOVE_ASSIGNEE=24,//减签
+        BUTTON_TYPE_ADD_ASSIGNEE=25,//加签//加批生成了新的节点,加签在当前节点增加审批人
+        BUTTON_TYPE_CHANGE_FUTURE_ASSIGNEE=26,//变更未来节点处理人
+        BUTTON_TYPE_REMOVE_FUTURE_ASSIGNEE=27,//未来节点减签
+        BUTTON_TYPE_ADD_FUTURE_ASSIGNEE=28,//未来节点加签
+        BUTTON_TYPE_PROCESS_DRAW_BACK=29,//流程撤回
+        
     }
 
     public static class ProcessOperationEnumExtensions
@@ -53,6 +62,22 @@ namespace AntFlowCore.Enums
                     return "加批";
                 case ProcessOperationEnum.BUTTON_TYPE_ZB:
                     return "转办";
+                case ProcessOperationEnum.BUTTON_TYPE_CHOOSE_ASSIGNEE:
+                    return "自选审批人";
+                case ProcessOperationEnum.BUTTON_TYPE_BACK_TO_ANY_NODE:
+                    return "退回任意节点";
+                case ProcessOperationEnum.BUTTON_TYPE_REMOVE_ASSIGNEE:
+                    return "减签";
+                case ProcessOperationEnum.BUTTON_TYPE_ADD_ASSIGNEE:
+                    return "加签";
+                case ProcessOperationEnum.BUTTON_TYPE_CHANGE_FUTURE_ASSIGNEE:
+                    return "变更未来节点处理人";
+                case ProcessOperationEnum.BUTTON_TYPE_REMOVE_FUTURE_ASSIGNEE:
+                    return "未来节点减签";
+                case ProcessOperationEnum.BUTTON_TYPE_ADD_FUTURE_ASSIGNEE:
+                    return "未来节点加签";
+                case ProcessOperationEnum.BUTTON_TYPE_PROCESS_DRAW_BACK:
+                    return "撤回";
                 default:
                     return null;
             }

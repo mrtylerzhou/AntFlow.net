@@ -10,6 +10,7 @@ using antflowcore.adaptor.variable;
 using antflowcore.aop;
 using antflowcore.bpmn.listener;
 using antflowcore.bpmn.service;
+using antflowcore.evt;
 using antflowcore.factory;
 using antflowcore.service;
 using antflowcore.service.biz;
@@ -51,6 +52,7 @@ public static class ServiceRegistration
         services.AddSingleton<BpmnConfLfFormdataFieldService>();
         services.AddSingleton<IAntFlowOrderPreProcessor<BpmnConfVo>,LFFormDataPreProcessor>();
         services.AddSingleton<IAntFlowOrderPostProcessor<BpmnConfVo>, LFFieldControlPostProcessor>();
+        services.AddSingleton<IAntFlowOrderPostProcessor<BusinessDataVo>, AntFlowButtonsOperationPostProcessor>();
         services.AddSingleton<BpmnNodeLfFormdataFieldControlService>();
         services.AddSingleton<LFFieldControlPostProcessor>();
         services.AddSingleton<ProcessApprovalService>();
@@ -274,6 +276,8 @@ public static class ServiceRegistration
         services.AddSingleton<BpmnViewPageButtonBizService>();
         services.AddSingleton<ProcessDeptBizService>();
         services.AddSingleton<ITenantIdHolder, MultiTenantIdHolder>();
+        services.AddSingleton<IWorkflowButtonOperationHandler, AntFlowOperationListener>();
+       
         //=================================不可越过的三八线==============================
         IAdaptorFactory adaptorFactory = AdaptorFactoryProxy.GetProxyInstance();
         services.AddSingleton(adaptorFactory);
