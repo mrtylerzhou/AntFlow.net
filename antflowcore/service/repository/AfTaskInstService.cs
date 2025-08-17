@@ -1,10 +1,11 @@
 ﻿using antflowcore.constant.enus;
 using antflowcore.entity;
+using antflowcore.service.interf;
 using antflowcore.util;
 
 namespace antflowcore.service.repository;
 
-public class AfTaskInstService: AFBaseCurdRepositoryService<BpmAfTaskInst>
+public class AfTaskInstService: AFBaseCurdRepositoryService<BpmAfTaskInst>,IAfTaskInstService
 {
     public AfTaskInstService(IFreeSql freeSql) : base(freeSql)
     {

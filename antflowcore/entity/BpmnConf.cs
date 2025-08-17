@@ -76,6 +76,7 @@ using System.Text.RegularExpressions;
     /// </summary>
     public int IsDel { get; set; }
 
+    public string TenantId { get; set; }
     /// <summary>
     /// create user
     /// </summary>

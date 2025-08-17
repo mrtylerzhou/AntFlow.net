@@ -49,7 +49,7 @@ public class BpmVariableMultiplayer
     /// 是否删除，0表示否，1表示是
     /// </summary>
     public int IsDel { get; set; }
-
+    public string TenantId { get; set; }
     /// <summary>
     /// 创建用户
     /// </summary>

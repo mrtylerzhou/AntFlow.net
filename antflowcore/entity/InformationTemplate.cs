@@ -75,6 +75,7 @@ namespace AntFlowCore.Entity
         /// </summary>
         public int IsDel { get; set; }
 
+        public string TenantId { get; set; }
         /// <summary>
         /// Creation time.
         /// </summary>

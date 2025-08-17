@@ -41,6 +41,7 @@ public class BpmProcessForward
     /// Is deleted (0 for no, 1 for yes).
     /// </summary>
     public int IsDel { get; set; }
+    public string TenantId { get; set; }
 
     /// <summary>
     /// Is read (0 for no, 1 for yes).

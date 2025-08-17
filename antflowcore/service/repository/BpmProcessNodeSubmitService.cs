@@ -7,12 +7,13 @@ using antflowcore.entity;
 using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.service.biz;
+using antflowcore.service.interf.repository;
 using antflowcore.util;
 using AntFlowCore.Vo;
 
 namespace antflowcore.service.repository;
 
-public class BpmProcessNodeSubmitService: AFBaseCurdRepositoryService<BpmProcessNodeSubmit>
+public class BpmProcessNodeSubmitService: AFBaseCurdRepositoryService<BpmProcessNodeSubmit>,IBpmProcessNodeSubmitService
 {
    
     private readonly TaskService _taskService;
@@ -42,7 +43,8 @@ public class BpmProcessNodeSubmitService: AFBaseCurdRepositoryService<BpmProcess
                 ProcessInstanceId = task.ProcInstId,
                 BackType = 0,
                 CreateUser = SecurityUtils.GetLogInEmpName(),
-                CreateTime = DateTime.Now
+                CreateTime = DateTime.Now,
+                TenantId = MultiTenantUtil.GetCurrentTenantId(),
             });
             bool nextElementParallelGateway=false;
             if (processNodeSubmit.BackType == 1||processNodeSubmit.BackType == 2 || processNodeSubmit.BackType == 4)

@@ -1,9 +1,10 @@
 ﻿using antflowcore.entity;
 using antflowcore.exception;
+using antflowcore.service.interf;
 
 namespace antflowcore.service.repository;
 
-public class BpmBusinessProcessService: AFBaseCurdRepositoryService<BpmBusinessProcess>
+public class BpmBusinessProcessService: AFBaseCurdRepositoryService<BpmBusinessProcess>,IBpmBusinessProcessService
 {
     public BpmBusinessProcessService(IFreeSql freeSql) : base(freeSql)
     {

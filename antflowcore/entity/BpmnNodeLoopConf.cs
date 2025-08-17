@@ -51,7 +51,7 @@ public class BpmnNodeLoopConf
     /// Deletion flag (0 for normal, 1 for deleted).
     /// </summary>
     public int IsDel { get; set; }
-
+    public string TenantId { get; set; }
     /// <summary>
     /// Created by user.
     /// </summary>

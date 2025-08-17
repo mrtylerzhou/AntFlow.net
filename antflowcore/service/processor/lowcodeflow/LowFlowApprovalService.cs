@@ -254,7 +254,8 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
             Id = SnowFlake.NextId(),
             ConfId = confId,
             FormCode = formCode,
-            CreateUser = SecurityUtils.GetLogInEmpName()
+            CreateUser = SecurityUtils.GetLogInEmpName(),
+            TenantId = MultiTenantUtil.GetCurrentTenantId(),
         };
         _mainService.baseRepo.Insert(main);
         long mainId = main.Id;

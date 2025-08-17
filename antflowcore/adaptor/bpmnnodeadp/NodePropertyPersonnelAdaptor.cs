@@ -95,7 +95,8 @@ public class NodePropertyPersonnelAdaptor : BpmnNodeAdaptor
                 CreateUser = SecurityUtils.GetLogInEmpNameSafe(),
                 UpdateTime = DateTime.Now,
                 UpdateUser = SecurityUtils.GetLogInEmpNameSafe(),
-                EmplName = id2nameMap.ContainsKey(emplId) ? id2nameMap[emplId] : null
+                EmplName = id2nameMap.ContainsKey(emplId) ? id2nameMap[emplId] : null,
+                TenantId = MultiTenantUtil.GetCurrentTenantId(),
             };
 
             personnelEmplConfs.Add(personnelEmplConf);

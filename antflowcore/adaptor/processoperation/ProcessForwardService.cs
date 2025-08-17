@@ -43,7 +43,8 @@ namespace antflowcore.adaptor.processoperation;
                         ForwardUserId = o.Id,
                         ForwardUserName = o.Name,
                         ProcessInstanceId = bpmBusinessProcess.ProcInstId,
-                        ProcessNumber = vo.ProcessNumber
+                        ProcessNumber = vo.ProcessNumber,
+                        TenantId = MultiTenantUtil.GetCurrentTenantId(),
                     });
                 });
             }

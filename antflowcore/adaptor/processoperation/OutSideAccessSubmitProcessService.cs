@@ -6,6 +6,7 @@ using AntFlowCore.Enums;
 using antflowcore.exception;
 using antflowcore.factory;
 using antflowcore.service.repository;
+using antflowcore.util;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
@@ -105,7 +106,7 @@ public class OutSideAccessSubmitProcessService : IProcessOperationAdaptor
         string processTitlePrefix;
         processTitlePrefix = businessDataVo.SubmitUser;
 
-        var bpmBusinessProcess = new BpmBusinessProcess
+        BpmBusinessProcess bpmBusinessProcess = new BpmBusinessProcess
         {
             BusinessId = businessDataVo.BusinessId,
             ProcessinessKey = businessDataVo.FormCode,
@@ -117,7 +118,8 @@ public class OutSideAccessSubmitProcessService : IProcessOperationAdaptor
             EntryId = processNum,
             Description = $"{processTitlePrefix}-{businessDataVo.BpmnName}",
             Version = businessDataVo.BpmnCode,
-            IsOutSideProcess = 1
+            IsOutSideProcess = 1,
+            TenantId = MultiTenantUtil.GetCurrentTenantId(),
         };
 
         // Save business process info

@@ -28,6 +28,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.BusinessPartyId).Name("business_party_id");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -42,6 +43,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.Content).Name("content");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -140,6 +142,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.ProcessKey).Name("process_key");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
             })
             .ConfigEntity<BpmBusinessProcess>(a =>
             {
@@ -158,6 +161,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.UserName).Name("user_name");
                 a.Property(b => b.ProcessDigest).Name("process_digest");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.DataSourceId).Name("data_source_id");
                 a.Property(b => b.ProcInstId).Name("PROC_INST_ID_");
                 a.Property(b => b.BackUserId).Name("back_user_id");
@@ -178,6 +182,8 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.IsRead).Name("is_read");
                 a.Property(b => b.ProcDefId).Name("proc_def_id");
                 a.Property(b => b.IsView).Name("is_view");
+                a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
             }).ConfigEntity<BpmFlowruninfo>(a =>
             {
                 a.Name("bpm_flowruninfo");
@@ -190,6 +196,8 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.CreateActor).Name("createactor");
                 a.Property(b => b.CreateDepart).Name("createdepart");
                 a.Property(b => b.CreateDate).Name("createdate");
+                a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
             }).ConfigEntity<BpmManualNotify>(a =>
             {
                 a.Name("bpm_manual_notify");
@@ -199,6 +207,8 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.LastTime).Name("last_time");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateTime).Name("update_time");
+                a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
             }).ConfigEntity<BpmnApproveRemind>(a =>
             {
                 a.Name("t_bpmn_approve_remind");
@@ -208,6 +218,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.TemplateId).Name("template_id");
                 a.Property(b => b.Days).Name("days");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.UpdateTime).Name("update_time");
@@ -219,6 +230,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.BpmnConfId).Name("bpmn_conf_id");
                 a.Property(b => b.Formdata).Name("formdata");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -234,6 +246,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.FieldType).Name("field_type");
                 a.Property(b => b.IsConditionField).Name("is_condition");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -244,6 +257,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.Id).IsPrimary(true).IsIdentity(true).Name("id");
                 a.Property(b => b.BpmnCode).Name("bpmn_code");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -256,6 +270,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.NoticeTemplateType).Name("notice_template_type");
                 a.Property(b => b.NoticeTemplateDetail).Name("notice_template_detail");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -278,6 +293,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.IsSignUp).Name("is_sign_up");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -297,6 +313,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.AssignLevelGrade).Name("assign_level_grade");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -312,6 +329,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.SignType).Name("sign_type");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -326,6 +344,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.ButtonName).Name("button_name");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -341,6 +360,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.GroupRelation).Name("group_relation");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -358,6 +378,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.CondGroup).Name("cond_group");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -370,6 +391,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.SignType).Name("sign_type");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -382,6 +404,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.HrbpConfType).Name("hrbp_conf_type");
                 a.Property(b => b.Remark);
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -396,6 +419,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.FieldName).Name("field_name");
                 a.Property(b => b.Perm).Name("field_perm");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -416,6 +440,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.LoopEndGrade).Name("loop_end_grade");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -444,6 +469,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.SignType).Name("sign_type");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -458,6 +484,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.EmplName).Name("empl_name");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -472,6 +499,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.SignType).Name("sign_type");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -484,6 +512,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.EmplId).Name("empl_id");
                 a.Property(b => b.EmplName).Name("empl_name");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -496,6 +525,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.AfterSignUpWay).Name("after_sign_up_way");
                 a.Property(b => b.SignUpType).Name("sign_up_type");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -507,6 +537,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.BpmnNodeId).Name("bpmn_node_id");
                 a.Property(b => b.NodeTo).Name("node_to");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -535,6 +566,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.MessageSendType).Name("message_send_type");
                 a.Property(b => b.FormCode).Name("form_code");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.Event).Name("event");
                 a.Property(b => b.Informs).Name(("informs"));
                 a.Property(b => b.Roles).Name(("roles"));
@@ -552,6 +584,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.ButtonType).Name("button_type");
                 a.Property(b => b.ButtonName).Name("button_name");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
@@ -602,6 +635,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.Id).IsPrimary(true).IsIdentity(true).Name("id");
                 a.Property(b => b.ProcessTypeName).Name("process_type_name");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.State).Name("state");
                 a.Property(b => b.Sort).Name("sort");
                 a.Property(b => b.IsApp).Name("is_app");
@@ -621,6 +655,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.UpdateTime).Name("update_time");
                 a.Property(b => b.ProcessKey).Name("process_key");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.IsAll).Name("is_all");
             }).ConfigEntity<BpmProcessForward>(a =>
             {
@@ -632,6 +667,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.CreateTime).Name("create_time");    
                 a.Property(b => b.CreateUserId).Name("create_user_id");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.IsRead).Name("is_read");
                 a.Property(b => b.TaskId).Name("task_id");
                 a.Property(b => b.ProcessNumber).Name("process_number");
@@ -640,9 +676,10 @@ public static class FreesqlFluentConfiguration
             {
                 a.Name("bpm_process_name");
                 a.Property(b => b.Id).IsPrimary(true).IsIdentity(true).Name("id");
-                a.Property(b => b.ProcessName).Name("process_name").IsNullable(true);
-                a.Property(b => b.IsDel).Name("is_del").IsNullable(false);
-                a.Property(b => b.CreateTime).Name("create_time").IsNullable(true);
+                a.Property(b => b.ProcessName).Name("process_name");
+                a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
+                a.Property(b => b.CreateTime).Name("create_time");
             }).ConfigEntity<BpmProcessNameRelevancy>(a =>
             {
                 a.Name("bpm_process_name_relevancy");
@@ -650,6 +687,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.ProcessNameId).Name("process_name_id");
                 a.Property(b => b.ProcessKey).Name("process_key");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateTime).Name("create_time");
             }).ConfigEntity<BpmProcessNodeOvertime>(a =>
             {
@@ -659,7 +697,10 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.NodeName).Name("node_name");
                 a.Property(b => b.NodeKey).Name("node_key");
                 a.Property(b => b.ProcessKey).Name("process_key");
+                a.Property(b => b.IsDel).Name("is_del");
                 a.Property(b => b.NoticeTime).Name("notice_time");
+                a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
             }).ConfigEntity<BpmProcessNodeRecord>(a =>
             {
                 a.Name("bpm_process_node_record");
@@ -667,6 +708,8 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.ProcessInstanceId).Name("processInstance_id");
                 a.Property(b => b.TaskId).Name("task_id");
                 a.Property(b => b.CreateTime).Name("create_time");
+                a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
             }).ConfigEntity<BpmProcessNodeSubmit>(a =>
             {
                 a.Name("bpm_process_node_submit");
@@ -677,12 +720,16 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.State).Name("state");
+                a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
             }).ConfigEntity<BpmProcessNotice>(a =>
             {
                 a.Name("bpm_process_notice");
                 a.Property(b => b.Id).IsPrimary(true).IsIdentity(true).Name("id");
                 a.Property(b => b.Type).Name("type");
                 a.Property(b => b.ProcessKey).Name("process_key");
+                a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
             }).ConfigEntity<BpmProcessOperation>(a =>
             {
                 a.Name("bpm_process_operation");
@@ -690,6 +737,8 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.ProcessKey).Name("process_key");
                 a.Property(b => b.ProcessNode).Name("process_node");
                 a.Property(b => b.Type).Name("type");
+                a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
             }).ConfigEntity<BpmProcessPermissions>(a =>
             {
                 a.Name("bpm_process_permissions");
@@ -701,6 +750,8 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.ProcessKey).Name("process_key");
                 a.Property(b => b.OfficeId).Name("office_id");
+                a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
             }).ConfigEntity<BpmTaskconfig>(a =>
             {
                 a.Name("bpm_taskconfig");
@@ -709,6 +760,8 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.TaskDefKey).Name("task_def_key_");
                 a.Property(b => b.UserId).Name("user_id");
                 a.Property(b => b.Number).Name("number");
+                a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
             }).ConfigEntity<BpmVariable>(a =>
             {
                 a.Name("t_bpm_variable");
@@ -720,6 +773,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.BpmnCode).Name("bpmn_code");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -733,6 +787,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.Content).Name("content");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -748,6 +803,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.ButtonName).Name("button_name");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -763,6 +819,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.Content).Name("content");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -779,6 +836,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.SignType).Name("sign_type");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -794,6 +852,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.UndertakeStatus).Name("undertake_status");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -811,6 +870,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.SequenceFlowConditions).Name("sequence_flow_conditions");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -826,6 +886,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.SubElements).Name("sub_elements");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -840,6 +901,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.AssigneeName).Name("assignee_name");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -858,6 +920,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.AssigneeName).Name("assignee_name");
                 a.Property(b => b.Remark); // 默认映射
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -872,6 +935,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.ButtonName).Name("button_name");
                 a.Property(b => b.Remark);
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
@@ -893,6 +957,8 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.BusinessId).Name("business_id");
                 a.Property(b => b.OriginalId).Name("original_id");
                 a.Property(b => b.ProcessCode).Name("process_code");
+                a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
             }).ConfigEntity<DefaultTemplate>(a =>
             {
                 a.Name("t_default_template");
@@ -900,6 +966,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.Event).Name("event");
                 a.Property(b => b.TemplateId).Name("template_id");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.UpdateTime).Name("update_time");
@@ -933,6 +1000,7 @@ public static class FreesqlFluentConfiguration
                 entity.Property(a => a.ListClass).Name("list_class");
                 entity.Property(a => a.IsDefault).Name("is_default");
                 entity.Property(a => a.IsDel).Name("is_del");
+                entity.Property(b => b.TenantId).Name("tenant_id");
                 entity.Property(a => a.CreateTime).Name("create_time");
                 entity.Property(a => a.CreateUser).Name("create_user");
                 entity.Property(a => a.UpdateTime).Name("update_time");
@@ -945,6 +1013,7 @@ public static class FreesqlFluentConfiguration
                 entity.Property(a => a.DictName).Name("dict_name");
                 entity.Property(a => a.DictType).Name("dict_type");
                 entity.Property(a => a.IsDel).Name("is_del");
+                entity.Property(b => b.TenantId).Name("tenant_id");
                 entity.Property(a => a.CreateTime).Name("create_time");
                 entity.Property(a => a.CreateUser).Name("create_user");
                 entity.Property(a => a.UpdateTime).Name("update_time");
@@ -953,32 +1022,33 @@ public static class FreesqlFluentConfiguration
             }).ConfigEntity<InformationTemplate>(a =>
             {
                 a.Name("t_information_template");
-                a.Property(b => b.Id).IsPrimary(true).IsIdentity(true);
-                a.Property(b => b.Name).Name("name").IsNullable(false);
-                a.Property(b => b.Num).Name("num").IsNullable(false);
-                a.Property(b => b.SystemTitle).Name("system_title").IsNullable(false);
-                a.Property(b => b.SystemContent).Name("system_content").IsNullable(false);
-                a.Property(b => b.MailTitle).Name("mail_title").IsNullable(false);
-                a.Property(b => b.MailContent).Name("mail_content").IsNullable(false);
-                a.Property(b => b.NoteContent).Name("note_content").IsNullable(false);
-                a.Property(b => b.JumpUrl).Name("jump_url").IsNullable(false);
-                a.Property(b => b.Remark).Name("remark").IsNullable(false);
-                a.Property(b => b.Status).Name("status").IsNullable(false);
-                a.Property(b => b.Evt).Name("event").IsNullable(true);
-                a.Property(b => b.EventName).Name("event_name").IsNullable(false);
-                a.Property(b => b.IsDel).Name("is_del").IsNullable(false);
-                a.Property(b => b.CreateTime).Name("create_time").IsNullable(true);
-                a.Property(b => b.CreateUser).Name("create_user").IsNullable(false);
-                a.Property(b => b.UpdateTime).Name("update_time").IsNullable(true);
-                a.Property(b => b.UpdateUser).Name("update_user").IsNullable(false);
+                a.Property(b => b.Id).IsPrimary(true);
+                a.Property(b => b.Name).Name("name");
+                a.Property(b => b.Num).Name("num");
+                a.Property(b => b.SystemTitle).Name("system_title");
+                a.Property(b => b.SystemContent).Name("system_content");
+                a.Property(b => b.MailTitle).Name("mail_title");
+                a.Property(b => b.MailContent).Name("mail_content");
+                a.Property(b => b.NoteContent).Name("note_content");
+                a.Property(b => b.JumpUrl).Name("jump_url");
+                a.Property(b => b.Remark).Name("remark");
+                a.Property(b => b.Status).Name("status");
+                a.Property(b => b.Evt).Name("event");
+                a.Property(b => b.EventName).Name("event_name");
+                a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
+                a.Property(b => b.CreateTime).Name("create_time");
+                a.Property(b => b.CreateUser).Name("create_user");
+                a.Property(b => b.UpdateTime).Name("update_time");
+                a.Property(b => b.UpdateUser).Name("update_user");
             }).ConfigEntity<LFMain>(a =>
             {
                 a.Name("t_lf_main");
-                a.Property(b => b.Id).IsPrimary(true).IsIdentity(false);
-                a.Property(b => b.ConfId).Name("conf_id").IsNullable(true);
-                a.Property(b => b.FormCode).Name("form_code").IsNullable(true);
+                a.Property(b => b.Id).IsPrimary(true);
+                a.Property(b => b.ConfId).Name("conf_id");
+                a.Property(b => b.FormCode).Name("form_code");
                 a.Property(b => b.IsDel).Name("is_del").IsNullable(false);
-                a.Property(b => b.CreateUser).Name("create_user").IsNullable(true);
+                a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time").CanUpdate(false).IsNullable(true);
                 a.Property(b => b.UpdateUser).Name("update_user").IsNullable(true);
                 a.Property(b => b.UpdateTime).Name("update_time").IsNullable(true);
@@ -989,6 +1059,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.ConfId).Name("conf_id").IsNullable(true);
                 a.Property(b => b.FormCode).Name("form_code").IsNullable(true);
                 a.Property(b => b.IsDel).Name("is_del").IsNullable(false);
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateUser).Name("create_user").IsNullable(true);
                 a.Property(b => b.CreateTime).Name("create_time").CanUpdate(false).IsNullable(true);
                 a.Property(b => b.UpdateUser).Name("update_user").IsNullable(true);
@@ -1126,6 +1197,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.Title).Name("title");
                 a.Property(b => b.EffectiveSource).Name("effective_source");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.Route).Name("route");
                 a.Property(b => b.Sort).Name("sort");
                 a.Property(b => b.CreateTime).Name("create_time");
@@ -1138,6 +1210,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.QuickEntryId).Name("quick_entry_id");
                 a.Property(b => b.Type).Name("type");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.TypeName).Name("type_name");
             }).ConfigEntity<SysVersion>(a =>
@@ -1147,6 +1220,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateTime).Name("update_time");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.Version).Name("version");
                 a.Property(b => b.Description).Name("description");
                 a.Property(b => b.Index).Name("index");
@@ -1191,6 +1265,8 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.UpdateTime).Name("update_time");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.UpdateUser).Name("update_user");
+                a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
             }).ConfigEntity<UserEntrust>(a =>
             {
                 a.Name("t_user_entrust");
@@ -1205,6 +1281,8 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.UpdateTime).Name("update_time");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.UpdateUser).Name("update_user");
+                a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
             }).ConfigEntity<UserMessage>(a =>
             {
                 a.Name("t_user_message");
@@ -1218,6 +1296,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.UrlParams).IsIgnore(true);
                 a.Property(b => b.IsRead).Name("is_read");
                 a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.UpdateTime).Name("update_time");
                 a.Property(b => b.CreateUser).Name("create_user");
@@ -1239,6 +1318,8 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.UpdateTime).Name("update_time");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.UpdateUser).Name("update_user");
+                a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
             }).ConfigEntity<UserRole>(entity =>
             {
                 entity.Name("t_user_role");
@@ -1262,6 +1343,7 @@ public static class FreesqlFluentConfiguration
                 entity.Property(e => e.FieldValueText).Name("field_value_text");
                 entity.Property(e => e.Sort).Name("sort");
                 entity.Property(e => e.IsDel).Name("is_del");
+                entity.Property(b => b.TenantId).Name("tenant_id");
                 entity.Property(e => e.CreateUser).Name("create_user");
                 entity.Property(e => e.CreateTime).Name("create_time").CanInsert(true);
                 entity.Property(e => e.UpdateUser).Name("update_user");

@@ -19,4 +19,9 @@ public class BpmProcessNotice
     /// Process key.
     /// </summary>
     public string ProcessKey { get; set; }
+    /// <summary>
+    /// Deletion Status (0: Not Deleted, 1: Deleted)
+    /// </summary>
+    public int IsDel { get; set; }
+    public string TenantId { get; set; }
 }

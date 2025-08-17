@@ -58,4 +58,9 @@ public class BpmFlowrunEntrust
     /// Whether the task is viewed (0 for no, 1 for yes).
     /// </summary>
     public int IsView { get; set; }
+    /// <summary>
+    /// Logical delete flag (0: not deleted, 1: deleted).
+    /// </summary>
+    public int IsDel { get; set; }
+    public string TenantId { get; set; }
 }

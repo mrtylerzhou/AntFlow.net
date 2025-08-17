@@ -1,11 +1,12 @@
 ﻿
 using antflowcore.entity;
 using AntFlowCore.Entity;
+using antflowcore.service.interf.repository;
 using antflowcore.vo;
 
 namespace antflowcore.service.repository;
 
-public class BpmnNodeLfFormdataFieldControlService: AFBaseCurdRepositoryService<BpmnNodeLfFormdataFieldControl>
+public class BpmnNodeLfFormdataFieldControlService: AFBaseCurdRepositoryService<BpmnNodeLfFormdataFieldControl>,IBpmnNodeLfFormdataFieldControlService
 {
     public BpmnNodeLfFormdataFieldControlService(IFreeSql freeSql) : base(freeSql)
     {

@@ -1,8 +1,10 @@
 ﻿using AntFlowCore.Entity;
+using antflowcore.service.interf;
+using antflowcore.util;
 
 namespace antflowcore.service.repository;
 
-public class BpmFlowrunEntrustService : AFBaseCurdRepositoryService<BpmFlowrunEntrust>
+public class BpmFlowrunEntrustService : AFBaseCurdRepositoryService<BpmFlowrunEntrust>,IBpmFlowrunEntrustService
 {
     public BpmFlowrunEntrustService(IFreeSql freeSql) : base(freeSql)
     {
@@ -28,7 +30,8 @@ public class BpmFlowrunEntrustService : AFBaseCurdRepositoryService<BpmFlowrunEn
             OriginalName = originalName,
             IsRead = 2,
             ProcDefId = processKey,
-            RunInfoId = processInstanceId
+            RunInfoId = processInstanceId,
+            TenantId = MultiTenantUtil.GetCurrentTenantId(),
         };
         this.baseRepo.Insert(entrust);
     }

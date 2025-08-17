@@ -5,6 +5,7 @@ using antflowcore.entity;
 using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.service.biz;
+using antflowcore.service.interf.repository;
 using antflowcore.util;
 using antflowcore.vo;
 using AntFlowCore.Vo;
@@ -12,7 +13,7 @@ using FreeSql.Internal.Model;
 
 namespace antflowcore.service.repository;
 
-public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSideBpmBusinessParty>
+public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSideBpmBusinessParty>,IOutSideBpmBusinessPartyService
 {
     private readonly OutSideBpmAdminPersonnelService _outSideBpmAdminPersonnelService;
     private readonly OutSideBpmCallbackUrlConfService _outSideBpmCallbackUrlConfService;

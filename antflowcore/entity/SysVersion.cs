@@ -12,6 +12,7 @@
         public DateTime? CreateTime { get; set; }
         public DateTime? UpdateTime { get; set; }
         public int IsDel { get; set; }
+        public string TenantId { get; set; }
         public string Version { get; set; }
         public string Description { get; set; }
         public int Index { get; set; }

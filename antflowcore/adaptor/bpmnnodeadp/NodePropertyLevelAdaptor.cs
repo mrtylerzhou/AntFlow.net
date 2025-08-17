@@ -53,7 +53,8 @@ namespace antflowcore.adaptor;
                 CreateTime = DateTime.Now,
                 CreateUser = SecurityUtils.GetLogInEmpName(),
                 UpdateTime = DateTime.Now,
-                UpdateUser = SecurityUtils.GetLogInEmpName()
+                UpdateUser = SecurityUtils.GetLogInEmpName(),
+                TenantId = MultiTenantUtil.GetCurrentTenantId(),
             };
 
             _bpmnNodeAssignLevelConfService.baseRepo.Insert(bpmnNodeAssignLevelConf);

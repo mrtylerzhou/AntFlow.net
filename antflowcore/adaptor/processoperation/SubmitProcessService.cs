@@ -67,7 +67,8 @@ public class SubmitProcessService: IProcessOperationAdaptor
             Description = applyName+"-"+processName,
             DataSourceId = businessDataVo.DataSourceId,
             ProcessDigest = businessDataVo.ProcessDigest,
-            Version = businessDataVo.BpmnCode
+            Version = businessDataVo.BpmnCode,
+            TenantId = MultiTenantUtil.GetCurrentTenantId(),
         };
         _bpmBusinessProcessService.baseRepo.Insert(bpmBusinessProcess);
         businessDataVo.ProcessNumber = processNumber;

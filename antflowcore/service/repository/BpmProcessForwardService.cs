@@ -1,10 +1,11 @@
 ﻿using System.Collections.Concurrent;
 using antflowcore.entity;
 using AntFlowCore.Entity;
+using antflowcore.service.interf.repository;
 
 namespace antflowcore.service.repository;
 
-public class BpmProcessForwardService: AFBaseCurdRepositoryService<BpmProcessForward>
+public class BpmProcessForwardService: AFBaseCurdRepositoryService<BpmProcessForward>,IBpmProcessForwardService
 {
     private readonly AFTaskService _taskService;
 

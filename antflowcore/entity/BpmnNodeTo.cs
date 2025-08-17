@@ -31,7 +31,7 @@ public class BpmnNodeTo
     /// Deletion status (0 for normal, 1 for delete).
     /// </summary>
     public int IsDel { get; set; }
-
+    public string TenantId { get; set; }
     /// <summary>
     /// User who created this record.
     /// </summary>

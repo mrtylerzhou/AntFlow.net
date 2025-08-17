@@ -41,7 +41,7 @@ public class BpmVariableSignUpPersonnel
     /// 0 for normal, 1 for delete.
     /// </summary>
     public int IsDel { get; set; }
-
+    public string TenantId { get; set; }
     /// <summary>
     /// Create user.
     /// </summary>

@@ -12,6 +12,7 @@
         public string Title { get; set; }
         public string EffectiveSource { get; set; }
         public int IsDel { get; set; }
+        public string TenantId { get; set; }
         public string Route { get; set; }
         public int Sort { get; set; }
         public DateTime? CreateTime { get; set; }

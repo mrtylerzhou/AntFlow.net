@@ -26,7 +26,7 @@ namespace AntFlowCore.Entity
         /// Indicates whether the template is deleted (0 - no, 1 - yes).
         /// </summary>
         public int IsDel { get; set; }
-
+        public string TenantId { get; set; }
         /// <summary>
         /// Creation time.
         /// </summary>

@@ -31,4 +31,9 @@ public class BpmTaskconfig
     /// User number.
     /// </summary>
     public int Number { get; set; }
+    /// <summary>
+    /// Deletion Status (0: Not Deleted, 1: Deleted)
+    /// </summary>
+    public int IsDel { get; set; }
+    public string TenantId { get; set; }
 }

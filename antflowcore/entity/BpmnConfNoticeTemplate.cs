@@ -18,6 +18,7 @@ public class BpmnConfNoticeTemplate
     /// Deletion Status (0: Normal, 1: Deleted)
     /// </summary>
     public int IsDel { get; set; }
+    public string TenantId { get; set; }
 
     /// <summary>
     /// Created By

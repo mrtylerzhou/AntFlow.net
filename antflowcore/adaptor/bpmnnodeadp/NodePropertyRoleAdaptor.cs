@@ -79,7 +79,8 @@ namespace antflowcore.adaptor;
                     CreateTime = DateTime.Now,
                     CreateUser = SecurityUtils.GetLogInEmpName(),
                     UpdateTime = DateTime.Now,
-                    UpdateUser = SecurityUtils.GetLogInEmpName()
+                    UpdateUser = SecurityUtils.GetLogInEmpName(),
+                    TenantId = MultiTenantUtil.GetCurrentTenantId(),
                 }).ToList());
 
                 if (bpmnNodeVo.IsOutSideProcess == 1)
@@ -93,7 +94,8 @@ namespace antflowcore.adaptor;
                             EmplId = empl.Id,
                             EmplName = empl.Name,
                             CreateUser = SecurityUtils.GetLogInEmpName(),
-                            UpdateUser = SecurityUtils.GetLogInEmpName()
+                            UpdateUser = SecurityUtils.GetLogInEmpName(),
+                            TenantId = MultiTenantUtil.GetCurrentTenantId(),
                         }).ToList();
 
                         _bpmnNodeRoleOutsideEmpConfService.baseRepo.Insert(outsideEmpConfs);

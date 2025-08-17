@@ -91,7 +91,8 @@ public class NodePropertyLoopAdaptor : BpmnNodeAdaptor
                 CreateTime = DateTime.Now,
                 CreateUser = SecurityUtils.GetLogInEmpName(),
                 UpdateTime = DateTime.Now,
-                UpdateUser = SecurityUtils.GetLogInEmpName()
+                UpdateUser = SecurityUtils.GetLogInEmpName(),
+                TenantId = MultiTenantUtil.GetCurrentTenantId(),
             };
 
             _bpmnNodeLoopConfService.baseRepo.Insert(bpmnNodeLoopConf);

@@ -1,10 +1,11 @@
 ﻿using antflowcore.constant.enus;
 using AntFlowCore.Entity;
+using antflowcore.service.interf.repository;
 using antflowcore.vo;
 
 namespace antflowcore.service.repository;
 
-public class BpmnNodeButtonConfService: AFBaseCurdRepositoryService<BpmnNodeButtonConf>
+public class BpmnNodeButtonConfService: AFBaseCurdRepositoryService<BpmnNodeButtonConf>,IBpmnNodeButtonConfService
 {
     public BpmnNodeButtonConfService(IFreeSql freeSql) : base(freeSql)
     {

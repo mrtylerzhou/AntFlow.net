@@ -2,10 +2,11 @@
 using antflowcore.constant.enus;
 using antflowcore.entity;
 using AntFlowCore.Entity;
+using antflowcore.service.interf.repository;
 
 namespace antflowcore.service.repository;
 
-public class OutSideBpmAdminPersonnelService: AFBaseCurdRepositoryService<OutSideBpmAdminPersonnel>
+public class OutSideBpmAdminPersonnelService: AFBaseCurdRepositoryService<OutSideBpmAdminPersonnel>,IOutSideBpmAdminPersonnelService
 {
     public OutSideBpmAdminPersonnelService(IFreeSql freeSql) : base(freeSql)
     {

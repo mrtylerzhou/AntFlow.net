@@ -3,11 +3,12 @@ using antflowcore.entity;
 using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.service.biz;
+using antflowcore.service.interf.repository;
 using antflowcore.util;
 
 namespace antflowcore.service.repository;
 
-public class BpmVariableSignUpService: AFBaseCurdRepositoryService<BpmVariableSignUp>
+public class BpmVariableSignUpService: AFBaseCurdRepositoryService<BpmVariableSignUp>,IBpmVariableSignUpService
 {
     public BpmVariableSignUpService(IFreeSql freeSql) : base(freeSql)
     {

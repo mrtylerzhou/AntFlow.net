@@ -11,6 +11,7 @@ public class DictMain
     public string DictName { get; set; }
     public string DictType { get; set; }
     public int? IsDel { get; set; }
+    public string TenantId { get; set; }
     public DateTime? CreateTime { get; set; }
     public string CreateUser { get; set; }
     public DateTime? UpdateTime { get; set; }

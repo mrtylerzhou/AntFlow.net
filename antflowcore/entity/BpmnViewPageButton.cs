@@ -29,6 +29,7 @@ public class BpmnViewPageButton
     public string Remark { get; set; }
 
     public int IsDel { get; set; }
+    public string TenantId { get; set; }
 
     public string CreateUser { get; set; }
 
@@ -49,7 +50,8 @@ public class BpmnViewPageButton
             CreateUser = SecurityUtils.GetLogInEmpNameSafe(),
             CreateTime = DateTime.Now,
             UpdateUser = SecurityUtils.GetLogInEmpNameSafe(),
-            UpdateTime = DateTime.Now
+            UpdateTime = DateTime.Now,
+            TenantId = MultiTenantUtil.GetCurrentTenantId(),
         };
     }
 }
