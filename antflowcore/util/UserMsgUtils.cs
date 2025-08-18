@@ -55,23 +55,23 @@ public static class UserMsgUtils
         service.InsertUserMessage(msg);
     }
 
-    public static void SendMessageBatch(List<UserMsgBathVo> list)
+    public static void SendMessageBatch(List<UserMsgBatchVo> list)
     {
         var service = GetMessageService();
         DoSendMessageBatch(list, service);
         InsertUserMessageBatch(list, service);
     }
 
-    public static void SendMessageBatchNoUserMessage(List<UserMsgBathVo> list)
+    public static void SendMessageBatchNoUserMessage(List<UserMsgBatchVo> list)
     {
         DoSendMessageBatch(list, GetMessageService());
     }
 
-    public static void InsertUserMessageBatch(List<UserMsgBathVo> list)
+    public static void InsertUserMessageBatch(List<UserMsgBatchVo> list)
     {
         InsertUserMessageBatch(list, GetMessageService());
     }
-    public static void SendMessageBathNoUserMessage(List<UserMsgBathVo> userMsgBathVos) {
+    public static void SendMessageBathNoUserMessage(List<UserMsgBatchVo> userMsgBathVos) {
 
         MessageService messageService = GetMessageService();
 
@@ -81,7 +81,7 @@ public static class UserMsgUtils
     }
     
 
-    private static void DoSendMessageBatch(List<UserMsgBathVo> list, MessageService service)
+    private static void DoSendMessageBatch(List<UserMsgBatchVo> list, MessageService service)
     {
         var map = FormatUserMsgBathVos(list);
 
@@ -104,7 +104,7 @@ public static class UserMsgUtils
         }
     }
 
-    private static void InsertUserMessageBatch(List<UserMsgBathVo> list, MessageService service)
+    private static void InsertUserMessageBatch(List<UserMsgBatchVo> list, MessageService service)
     {
         var messages = list
             .Where(x => CheckEmployeeStatus(x.UserMsgVo.UserId))
@@ -114,7 +114,7 @@ public static class UserMsgUtils
         service.InsertUserMessageBatch(messages);
     }
 
-    private static Dictionary<MessageSendTypeEnum, List<UserMsgVo>> FormatUserMsgBathVos(List<UserMsgBathVo> list)
+    private static Dictionary<MessageSendTypeEnum, List<UserMsgVo>> FormatUserMsgBathVos(List<UserMsgBatchVo> list)
     {
         return list
             .Distinct()

@@ -24,7 +24,7 @@ public class BpmVariableMessageListenerService
    /// 监听发送模板消息
    /// </summary>
    /// <param name="bpmVariableMessageVo"></param>
-    public void listenerSendTemplateMessages(BpmVariableMessageVo bpmVariableMessageVo) {
+    public void ListenerSendTemplateMessages(BpmVariableMessageVo bpmVariableMessageVo) {
         //build variable message
         BpmVariableMessageVo vo = _bpmVariableMessageService.GetBpmVariableMessageVo(bpmVariableMessageVo);
         //send template message

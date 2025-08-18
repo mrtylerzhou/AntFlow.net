@@ -277,7 +277,8 @@ public static class ServiceRegistration
         services.AddSingleton<ProcessDeptBizService>();
         services.AddSingleton<ITenantIdHolder, MultiTenantIdHolder>();
         services.AddSingleton<IWorkflowButtonOperationHandler, AntFlowOperationListener>();
-       
+        services.AddSingleton<ActivitiBpmMsgTemplateService>();
+        services.AddSingleton<BpmnConfNoticeTemplateDetailService>();
         //=================================不可越过的三八线==============================
         IAdaptorFactory adaptorFactory = AdaptorFactoryProxy.GetProxyInstance();
         services.AddSingleton(adaptorFactory);

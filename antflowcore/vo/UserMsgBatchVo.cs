@@ -3,7 +3,7 @@ using AntFlowCore.Vo;
 
 namespace antflowcore.vo;
 
-public class UserMsgBathVo
+public class UserMsgBatchVo
 {
    
     public UserMsgVo UserMsgVo { get; set; }

@@ -27,7 +27,7 @@ namespace AntFlowCore.Vo
         public string ElementId { get; set; }
 
         /// <summary>
-        /// Gets or sets the message type (1 for node in message, 2 for node out message).
+        ///  1-out of node message；2-in node message
         /// </summary>
         [JsonPropertyName("messageType")]
         public int? MessageType { get; set; }

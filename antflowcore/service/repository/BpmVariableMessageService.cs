@@ -328,15 +328,17 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
         if (messageType == 2)
         {
             long count = this.baseRepo
-                .Where(a=> a.VariableId == bpmVariable.Id
-                           &&a.ElementId == vo.ElementId
+                .Where(a=> 
+                             a.VariableId == bpmVariable.Id
+                           //&&a.ElementId == vo.ElementId
                            && a.MessageType == messageType
                            && a.EventType == vo.EventType).Count();
             return count > 0;
         }else if (messageType == 1)
         {
             long count = this.baseRepo
-                .Where(a=> a.VariableId == bpmVariable.Id
+                .Where(a=> 
+                              a.VariableId == bpmVariable.Id
                            && a.MessageType == messageType
                            && a.EventType == vo.EventType).Count();
             return count > 0;
@@ -544,7 +546,7 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
                 continue;
             }
 
-            List<UserMsgBathVo> userMsgBathVos = employees
+            List<UserMsgBatchVo> userMsgBathVos = employees
                 .Select(o => GetUserMsgBathVo(o, informationTemplateVo.MailTitle,
                     informationTemplateVo.MailContent,
                     vo.TaskId, emailUrl, appUrl, MessageSendTypeEnum.MAIL))
@@ -564,7 +566,7 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
         }
     }
 
-    private UserMsgBathVo GetUserMsgBathVo(
+    private UserMsgBatchVo GetUserMsgBathVo(
         Employee employee,
         string title,
         string content,
@@ -586,7 +588,7 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
             TaskId = taskId
         };
 
-        return new UserMsgBathVo
+        return new UserMsgBatchVo
         {
             UserMsgVo = userMsgVo,
             MessageSendTypeEnums = new List<MessageSendTypeEnum> { messageSendTypeEnum }

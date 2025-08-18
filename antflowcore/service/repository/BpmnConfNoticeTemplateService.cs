@@ -3,6 +3,7 @@ using antflowcore.entity;
 using AntFlowCore.Entity;
 using antflowcore.service.interf.repository;
 using antflowcore.util;
+using antflowcore.util.Extension;
 
 namespace antflowcore.service.repository;
 
@@ -40,5 +41,16 @@ public class BpmnConfNoticeTemplateService : AFBaseCurdRepositoryService<BpmnCon
 
         int affrows = Frsql.Insert(list).ExecuteAffrows();
         return id;
+    }
+
+    public BpmnConfNoticeTemplateDetail? GetDetailByCodeAndType(string bpmnCode, int msgNoticeType)
+    {
+        BpmnConfNoticeTemplateDetailService bpmnConfNoticeTemplateDetailService = ServiceProviderUtils.GetService<BpmnConfNoticeTemplateDetailService>();
+        List<BpmnConfNoticeTemplateDetail> bpmnConfNoticeTemplateDetails = bpmnConfNoticeTemplateDetailService
+            .baseRepo
+            .Where(a => a.BpmnCode == bpmnCode && a.NoticeTemplateType == msgNoticeType)
+            .OrderByDescending(a => a.Id)
+            .ToList();
+        return bpmnConfNoticeTemplateDetails.IsEmpty() ? null : bpmnConfNoticeTemplateDetails[0];
     }
 }
