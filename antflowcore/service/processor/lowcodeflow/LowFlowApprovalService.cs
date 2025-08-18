@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Nodes;
 using antflowcore.adaptor;
+using antflowcore.adaptor.bpmnelementadp;
 using antflowcore.constant.enums;
 using antflowcore.constant.enus;
 using antflowcore.entity;
@@ -89,7 +90,11 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
 
     public void OnInitData(UDLFApplyVo vo)
     {
-        return;
+        IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
+        foreach (var o in lfFormOperationAdaptors)
+        {
+            o.OnInitData(vo);
+        }
     }
 
     public void OnQueryData(UDLFApplyVo vo)
@@ -236,6 +241,11 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
 
         var lfFormdata = bpmnConfLfFormdataList.First();
         vo.LfFormData = lfFormdata.Formdata;
+        IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
+        foreach (var o in lfFormOperationAdaptors)
+        {
+            o.OnQueryData(vo);
+        }
     }
 
     public void OnSubmitData(UDLFApplyVo vo)
@@ -277,6 +287,11 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         vo.BusinessId = mainId.ToString();
         vo.ProcessDigest = vo.Remark;
         vo.EntityName = nameof(LowFlowApprovalService);
+        IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
+        foreach (var o in lfFormOperationAdaptors)
+        {
+            o.OnSubmitData(vo);
+        }
     }
 
     public void OnConsentData(UDLFApplyVo vo)
@@ -344,6 +359,11 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
             field.FieldValue = fValue;
         }
         _lfMainFieldService.baseRepo.Update(lfMainFields);
+        IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
+        foreach (var o in lfFormOperationAdaptors)
+        {
+            o.OnConsentData(vo);
+        }
     }
 
     public void OnBackToModifyData(UDLFApplyVo vo)
@@ -353,11 +373,19 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
 
     public void OnCancellationData(UDLFApplyVo vo)
     {
-       
+        IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
+        foreach (var o in lfFormOperationAdaptors)
+        {
+            o.OnCancellationData(vo);
+        }
     }
 
     public void OnFinishData(BusinessDataVo vo)
     {
-        //.net版暂未实现hook,需要监听完结的可以直接在这里写代码,或者自己实现策略实现分发
+        IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
+        foreach (var o in lfFormOperationAdaptors)
+        {
+            o.OnFinishData(vo);
+        }
     }
 }
