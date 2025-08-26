@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/01-Solution Items/">
+    <File Path="common.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="LICENSE" />
+    <File Path="readme.md" />
+    <File Path="version.props" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Project Path="antflowcore/antflowcore.csproj" />
+  <Project Path="antflownet/antflownet.csproj" />
+</Solution>
