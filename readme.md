@@ -68,15 +68,15 @@ QQ群:629171398
 
 ## 演示图
 
-![1749354459962](image/readme/1749354459962.png)
+![1749354459962](docs/images/readme/1749354459962.png)
 
-![1749354935329](image/readme/1749354935329.png)
+![1749354935329](docs/images/readme/1749354935329.png)
 
-![1749354977712](image/readme/1749354977712.png)
+![1749354977712](docs/images/readme/1749354977712.png)
 
-![1744243574675](image/readme/1744243574675.png)
+![1744243574675](docs/images/readme/1744243574675.png)
 
-![1749354716228](/image/readme/1750286434660.png)
+![1749354716228](docs/images/readme/1750286434660.png)
 
 ## 捐赠支持
 
@@ -94,8 +94,8 @@ SZ1806 188元,ゞ低调℡华丽 100元,Dorian 8.88元,小桥流水 6.6元,杨�
 
 <table>
     <tr>
-        <td><img src="image/readme/wxpay.jpg"/></td>
-        <td><img src="image/readme/alipay.jpg"/></td>
+        <td><img src="docs/images/readme/wxpay.jpg"/></td>
+        <td><img src="docs/images/readme/alipay.jpg"/></td>
     </tr>  
 </table>
 ## 好书推荐
@@ -103,4 +103,4 @@ SZ1806 188元,ゞ低调℡华丽 100元,Dorian 8.88元,小桥流水 6.6元,杨�
 大家在使用本项目时，推荐结合贺波老师的书
 [《深入Flowable流程引擎：核心原理与高阶实战》](https://item.jd.com/14804836.html)学习。这本书得到了Flowable创始人Tijs Rademakers亲笔作序推荐，对系统学习和深入掌握Flowable的用法非常有帮助。
 
-![1745325166101](image/readme/1745325166101.png)
+![1745325166101](docs/images/readme/1745325166101.png)

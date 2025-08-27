@@ -15,6 +15,9 @@ tab_width = 4
 end_of_line = crlf
 insert_final_newline = false
 
+# 字符编码
+charset = utf-8
+
 #### .NET 代码操作 ####
 
 # 类型成员
