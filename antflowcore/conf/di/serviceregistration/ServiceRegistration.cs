@@ -1,5 +1,6 @@
 ﻿using antflowcore.adaptor;
 using antflowcore.adaptor.bpmnelementadp;
+using antflowcore.adaptor.bpmnprocessnotice;
 using antflowcore.adaptor.nodetypecondition;
 using antflowcore.adaptor.nodetypecondition.judge;
 using antflowcore.adaptor.personnel;
@@ -279,6 +280,11 @@ public static class ServiceRegistration
         services.AddSingleton<IWorkflowButtonOperationHandler, AntFlowOperationListener>();
         services.AddSingleton<ActivitiBpmMsgTemplateService>();
         services.AddSingleton<BpmnConfNoticeTemplateDetailService>();
+
+        services.AddSingleton<IProcessNoticeAdaptor, EmailSendAdaptor>();
+        services.AddSingleton<IProcessNoticeAdaptor, AppPushAdaptor>();
+        services.AddSingleton<IProcessNoticeAdaptor, SMSSendAdaptor>();
+        services.AddSingleton<AfStaticLogUtil>();
         //=================================不可越过的三八线==============================
         IAdaptorFactory adaptorFactory = AdaptorFactoryProxy.GetProxyInstance();
         services.AddSingleton(adaptorFactory);

@@ -546,27 +546,16 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
                 continue;
             }
 
-            List<UserMsgBatchVo> userMsgBathVos = employees
-                .Select(o => GetUserMsgBathVo(o, informationTemplateVo.MailTitle,
+            List<UserMsgBatchVo> userMsgBatchVos = employees
+                .Select(o => GetUserMsgBatchVo(o, informationTemplateVo.MailTitle,
                     informationTemplateVo.MailContent,
                     vo.TaskId, emailUrl, appUrl, MessageSendTypeEnum.MAIL))
                 .ToList();
-            if (messageSendTypeEnum == MessageSendTypeEnum.MAIL)
-            {
-                    UserMsgUtils.SendMessageBathNoUserMessage(userMsgBathVos);
-            }else if (messageSendTypeEnum == MessageSendTypeEnum.MESSAGE)
-            {
-                userMsgBathVos.ForEach(a=>a.MessageSendTypeEnums=new List<MessageSendTypeEnum>{MessageSendTypeEnum.MESSAGE});
-                UserMsgUtils.SendMessageBathNoUserMessage(userMsgBathVos);
-            }else if (messageSendTypeEnum == MessageSendTypeEnum.PUSH)
-            {
-                userMsgBathVos.ForEach(a=>a.MessageSendTypeEnums=new List<MessageSendTypeEnum>{MessageSendTypeEnum.PUSH});
-                UserMsgUtils.SendMessageBathNoUserMessage(userMsgBathVos);
-            }
+            UserMsgUtils.SendMessageBatchNoUserMessage(userMsgBatchVos);
         }
     }
 
-    private UserMsgBatchVo GetUserMsgBathVo(
+    private UserMsgBatchVo GetUserMsgBatchVo(
         Employee employee,
         string title,
         string content,

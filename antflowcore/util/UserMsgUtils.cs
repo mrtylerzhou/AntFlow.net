@@ -1,4 +1,5 @@
-﻿using antflowcore.constant.enums;
+﻿using antflowcore.adaptor.bpmnprocessnotice;
+using antflowcore.constant.enums;
 using AntFlowCore.Entity;
 using antflowcore.service.biz;
 using antflowcore.service.repository;
@@ -83,24 +84,33 @@ public static class UserMsgUtils
 
     private static void DoSendMessageBatch(List<UserMsgBatchVo> list, MessageService service)
     {
-        var map = FormatUserMsgBathVos(list);
-
-        if (map.TryGetValue(MessageSendTypeEnum.MAIL, out var mailList))
+        Dictionary<MessageSendTypeEnum, List<UserMsgVo>> map = FormatUserMsgBatchVos(list);
+        foreach (KeyValuePair<MessageSendTypeEnum,List<UserMsgVo>> messageSendTypeEnumListEntry in map)
         {
-            var dict = mailList.ToDictionary(v => v.UserId, BuildMailInfo);
-            service.SendMailBatch(dict);
-        }
+            MessageSendTypeEnum messageSendTypeEnum = messageSendTypeEnumListEntry.Key;
+            if (messageSendTypeEnum == null)
+            {
+                continue;
+            }
+            List<UserMsgVo> userMsgVos = messageSendTypeEnumListEntry.Value;
+            IEnumerable<IProcessNoticeAdaptor> processNoticeAdaptors = ServiceProviderUtils.GetServices<IProcessNoticeAdaptor>();
+            bool currentSend = false;
+            foreach (IProcessNoticeAdaptor processNoticeAdaptor in processNoticeAdaptors)
+            {
+                if (processNoticeAdaptor!=null)
+                {
+                    if (processNoticeAdaptor.GetSupportCode() == messageSendTypeEnum.Code)
+                    {
+                        currentSend = true;
+                        processNoticeAdaptor.SendMessageBatchByType(userMsgVos);
+                    }
+                }
+            }
 
-        if (map.TryGetValue(MessageSendTypeEnum.MESSAGE, out var msgList))
-        {
-            var dict = msgList.ToDictionary(v => v.UserId, BuildMessageInfo);
-            service.SendSmsBatch(dict);
-        }
-
-        if (map.TryGetValue(MessageSendTypeEnum.PUSH, out var pushList))
-        {
-            var dict = pushList.ToDictionary(v => v.UserId, BuildBaseMsgInfo);
-            service.SendAppPushBatch(dict);
+            if (!currentSend)
+            {
+              AfStaticLogUtil.Logger.LogInformation($"未实现的消息发送策略!{messageSendTypeEnum}");
+            }
         }
     }
 
@@ -114,7 +124,7 @@ public static class UserMsgUtils
         service.InsertUserMessageBatch(messages);
     }
 
-    private static Dictionary<MessageSendTypeEnum, List<UserMsgVo>> FormatUserMsgBathVos(List<UserMsgBatchVo> list)
+    private static Dictionary<MessageSendTypeEnum, List<UserMsgVo>> FormatUserMsgBatchVos(List<UserMsgBatchVo> list)
     {
         return list
             .Distinct()
@@ -139,7 +149,7 @@ public static class UserMsgUtils
         };
     }
 
-    private static BaseMsgInfo BuildBaseMsgInfo(UserMsgVo vo)
+    public static BaseMsgInfo BuildBaseMsgInfo(UserMsgVo vo)
     {
         return new BaseMsgInfo
         {
@@ -149,7 +159,7 @@ public static class UserMsgUtils
         };
     }
 
-    private static MessageInfo BuildMessageInfo(UserMsgVo vo)
+    public static MessageInfo BuildMessageInfo(UserMsgVo vo)
     {
         return new MessageInfo
         {
@@ -158,7 +168,7 @@ public static class UserMsgUtils
         };
     }
 
-    private static MailInfo BuildMailInfo(UserMsgVo vo)
+    public static MailInfo BuildMailInfo(UserMsgVo vo)
     {
         return new MailInfo
         {
