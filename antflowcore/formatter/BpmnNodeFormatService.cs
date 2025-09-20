@@ -4,6 +4,7 @@ using antflowcore.exception;
 using antflowcore.factory;
 using antflowcore.service.biz;
 using antflowcore.util;
+using antflowcore.util.Extension;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 
@@ -321,7 +322,7 @@ public class BpmnNodeFormatService
             // Skip deduplicated node and rebuild nodeTo
             var nextNodeTo = GetNodeTo(nodeVo);
             List<BpmnNodeVo> nodeVos = rebuildNodesList.Where(a => nodeVo.NodeId == a.Params.NodeTo).ToList();
-            if(nodeVos.Count > 1)
+            if(!nodeVos.IsEmpty())
             {
                 BpmnNodeVo vo = nodeVos[0];
                 if((int)NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY==vo.NodeType)
