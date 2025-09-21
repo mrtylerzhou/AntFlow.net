@@ -140,6 +140,7 @@ public class DictService
             List<DictData> dictDatas = this._dicDataSerivce
                 .baseRepo
                 .Where(expression)
+                .OrderByDescending(c=>c.CreateTime)
                 .Page(basePagingInfo)
                 .ToList();
             page.Total = (int)basePagingInfo.Count;
