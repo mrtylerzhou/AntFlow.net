@@ -20,12 +20,12 @@ public class ActivitiTagParser<T>: TagParser<IFormOperationAdaptor<T>,BusinessDa
         {
             var customAttributes = service.GetType().GetCustomAttributes(true);
            
-            IEnumerable<AfFormServiceAnnoAttribute> afFormServiceAnnoAttributes = customAttributes.OfType<AfFormServiceAnnoAttribute>();
+            IEnumerable<DIYFormServiceAnnoAttribute> afFormServiceAnnoAttributes = customAttributes.OfType<DIYFormServiceAnnoAttribute>();
             if (!afFormServiceAnnoAttributes.Any())
             {
                 return null;
             }
-            foreach (AfFormServiceAnnoAttribute afFormServiceAnnoAttribute in afFormServiceAnnoAttributes)
+            foreach (DIYFormServiceAnnoAttribute afFormServiceAnnoAttribute in afFormServiceAnnoAttributes)
             {
                
                 if (afFormServiceAnnoAttribute.SvcName.Equals(data.FormCode)||(data.IsLowCodeFlow is 1 && afFormServiceAnnoAttribute.SvcName.Equals("LF")))

@@ -9,7 +9,7 @@ using AntFlowCore.Vo;
 
 
 namespace antflowcore.service.formprocess;
-[AfFormServiceAnno(SvcName = "DSFZH_WMA",Desc = "三方账号申请")]
+[DIYFormServiceAnno(SvcName = "DSFZH_WMA",Desc = "三方账号申请")]
 public class ThirdPartyAccountApplyService : AFBaseCurdRepositoryService<ThirdPartyAccountApply>,IFormOperationAdaptor<ThirdPartyAccountApplyVo>
 {
     

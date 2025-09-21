@@ -1,7 +1,7 @@
-﻿using System.Text.Json;
+﻿using System.Reflection;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using antflowcore.adaptor;
-using antflowcore.adaptor.bpmnelementadp;
 using antflowcore.constant.enums;
 using antflowcore.constant.enus;
 using antflowcore.entity;
@@ -12,14 +12,15 @@ using antflowcore.service.repository;
 using antflowcore.util;
 using antflowcore.vo;
 using AntFlowCore.Vo;
-using Microsoft.Extensions.Logging;
+using System.Reflection;
+using antflowcore.factory.tagparser;
 
 namespace antflowcore.service.processor.lowcodeflow;
 
 /**
  * 低(无)代码流程
  */
-[AfFormServiceAnno(SvcName = "LF", Desc = "")]
+[DIYFormServiceAnno(SvcName = "LF", Desc = "")]
 public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
 {
     private readonly ILogger<LowFlowApprovalService> _logger;
@@ -93,7 +94,13 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
         foreach (var o in lfFormOperationAdaptors)
         {
-            o.OnInitData(vo);
+            LFFormServiceAnnoAttribute? lfFormServiceAnnoAttribute = o.GetType().GetCustomAttribute<LFFormServiceAnnoAttribute>();
+           
+            if (lfFormServiceAnnoAttribute != null && lfFormServiceAnnoAttribute.SvcName.Equals(vo.FormCode))
+            {
+                o.OnInitData(vo);
+            }
+           
         }
     }
 
@@ -244,7 +251,12 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
         foreach (var o in lfFormOperationAdaptors)
         {
-            o.OnQueryData(vo);
+            LFFormServiceAnnoAttribute? lfFormServiceAnnoAttribute = o.GetType().GetCustomAttribute<LFFormServiceAnnoAttribute>();
+           
+            if (lfFormServiceAnnoAttribute != null && lfFormServiceAnnoAttribute.SvcName.Equals(vo.FormCode))
+            {
+                o.OnQueryData(vo);
+            }
         }
     }
 
@@ -290,7 +302,12 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
         foreach (var o in lfFormOperationAdaptors)
         {
-            o.OnSubmitData(vo);
+            LFFormServiceAnnoAttribute? lfFormServiceAnnoAttribute = o.GetType().GetCustomAttribute<LFFormServiceAnnoAttribute>();
+           
+            if (lfFormServiceAnnoAttribute != null && lfFormServiceAnnoAttribute.SvcName.Equals(vo.FormCode))
+            {
+                o.OnSubmitData(vo);
+            }
         }
     }
 
@@ -362,13 +379,29 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
         foreach (var o in lfFormOperationAdaptors)
         {
-            o.OnConsentData(vo);
+            
+            LFFormServiceAnnoAttribute? lfFormServiceAnnoAttribute = o.GetType().GetCustomAttribute<LFFormServiceAnnoAttribute>();
+           
+            if (lfFormServiceAnnoAttribute != null && lfFormServiceAnnoAttribute.SvcName.Equals(vo.FormCode))
+            {
+                o.OnConsentData(vo);
+            }
         }
     }
 
     public void OnBackToModifyData(UDLFApplyVo vo)
     {
-        
+        IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
+        foreach (var o in lfFormOperationAdaptors)
+        {
+            
+            LFFormServiceAnnoAttribute? lfFormServiceAnnoAttribute = o.GetType().GetCustomAttribute<LFFormServiceAnnoAttribute>();
+           
+            if (lfFormServiceAnnoAttribute != null && lfFormServiceAnnoAttribute.SvcName.Equals(vo.FormCode))
+            {
+                o.OnBackToModifyData(vo);
+            }
+        }
     }
 
     public void OnCancellationData(UDLFApplyVo vo)
@@ -376,7 +409,12 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
         foreach (var o in lfFormOperationAdaptors)
         {
-            o.OnCancellationData(vo);
+            LFFormServiceAnnoAttribute? lfFormServiceAnnoAttribute = o.GetType().GetCustomAttribute<LFFormServiceAnnoAttribute>();
+           
+            if (lfFormServiceAnnoAttribute != null && lfFormServiceAnnoAttribute.SvcName.Equals(vo.FormCode))
+            {
+                o.OnCancellationData(vo);
+            }
         }
     }
 
@@ -385,7 +423,12 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
         foreach (var o in lfFormOperationAdaptors)
         {
-            o.OnFinishData(vo);
+            LFFormServiceAnnoAttribute? lfFormServiceAnnoAttribute = o.GetType().GetCustomAttribute<LFFormServiceAnnoAttribute>();
+           
+            if (lfFormServiceAnnoAttribute != null && lfFormServiceAnnoAttribute.SvcName.Equals(vo.FormCode))
+            {
+                o.OnFinishData(vo);
+            }
         }
     }
 }

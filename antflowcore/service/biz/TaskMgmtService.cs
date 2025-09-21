@@ -143,7 +143,7 @@ public class TaskMgmtService
         foreach (object service in services)
         {
            
-            var annotation = service.GetType().GetCustomAttribute<AfFormServiceAnnoAttribute>();
+            var annotation = service.GetType().GetCustomAttribute<DIYFormServiceAnnoAttribute>();
             if (string.IsNullOrEmpty(annotation?.Desc))
             {
                 continue;
