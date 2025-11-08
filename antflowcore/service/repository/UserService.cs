@@ -224,7 +224,9 @@ public class UserService: AFBaseCurdRepositoryService<User>,IUserService
     /// <returns></returns>
     public BaseIdTranStruVo GetById(string userId)
     {
-        User first = baseRepo.Where(a=>a.Id==Convert.ToInt64(userId)).First();
+        long uid = Convert.ToInt64(userId);
+        var executeScalar = baseRepo.Orm.Ado.ExecuteScalar("SELECT COUNT(*) FROM T_USER");
+        User first = baseRepo.Where(a=>a.Id==uid).First();
         return new BaseIdTranStruVo{Id = first.Id.ToString(),Name = first.Name};
     }
 

@@ -1,19 +1,19 @@
 ﻿<Project>
-	<PropertyGroup>
-		<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-	</PropertyGroup>
-	<ItemGroup>
-		<PackageVersion Include="DotNetCore.Natasha.CSharp.Compiler" Version="9.0.0.4" />
-		<PackageVersion Include="DotNetCore.Natasha.CSharp.Compiler.Domain" Version="9.0.0.1" />
-		<PackageVersion Include="DotNetCore.Natasha.CSharp.Extension.MethodCreator" Version="9.0.0.4" />
-		<PackageVersion Include="DotNetCore.Natasha.Domain" Version="9.0.0.1" />
-		<PackageVersion Include="FreeSql" Version="3.5.202" />
-		<PackageVersion Include="FreeSql.DbContext" Version="3.5.202" />
-		<PackageVersion Include="hyjiacan.pinyin4net" Version="4.1.1" />
-		<PackageVersion Include="murmurhash" Version="1.0.3" />
-		<PackageVersion Include="Rougamo.Fody" Version="5.0.0" />
-		<PackageVersion Include="FreeSql.Provider.MySqlConnector" Version="3.5.202" />
-		<PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
-		<PackageVersion Include="Swashbuckle.AspNetCore" Version="9.0.3" />
-	</ItemGroup>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="DotNetCore.Natasha.CSharp.Compiler" Version="9.0.0.4" />
+    <PackageVersion Include="DotNetCore.Natasha.CSharp.Compiler.Domain" Version="9.0.0.1" />
+    <PackageVersion Include="DotNetCore.Natasha.CSharp.Extension.MethodCreator" Version="9.0.0.4" />
+    <PackageVersion Include="DotNetCore.Natasha.Domain" Version="9.0.0.1" />
+    <PackageVersion Include="FreeSql" Version="3.5.215" />
+    <PackageVersion Include="FreeSql.DbContext" Version="3.5.215" />
+    <PackageVersion Include="FreeSql.Provider.Oracle" Version="3.5.215" />
+    <PackageVersion Include="hyjiacan.pinyin4net" Version="4.1.1" />
+    <PackageVersion Include="murmurhash" Version="1.0.3" />
+    <PackageVersion Include="Rougamo.Fody" Version="5.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.4" />
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="9.0.3" />
+  </ItemGroup>
 </Project>
