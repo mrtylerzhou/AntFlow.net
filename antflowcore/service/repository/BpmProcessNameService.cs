@@ -58,7 +58,7 @@ public class BpmProcessNameService: AFBaseCurdRepositoryService<BpmProcessName>,
             }
             else
             {
-                BpmProcessName process = new BpmProcessName { ProcessName = bpmnConfByCode.BpmnName };
+                BpmProcessName process = new BpmProcessName { ProcessName = bpmnConfByCode.BpmnName,CreateTime = DateTime.Now};
                 this.baseRepo.Insert(process);
 
                 long id = process.Id;
