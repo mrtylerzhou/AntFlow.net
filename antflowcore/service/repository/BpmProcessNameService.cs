@@ -42,7 +42,8 @@ public class BpmProcessNameService: AFBaseCurdRepositoryService<BpmProcessName>,
                 bpmProcessNameRelevancyService.Add(new BpmProcessNameRelevancy
                 {
                     ProcessKey = bpmnConfByCode.FormCode,
-                    ProcessNameId = processName.Id
+                    ProcessNameId = processName.Id,
+                    CreateTime = DateTime.Now,
                 });
             }
         }
@@ -64,7 +65,8 @@ public class BpmProcessNameService: AFBaseCurdRepositoryService<BpmProcessName>,
                 bpmProcessNameRelevancyService.Add(new BpmProcessNameRelevancy
                 {
                     ProcessKey = bpmnConfByCode.FormCode,
-                    ProcessNameId = id
+                    ProcessNameId = id,
+                    CreateTime = DateTime.Now,
                 });
             }
         }
