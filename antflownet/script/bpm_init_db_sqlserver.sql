@@ -90,7 +90,7 @@ NONCLUSTERED INDEX index_node_id
 CREATE TABLE t_bpmn_conf_notice_template
 (
     id          INT IDENTITY(1,1) NOT NULL,
-    bpmn_code   VARCHAR(60)       DEFAULT '', ',
+    bpmn_code   VARCHAR(60)       DEFAULT '',
                                              tenant_id   VARCHAR(64)                DEFAULT '',
                                              is_del      TINYINT           NOT NULL DEFAULT 0,
                                              create_user VARCHAR(50)                DEFAULT '',
@@ -113,7 +113,7 @@ CREATE TABLE t_bpmn_view_page_button (
                                          view_type   INT               NOT NULL,
                                          button_type INT               NOT NULL,
                                          button_name VARCHAR(60)       DEFAULT '',
-                                         remark      VARCHAR(255)      DEFAULT '',',
+                                         remark      VARCHAR(255)      DEFAULT '',
     tenant_id   VARCHAR(64)       DEFAULT '',
     is_del      TINYINT  NOT NULL DEFAULT 0,
     create_user VARCHAR(50)       DEFAULT '',
