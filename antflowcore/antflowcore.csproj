@@ -17,6 +17,7 @@
 	  <PackageReference Include="DotNetCore.Natasha.Domain"/>
       <PackageReference Include="FreeSql"  />
       <PackageReference Include="FreeSql.DbContext" />
+      <PackageReference Include="FreeSql.Provider.SqlServer" />
       <PackageReference Include="hyjiacan.pinyin4net"  />
       <PackageReference Include="murmurhash"  />
       <PackageReference Include="Rougamo.Fody"  />
