@@ -61,7 +61,7 @@ CREATE TABLE t_bpmn_node
 
 
 CREATE
-NONCLUSTERED INDEX index_conf_id 
+NONCLUSTERED INDEX index_conf_id
 
  ON t_bpmn_node (conf_id);
 
@@ -83,7 +83,7 @@ CREATE TABLE t_bpmn_node_business_table_conf
 );
 
 CREATE
-NONCLUSTERED INDEX index_node_id 
+NONCLUSTERED INDEX index_node_id
     ON t_bpmn_node_business_table_conf (bpmn_node_id);
 
 
@@ -91,19 +91,19 @@ CREATE TABLE t_bpmn_conf_notice_template
 (
     id          INT IDENTITY(1,1) NOT NULL,
     bpmn_code   VARCHAR(60)       DEFAULT '',
-                                             tenant_id   VARCHAR(64)                DEFAULT '',
-                                             is_del      TINYINT           NOT NULL DEFAULT 0,
-                                             create_user VARCHAR(50)                DEFAULT '',
-                                             create_time DATETIME          NOT NULL DEFAULT GETDATE(),
-                                             update_user VARCHAR(50)                DEFAULT '',
-                                             update_time DATETIME          DEFAULT GETDATE(),
-                                             CONSTRAINT PK_t_bpmn_conf_notice_template PRIMARY KEY (id)
+    tenant_id   VARCHAR(64)                DEFAULT '',
+    is_del      TINYINT           NOT NULL DEFAULT 0,
+    create_user VARCHAR(50)                DEFAULT '',
+    create_time DATETIME          NOT NULL DEFAULT GETDATE(),
+    update_user VARCHAR(50)                DEFAULT '',
+    update_time DATETIME          DEFAULT GETDATE(),
+    CONSTRAINT PK_t_bpmn_conf_notice_template PRIMARY KEY (id)
 );
 
-CREATE NONCLUSTERED INDEX index_bpmn_code 
+CREATE NONCLUSTERED INDEX index_bpmn_code
     ON t_bpmn_conf_notice_template (bpmn_code);
-       
-       
+
+
 -- ----------------------------
 -- Table structure for t_bpmn_view_page_button
 -- ----------------------------
@@ -114,13 +114,13 @@ CREATE TABLE t_bpmn_view_page_button (
                                          button_type INT               NOT NULL,
                                          button_name VARCHAR(60)       DEFAULT '',
                                          remark      VARCHAR(255)      DEFAULT '',
-    tenant_id   VARCHAR(64)       DEFAULT '',
-    is_del      TINYINT  NOT NULL DEFAULT 0,
-    create_user VARCHAR(50)       DEFAULT '',
-    create_time DATETIME NOT NULL DEFAULT GETDATE(),
-    update_user VARCHAR(50)       DEFAULT '',
-    update_time DATETIME          DEFAULT GETDATE(),
-    CONSTRAINT PK_t_bpmn_view_page_button PRIMARY KEY (id)
+                                         tenant_id   VARCHAR(64)       DEFAULT '',
+                                         is_del      TINYINT  NOT NULL DEFAULT 0,
+                                         create_user VARCHAR(50)       DEFAULT '',
+                                         create_time DATETIME NOT NULL DEFAULT GETDATE(),
+                                         update_user VARCHAR(50)       DEFAULT '',
+                                         update_time DATETIME          DEFAULT GETDATE(),
+                                         CONSTRAINT PK_t_bpmn_view_page_button PRIMARY KEY (id)
 );
 
 -- ----------------------------
@@ -154,15 +154,15 @@ CREATE TABLE t_bpmn_template
 CREATE TABLE t_information_template
 (
     id           BIGINT IDENTITY(1,1) NOT NULL,
-    name         VARCHAR(30)       DEFAULT '', ',
-                                        num              VARCHAR(10)          DEFAULT '',',
-    system_title VARCHAR(100)      DEFAULT '', ',
-                                        system_content   VARCHAR(500)         DEFAULT '',',
-    mail_title   VARCHAR(100)      DEFAULT '', ',
-                                        mail_content     VARCHAR(500)         DEFAULT '',',
-    note_content VARCHAR(200)      DEFAULT '', ',
-                                        jump_url         INT                  ,
-                                        remark           VARCHAR(200)         DEFAULT '',',
+    name         VARCHAR(30)       DEFAULT '',
+    num              VARCHAR(10)          DEFAULT '',
+    system_title VARCHAR(100)      DEFAULT '',
+    system_content   VARCHAR(500)         DEFAULT '',
+    mail_title   VARCHAR(100)      DEFAULT '',
+    mail_content     VARCHAR(500)         DEFAULT '',
+    note_content VARCHAR(200)      DEFAULT '',
+    jump_url         INT                  ,
+    remark           VARCHAR(200)         DEFAULT '',
     status       TINYINT  NOT NULL DEFAULT 0,
     event        INT,
     event_name   VARCHAR(50),
@@ -214,9 +214,9 @@ CREATE TABLE bpm_flowrun_entrust
 );
 
 CREATE
-NONCLUSTERED INDEX BPM_IDX_ID 
+NONCLUSTERED INDEX BPM_IDX_ID
     ON bpm_flowrun_entrust (runinfoid, original, actual);
-       
+
 -- ----------------------------
 -- Table structure for bpm_flowruninfo
 -- ----------------------------
@@ -290,13 +290,13 @@ CREATE TABLE t_bpmn_conf_notice_template_detail
 );
 
 CREATE
-NONCLUSTERED INDEX index_bpmn_code 
+NONCLUSTERED INDEX index_bpmn_code
     ON t_bpmn_conf_notice_template_detail (bpmn_code);
 
 CREATE
-NONCLUSTERED INDEX index_bpmn_type 
+NONCLUSTERED INDEX index_bpmn_type
     ON t_bpmn_conf_notice_template_detail (notice_template_type);
-       
+
 -- ----------------------------
 -- Table structure for t_bpmn_node_conditions_conf
 -- ----------------------------
@@ -367,8 +367,8 @@ CREATE TABLE t_bpmn_node_to
 (
     id           BIGINT IDENTITY(1,1) NOT NULL,
     bpmn_node_id BIGINT   NOT NULL,
-    node_to      NVARCHAR(60)         DEFAULT '', ',
-                                remark         NVARCHAR(255)        DEFAULT '',',
+    node_to      NVARCHAR(60)         DEFAULT '',
+    remark         NVARCHAR(255)        DEFAULT '',
     is_del       TINYINT  NOT NULL DEFAULT 0,
     tenant_id    NVARCHAR(64)         DEFAULT '',
     create_user  NVARCHAR(50)         DEFAULT '',
@@ -422,14 +422,14 @@ CREATE TABLE bpm_process_forward
 );
 
 CREATE
-NONCLUSTERED INDEX forward_user_id 
+NONCLUSTERED INDEX forward_user_id
     ON bpm_process_forward (forward_user_id);
 
 CREATE
-NONCLUSTERED INDEX index_forward_user_id_is_read 
+NONCLUSTERED INDEX index_forward_user_id_is_read
     ON bpm_process_forward (forward_user_id, is_read);
-       
-       
+
+
 -- ----------------------------
 -- Table structure for bpm_process_node_overtime
 -- ----------------------------
@@ -509,22 +509,22 @@ CREATE TABLE bpm_taskconfig
 );
 
 CREATE
-NONCLUSTERED INDEX BPM_IDX__TASK_CONFIG 
+NONCLUSTERED INDEX BPM_IDX__TASK_CONFIG
     ON bpm_taskconfig (proc_def_id_, task_def_key_);
-       
+
 -- ----------------------------
 -- Table structure for t_bpm_variable
 -- ----------------------------
 CREATE TABLE t_bpm_variable
 (
     id           BIGINT IDENTITY(1,1) NOT NULL,
-    process_num  NVARCHAR(60)         DEFAULT '', ',
-                                process_name             NVARCHAR(60)         DEFAULT '',',
-    process_desc NVARCHAR(255)        DEFAULT '', ',
-                                process_start_conditions NVARCHAR(MAX)        NOT NULL,
-                                bpmn_code                NVARCHAR(60)         DEFAULT '',
-                                is_new_data              INT                  DEFAULT 0,
-                                remark                   NVARCHAR(255)        DEFAULT '',',
+    process_num  NVARCHAR(60)         DEFAULT '',
+    process_name             NVARCHAR(60)         DEFAULT '',
+    process_desc NVARCHAR(255)        DEFAULT '',
+    process_start_conditions NVARCHAR(MAX)        NOT NULL,
+    bpmn_code                NVARCHAR(60)         DEFAULT '',
+    is_new_data              INT                  DEFAULT 0,
+    remark                   NVARCHAR(255)        DEFAULT '',
     is_del       TINYINT  NOT NULL DEFAULT 0,
     tenant_id    NVARCHAR(64)         DEFAULT '',
     create_user  NVARCHAR(50)         DEFAULT '',
@@ -535,20 +535,20 @@ CREATE TABLE t_bpm_variable
 );
 
 CREATE
-NONCLUSTERED INDEX index_process_num 
+NONCLUSTERED INDEX index_process_num
     ON t_bpm_variable (process_num);
-       
-       
+
+
 -- ----------------------------
 -- Table structure for t_bpm_variable_approve_remind
 -- ----------------------------
 CREATE TABLE t_bpm_variable_approve_remind
 (
-    id          BIGINT IDENTITY(1,1) NOT NULL,
+    id   BIGINT IDENTITY(1,1) NOT NULL,
     variable_id BIGINT   NOT NULL,
-    element_id  NVARCHAR(60)         DEFAULT '', ',
-                                               content      NVARCHAR(MAX)        NOT NULL,
-                                               remark       NVARCHAR(255)        DEFAULT '',',
+    element_id  NVARCHAR(60)         DEFAULT '',
+    content      NVARCHAR(MAX)        NOT NULL,
+    remark       NVARCHAR(255)        DEFAULT '',
     is_del      TINYINT  NOT NULL DEFAULT 0,
     tenant_id   NVARCHAR(64)         DEFAULT '',
     create_user NVARCHAR(50)         DEFAULT '',
@@ -559,10 +559,10 @@ CREATE TABLE t_bpm_variable_approve_remind
 );
 
 CREATE
-NONCLUSTERED INDEX variable_id_element_id 
+NONCLUSTERED INDEX variable_id_element_id
     ON t_bpm_variable_approve_remind (variable_id, element_id);
-       
-       
+
+
 -- ----------------------------
 -- Table structure for t_bpm_variable_button
 -- ----------------------------
@@ -585,9 +585,9 @@ CREATE TABLE t_bpm_variable_button
 );
 
 CREATE
-NONCLUSTERED INDEX variable_id 
+NONCLUSTERED INDEX variable_id
     ON t_bpm_variable_button (variable_id);
-       
+
 
 -- ----------------------------
 -- Table structure for t_bpm_variable_message
@@ -611,13 +611,13 @@ CREATE TABLE t_bpm_variable_message
 );
 
 CREATE
-NONCLUSTERED INDEX variable_id_element_id_message_type_event_type 
+NONCLUSTERED INDEX variable_id_element_id_message_type_event_type
     ON t_bpm_variable_message (variable_id, element_id, message_type, event_type);
 
 CREATE
-NONCLUSTERED INDEX variable_id_message_type_event_type 
+NONCLUSTERED INDEX variable_id_message_type_event_type
     ON t_bpm_variable_message (variable_id, message_type, event_type);
-       
+
 -- ----------------------------
 -- Table structure for t_bpm_variable_multiplayer
 -- ----------------------------
@@ -641,13 +641,13 @@ CREATE TABLE t_bpm_variable_multiplayer
 );
 
 CREATE
-NONCLUSTERED INDEX variable_id 
+NONCLUSTERED INDEX variable_id
     ON t_bpm_variable_multiplayer (variable_id);
 
 CREATE
-NONCLUSTERED INDEX variable_id_element_id 
+NONCLUSTERED INDEX variable_id_element_id
     ON t_bpm_variable_multiplayer (variable_id, element_id);
-       
+
 -- ----------------------------
 -- Table structure for t_bpm_variable_multiplayer_personnel
 -- ----------------------------
@@ -669,9 +669,9 @@ CREATE TABLE t_bpm_variable_multiplayer_personnel
 );
 
 CREATE
-NONCLUSTERED INDEX variable_multiplayer_id 
+NONCLUSTERED INDEX variable_multiplayer_id
     ON t_bpm_variable_multiplayer_personnel (variable_multiplayer_id);
-       
+
 -- ----------------------------
 -- Table structure for t_bpm_variable_sequence_flow
 -- ----------------------------
@@ -717,14 +717,14 @@ CREATE TABLE t_bpm_variable_sign_up
 );
 
 CREATE
-NONCLUSTERED INDEX variable_id 
+NONCLUSTERED INDEX variable_id
     ON t_bpm_variable_sign_up (variable_id);
 
 CREATE
-NONCLUSTERED INDEX variable_id_element_id 
+NONCLUSTERED INDEX variable_id_element_id
     ON t_bpm_variable_sign_up (variable_id, element_id);
-       
-       
+
+
 -- ----------------------------
 -- Table structure for t_bpm_variable_sign_up_personnel
 -- ----------------------------
@@ -746,13 +746,13 @@ CREATE TABLE t_bpm_variable_sign_up_personnel
 );
 
 CREATE
-NONCLUSTERED INDEX variable_id 
+NONCLUSTERED INDEX variable_id
     ON t_bpm_variable_sign_up_personnel (variable_id);
 
 CREATE
-NONCLUSTERED INDEX variable_id_element_id 
+NONCLUSTERED INDEX variable_id_element_id
     ON t_bpm_variable_sign_up_personnel (variable_id, element_id);
-       
+
 
 -- ----------------------------
 -- Table structure for t_bpm_variable_single
@@ -778,14 +778,14 @@ CREATE TABLE t_bpm_variable_single
 );
 
 CREATE
-NONCLUSTERED INDEX variable_id 
+NONCLUSTERED INDEX variable_id
     ON t_bpm_variable_single (variable_id);
 
 CREATE
-NONCLUSTERED INDEX variable_id_element_id 
+NONCLUSTERED INDEX variable_id_element_id
     ON t_bpm_variable_single (variable_id, element_id);
-       
-       
+
+
 -- ----------------------------
 -- Table structure for t_bpm_variable_view_page_button
 -- ----------------------------
@@ -795,8 +795,8 @@ CREATE TABLE t_bpm_variable_view_page_button
     variable_id BIGINT   NOT NULL,
     view_type   INT      NOT NULL,
     button_type INT      NOT NULL,
-    button_name NVARCHAR(60)         DEFAULT '', ',
-                                                 remark        NVARCHAR(255)        DEFAULT '',',
+    button_name NVARCHAR(60)         DEFAULT '',
+    remark        NVARCHAR(255)        DEFAULT '',
     is_del      TINYINT  NOT NULL DEFAULT 0,
     tenant_id   NVARCHAR(64)         DEFAULT '',
     create_user NVARCHAR(50)         DEFAULT '',
@@ -807,9 +807,9 @@ CREATE TABLE t_bpm_variable_view_page_button
 );
 
 CREATE
-NONCLUSTERED INDEX index_variable_id 
+NONCLUSTERED INDEX index_variable_id
     ON t_bpm_variable_view_page_button (variable_id);
-       
+
 -- ----------------------------
 -- Table structure for bpm_verify_info
 -- ----------------------------
@@ -830,20 +830,18 @@ CREATE TABLE bpm_verify_info
     original_id      NVARCHAR(64),
     process_code     NVARCHAR(64),
     is_del           TINYINT  NOT NULL DEFAULT 0,
-    tenant_id        NVARCHAR(64)         DEFAULT ''
+    tenant_id        NVARCHAR(64)         DEFAULT '',
+    CONSTRAINT PK_bpm_verify_info PRIMARY KEY (id)
 );
 
-ALTER TABLE bpm_verify_info
-    ADD CONSTRAINT PK_bpm_verify_info PRIMARY KEY (id);
-
 CREATE
-NONCLUSTERED INDEX BPM_IDX__INFOR 
+NONCLUSTERED INDEX BPM_IDX__INFOR
     ON bpm_verify_info (business_type, business_id);
 
 CREATE
-NONCLUSTERED INDEX process_code_index 
+NONCLUSTERED INDEX process_code_index
     ON bpm_verify_info (process_code);
-       
+
 -- ----------------------------
 -- Table structure for t_default_template
 -- ----------------------------
@@ -881,9 +879,9 @@ CREATE TABLE t_user_email_send
 );
 
 CREATE
-NONCLUSTERED INDEX sender 
+NONCLUSTERED INDEX sender
     ON t_user_email_send (receiver);
-       
+
 -- ----------------------------
 -- Table structure for t_method_replay
 -- ----------------------------
@@ -905,7 +903,7 @@ CREATE TABLE t_method_replay
 CREATE
 NONCLUSTERED INDEX t_method_replay_NOW_TIME_index
     ON t_method_replay (NOW_TIME);
-       
+
 -- ----------------------------
 -- Table structure for t_user_entrust
 -- ----------------------------
@@ -923,23 +921,21 @@ CREATE TABLE t_user_entrust
     create_user   NVARCHAR(50)      NOT NULL,
     update_user   NVARCHAR(50)      NOT NULL,
     is_del        TINYINT  NOT NULL DEFAULT 0,
-    tenant_id     NVARCHAR(64)      DEFAULT ''
+    tenant_id     NVARCHAR(64)      DEFAULT '',
+    CONSTRAINT PK_t_user_entrust PRIMARY KEY (id)
 );
-
-ALTER TABLE t_user_entrust
-    ADD CONSTRAINT PK_t_user_entrust PRIMARY KEY (id);
 
 -- 唯一约束：sender + receiver_id + power_id
 CREATE
 UNIQUE
-NONCLUSTERED INDEX s_r_id 
+NONCLUSTERED INDEX s_r_id
     ON t_user_entrust (sender, receiver_id, power_id);
 
 -- 普通索引：sender + power_id
 CREATE
-NONCLUSTERED INDEX user_id 
+NONCLUSTERED INDEX user_id
     ON t_user_entrust (sender, power_id);
-       
+
 -- ----------------------------
 -- Table structure for t_user_message_status
 -- ----------------------------
@@ -960,16 +956,15 @@ CREATE TABLE t_user_message_status
     create_user            NVARCHAR(50)      NOT NULL,
     update_user            NVARCHAR(50)      NOT NULL,
     is_del                 TINYINT  NOT NULL DEFAULT 0,
-    tenant_id              NVARCHAR(64)      DEFAULT ''
+    tenant_id              NVARCHAR(64)      DEFAULT '',
+    CONSTRAINT PK_t_user_message_status PRIMARY KEY (id)
 );
 
-ALTER TABLE t_user_message_status
-    ADD CONSTRAINT PK_t_user_message_status PRIMARY KEY (id);
 
 CREATE
-NONCLUSTERED INDEX user_id 
+NONCLUSTERED INDEX user_id
     ON t_user_message_status (user_id);
-       
+
 -- ----------------------------
 -- Table structure for t_bpmn_node_button_conf
 -- ----------------------------
@@ -1015,33 +1010,32 @@ CREATE TABLE bpm_business_process
     back_user_id        NVARCHAR(64),
     user_name           NVARCHAR(255),
     is_out_side_process TINYINT           DEFAULT 0,
-    is_lowcode_flow     TINYINT           DEFAULT 0
+    is_lowcode_flow     TINYINT           DEFAULT 0,
+    CONSTRAINT PK_bpm_business_process PRIMARY KEY (id)
 );
 
-ALTER TABLE bpm_business_process
-    ADD CONSTRAINT PK_bpm_business_process PRIMARY KEY (id);
 
 CREATE
-NONCLUSTERED INDEX PROC_INST_ID_index 
+NONCLUSTERED INDEX PROC_INST_ID_index
     ON bpm_business_process (PROC_INST_ID_);
 
 CREATE
-NONCLUSTERED INDEX process_entry_id 
+NONCLUSTERED INDEX process_entry_id
     ON bpm_business_process (ENTRY_ID);
 
 CREATE
-NONCLUSTERED INDEX process_key_index 
+NONCLUSTERED INDEX process_key_index
     ON bpm_business_process (PROCESSINESS_KEY);
 
 CREATE
-NONCLUSTERED INDEX process_number_index 
+NONCLUSTERED INDEX process_number_index
     ON bpm_business_process (BUSINESS_NUMBER);
 
 CREATE
-NONCLUSTERED INDEX process_state_index 
+NONCLUSTERED INDEX process_state_index
     ON bpm_business_process (process_state);
-       
-       
+
+
 -- ----------------------------
 -- Table structure for bpm_process_name_relevancy
 -- ----------------------------
@@ -1052,21 +1046,21 @@ CREATE TABLE bpm_process_name_relevancy
     process_key     NVARCHAR(50),
     is_del          INT               DEFAULT 0,
     tenant_id       NVARCHAR(64)         DEFAULT '',
-    create_time     DATETIME NOT NULL DEFAULT GETDATE()
+    create_time     DATETIME NOT NULL DEFAULT GETDATE(),
+    CONSTRAINT PK_bpm_process_name_relevancy PRIMARY KEY (id)
 );
 
-ALTER TABLE bpm_process_name_relevancy
-    ADD CONSTRAINT PK_bpm_process_name_relevancy PRIMARY KEY (id);
+
 
 CREATE
-NONCLUSTERED INDEX process_key_index 
+NONCLUSTERED INDEX process_key_index
     ON bpm_process_name_relevancy (process_key);
 
 CREATE
-NONCLUSTERED INDEX process_name_id_index 
+NONCLUSTERED INDEX process_name_id_index
     ON bpm_process_name_relevancy (process_name_id);
-       
-       
+
+
 -- ----------------------------
 -- Table structure for t_bpmn_node_personnel_conf
 -- ----------------------------
@@ -1081,11 +1075,10 @@ CREATE TABLE t_bpmn_node_personnel_conf
     create_user  NVARCHAR(50),
     create_time  DATETIME NOT NULL DEFAULT GETDATE(),
     update_user  NVARCHAR(50),
-    update_time  DATETIME          DEFAULT GETDATE()
+    update_time  DATETIME          DEFAULT GETDATE(),
+    CONSTRAINT PK_t_bpmn_node_personnel_conf PRIMARY KEY (id)
 );
 
-ALTER TABLE t_bpmn_node_personnel_conf
-    ADD CONSTRAINT PK_t_bpmn_node_personnel_conf PRIMARY KEY (id);
 
 -- ----------------------------
 -- Table structure for t_bpmn_node_personnel_empl_conf
@@ -1102,11 +1095,10 @@ CREATE TABLE t_bpmn_node_personnel_empl_conf
     create_user           NVARCHAR(30),
     create_time           DATETIME NOT NULL DEFAULT GETDATE(),
     update_user           NVARCHAR(30),
-    update_time           DATETIME          DEFAULT GETDATE()
+    update_time           DATETIME          DEFAULT GETDATE(),
+    CONSTRAINT PK_t_bpmn_node_personnel_empl_conf PRIMARY KEY (id)
 );
 
-ALTER TABLE t_bpmn_node_personnel_empl_conf
-    ADD CONSTRAINT PK_t_bpmn_node_personnel_empl_conf PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1119,28 +1111,11 @@ CREATE TABLE bpm_process_operation
     process_node NVARCHAR(50),
     type         INT,
     is_del       TINYINT,
-    tenant_id    NVARCHAR(64) DEFAULT ''
+    tenant_id    NVARCHAR(64) DEFAULT '',
+    CONSTRAINT PK_bpm_process_operation PRIMARY KEY (id)
 );
 
-ALTER TABLE bpm_process_operation
-    ADD CONSTRAINT PK_bpm_process_operation PRIMARY KEY (id);
 
-
--- ----------------------------
--- Table structure for bpm_process_operation
--- ----------------------------
-CREATE TABLE bpm_process_operation
-(
-    id           BIGINT IDENTITY(1,1) NOT NULL,
-    process_key  NVARCHAR(50),
-    process_node NVARCHAR(50),
-    type         INT,
-    is_del       TINYINT,
-    tenant_id    NVARCHAR(64) DEFAULT ''
-);
-
-ALTER TABLE bpm_process_operation
-    ADD CONSTRAINT PK_bpm_process_operation PRIMARY KEY (id);
 
 -- ----------------------------
 -- Table structure for bpm_process_node_back
@@ -1153,11 +1128,10 @@ CREATE TABLE bpm_process_node_back
     back_type   INT,
     process_key NVARCHAR(100),
     is_del      TINYINT,
-    tenant_id   NVARCHAR(64) DEFAULT ''
+    tenant_id   NVARCHAR(64) DEFAULT '',
+    CONSTRAINT PK_bpm_process_node_back PRIMARY KEY (id)
 );
 
-ALTER TABLE bpm_process_node_back
-    ADD CONSTRAINT PK_bpm_process_node_back PRIMARY KEY (id);
 
 -- ----------------------------
 -- Table structure for bpm_process_name
@@ -1168,11 +1142,10 @@ CREATE TABLE bpm_process_name
     process_name NVARCHAR(50),
     is_del       INT      DEFAULT 0,
     tenant_id    NVARCHAR(64) DEFAULT '',
-    create_time  DATETIME DEFAULT GETDATE()
+    create_time  DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_bpm_process_name PRIMARY KEY (id)
 );
 
-ALTER TABLE bpm_process_name
-    ADD CONSTRAINT PK_bpm_process_name PRIMARY KEY (id);
 
 -- ----------------------------
 -- Table structure for t_user_message
@@ -1194,11 +1167,10 @@ CREATE TABLE t_user_message
     create_user NVARCHAR(50),
     update_user NVARCHAR(50),
     app_url     NVARCHAR(255),
-    source      INT
+    source      INT,
+    CONSTRAINT PK_t_user_message PRIMARY KEY (id)
 );
 
-ALTER TABLE t_user_message
-    ADD CONSTRAINT PK_t_user_message PRIMARY KEY (id);
 
 -- ----------------------------
 -- Table structure for t_op_log
@@ -1221,11 +1193,10 @@ CREATE TABLE t_op_log
     system_version NVARCHAR(50),
     remark         NVARCHAR(255),
     is_del         INT      DEFAULT 0,
-    tenant_id      NVARCHAR(64) DEFAULT ''
+    tenant_id      NVARCHAR(64) DEFAULT '',
+    CONSTRAINT PK_t_op_log PRIMARY KEY (id)
 );
 
-ALTER TABLE t_op_log
-    ADD CONSTRAINT PK_t_op_log PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1238,11 +1209,9 @@ CREATE TABLE t_biz_account_apply
     account_owner_name NVARCHAR(50),
     remark             NVARCHAR(200),
     is_del             INT DEFAULT 0,
-    tenant_id          NVARCHAR(64) DEFAULT ''
+    tenant_id          NVARCHAR(64) DEFAULT '',
+    CONSTRAINT PK_t_biz_account_apply PRIMARY KEY (id)
 );
-
-ALTER TABLE t_biz_account_apply
-    ADD CONSTRAINT PK_t_biz_account_apply PRIMARY KEY (id);
 
 -- ----------------------------
 -- Table structure for t_bpmn_node_out_side_access_conf
@@ -1258,11 +1227,10 @@ CREATE TABLE t_bpmn_node_out_side_access_conf
     create_user  NVARCHAR(50),
     create_time  DATETIME DEFAULT GETDATE(),
     update_user  NVARCHAR(50),
-    update_time  DATETIME DEFAULT GETDATE()
+    update_time  DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_t_bpmn_node_out_side_access_conf PRIMARY KEY (id)
 );
 
-ALTER TABLE t_bpmn_node_out_side_access_conf
-    ADD CONSTRAINT PK_t_bpmn_node_out_side_access_conf PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1295,11 +1263,10 @@ CREATE TABLE bpm_process_app_application
     is_all           TINYINT  DEFAULT 0,
     state            TINYINT  DEFAULT 1,
     sort             INT,
-    source           NVARCHAR(255)
+    source           NVARCHAR(255),
+    CONSTRAINT PK_bpm_process_app_application PRIMARY KEY (id)
 );
 
-ALTER TABLE bpm_process_app_application
-    ADD CONSTRAINT PK_bpm_process_app_application PRIMARY KEY (id);
 
 -- ----------------------------
 -- Table structure for bpm_process_app_data
@@ -1316,11 +1283,9 @@ CREATE TABLE bpm_process_app_data
     is_all         TINYINT,
     version_id     BIGINT,
     application_id BIGINT,
-    type           INT
+    type           INT,
+    CONSTRAINT PK_bpm_process_app_data PRIMARY KEY (id)
 );
-
-ALTER TABLE bpm_process_app_data
-    ADD CONSTRAINT PK_bpm_process_app_data PRIMARY KEY (id);
 
 -- ----------------------------
 -- Table structure for bpm_process_application_type
@@ -1337,11 +1302,10 @@ CREATE TABLE bpm_process_application_type
     history_id       BIGINT,
     visble_state     INT,
     create_time      DATETIME DEFAULT GETDATE(),
-    common_use_state INT
+    common_use_state INT,
+    CONSTRAINT PK_bpm_process_application_type PRIMARY KEY (id)
 );
 
-ALTER TABLE bpm_process_application_type
-    ADD CONSTRAINT PK_bpm_process_application_type PRIMARY KEY (id);
 
 -- ----------------------------
 -- Table structure for bpm_process_category
@@ -1355,11 +1319,9 @@ CREATE TABLE bpm_process_category
     state             INT,
     sort              INT,
     is_app            TINYINT,
-    entrance          NVARCHAR(255)
+    entrance          NVARCHAR(255),
+    CONSTRAINT PK_bpm_process_category PRIMARY KEY (id)
 );
-
-ALTER TABLE bpm_process_category
-    ADD CONSTRAINT PK_bpm_process_category PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1402,11 +1364,9 @@ CREATE TABLE t_out_side_bpm_access_business
     create_user       NVARCHAR(50),
     create_time       DATETIME DEFAULT GETDATE(),
     update_user       NVARCHAR(50),
-    update_time       DATETIME DEFAULT GETDATE()
+    update_time       DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_t_out_side_bpm_access_business PRIMARY KEY (id)
 );
-
-ALTER TABLE t_out_side_bpm_access_business
-    ADD CONSTRAINT PK_t_out_side_bpm_access_business PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1424,11 +1384,10 @@ CREATE TABLE t_out_side_bpm_admin_personnel
     create_user       NVARCHAR(50),
     create_time       DATETIME DEFAULT GETDATE(),
     update_user       NVARCHAR(50),
-    update_time       DATETIME DEFAULT GETDATE()
+    update_time       DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_t_out_side_bpm_admin_personnel PRIMARY KEY (id)
 );
 
-ALTER TABLE t_out_side_bpm_admin_personnel
-    ADD CONSTRAINT PK_t_out_side_bpm_admin_personnel PRIMARY KEY (id);
 
 -- ----------------------------
 -- Table structure for t_out_side_bpm_business_party
@@ -1444,11 +1403,9 @@ CREATE TABLE t_out_side_bpm_business_party
     create_user         NVARCHAR(50),
     create_time         DATETIME DEFAULT GETDATE(),
     update_user         NVARCHAR(50),
-    update_time         DATETIME DEFAULT GETDATE()
+    update_time         DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_t_out_side_bpm_business_party PRIMARY KEY (id)
 );
-
-ALTER TABLE t_out_side_bpm_business_party
-    ADD CONSTRAINT PK_t_out_side_bpm_business_party PRIMARY KEY (id);
 
 -- ----------------------------
 -- Table structure for t_out_side_bpm_callback_url_conf
@@ -1470,11 +1427,10 @@ CREATE TABLE t_out_side_bpm_callback_url_conf
     remark                NVARCHAR(50),
     is_del                TINYINT  DEFAULT 0,
     create_time           DATETIME DEFAULT GETDATE(),
-    update_time           DATETIME DEFAULT GETDATE()
+    update_time           DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_t_out_side_bpm_callback_url_conf PRIMARY KEY (id)
 );
 
-ALTER TABLE t_out_side_bpm_callback_url_conf
-    ADD CONSTRAINT PK_t_out_side_bpm_callback_url_conf PRIMARY KEY (id);
 
 -- ----------------------------
 -- Table structure for t_out_side_bpm_approve_template
@@ -1496,11 +1452,10 @@ CREATE TABLE t_out_side_bpm_approve_template
     create_time       DATETIME DEFAULT GETDATE(),
     update_user       NVARCHAR(50),
     update_time       DATETIME DEFAULT GETDATE(),
-    create_user_id    NVARCHAR(64)
+    create_user_id    NVARCHAR(64),
+    CONSTRAINT PK_t_out_side_bpm_approve_template PRIMARY KEY (id)
 );
 
-ALTER TABLE t_out_side_bpm_approve_template
-    ADD CONSTRAINT PK_t_out_side_bpm_approve_template PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1519,11 +1474,10 @@ CREATE TABLE t_out_side_bpm_conditions_template
     create_time       DATETIME DEFAULT GETDATE(),
     update_user       NVARCHAR(50),
     update_time       DATETIME DEFAULT GETDATE(),
-    create_user_id    NVARCHAR(64)
+    create_user_id    NVARCHAR(64),
+    CONSTRAINT PK_t_out_side_bpm_conditions_template PRIMARY KEY (id)
 );
 
-ALTER TABLE t_out_side_bpm_conditions_template
-    ADD CONSTRAINT PK_t_out_side_bpm_conditions_template PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1539,11 +1493,10 @@ CREATE TABLE t_out_side_bpmn_node_conditions_conf
     create_user  NVARCHAR(50),
     create_time  DATETIME DEFAULT GETDATE(),
     update_user  NVARCHAR(50),
-    update_time  DATETIME DEFAULT GETDATE()
+    update_time  DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_t_out_side_bpmn_node_conditions_conf PRIMARY KEY (id)
 );
 
-ALTER TABLE t_out_side_bpmn_node_conditions_conf
-    ADD CONSTRAINT PK_t_out_side_bpmn_node_conditions_conf PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1563,11 +1516,10 @@ CREATE TABLE t_out_side_bpm_call_back_record
     create_user           NVARCHAR(50),
     create_time           DATETIME DEFAULT GETDATE(),
     update_user           NVARCHAR(50),
-    update_time           DATETIME DEFAULT GETDATE()
+    update_time           DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_t_out_side_bpm_call_back_record PRIMARY KEY (id)
 );
 
-ALTER TABLE t_out_side_bpm_call_back_record
-    ADD CONSTRAINT PK_t_out_side_bpm_call_back_record PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1584,11 +1536,10 @@ CREATE TABLE t_quick_entry
     sort              TINYINT  DEFAULT 0,
     create_time       DATETIME DEFAULT GETDATE(),
     status            TINYINT  DEFAULT 0,
-    variable_url_flag TINYINT  DEFAULT 0
+    variable_url_flag TINYINT  DEFAULT 0,
+    CONSTRAINT PK_t_quick_entry PRIMARY KEY (id)
 );
 
-ALTER TABLE t_quick_entry
-    ADD CONSTRAINT PK_t_quick_entry PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1602,11 +1553,10 @@ CREATE TABLE t_quick_entry_type
     is_del         TINYINT  DEFAULT 0,
     tenant_id      NVARCHAR(64) DEFAULT '',
     create_time    DATETIME DEFAULT GETDATE(),
-    type_name      NVARCHAR(255)
+    type_name      NVARCHAR(255),
+    CONSTRAINT PK_t_quick_entry_type PRIMARY KEY (id)
 );
 
-ALTER TABLE t_quick_entry_type
-    ADD CONSTRAINT PK_t_quick_entry_type PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1630,11 +1580,9 @@ CREATE TABLE t_sys_version
     update_user    NVARCHAR(50),
     is_hide        TINYINT,
     download_code  NVARCHAR(255),
-    effective_time DATETIME DEFAULT GETDATE()
+    effective_time DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_t_sys_version PRIMARY KEY (id)
 );
-
-ALTER TABLE t_sys_version
-    ADD CONSTRAINT PK_t_sys_version PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1653,11 +1601,10 @@ CREATE TABLE t_bpmn_node_role_conf
     create_user  NVARCHAR(50),
     create_time  DATETIME DEFAULT GETDATE(),
     update_user  NVARCHAR(50),
-    update_time  DATETIME DEFAULT GETDATE()
+    update_time  DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_t_bpmn_node_role_conf PRIMARY KEY (id)
 );
 
-ALTER TABLE t_bpmn_node_role_conf
-    ADD CONSTRAINT PK_t_bpmn_node_role_conf PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1674,11 +1621,10 @@ CREATE TABLE t_bpmn_node_role_outside_emp_conf
     update_user NVARCHAR(255),
     update_time DATETIME DEFAULT GETDATE(),
     is_del      TINYINT  DEFAULT 0,
-    tenant_id   NVARCHAR(64) DEFAULT ''
+    tenant_id   NVARCHAR(64) DEFAULT '',
+    CONSTRAINT PK_t_bpmn_node_role_outside_emp_conf PRIMARY KEY (id)
 );
 
-ALTER TABLE t_bpmn_node_role_outside_emp_conf
-    ADD CONSTRAINT PK_t_bpmn_node_role_outside_emp_conf PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1699,11 +1645,9 @@ CREATE TABLE t_bpmn_node_loop_conf
     create_user               NVARCHAR(50),
     create_time               DATETIME DEFAULT GETDATE(),
     update_user               NVARCHAR(50),
-    update_time               DATETIME DEFAULT GETDATE()
+    update_time               DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_t_bpmn_node_loop_conf PRIMARY KEY (id)
 );
-
-ALTER TABLE t_bpmn_node_loop_conf
-    ADD CONSTRAINT PK_t_bpmn_node_loop_conf PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1721,11 +1665,9 @@ CREATE TABLE t_bpmn_node_assign_level_conf
     create_user        NVARCHAR(255),
     create_time        DATETIME DEFAULT GETDATE(),
     update_user        NVARCHAR(255),
-    update_time        DATETIME DEFAULT GETDATE()
+    update_time        DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_t_bpmn_node_assign_level_conf PRIMARY KEY (id)
 );
-
-ALTER TABLE t_bpmn_node_assign_level_conf
-    ADD CONSTRAINT PK_t_bpmn_node_assign_level_conf PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1742,11 +1684,10 @@ CREATE TABLE t_bpmn_node_hrbp_conf
     create_user    NVARCHAR(255),
     create_time    DATETIME,
     update_user    NVARCHAR(255),
-    update_time    DATETIME
+    update_time    DATETIME,
+    CONSTRAINT PK_t_bpmn_node_hrbp_conf PRIMARY KEY (id)
 );
 
-ALTER TABLE t_bpmn_node_hrbp_conf
-    ADD CONSTRAINT PK_t_bpmn_node_hrbp_conf PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1767,11 +1708,9 @@ CREATE TABLE t_department
     create_user NVARCHAR(255),
     update_user NVARCHAR(255),
     create_time DATETIME,
-    update_time DATETIME
+    update_time DATETIME,
+    CONSTRAINT PK_t_department PRIMARY KEY (id)
 );
-
-ALTER TABLE t_department
-    ADD CONSTRAINT PK_t_department PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1789,11 +1728,10 @@ CREATE TABLE t_user
     department_id  BIGINT,
     path           NVARCHAR(1000),
     is_del         TINYINT DEFAULT 0,
-    head_img       NVARCHAR(3000)
+    head_img       NVARCHAR(3000),
+    CONSTRAINT PK_t_user PRIMARY KEY (id)
 );
 
-ALTER TABLE t_user
-    ADD CONSTRAINT PK_t_user PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1802,11 +1740,9 @@ ALTER TABLE t_user
 CREATE TABLE t_role
 (
     id        BIGINT IDENTITY(1,1) NOT NULL,
-    role_name NVARCHAR(255)
+    role_name NVARCHAR(255),
+    CONSTRAINT PK_t_role PRIMARY KEY (id)
 );
-
-ALTER TABLE t_role
-    ADD CONSTRAINT PK_t_role PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1825,11 +1761,9 @@ CREATE TABLE t_biz_leavetime
     create_user     NVARCHAR(255),
     create_time     DATETIME DEFAULT GETDATE(),
     update_user     NVARCHAR(255),
-    update_time     DATETIME DEFAULT GETDATE()
+    update_time     DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_t_biz_leavetime PRIMARY KEY (id)
 );
-
-ALTER TABLE t_biz_leavetime
-    ADD CONSTRAINT PK_t_biz_leavetime PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1847,11 +1781,9 @@ CREATE TABLE t_biz_purchase
     create_user                  NVARCHAR(255),
     create_time                  DATETIME DEFAULT GETDATE(),
     update_user                  NVARCHAR(255),
-    update_time                  DATETIME DEFAULT GETDATE()
+    update_time                  DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_t_biz_purchase PRIMARY KEY (id)
 );
-
-ALTER TABLE t_biz_purchase
-    ADD CONSTRAINT PK_t_biz_purchase PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1864,13 +1796,12 @@ CREATE TABLE t_biz_ucar_refuel
     refuel_time          DATETIME,
     remark               NVARCHAR(255),
     create_user          NVARCHAR(50),
-    create_time          DATETIME,
+    create_time          DATETIME DEFAULT GETDATE(),
     update_user          NVARCHAR(50),
-    update_time          DATETIME
+    update_time          DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_t_biz_ucar_refuel PRIMARY KEY (id)
 );
 
-ALTER TABLE t_biz_ucar_refuel
-    ADD CONSTRAINT PK_t_biz_ucar_refuel PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1888,11 +1819,9 @@ CREATE TABLE t_biz_refund
     create_user      NVARCHAR(255),
     create_time      DATETIME       DEFAULT GETDATE(),
     update_user      NVARCHAR(255),
-    update_time      DATETIME       DEFAULT GETDATE()
+    update_time      DATETIME       DEFAULT GETDATE(),
+    CONSTRAINT PK_t_biz_refund PRIMARY KEY (id)
 );
-
-ALTER TABLE t_biz_refund
-    ADD CONSTRAINT PK_t_biz_refund PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1908,11 +1837,10 @@ CREATE TABLE t_bpmn_conf_lf_formdata
     create_user  NVARCHAR(255),
     create_time  DATETIME DEFAULT GETDATE(),
     update_user  NVARCHAR(255),
-    update_time  DATETIME DEFAULT GETDATE()
+    update_time  DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_t_bpmn_conf_lf_formdata PRIMARY KEY (id)
 );
 
-ALTER TABLE t_bpmn_conf_lf_formdata
-    ADD CONSTRAINT PK_t_bpmn_conf_lf_formdata PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1932,11 +1860,9 @@ CREATE TABLE t_bpmn_conf_lf_formdata_field
     create_user  NVARCHAR(255),
     create_time  DATETIME DEFAULT GETDATE(),
     update_user  NVARCHAR(255),
-    update_time  DATETIME DEFAULT GETDATE()
+    update_time  DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_t_bpmn_conf_lf_formdata_field PRIMARY KEY (id)
 );
-
-ALTER TABLE t_bpmn_conf_lf_formdata_field
-    ADD CONSTRAINT PK_t_bpmn_conf_lf_formdata_field PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1955,11 +1881,10 @@ CREATE TABLE t_bpmn_node_lf_formdata_field_control
     create_user NVARCHAR(255),
     create_time DATETIME DEFAULT GETDATE(),
     update_user NVARCHAR(255),
-    update_time DATETIME DEFAULT GETDATE()
+    update_time DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_t_bpmn_node_lf_formdata_field_control PRIMARY KEY (id)
 );
 
-ALTER TABLE t_bpmn_node_lf_formdata_field_control
-    ADD CONSTRAINT PK_t_bpmn_node_lf_formdata_field_control PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -1975,11 +1900,10 @@ CREATE TABLE t_lf_main
     create_user NVARCHAR(255),
     create_time DATETIME DEFAULT GETDATE(),
     update_user NVARCHAR(255),
-    update_time DATETIME DEFAULT GETDATE()
+    update_time DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_t_lf_main PRIMARY KEY (id)
 );
 
-ALTER TABLE t_lf_main
-    ADD CONSTRAINT PK_t_lf_main PRIMARY KEY (id);
 
 
 -- ----------------------------
@@ -2004,12 +1928,9 @@ CREATE TABLE t_lf_main_field
     create_user        NVARCHAR(255),
     create_time        DATETIME DEFAULT GETDATE(),
     update_user        NVARCHAR(255),
-    update_time        DATETIME DEFAULT GETDATE()
+    update_time        DATETIME DEFAULT GETDATE(),
+    CONSTRAINT PK_t_lf_main_field PRIMARY KEY (id)
 );
-
-ALTER TABLE t_lf_main_field
-
-    ADD CONSTRAINT PK_t_lf_main_field PRIMARY KEY (id);
 
 -- ----------------------------
 -- Table structure for t_dict_main
@@ -2025,15 +1946,10 @@ CREATE TABLE t_dict_main
     create_time DATETIME DEFAULT GETDATE(),
     update_user NVARCHAR(255),
     update_time DATETIME DEFAULT GETDATE(),
-    remark      NVARCHAR(500)
+    remark      NVARCHAR(500),
+    CONSTRAINT PK_t_dict_main PRIMARY KEY (id),
+    CONSTRAINT UK_t_dict_main_dict_type UNIQUE (dict_type)
 );
-
-ALTER TABLE t_dict_main
-    ADD CONSTRAINT PK_t_dict_main PRIMARY KEY (id);
-
--- 唯一约束：字典类型不能重复
-ALTER TABLE t_dict_main
-    ADD CONSTRAINT UK_t_dict_main_dict_type UNIQUE (dict_type);
 
 
 -- ----------------------------
@@ -2055,14 +1971,12 @@ CREATE TABLE t_dict_data
     create_time DATETIME DEFAULT GETDATE(),
     update_user NVARCHAR(255),
     update_time DATETIME DEFAULT GETDATE(),
-    remark      NVARCHAR(500)
+    remark      NVARCHAR(500),
+    CONSTRAINT PK_t_dict_data PRIMARY KEY (id)
 );
 
-ALTER TABLE t_dict_data
-    ADD CONSTRAINT PK_t_dict_data PRIMARY KEY (id);
-
 CREATE
-NONCLUSTERED INDEX idx_processInstance_Id 
+NONCLUSTERED INDEX idx_processInstance_Id
 ON bpm_process_node_submit (processInstance_Id);
 
 
@@ -2096,10 +2010,10 @@ CREATE TABLE t_bpmn_node_labels
 );
 
 CREATE
-NONCLUSTERED INDEX indx_node_id 
+NONCLUSTERED INDEX indx_node_id
 ON t_bpmn_node_labels (nodeid);
-       
-       
+
+
 -- ----------------------------
 -- Table structure for t_bpm_dynamic_condition_choosen
 -- ----------------------------
@@ -2115,10 +2029,30 @@ CREATE TABLE t_bpm_dynamic_condition_choosen
 );
 
 CREATE
-NONCLUSTERED INDEX indx_process_number 
+NONCLUSTERED INDEX indx_process_number
 ON t_bpm_dynamic_condition_choosen (process_number);
-       
-       
+
+
+
+
+-- ----------------------------
+-- Table structure for t_bpmn_node_customize_conf
+-- ----------------------------
+CREATE TABLE t_bpmn_node_customize_conf
+(
+    id           BIGINT IDENTITY(1,1) NOT NULL,
+    bpmn_node_id BIGINT,
+    sign_type    INT,
+    remark       NVARCHAR(255),
+    is_del       INT,
+    tenant_id    NVARCHAR(255) DEFAULT '',
+    create_user  NVARCHAR(255),
+    create_time  DATETIME,
+    update_user  NVARCHAR(255),
+    update_time  DATETIME,
+    CONSTRAINT PK_t_bpmn_node_customize_conf PRIMARY KEY (id)
+);
+
 -- ----------------------------
 -- Table structure for bpm_af_deployment
 -- ----------------------------
@@ -2274,25 +2208,6 @@ ON bpm_af_execution (proc_inst_id);
 CREATE
 NONCLUSTERED INDEX AF_IDX_EXEC_BUSKEY 
 ON bpm_af_execution (business_key);
-       
--- ----------------------------
--- Table structure for t_bpmn_node_customize_conf
--- ----------------------------
-CREATE TABLE t_bpmn_node_customize_conf
-(
-    id           BIGINT IDENTITY(1,1) NOT NULL,
-    bpmn_node_id BIGINT,
-    sign_type    INT,
-    remark       NVARCHAR(255),
-    is_del       INT,
-    tenant_id    NVARCHAR(255) DEFAULT '',
-    create_user  NVARCHAR(255),
-    create_time  DATETIME,
-    update_user  NVARCHAR(255),
-    update_time  DATETIME,
-    CONSTRAINT PK_t_bpmn_node_customize_conf PRIMARY KEY (id)
-);
-
 
 
 -- ----------------------------
