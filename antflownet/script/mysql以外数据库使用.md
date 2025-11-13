@@ -6,3 +6,5 @@
 > 这样生成的没有初始化demo数据,用户可以自行将bpm_init_db_mysql.sql生成demo数据的sql改一下初始demo数据
 5. 进到Freesql官网,查看切换为自己使用的数据库需要什么驱动
 6. done!
+
+## 官方SqlServer,Oracle,Postgresql脚本已经制作完成。现限时免费提供，点赞用户加群联系群主获取

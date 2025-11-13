@@ -5,7 +5,9 @@
  <img src="https://img.shields.io/badge/freesql-yellow.svg" alt="Downloads">
  <img src="https://img.shields.io/badge/license-Apache 2.0-green.svg" alt="Downloads">
 
-### 📢 Oracle初始化脚本来啦!限制免费,点赞加群联系群主即可获得!
+### 📢 Oracle版本来啦!限制免费,点赞加群联系群主即可获得!
+
+### 📢 SqlServer版本来啦!限制免费,点赞加群联系群主即可获得!
 
 ## **DotNet💖workflow，AntFlow.Net让工作流开发像普通CURD一样简单,即便没有流程开发经验的程序员也能快速开发流程!让NET项目如虎添翼!**
 
