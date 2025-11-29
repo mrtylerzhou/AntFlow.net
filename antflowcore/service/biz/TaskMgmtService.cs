@@ -6,6 +6,7 @@ using antflowcore.constant.enus;
 using antflowcore.dto;
 using antflowcore.entity;
 using AntFlowCore.Entity;
+using antflowcore.exception;
 using antflowcore.factory;
 using antflowcore.service.repository;
 using antflowcore.util;
@@ -19,18 +20,21 @@ public class TaskMgmtService
     private readonly AFTaskService _taskService;
     private readonly AfTaskInstService _taskInstService;
     private readonly BpmProcessNoticeService _bpmProcessNoticeService;
+    private readonly AFExecutionService _executionService;
     private readonly BpmnConfService _bpmnConfService;
     private IEnumerable services = ServiceProviderUtils.GetServicesByOpenGenericType(typeof(IFormOperationAdaptor<>));
     public TaskMgmtService(
         AFTaskService taskService,
         AfTaskInstService taskInstService,
         BpmProcessNoticeService bpmProcessNoticeService,
+        AFExecutionService executionService,
         BpmnConfService bpmnConfService
         )
     {
         _taskService = taskService;
         _taskInstService = taskInstService;
         _bpmProcessNoticeService = bpmProcessNoticeService;
+        _executionService = executionService;
         _bpmnConfService = bpmnConfService;
     }
 
@@ -173,5 +177,28 @@ public class TaskMgmtService
         return results;
     }
 
-  
+  public  void DeleteExecutionById(String executionId)
+    {
+        if (string.IsNullOrEmpty(executionId))
+        {
+            throw new AFBizException("executionId不存在!");
+        }
+        _executionService.Frsql
+            .Delete<BpmAfExecution>()
+            .Where(a => a.Id == executionId)
+            .ExecuteAffrows();
+    }
+
+    public void DeletTask(String taskId)
+    {
+        if (string.IsNullOrEmpty(taskId))
+        {
+            throw new AFBizException("taskId不存在!");
+        }
+
+        _taskService.Frsql
+            .Delete<BpmAfTask>()
+            .Where(a => a.Id == taskId)
+            .ExecuteAffrows();
+    }
 }

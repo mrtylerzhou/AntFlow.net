@@ -14,7 +14,7 @@ public class AFDeploymentService: AFBaseCurdRepositoryService<BpmAfDeployment>,I
     {
     }
 
-    public void updateNodeAssignee(BusinessDataVo businessDataVo)
+    public void UpdateNodeAssignee(BusinessDataVo businessDataVo)
     {
         string processNumber = businessDataVo.ProcessNumber;
         if (string.IsNullOrEmpty(processNumber))
@@ -82,5 +82,32 @@ public class AFDeploymentService: AFBaseCurdRepositoryService<BpmAfDeployment>,I
         bpmAfDeployment.UpdateTime=DateTime.Now;
         bpmAfDeployment.UpdateUser = SecurityUtils.GetLogInEmpId();
         this.baseRepo.Update(bpmAfDeployment);
+    }
+
+    public List<BpmnConfCommonElementVo> GetDeploymentByProcessNumber(string processNumber)
+    {
+        if (string.IsNullOrEmpty(processNumber))
+        {
+            return null;
+        }
+        BpmAfDeployment bpmAfDeployment = this.Frsql
+            .Select<BpmBusinessProcess,BpmAfTask,BpmAfDeployment>()
+            .InnerJoin((a,b,c)=>a.ProcInstId==b.ProcInstId)
+            .InnerJoin((a,b,c)=>b.ProcDefId==c.Id)
+            .Where((a,b,c)=>a.BusinessNumber==processNumber)
+            .ToList<BpmAfDeployment>((a,b,c)=>c)
+            .First();
+        if (bpmAfDeployment == null)
+        {
+            throw new AFBizException($"未能根据流程编号:{processNumber}找到流程定义!");
+        }
+
+        string content = bpmAfDeployment.Content;
+        if (string.IsNullOrEmpty(content))
+        {
+            throw new AFBizException($"根据流程编号:{processNumber}查找到流程定义内容为空!");
+        }
+        List<BpmnConfCommonElementVo> elements = JsonSerializer.Deserialize<List<BpmnConfCommonElementVo>>(content);
+        return elements;
     }
 }
