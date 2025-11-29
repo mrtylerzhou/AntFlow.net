@@ -42,7 +42,12 @@ namespace AntFlowCore.Vo
 
         [JsonPropertyName("taskId")]
         public string TaskId { get; set; }
-
+        [JsonPropertyName("taskDefKey")]
+        public String TaskDefKey { get; set; }
+        [JsonPropertyName("nodeId"),JsonConverter(typeof(IntToStringConverter))]
+        public String NodeId { get; set; }
+        [JsonPropertyName("elementId")]
+        public String ElementId { get; set; }
         [JsonPropertyName("objectMap")]
         public Dictionary<string, object> ObjectMap { get; set; }
 

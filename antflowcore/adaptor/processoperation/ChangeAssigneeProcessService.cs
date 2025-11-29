@@ -46,8 +46,8 @@ public class ChangeAssigneeProcessService: IProcessOperationAdaptor
 
             if (!userIds.Contains(assignee))
             {
-                _bpmFlowrunEntrustService.AddFlowrunEntrust(user, userName, assignee, assigneeName, task.Id, 0,
-                    bpmBusinessProcess.ProcInstId, vo.ProcessKey);
+                _bpmFlowrunEntrustService.AddFlowrunEntrust(user, userName, assignee, assigneeName, task.TaskDefKey, 0,
+                    bpmBusinessProcess.ProcInstId, vo.ProcessKey,vo.NodeId,1);
             }
 
             TaskMgmtVO taskMgmtVo = new TaskMgmtVO

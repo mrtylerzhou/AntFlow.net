@@ -18,7 +18,7 @@ public class BpmFlowrunEntrustService : AFBaseCurdRepositoryService<BpmFlowrunEn
     }
 
     public void AddFlowrunEntrust(String actual, String actualName, String original, String originalName,
-        String runtaskid, int type, String processInstanceId, String processKey)
+        String runtaskid, int type, String processInstanceId, String processKey,string nodeId,int actionType)
     {
         var entrust = new BpmFlowrunEntrust
         {
@@ -32,6 +32,8 @@ public class BpmFlowrunEntrustService : AFBaseCurdRepositoryService<BpmFlowrunEn
             ProcDefId = processKey,
             RunInfoId = processInstanceId,
             TenantId = MultiTenantUtil.GetCurrentTenantId(),
+            NodeId = nodeId,
+            ActionType = actionType,
         };
         this.baseRepo.Insert(entrust);
     }

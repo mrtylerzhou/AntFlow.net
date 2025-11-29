@@ -191,6 +191,8 @@ CREATE TABLE if not exists `bpm_flowrun_entrust`
     `is_view`     int(11) NOT NULL DEFAULT '0',
     `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `is_del`           int(11)      DEFAULT '0',
+    node_id       varchar(64)            null,
+    action_type   int         default 0  null comment '0 global user configed entrust,1.change assignee entrust,2 add assignee 3 remove assignee',
     PRIMARY KEY (`id`) USING BTREE,
     KEY `BPM_IDX_ID` (`runinfoid`, `original`, `actual`) USING BTREE
     ) ENGINE = InnoDB

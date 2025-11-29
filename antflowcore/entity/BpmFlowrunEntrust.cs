@@ -63,4 +63,9 @@ public class BpmFlowrunEntrust
     /// </summary>
     public int IsDel { get; set; }
     public string TenantId { get; set; }
+    public string NodeId { get; set; }
+    /// <summary>
+    /// 0 global user configed entrust,1.change assignee entrust,2 add assignee 3 remove assignee
+    /// </summary>
+    public int? ActionType { get; set; }
 }

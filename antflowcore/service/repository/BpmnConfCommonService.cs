@@ -10,6 +10,7 @@ using antflowcore.service.biz;
 using antflowcore.service.processor;
 using antflowcore.service.processor.filter;
 using antflowcore.util;
+using antflowcore.util.Extension;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
@@ -31,6 +32,7 @@ public class BpmnConfCommonService
     private readonly BpmnCreateAndStartService _bpmnCreateAndStartService;
     private readonly BpmVerifyInfoBizService _bpmVerifyInfoBizService;
     private readonly BpmVariableService _bpmVariableService;
+    private readonly BpmFlowrunEntrustService _flowrunEntrustService;
     private readonly FormFactory _formFactory;
     private readonly IFreeSql _freeSql;
     private readonly ILogger<BpmnConfCommonService> _logger;
@@ -48,6 +50,7 @@ public class BpmnConfCommonService
         BpmnCreateAndStartService bpmnCreateAndStartService,
         BpmVerifyInfoBizService bpmVerifyInfoBizService,
         BpmVariableService bpmVariableService,
+        BpmFlowrunEntrustService flowrunEntrustService,
         FormFactory formFactory,
         IFreeSql freeSql,
         ILogger<BpmnConfCommonService> logger)
@@ -64,6 +67,7 @@ public class BpmnConfCommonService
         _bpmnCreateAndStartService = bpmnCreateAndStartService;
         _bpmVerifyInfoBizService = bpmVerifyInfoBizService;
         _bpmVariableService = bpmVariableService;
+        _flowrunEntrustService = flowrunEntrustService;
         _formFactory = formFactory;
         _freeSql = freeSql;
         _logger = logger;
@@ -260,9 +264,9 @@ public class BpmnConfCommonService
     {
         var map = nodeList.ToDictionary(node => node.NodeId);
         BpmnNodeVo startNode = GetNodeMapAndStartNode(nodeList, map);
-        var resultList = new List<BpmnNodeVo>();
-        var lastNode = new BpmnNodeVo { NodeId = "" };
-        var nowNode = startNode;
+        List<BpmnNodeVo> resultList = new List<BpmnNodeVo>();
+        BpmnNodeVo lastNode = new BpmnNodeVo { NodeId = "" };
+        BpmnNodeVo nowNode = startNode;
 
         if (nowNode != null)
         {
@@ -485,5 +489,90 @@ public class BpmnConfCommonService
             .Where(a=>formCodes.Contains(a.FormCode)&&a.EffectiveStatus==1)
             .ToList();
         return bpmnConfs;
+    }
+
+    private void ReTreatNodeAssignee(List<BpmnNodeVo> nodeVos,string processNumber)
+    {
+        if (string.IsNullOrEmpty(processNumber))
+        {
+            return;
+        }
+
+        List<BpmFlowrunEntrust> bpmFlowrunEntrusts = _flowrunEntrustService
+            .Frsql
+            .Select<BpmFlowrunEntrust, BpmBusinessProcess>()
+            .InnerJoin((a, b) => a.RunInfoId == b.ProcInstId)
+            .Where((a, b) => b.BusinessNumber == processNumber)
+            .ToList<BpmFlowrunEntrust>();
+         
+         Dictionary<string, List<BpmFlowrunEntrust>> nodeId2entrustDict= bpmFlowrunEntrusts.GroupBy(a => a.NodeId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+        foreach (BpmnNodeVo bpmnNodeVo in nodeVos)
+        {
+            int nodeType = bpmnNodeVo.NodeType;
+            if (nodeType == (int)NodeTypeEnum.NODE_TYPE_START || nodeType == (int)NodeTypeEnum.NODE_TYPE_GATEWAY ||
+                nodeType == (int)NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY ||
+                nodeType == (int)NodeTypeEnum.NODE_TYPE_CONDITIONS)
+            {
+                continue;
+            }
+
+            BpmnNodePropertysVo bpmnNodePropertysVo = bpmnNodeVo.Property;
+            if (bpmnNodePropertysVo == null)
+            {
+                continue;
+            }
+
+            List<BpmFlowrunEntrust> flowrunEntrusts = nodeId2entrustDict[bpmnNodeVo.NodeId];
+            if (flowrunEntrusts.IsEmpty())
+            {
+                continue;
+            }
+            List<BaseIdTranStruVo> emplList = bpmnNodePropertysVo.EmplList;
+            if (emplList.IsEmpty())
+            {
+                continue;
+            }
+            IEnumerable<IGrouping<int?,BpmFlowrunEntrust>> groupBy = flowrunEntrusts.GroupBy(a=>a.ActionType);
+            foreach (IGrouping<int?,BpmFlowrunEntrust> entrustse in groupBy)
+            {
+                int? actionType = entrustse.Key;
+                if (actionType == null)
+                {
+                    continue;
+                }
+                foreach (BpmFlowrunEntrust bpmFlowrunEntrust in entrustse)
+                {
+                    BaseIdTranStruVo matchEmp = emplList.First(a => a.Id==bpmFlowrunEntrust.Original);
+                    if (matchEmp == null)
+                    {
+                        continue;
+                    }
+                    if (actionType == 0 || actionType == 1)//change assignee
+                    {
+                        matchEmp.Id = bpmFlowrunEntrust.Actual;
+                        matchEmp.Name = bpmFlowrunEntrust.ActualName + "*";
+                    }else if (actionType == 2)//add asignee
+                    {
+                        BaseIdTranStruVo addEmp =
+                            new BaseIdTranStruVo(bpmFlowrunEntrust.Actual, bpmFlowrunEntrust.ActualName+"+");
+                        emplList.Add(addEmp);
+                    }else if (actionType == 3)//remove assignee
+                    {
+                        matchEmp.Name = matchEmp.Name + "-";
+                    }
+                }
+            }
+
+            if (emplList.Count == 0)
+            {
+                emplList.Add(new BaseIdTranStruVo("0","*"));
+            }
+
+            List<string> emplIds = emplList.Select(a=>a.Id).ToList();
+            bpmnNodePropertysVo.EmplIds = emplIds;
+            bpmnNodePropertysVo.EmplList = emplList;
+        }
+       
     }
 }

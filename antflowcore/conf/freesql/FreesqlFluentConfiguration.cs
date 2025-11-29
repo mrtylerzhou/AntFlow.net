@@ -184,6 +184,9 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.IsView).Name("is_view");
                 a.Property(b => b.IsDel).Name("is_del");
                 a.Property(b => b.TenantId).Name("tenant_id");
+                a.Property(b => b.NodeId).Name("node_id");
+                a.Property(b => b.ActionType).Name("action_type");
+              
             }).ConfigEntity<BpmFlowruninfo>(a =>
             {
                 a.Name("bpm_flowruninfo");

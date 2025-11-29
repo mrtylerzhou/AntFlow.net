@@ -110,10 +110,8 @@ public class BpmnConfController
         {
             return Result<PreviewNode>.Succ(_bpmnConfCommonService.StartPagePreviewNode(paramsJson));
         }
-        else
-        {
-            return Result<PreviewNode>.Succ(_bpmnConfCommonService.TaskPagePreviewNode(paramsJson));
-        }
+
+        return Result<PreviewNode>.Succ(_bpmnConfCommonService.TaskPagePreviewNode(paramsJson));
     }
     
     /// <summary>

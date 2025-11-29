@@ -285,6 +285,7 @@ public static class ServiceRegistration
         services.AddSingleton<IProcessNoticeAdaptor, AppPushAdaptor>();
         services.AddSingleton<IProcessNoticeAdaptor, SMSSendAdaptor>();
         services.AddSingleton<AfStaticLogUtil>();
+        services.AddSingleton<BpmvariableBizService>();
         //=================================不可越过的三八线==============================
         IAdaptorFactory adaptorFactory = AdaptorFactoryProxy.GetProxyInstance();
         services.AddSingleton(adaptorFactory);

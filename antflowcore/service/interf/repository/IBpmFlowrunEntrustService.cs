@@ -7,5 +7,5 @@ public interface IBpmFlowrunEntrustService
     BpmFlowrunEntrust GetEntrustByTaskId(string actual, string procDefId, string taskId);
 
     void AddFlowrunEntrust(String actual, String actualName, String original, String originalName,
-        String runtaskid, int type, String processInstanceId, String processKey);
+        String runtaskid, int type, String processInstanceId, String processKey,string nodeId,int actionType);
 }

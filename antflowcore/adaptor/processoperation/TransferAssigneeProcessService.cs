@@ -1,5 +1,6 @@
 ﻿using antflowcore.bpmn.service;
 using AntFlowCore.Constants;
+using antflowcore.entity;
 using AntFlowCore.Enums;
 using antflowcore.exception;
 using antflowcore.service.biz;
@@ -13,24 +14,27 @@ namespace antflowcore.adaptor.processoperation;
         private readonly BpmBusinessProcessService _bpmBusinessProcessService;
         private readonly AFTaskService _taskService;
         private readonly TaskMgmtService _taskMgmtService;
+        private readonly BpmvariableBizService _bpmvariableBizService;
         private readonly BpmFlowrunEntrustService _bpmFlowrunEntrustService;
 
         public TransferAssigneeProcessService(
             BpmBusinessProcessService bpmBusinessProcessService,
             AFTaskService taskService,
             TaskMgmtService taskMgmtService,
+            BpmvariableBizService bpmvariableBizService,
             BpmFlowrunEntrustService bpmFlowrunEntrustService)
         {
             _bpmBusinessProcessService = bpmBusinessProcessService;
             _taskService = taskService;
             _taskMgmtService = taskMgmtService;
+            _bpmvariableBizService = bpmvariableBizService;
             _bpmFlowrunEntrustService = bpmFlowrunEntrustService;
         }
 
         public void DoProcessButton(BusinessDataVo vo)
         {
-            var bpmBusinessProcess = _bpmBusinessProcessService.GetBpmBusinessProcess(vo.ProcessNumber);
-            var tasks = _taskService
+            BpmBusinessProcess bpmBusinessProcess = _bpmBusinessProcessService.GetBpmBusinessProcess(vo.ProcessNumber);
+            List<BpmAfTask> tasks = _taskService
                 .baseRepo
                 .Where(a=>a.ProcInstId==bpmBusinessProcess.ProcInstId)
                 .ToList();
@@ -60,7 +64,9 @@ namespace antflowcore.adaptor.processoperation;
             {
                 if (task.Assignee == originalUserId)
                 {
-                    _bpmFlowrunEntrustService.AddFlowrunEntrust(transferToUserId, transferToUserName, originalUserId, originalUserName, task.Id, 0, bpmBusinessProcess.ProcInstId, vo.ProcessKey);
+                    string nodeIdByElementId = _bpmvariableBizService.GetNodeIdByElementId(vo.ProcessNumber,task.TaskDefKey);
+                    _bpmFlowrunEntrustService.AddFlowrunEntrust(transferToUserId, transferToUserName, originalUserId, 
+                        originalUserName, task.TaskDefKey, 0, bpmBusinessProcess.ProcInstId, vo.ProcessKey,nodeIdByElementId,0);
 
                     var taskMgmtVO = new TaskMgmtVO
                     {
