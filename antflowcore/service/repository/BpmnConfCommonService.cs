@@ -240,7 +240,7 @@ public class BpmnConfCommonService
             DeduplicationType = bpmnConfVo.DeduplicationType,
             DeduplicationTypeName = DeduplicationTypeEnumExtensions.GetDescByCode(bpmnConfVo.DeduplicationType.Value)
         };
-        
+        ReTreatNodeAssignee(previewNode.BpmnNodeList,vo.ProcessNumber);
         string currentNodeIdStr = _bpmVerifyInfoBizService.FindCurrentNodeIds(vo.ProcessNumber);
         previewNode.CurrentNodeId = currentNodeIdStr;
 
@@ -505,7 +505,7 @@ public class BpmnConfCommonService
             .Where((a, b) => b.BusinessNumber == processNumber)
             .ToList<BpmFlowrunEntrust>();
          
-         Dictionary<string, List<BpmFlowrunEntrust>> nodeId2entrustDict= bpmFlowrunEntrusts.GroupBy(a => a.NodeId)
+         Dictionary<string, List<BpmFlowrunEntrust>> nodeId2entrustDict= bpmFlowrunEntrusts.Where(a=>!string.IsNullOrEmpty(a.NodeId)).GroupBy(a => a.NodeId)
             .ToDictionary(g => g.Key, g => g.ToList());
         foreach (BpmnNodeVo bpmnNodeVo in nodeVos)
         {
@@ -523,7 +523,7 @@ public class BpmnConfCommonService
                 continue;
             }
 
-            List<BpmFlowrunEntrust> flowrunEntrusts = nodeId2entrustDict[bpmnNodeVo.NodeId];
+            List<BpmFlowrunEntrust> flowrunEntrusts = nodeId2entrustDict.GetValueOrDefault(bpmnNodeVo.Id.ToString(), null);
             if (flowrunEntrusts.IsEmpty())
             {
                 continue;
@@ -543,7 +543,7 @@ public class BpmnConfCommonService
                 }
                 foreach (BpmFlowrunEntrust bpmFlowrunEntrust in entrustse)
                 {
-                    BaseIdTranStruVo matchEmp = emplList.First(a => a.Id==bpmFlowrunEntrust.Original);
+                    BaseIdTranStruVo? matchEmp = emplList.FirstOrDefault(a => a.Id==bpmFlowrunEntrust.Original);
                     if (matchEmp == null)
                     {
                         continue;
