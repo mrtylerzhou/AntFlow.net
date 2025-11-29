@@ -14,9 +14,17 @@ public class AFDeploymentService: AFBaseCurdRepositoryService<BpmAfDeployment>,I
     {
     }
 
-    public void UpdateNodeAssignee(BusinessDataVo businessDataVo)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="processNumber"></param>
+    /// <param name="userInfos"></param>
+    /// <param name="nodeId"></param>
+    /// <param name="actionType">1 add,2 remove</param>
+    /// <exception cref="AFBizException"></exception>
+    public void UpdateNodeAssignee(string processNumber,List<BaseIdTranStruVo>userInfos,string nodeId,int actionType)
     {
-        string processNumber = businessDataVo.ProcessNumber;
+       
         if (string.IsNullOrEmpty(processNumber))
         {
             throw new AFBizException("请传入流程编号");
@@ -25,7 +33,7 @@ public class AFDeploymentService: AFBaseCurdRepositoryService<BpmAfDeployment>,I
             .Select<BpmBusinessProcess,BpmAfTask,BpmAfDeployment>()
             .InnerJoin((a,b,c)=>a.ProcInstId==b.ProcInstId)
             .InnerJoin((a,b,c)=>b.ProcDefId==c.Id)
-            .Where((a,b,c)=>a.BusinessNumber==businessDataVo.ProcessNumber)
+            .Where((a,b,c)=>a.BusinessNumber==processNumber)
             .ToList<BpmAfDeployment>((a,b,c)=>c)
             .First();
         if (bpmAfDeployment == null)
@@ -39,7 +47,6 @@ public class AFDeploymentService: AFBaseCurdRepositoryService<BpmAfDeployment>,I
             throw new AFBizException($"根据流程编号:{processNumber}查找到流程定义内容为空!");
         }
         List<BpmnConfCommonElementVo> elements = JsonSerializer.Deserialize<List<BpmnConfCommonElementVo>>(content);
-        List<BaseIdTranStruVo> userInfos = businessDataVo.UserInfos;
         if (userInfos == null)
         {
             userInfos = new List<BaseIdTranStruVo>();
@@ -53,8 +60,7 @@ public class AFDeploymentService: AFBaseCurdRepositoryService<BpmAfDeployment>,I
                 Name = "跳过",
             });
         }
-
-        string nodeId = businessDataVo.NodeId;
+        
         if (string.IsNullOrEmpty(nodeId))
         {
             throw new AFBizException("传入节点为空,请检查入参");
@@ -66,22 +72,32 @@ public class AFDeploymentService: AFBaseCurdRepositoryService<BpmAfDeployment>,I
             throw new AFBizException($"流程编号:{processNumber},节点id:{nodeId},未在流程图中找到对应定义");
         }
 
-        List<string> newCollectionValue = new List<string>();
-        IDictionary<string, string> assigneeMap = new SortedDictionary<string, string>();
-        
-        foreach (BaseIdTranStruVo baseIdTranStruVo in userInfos)
-        {
-            newCollectionValue.Add(baseIdTranStruVo.Id);
-            assigneeMap[baseIdTranStruVo.Id] = baseIdTranStruVo.Name;
-        }
+        IDictionary<string,string> nodeAssigneeMap = bpmnConfCommonElementVo.AssigneeMap;
+        List<string> collectionValue = bpmnConfCommonElementVo.CollectionValue;
 
-        bpmnConfCommonElementVo.CollectionValue = newCollectionValue;
-        bpmnConfCommonElementVo.AssigneeMap = assigneeMap;
+        foreach (BaseIdTranStruVo userInfo in userInfos)
+        {
+            string id = userInfo.Id;
+            string name = userInfo.Name;
+            if (actionType == 1)
+            {
+                collectionValue.Add(id);
+                nodeAssigneeMap[id] = name;
+            }else if (actionType == 2)
+            {
+                if (nodeAssigneeMap.ContainsKey(id))
+                {
+                    nodeAssigneeMap.Remove(id);
+                }
+            }
+           
+        }
+        
         bpmAfDeployment.Content = JsonSerializer.Serialize(elements);
         bpmAfDeployment.Rev += 1;
         bpmAfDeployment.UpdateTime=DateTime.Now;
         bpmAfDeployment.UpdateUser = SecurityUtils.GetLogInEmpId();
-        this.baseRepo.Update(bpmAfDeployment);
+        baseRepo.Update(bpmAfDeployment);
     }
 
     public List<BpmnConfCommonElementVo> GetDeploymentByProcessNumber(string processNumber)

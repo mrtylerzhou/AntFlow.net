@@ -1,5 +1,8 @@
-﻿using antflowcore.entity;
+﻿using antflowcore.dto;
+using antflowcore.entity;
+using antflowcore.exception;
 using antflowcore.service.repository;
+using antflowcore.util.Extension;
 using antflowcore.vo;
 
 namespace antflowcore.service.biz;
@@ -42,6 +45,68 @@ public class BpmvariableBizService
         return !string.IsNullOrEmpty(nodeIdSingle) ? nodeIdSingle : nodeIdMultiplayer;
     }
 
+    public NodeElementDto GetElementIdByNodeId(String processNumber, String nodeId)
+    {
+        NodeElementDto nodeSingleElementDto = _bpmVariableService.Frsql
+            .Select<BpmVariable,BpmVariableSingle>()
+            .InnerJoin((a,b)=>a.Id==b.VariableId)
+            .Where((a,b)=>a.ProcessNum==processNumber&&b.NodeId==nodeId)
+            .ToList<NodeElementDto>((a,b)=>new NodeElementDto
+            {
+                NodeId = nodeId,
+                ElementId = b.ElementId,
+                AssigneeInfoList = new List<BaseIdTranStruVo>
+                {
+                    new BaseIdTranStruVo
+                    {
+                        Id = b.Assignee,
+                        Name = b.AssigneeName
+                    }
+                }
+            })
+            .First();
+        List<NodeElementDto> nodeElementDtos = _bpmVariableService.Frsql
+            .Select<BpmVariable, BpmVariableMultiplayer, BpmVariableMultiplayerPersonnel>()
+            .InnerJoin((a, b, c) => a.Id == b.VariableId)
+            .InnerJoin((a, b, c) => b.Id == c.VariableMultiplayerId)
+            .Where((a, b, c) => a.ProcessNum == processNumber && b.NodeId == nodeId)
+            .ToList<NodeElementDto>((a, b, c) => new NodeElementDto
+            {
+                NodeId = nodeId,
+                ElementId = b.ElementId,
+                AssigneeInfoList = new List<BaseIdTranStruVo>
+                {
+                    new BaseIdTranStruVo
+                    {
+                        Id = c.Assignee,
+                        Name = c.AssigneeName
+                    }
+                }
+            });
+        NodeElementDto nodeMultiplayerElementDto = null;
+        if (!nodeElementDtos.IsEmpty())
+        {
+            nodeMultiplayerElementDto = new NodeElementDto();
+            nodeMultiplayerElementDto.NodeId = nodeId;
+            nodeMultiplayerElementDto.ElementId = nodeElementDtos[0].ElementId;
+            nodeMultiplayerElementDto.IsSingle = false;
+            nodeMultiplayerElementDto.AssigneeInfoList = new List<BaseIdTranStruVo>();
+            foreach (NodeElementDto nodeElementDto in nodeElementDtos)
+            {
+                nodeMultiplayerElementDto.AssigneeInfoList.AddRange(nodeElementDto.AssigneeInfoList);
+            }
+        }
+
+        if (nodeSingleElementDto != null)
+        {
+            return nodeSingleElementDto;
+        }else if (nodeMultiplayerElementDto != null)
+        {
+            return nodeMultiplayerElementDto;
+        }
+
+        throw new AFBizException("未能根据指定节点Id找到elementId");
+    }
     public void AddNodeAssignees(String processNumber, String elementId, List<BaseIdTranStruVo> assignees)
     {
         List<BpmVariableMultiplayer> multiplayers = QuerymultiplayersByProcessNumAndElementId(processNumber,elementId);
@@ -70,5 +135,44 @@ public class BpmvariableBizService
             .Where((a,b)=>a.ProcessNum==processNum&&b.ElementId==elementId)
             .ToList<BpmVariableMultiplayer>();
         return bpmVariableMultiplayers;
+    }
+
+    public void InvalidNodeAssignees(List<string> assigneeIds,string processNumber, bool isSingle)
+    {
+        BpmVariable bpmVariable = _bpmVariableService.baseRepo
+            .Where(a=>a.ProcessNum==processNumber)
+            .ToOne();
+        if (bpmVariable == null)
+        {
+            throw new AFBizException($"未能根据流程编号找到变量信息!{processNumber}");
+        }
+
+        long bpmVariableId = bpmVariable.Id;
+        if (isSingle)
+        {
+            _bpmVariableService.Frsql
+                .Update<BpmVariableSignUp>()
+                .Set(a => a.IsDel, 1)
+                .Set(a=>a.Remark,"管理员减签")
+                .Where(a => a.Id == bpmVariableId)
+                .ExecuteAffrows();
+            return;
+        }
+
+        BpmVariableMultiplayer bpmVariableMultiplayer = _multiplayerService.baseRepo
+            .Where(a=>a.VariableId==bpmVariableId)
+            .ToOne();
+        if (bpmVariableMultiplayer == null)
+        {
+            throw new AFBizException($"未能根据流程编号找到流程多变量信息!{processNumber}");
+        }
+
+        long multiPlayerId = bpmVariableMultiplayer.Id;
+        _bpmVariableService.Frsql
+            .Update<BpmVariableMultiplayerPersonnel>()
+            .Set(a => a.IsDel, 1)
+            .Set(a => a.Remark, "管理员减签")
+            .Where(a => a.VariableMultiplayerId == multiPlayerId&&assigneeIds.Contains(a.Assignee))
+            .ExecuteAffrows();
     }
 }

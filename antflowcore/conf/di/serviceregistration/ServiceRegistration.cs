@@ -258,6 +258,9 @@ public static class ServiceRegistration
         services.AddSingleton<IProcessOperationAdaptor, ProcessForwardService>();
         services.AddSingleton<IProcessOperationAdaptor, RemoveAssigneeProcessService>();
         services.AddSingleton<IProcessOperationAdaptor, AddAssigneeProcessService>();
+        services.AddSingleton<IProcessOperationAdaptor, RemoveFutureAssigneeProcessService>();
+        services.AddSingleton<IProcessOperationAdaptor, AddFutureAssigneeProcessService>();
+        
 
         services.AddSingleton<AFDeploymentService>();
         services.AddSingleton<AfTaskInstService>();
