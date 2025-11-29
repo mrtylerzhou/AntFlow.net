@@ -23,7 +23,11 @@ using System.Net.NetworkInformation;
 
         public static string GetNextId()
         {
-            return Generator.GenerateGuid().ToString();
+            #if NET9_0_OR_GREATER
+                return Guid.CreateVersion7().ToString();
+            #else
+                return Generator.GenerateGuid().ToString();
+            #endif
         }
 
         private static byte[] GetEthernetAddress()
@@ -40,8 +44,7 @@ using System.Net.NetworkInformation;
                     }
                 }
             }
-
-            // fallback: random MAC
+            
             var rnd = new Random();
             byte[] mac = new byte[6];
             rnd.NextBytes(mac);
@@ -87,7 +90,7 @@ using System.Net.NetworkInformation;
         {
             while (true)
             {
-                long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                long now = DateTimeOffset.UtcNow.ToFileTime();
                 long last = Interlocked.Read(ref _lastTimestamp);
 
                 if (now == last)

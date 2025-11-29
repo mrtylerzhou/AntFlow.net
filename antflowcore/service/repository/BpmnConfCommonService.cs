@@ -544,12 +544,13 @@ public class BpmnConfCommonService
                 foreach (BpmFlowrunEntrust bpmFlowrunEntrust in entrustse)
                 {
                     BaseIdTranStruVo? matchEmp = emplList.FirstOrDefault(a => a.Id==bpmFlowrunEntrust.Original);
-                    if (matchEmp == null)
-                    {
-                        continue;
-                    }
+                   
                     if (actionType == 0 || actionType == 1)//change assignee
                     {
+                        if (matchEmp == null)
+                        {
+                            continue;
+                        }
                         matchEmp.Id = bpmFlowrunEntrust.Actual;
                         matchEmp.Name = bpmFlowrunEntrust.ActualName + "*";
                     }else if (actionType == 2)//add asignee
@@ -559,6 +560,10 @@ public class BpmnConfCommonService
                         emplList.Add(addEmp);
                     }else if (actionType == 3)//remove assignee
                     {
+                        if (matchEmp == null)
+                        {
+                            continue;
+                        }
                         matchEmp.Name = matchEmp.Name + "-";
                     }
                 }

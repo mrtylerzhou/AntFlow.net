@@ -77,7 +77,7 @@ public class AFDeploymentService: AFBaseCurdRepositoryService<BpmAfDeployment>,I
 
         bpmnConfCommonElementVo.CollectionValue = newCollectionValue;
         bpmnConfCommonElementVo.AssigneeMap = assigneeMap;
-        bpmAfDeployment.Content = JsonSerializer.Serialize(bpmnConfCommonElementVo);
+        bpmAfDeployment.Content = JsonSerializer.Serialize(elements);
         bpmAfDeployment.Rev += 1;
         bpmAfDeployment.UpdateTime=DateTime.Now;
         bpmAfDeployment.UpdateUser = SecurityUtils.GetLogInEmpId();
