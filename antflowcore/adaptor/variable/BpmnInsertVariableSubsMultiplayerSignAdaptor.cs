@@ -42,7 +42,7 @@ public class BpmnInsertVariableSubsMultiplayerSignAdaptor: IBpmnInsertVariableSu
             {
                 VariableMultiplayerId = variableMultiplayerId,
                 Assignee = o,
-                AssigneeName = assigneeMap != null && assigneeMap.ContainsKey(o) ? assigneeMap[o] : "",
+                AssigneeName = assigneeMap != null && assigneeMap.TryGetValue(o, out var value) ? value : "",
                 UndertakeStatus = 0,
                 CreateTime = DateTime.Now,
             })

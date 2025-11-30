@@ -531,7 +531,15 @@ public class BpmnConfCommonService
             List<BaseIdTranStruVo> emplList = bpmnNodePropertysVo.EmplList;
             if (emplList.IsEmpty())
             {
-                continue;
+                if (bpmnNodeVo.NodeProperty == (int)NodePropertyEnum.NODE_PROPERTY_CUSTOMIZE)
+                {
+                    emplList = bpmnNodeVo.Params.AssigneeList
+                        .Select(a => new BaseIdTranStruVo(a.Assignee, a.AssigneeName)).ToList();
+                }
+                else
+                {
+                    continue;
+                }
             }
             IEnumerable<IGrouping<int?,BpmFlowrunEntrust>> groupBy = flowrunEntrusts.GroupBy(a=>a.ActionType);
             foreach (IGrouping<int?,BpmFlowrunEntrust> entrustse in groupBy)
@@ -543,10 +551,10 @@ public class BpmnConfCommonService
                 }
                 foreach (BpmFlowrunEntrust bpmFlowrunEntrust in entrustse)
                 {
-                    BaseIdTranStruVo? matchEmp = emplList.FirstOrDefault(a => a.Id==bpmFlowrunEntrust.Original);
-                   
+                    
                     if (actionType == 0 || actionType == 1)//change assignee
                     {
+                        BaseIdTranStruVo? matchEmp = emplList.FirstOrDefault(a => a.Id==bpmFlowrunEntrust.Original);
                         if (matchEmp == null)
                         {
                             continue;
@@ -560,11 +568,11 @@ public class BpmnConfCommonService
                         emplList.Add(addEmp);
                     }else if (actionType == 3)//remove assignee
                     {
-                        if (matchEmp == null)
+                        BaseIdTranStruVo? baseIdTranStruVo = emplList.FirstOrDefault(a => a.Id==bpmFlowrunEntrust.Actual);
+                        if (baseIdTranStruVo != null)
                         {
-                            continue;
+                            baseIdTranStruVo.Name += "-";
                         }
-                        matchEmp.Name = matchEmp.Name + "-";
                     }
                 }
             }
@@ -577,6 +585,16 @@ public class BpmnConfCommonService
             List<string> emplIds = emplList.Select(a=>a.Id).ToList();
             bpmnNodePropertysVo.EmplIds = emplIds;
             bpmnNodePropertysVo.EmplList = emplList;
+            if (bpmnNodeVo.Params != null)
+            {
+                bpmnNodeVo.Params.AssigneeList = emplList.Select(a => new BpmnNodeParamsAssigneeVo
+                {
+                    Assignee = a.Id,
+                    AssigneeName = a.Name,
+                    ElementName = "审核人",
+                    IsDeduplication = 0,
+                }).ToList();
+            }
         }
        
     }

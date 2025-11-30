@@ -743,6 +743,17 @@ public class BpmnConfBizService
         }
         return GetBpmnConfVo(bpmnConf);
     }
+
+    public int? GetCustomizeNodeSignType(long nodeId)
+    {
+        int? signType = _bpmnNodeService.Frsql
+            .Select<BpmnNode,BpmnNodeCustomizeConf>()
+            .InnerJoin((a,b)=>a.Id==b.BpmnNodeId)
+            .Where((a,b)=>a.Id==nodeId)
+            .ToList<int?>((a,b)=>b.SignType)
+            .FirstOrDefault();
+        return signType;
+    }
     private BpmnConfVo FormatConfVo(BpmnConfVo confVo)
     {
         if(confVo==null){

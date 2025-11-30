@@ -1,9 +1,12 @@
-﻿using antflowcore.dto;
+﻿using System.Linq.Expressions;
+using antflowcore.constant.enus;
+using antflowcore.dto;
 using antflowcore.entity;
 using antflowcore.exception;
 using antflowcore.service.repository;
 using antflowcore.util.Extension;
 using antflowcore.vo;
+using FreeSql.Internal.Model;
 
 namespace antflowcore.service.biz;
 
@@ -47,7 +50,7 @@ public class BpmvariableBizService
 
     public NodeElementDto GetElementIdByNodeId(String processNumber, String nodeId)
     {
-        NodeElementDto nodeSingleElementDto = _bpmVariableService.Frsql
+        NodeElementDto? nodeSingleElementDto = _bpmVariableService.Frsql
             .Select<BpmVariable,BpmVariableSingle>()
             .InnerJoin((a,b)=>a.Id==b.VariableId)
             .Where((a,b)=>a.ProcessNum==processNumber&&b.NodeId==nodeId)
@@ -64,37 +67,28 @@ public class BpmvariableBizService
                     }
                 }
             })
-            .First();
-        List<NodeElementDto> nodeElementDtos = _bpmVariableService.Frsql
+            .FirstOrDefault();
+
+
+        var tuples = _bpmVariableService.Frsql
             .Select<BpmVariable, BpmVariableMultiplayer, BpmVariableMultiplayerPersonnel>()
             .InnerJoin((a, b, c) => a.Id == b.VariableId)
             .InnerJoin((a, b, c) => b.Id == c.VariableMultiplayerId)
             .Where((a, b, c) => a.ProcessNum == processNumber && b.NodeId == nodeId)
-            .ToList<NodeElementDto>((a, b, c) => new NodeElementDto
-            {
-                NodeId = nodeId,
-                ElementId = b.ElementId,
-                AssigneeInfoList = new List<BaseIdTranStruVo>
-                {
-                    new BaseIdTranStruVo
-                    {
-                        Id = c.Assignee,
-                        Name = c.AssigneeName
-                    }
-                }
-            });
+            .ToList<HzyTuple<BpmVariable, BpmVariableMultiplayer, BpmVariableMultiplayerPersonnel>>(
+                (a,b,c)=>new HzyTuple<BpmVariable, BpmVariableMultiplayer, BpmVariableMultiplayerPersonnel>(a,b,c)
+            );
         NodeElementDto nodeMultiplayerElementDto = null;
-        if (!nodeElementDtos.IsEmpty())
+        if (!tuples.IsEmpty())
         {
             nodeMultiplayerElementDto = new NodeElementDto();
             nodeMultiplayerElementDto.NodeId = nodeId;
-            nodeMultiplayerElementDto.ElementId = nodeElementDtos[0].ElementId;
+            nodeMultiplayerElementDto.ElementId = tuples[0].t2.ElementId;
             nodeMultiplayerElementDto.IsSingle = false;
             nodeMultiplayerElementDto.AssigneeInfoList = new List<BaseIdTranStruVo>();
-            foreach (NodeElementDto nodeElementDto in nodeElementDtos)
-            {
-                nodeMultiplayerElementDto.AssigneeInfoList.AddRange(nodeElementDto.AssigneeInfoList);
-            }
+            
+            nodeMultiplayerElementDto.AssigneeInfoList
+                .AddRange(tuples.Select(a=>new BaseIdTranStruVo(a.t3.Assignee,a.t3.AssigneeName)));
         }
 
         if (nodeSingleElementDto != null)
@@ -174,5 +168,22 @@ public class BpmvariableBizService
             .Set(a => a.Remark, "管理员减签")
             .Where(a => a.VariableMultiplayerId == multiPlayerId&&assigneeIds.Contains(a.Assignee))
             .ExecuteAffrows();
+    }
+
+    public BpmVariableMultiplayer GetCurrentMultiPlayerNode(string processNumber, string elementId, string nodeId=null)
+    {
+        Expression<Func<BpmVariable,BpmVariableMultiplayer,bool>> whereCond = LinqExtensions.True<BpmVariable,BpmVariableMultiplayer>();
+        whereCond = LinqExtensions.And(whereCond, (a, b) => a.ProcessNum == processNumber);
+        whereCond= whereCond.WhereIf(!string.IsNullOrEmpty(nodeId), (a, b) => b.ElementId == elementId);
+        
+        whereCond = whereCond.WhereIf(!string.IsNullOrEmpty(elementId), (a, b) => b.NodeId == nodeId);
+        BpmVariableMultiplayer? bpmVariableMultiplayer = _bpmVariableService.Frsql
+            .Select<BpmVariable,BpmVariableMultiplayer>()
+            .Where(whereCond)
+            .ToList<BpmVariableMultiplayer>((a,b)=>b)
+            .FirstOrDefault();
+
+
+        return bpmVariableMultiplayer;
     }
 }

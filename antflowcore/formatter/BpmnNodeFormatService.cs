@@ -54,7 +54,7 @@ public class BpmnNodeFormatService
         };
         BpmnConfCommonElementVo startNodeElement =
             BpmnElementUtils.GetSingleElement(startElementId, "发起人", "startUser", startUserId, singleAssigneeMap);
-
+        startNodeElement.NodeId = startNode.Id.ToString();
         // Set start user node buttons
         SetStartNodeElementButtons(startUserNode, startNodeElement);
 

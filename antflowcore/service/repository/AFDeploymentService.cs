@@ -87,6 +87,7 @@ public class AFDeploymentService: AFBaseCurdRepositoryService<BpmAfDeployment>,I
             {
                 if (nodeAssigneeMap.ContainsKey(id))
                 {
+                    collectionValue.Remove(id);
                     nodeAssigneeMap.Remove(id);
                 }
             }
