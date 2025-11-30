@@ -20,7 +20,7 @@ public class AFDeploymentService: AFBaseCurdRepositoryService<BpmAfDeployment>,I
     /// <param name="processNumber"></param>
     /// <param name="userInfos"></param>
     /// <param name="nodeId"></param>
-    /// <param name="actionType">1 add,2 remove</param>
+    /// <param name="actionType">1 add,2 remove,3 replace</param>
     /// <exception cref="AFBizException"></exception>
     public void UpdateNodeAssignee(string processNumber,List<BaseIdTranStruVo>userInfos,string nodeId,int actionType)
     {
@@ -93,7 +93,14 @@ public class AFDeploymentService: AFBaseCurdRepositoryService<BpmAfDeployment>,I
             }
            
         }
-        
+
+        if (actionType == 3)
+        {
+            collectionValue = userInfos.Select(a => a.Id).ToList();
+            nodeAssigneeMap = userInfos.ToDictionary(a => a.Id, a => a.Name);
+            bpmnConfCommonElementVo.CollectionValue = collectionValue;
+            bpmnConfCommonElementVo.AssigneeMap = nodeAssigneeMap;
+        }
         bpmAfDeployment.Content = JsonSerializer.Serialize(elements);
         bpmAfDeployment.Rev += 1;
         bpmAfDeployment.UpdateTime=DateTime.Now;

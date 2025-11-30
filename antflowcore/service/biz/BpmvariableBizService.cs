@@ -50,31 +50,36 @@ public class BpmvariableBizService
 
     public NodeElementDto GetElementIdByNodeId(String processNumber, String nodeId)
     {
-        NodeElementDto? nodeSingleElementDto = _bpmVariableService.Frsql
+        NodeElementDto? nodeSingleElementDto = null;
+        HzyTuple<BpmVariable,BpmVariableSingle>? firstOrDefault = _bpmVariableService.Frsql
             .Select<BpmVariable,BpmVariableSingle>()
             .InnerJoin((a,b)=>a.Id==b.VariableId)
             .Where((a,b)=>a.ProcessNum==processNumber&&b.NodeId==nodeId)
-            .ToList<NodeElementDto>((a,b)=>new NodeElementDto
-            {
-                NodeId = nodeId,
-                ElementId = b.ElementId,
-                AssigneeInfoList = new List<BaseIdTranStruVo>
-                {
-                    new BaseIdTranStruVo
-                    {
-                        Id = b.Assignee,
-                        Name = b.AssigneeName
-                    }
-                }
-            })
+            .ToList<HzyTuple<BpmVariable,BpmVariableSingle>>((a,b)=>new HzyTuple<BpmVariable, BpmVariableSingle>(a,b))
             .FirstOrDefault();
-
+        if (firstOrDefault != null)
+        {
+            nodeSingleElementDto = new NodeElementDto();
+            nodeSingleElementDto.IsSingle = true;
+            nodeSingleElementDto.NodeId = nodeId;
+            nodeSingleElementDto.ElementId = firstOrDefault.t2.ElementId;
+            nodeSingleElementDto.AssigneeInfoList = new List<BaseInfoTranStructVo>()
+            {
+                new BaseInfoTranStructVo()
+                {
+                    Id = firstOrDefault.t2.Assignee,
+                    Name = firstOrDefault.t2.AssigneeName,
+                    VariableId = firstOrDefault.t2.Id.ToString(),//存储有人的节点的id
+                }
+            };
+        }
 
         var tuples = _bpmVariableService.Frsql
             .Select<BpmVariable, BpmVariableMultiplayer, BpmVariableMultiplayerPersonnel>()
             .InnerJoin((a, b, c) => a.Id == b.VariableId)
             .InnerJoin((a, b, c) => b.Id == c.VariableMultiplayerId)
             .Where((a, b, c) => a.ProcessNum == processNumber && b.NodeId == nodeId)
+            .OrderBy((a,b,c)=>c.UpdateTime)
             .ToList<HzyTuple<BpmVariable, BpmVariableMultiplayer, BpmVariableMultiplayerPersonnel>>(
                 (a,b,c)=>new HzyTuple<BpmVariable, BpmVariableMultiplayer, BpmVariableMultiplayerPersonnel>(a,b,c)
             );
@@ -85,10 +90,15 @@ public class BpmvariableBizService
             nodeMultiplayerElementDto.NodeId = nodeId;
             nodeMultiplayerElementDto.ElementId = tuples[0].t2.ElementId;
             nodeMultiplayerElementDto.IsSingle = false;
-            nodeMultiplayerElementDto.AssigneeInfoList = new List<BaseIdTranStruVo>();
+            nodeMultiplayerElementDto.AssigneeInfoList = new List<BaseInfoTranStructVo>();
             
             nodeMultiplayerElementDto.AssigneeInfoList
-                .AddRange(tuples.Select(a=>new BaseIdTranStruVo(a.t3.Assignee,a.t3.AssigneeName)));
+                .AddRange(tuples.Select(a=>new BaseInfoTranStructVo
+                {
+                    Id = a.t3.Assignee,
+                    Name = a.t3.AssigneeName,
+                    VariableId = a.t3.Id.ToString(),
+                }));
         }
 
         if (nodeSingleElementDto != null)
@@ -185,5 +195,37 @@ public class BpmvariableBizService
 
 
         return bpmVariableMultiplayer;
+    }
+
+    public void ChangeVariableAssignees(IDictionary<BaseInfoTranStructVo,BaseIdTranStruVo> changedAssignees,bool isSingle)
+    {
+        if (changedAssignees.IsEmpty())
+        {
+            return;
+        }
+
+        foreach (var (old, changed) in changedAssignees)
+        {
+            if (isSingle)
+            {
+                _bpmVariableSingleService.Frsql
+                    .Update<BpmVariableSingle>()
+                    .Set(a => a.Assignee, changed.Id)
+                    .Set(a => a.AssigneeName, changed.Name)
+                    .Set(a=>a.Remark,$"管理员变更{old.Id}:{old.Name}=>{changed.Id}:{changed.Name}")
+                    .Where(a => a.Id == long.Parse(old.VariableId))
+                    .ExecuteAffrows();
+            }
+            else
+            {
+                _bpmVariableMultiplayerPersonnelService.Frsql
+                    .Update<BpmVariableMultiplayerPersonnel>()
+                    .Set(a => a.Assignee, changed.Id)
+                    .Set(a => a.AssigneeName, changed.Name)
+                    .Set(a => a.Remark, $"管理员变更{old.Id}:{old.Name}=>{changed.Id}:{changed.Name}")
+                    .Where(a => a.Id == long.Parse(old.VariableId))
+                    .ExecuteAffrows();
+            }
+        }
     }
 }

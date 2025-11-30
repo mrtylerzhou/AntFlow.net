@@ -505,7 +505,10 @@ public class BpmnConfCommonService
             .Where((a, b) => b.BusinessNumber == processNumber)
             .ToList<BpmFlowrunEntrust>();
          
-         Dictionary<string, List<BpmFlowrunEntrust>> nodeId2entrustDict= bpmFlowrunEntrusts.Where(a=>!string.IsNullOrEmpty(a.NodeId)).GroupBy(a => a.NodeId)
+         Dictionary<string, List<BpmFlowrunEntrust>> nodeId2entrustDict= bpmFlowrunEntrusts
+             .Where(a=>!string.IsNullOrEmpty(a.NodeId))
+             .OrderBy(a=>a.Id)
+             .GroupBy(a => a.NodeId)
             .ToDictionary(g => g.Key, g => g.ToList());
         foreach (BpmnNodeVo bpmnNodeVo in nodeVos)
         {

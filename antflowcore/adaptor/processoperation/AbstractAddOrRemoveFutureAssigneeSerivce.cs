@@ -76,7 +76,7 @@ public abstract class AbstractAddOrRemoveFutureAssigneeSerivce
             }
         }
 
-        List<BaseIdTranStruVo> currentNodeAssignees = nodeElementDto.AssigneeInfoList;
+        List<BaseInfoTranStructVo> currentNodeAssignees = nodeElementDto.AssigneeInfoList;
         List<string> assigneeIds = userInfos.Select(a=>a.Id).ToList();
        
         if (actionType == 1)

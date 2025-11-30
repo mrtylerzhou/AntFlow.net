@@ -260,6 +260,7 @@ public static class ServiceRegistration
         services.AddSingleton<IProcessOperationAdaptor, AddAssigneeProcessService>();
         services.AddSingleton<IProcessOperationAdaptor, RemoveFutureAssigneeProcessService>();
         services.AddSingleton<IProcessOperationAdaptor, AddFutureAssigneeProcessService>();
+        services.AddSingleton<IProcessOperationAdaptor, ChangeFutureAssigneeProcessService>();
         
 
         services.AddSingleton<AFDeploymentService>();
