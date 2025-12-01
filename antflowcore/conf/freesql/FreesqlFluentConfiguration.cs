@@ -1,3 +1,4 @@
+using AntFlowCore.Entities;
 using antflowcore.entity;
 using AntFlowCore.Entity;
 using Microsoft.Extensions.DependencyInjection;
@@ -307,6 +308,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.IsOutSideProcess).IsIgnore(true);
                 a.Property(b => b.IsLowCodeFlow).IsIgnore(true);
                 a.Property(b => b.ExtraFlags).IsIgnore(true);
+                a.Property(b => b.NoHeaderAction).Name("no_header_action");
             }).ConfigEntity<BpmnNodeAssignLevelConf>(a =>
             {
                 a.Name("t_bpmn_node_assign_level_conf");
@@ -1256,7 +1258,12 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.Path).Name("path");
                 a.Property(b => b.IsDel).Name("is_del");
                 a.Property(b => b.HeadImg).Name("head_img");
-            }).ConfigEntity<UserEmailSend>(a =>
+            }).ConfigEntity<Role>(a =>
+                {
+                    a.Property(b => b.Id).Name("id");
+                    a.Property(b=>b.RoleName).Name("role_name");
+                })
+            .ConfigEntity<UserEmailSend>(a =>
             {
                 a.Name("t_user_email_send");
                 a.Property(b => b.Id).IsPrimary(true).IsIdentity(true);

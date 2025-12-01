@@ -17,12 +17,12 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
 {
     private readonly OutSideBpmAdminPersonnelService _outSideBpmAdminPersonnelService;
     private readonly OutSideBpmCallbackUrlConfService _outSideBpmCallbackUrlConfService;
-    private readonly UserService _employeeService;
+    private readonly IUserService _employeeService;
 
     public OutSideBpmBusinessPartyService(
         OutSideBpmAdminPersonnelService outSideBpmAdminPersonnelService,
         OutSideBpmCallbackUrlConfService outSideBpmCallbackUrlConfService,
-        UserService employeeService,
+        IUserService employeeService,
         IFreeSql freeSql) : base(freeSql)
     {
         _outSideBpmAdminPersonnelService = outSideBpmAdminPersonnelService;
@@ -136,7 +136,7 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
                     Id = p.EmployeeId,
                     Name = !string.IsNullOrEmpty(p.EmployeeName)
                         ? p.EmployeeName
-                        : (employeeMap.TryGetValue(p.EmployeeId, out var emp) ? emp.Username : string.Empty)
+                        : (employeeMap.TryGetValue(p.EmployeeId, out var emp) ? emp.UserName : string.Empty)
                 }).ToList();
 
                 // 设置到对应属性上（如 AdminList、AuditorList 等）
@@ -150,7 +150,7 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
             {
                 // 拼接用户名
                 var nameStr = string.Join(",", bpmAdminPersonnels
-                    .Select(p => employeeMap.TryGetValue(p.EmployeeId, out var emp) ? emp.Username : string.Empty));
+                    .Select(p => employeeMap.TryGetValue(p.EmployeeId, out var emp) ? emp.UserName : string.Empty));
 
                 SetProperty(outSideBpmBusinessPartyVo, typeEnum.StrField, nameStr);
             }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using AntFlowCore.Entity;
+using antflowcore.entityj;
 using antflowcore.vo;
 
 namespace AntFlowCore.Vo
@@ -12,7 +13,7 @@ namespace AntFlowCore.Vo
         public List<BpmVerifyInfoVo> VerifyInfoList { get; set; }
 
         [JsonPropertyName("employee")]
-        public Employee Employee { get; set; }
+        public DetailedUser Employee { get; set; }
 
         [JsonPropertyName("processTitle")]
         public string ProcessTitle { get; set; }

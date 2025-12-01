@@ -4,6 +4,7 @@ using antflowcore.entity;
 using AntFlowCore.Entity;
 using antflowcore.service.interf.repository;
 using antflowcore.util;
+using antflowcore.vo;
 
 namespace antflowcore.service.repository;
 
@@ -18,12 +19,19 @@ public class RoleService: AFBaseCurdRepositoryService<Role>,IRoleService
     /// </summary>
     /// <param name="roleIds"></param>
     /// <returns></returns>
-    public List<User> QueryUserByRoleIds(ICollection<String> roleIds)
+    public List<BaseIdTranStruVo> QueryUserByRoleIds(ICollection<String> roleIds)
     {
         IEnumerable<long> roleIdsLong = AFCollectionUtil.StringToLongList(roleIds);
-        List<User> users = Frsql.Select<User, UserRole>()
+        List<BaseIdTranStruVo> users = Frsql.Select<User, UserRole>()
             .InnerJoin((u, r) => u.Id == r.UserId)
-            .Where((u, r) => roleIdsLong.Contains(r.RoleId ?? 0L)).ToList();
+            .Where((u, r) => roleIdsLong.Contains(r.RoleId ?? 0L))
+            .ToList<BaseIdTranStruVo>(
+                (a,b)=>new BaseIdTranStruVo
+                {
+                    Id = a.Id.ToString(),
+                    Name = a.Name,
+                }
+                );
         return users;
     }
 }

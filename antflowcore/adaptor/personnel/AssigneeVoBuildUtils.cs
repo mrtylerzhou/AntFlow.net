@@ -1,6 +1,8 @@
-﻿using antflowcore.exception;
+﻿using System.Collections;
+using antflowcore.exception;
 using antflowcore.service;
 using antflowcore.vo;
+using Microsoft.VisualBasic;
 
 namespace antflowcore.adaptor.personnel;
 
@@ -48,6 +50,34 @@ public class AssigneeVoBuildUtils
         return assigneeVos;
     }
 
+    public List<BpmnNodeParamsAssigneeVo> BuildVOs(
+        ICollection<BaseIdTranStruVo> assigneeInfos, 
+        string nodeName, 
+        bool hasSuffix)
+    {
+        if (string.IsNullOrEmpty(nodeName))
+        {
+            nodeName = "层层审批";
+        }
+
+        var assigneeVos = new List<BpmnNodeParamsAssigneeVo>();
+        int index = 0;
+
+        foreach (var assigneeInfo in assigneeInfos)
+        {
+            index++;
+            string nameSuffix = hasSuffix ? $"_{index}" : "";
+            var vo = new BpmnNodeParamsAssigneeVo
+            {
+                Assignee = assigneeInfo.Id,
+                AssigneeName = assigneeInfo.Name,
+                ElementName = nodeName + nameSuffix
+            };
+            assigneeVos.Add(vo);
+        }
+
+        return assigneeVos;
+    }
     public List<BpmnNodeParamsAssigneeVo> BuildVos(IEnumerable<string> assignees, string nodeName, bool hasSuffix)
     {
         var assigneeInfos = new List<BaseIdTranStruVo>();

@@ -2,6 +2,8 @@
 using antflowcore.constant.enus;
 using antflowcore.entity;
 using AntFlowCore.Entity;
+using antflowcore.entityj;
+using antflowcore.service.interf.repository;
 using antflowcore.service.repository;
 using antflowcore.util;
 using antflowcore.vo;
@@ -11,13 +13,13 @@ namespace antflowcore.service.biz;
 
 public class ActivitiBpmMsgTemplateService
 {
-    private readonly UserService _userService;
+    private readonly IUserService _userService;
     private readonly BpmProcessNoticeService _bpmProcessNoticeService;
     private readonly IConfiguration _configuration;
     private readonly BpmnConfNoticeTemplateService _bpmnConfNoticeTemplateService;
     private readonly ILogger<ActivitiBpmMsgTemplateService> _logger;
 
-    public ActivitiBpmMsgTemplateService(UserService userService,
+    public ActivitiBpmMsgTemplateService(IUserService userService,
         BpmProcessNoticeService bpmProcessNoticeService,
         IConfiguration configuration,
         BpmnConfNoticeTemplateService bpmnConfNoticeTemplateService,
@@ -376,7 +378,7 @@ public class ActivitiBpmMsgTemplateService
     }
     private UserMsgVo BuildUserMsgVo(ActivitiBpmMsgVo activitiBpmMsgVo, string content)
     {
-        Employee employee = GetEmployee(activitiBpmMsgVo.UserId, activitiBpmMsgVo);
+        DetailedUser employee = GetEmployee(activitiBpmMsgVo.UserId, activitiBpmMsgVo);
 
         return new UserMsgVo
         {
@@ -424,13 +426,13 @@ public class ActivitiBpmMsgTemplateService
         return Array.Empty<MessageSendTypeEnum>();
     }
 
-    private Employee GetEmployee(string employeeId, ActivitiBpmMsgVo activitiBpmMsgVo)
+    private DetailedUser GetEmployee(string employeeId, ActivitiBpmMsgVo activitiBpmMsgVo)
     {
-        Employee employee = _userService.GetEmployeeDetailById(employeeId);
+        DetailedUser employee = _userService.GetEmployeeDetailById(employeeId);
 
         if (employee == null)
         {
-            employee = new Employee();
+            employee = new DetailedUser();
             _logger.LogError("流程消息查询员工信息失败，消息入参 {activitiBpmMsgVo}", 
                 System.Text.Json.JsonSerializer.Serialize(activitiBpmMsgVo));
         }
@@ -451,7 +453,7 @@ public class ActivitiBpmMsgTemplateService
 
         if (noticeReplaceEnums.Any())
         {
-            Employee employee = null;
+            DetailedUser employee = null;
             if (noticeReplaceEnums.Any(e => e.IsSelectEmpl))
             {
                 employee = _userService.GetEmployeeDetailById(activitiBpmMsgVo.OtherUserId);
@@ -461,7 +463,7 @@ public class ActivitiBpmMsgTemplateService
             {
                 if (noticeReplaceEnum.IsSelectEmpl)
                 {
-                    var name = employee?.Username ?? string.Empty;
+                    var name = employee?.UserName ?? string.Empty;
                     content = content.Replace("{" + noticeReplaceEnum.Desc + "}", name);
                 }
                 else

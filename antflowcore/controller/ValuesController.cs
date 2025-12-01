@@ -3,6 +3,7 @@ using antflowcore.adaptor.personnel.provider;
 using antflowcore.dto;
 using antflowcore.entity;
 using AntFlowCore.Entity;
+using antflowcore.service.interf.repository;
 using antflowcore.service.repository;
 using antflowcore.util;
 using antflowcore.vo;
@@ -16,11 +17,11 @@ public class ValuesController
 {
     private readonly IFreeSql _free;
     private readonly IEnumerable<IBpmnPersonnelProviderService> _personnelProviderServices;
-    private readonly UserService _userService;
+    private readonly IUserService _userService;
 
     public ValuesController(IFreeSql free,
         IEnumerable<IBpmnPersonnelProviderService> personnelProviderServices,
-        UserService userService)
+        IUserService userService)
     {
         _free = free;
         _personnelProviderServices = personnelProviderServices;

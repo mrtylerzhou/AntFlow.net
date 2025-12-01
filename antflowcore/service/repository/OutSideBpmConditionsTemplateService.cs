@@ -17,7 +17,7 @@ public class OutSideBpmConditionsTemplateService : AFBaseCurdRepositoryService<O
     private readonly OutSideBpmBaseService _outSideBpmBaseService;
     private readonly OutSideBpmBusinessPartyService _outSideBpmBusinessPartyService;
     private readonly BpmProcessAppApplicationService _bpmProcessAppApplicationService;
-    private readonly UserService _employeeService;
+    private readonly IUserService _employeeService;
     private readonly BpmnConfService _bpmnConfService;
     private readonly BpmnNodeService _bpmnNodeService;
     private readonly BpmnNodeConditionsConfService _bpmnNodeConditionsConfService;
@@ -27,7 +27,7 @@ public class OutSideBpmConditionsTemplateService : AFBaseCurdRepositoryService<O
         OutSideBpmBaseService outSideBpmBaseService,
         OutSideBpmBusinessPartyService outSideBpmBusinessPartyService,
         BpmProcessAppApplicationService bpmProcessAppApplicationService,
-        UserService employeeService,
+        IUserService employeeService,
         BpmnConfService bpmnConfService,
         BpmnNodeService bpmnNodeService,
         BpmnNodeConditionsConfService bpmnNodeConditionsConfService,
@@ -85,7 +85,7 @@ public class OutSideBpmConditionsTemplateService : AFBaseCurdRepositoryService<O
 
             if (!string.IsNullOrEmpty(item.CreateUserId) && employeeMap.TryGetValue(item.CreateUserId, out var emp))
             {
-                item.CreateUserName = emp.Username;
+                item.CreateUserName = emp.UserName;
             }
 
             if (item.ApplicationId != null && item.ApplicationId != 0)

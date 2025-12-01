@@ -1,6 +1,8 @@
 ﻿using antflowcore.conf.di;
 using antflowcore.exception;
+using antflowcore.service.interf.repository;
 using antflowcore.service.repository;
+using antflowcore.util.Extension;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 
@@ -10,14 +12,15 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 [NamedService(nameof(RolePersonnelProvider))]
-public class RolePersonnelProvider : AbstractNodeAssigneeVoProvider
+public class RolePersonnelProvider : AbstractMissingAssignNodeAssigneeVoProvider
 {
-    private readonly UserService _roleInfoProvider;
+    private readonly IUserService _roleInfoProvider;
     private readonly ILogger<RolePersonnelProvider> _logger;
 
-    public RolePersonnelProvider(UserService userService, ILogger<RolePersonnelProvider> logger,AssigneeVoBuildUtils assigneeVoBuildUtils) : base(assigneeVoBuildUtils)
+
+    public RolePersonnelProvider(AssigneeVoBuildUtils assigneeVoBuildUtils, IBpmnProcessAdminProvider processAdminProvider, IUserService roleInfoProvider, ILogger<RolePersonnelProvider> logger) : base(assigneeVoBuildUtils, processAdminProvider)
     {
-        _roleInfoProvider = userService;
+        _roleInfoProvider = roleInfoProvider;
         _logger = logger;
     }
 
@@ -43,13 +46,11 @@ public class RolePersonnelProvider : AbstractNodeAssigneeVoProvider
         var roleIds = propertysVo.RoleIds;
         Dictionary<string,string> roleEmployeeInfo = _roleInfoProvider.ProvideRoleEmployeeInfo(roleIds);
 
-        if (roleEmployeeInfo == null || roleEmployeeInfo.Count == 0)
-        {
-            _logger.LogWarning("can not find specified roles info via roleIds:{roleIds}", string.Join(",", roleIds));
-            throw new AFBizException("can not find specified roles info via roleIds");
-        }
 
-        var userIds =roleEmployeeInfo.Keys.ToList();
-        return base.ProvideAssigneeList(bpmnNodeVo, userIds);
+
+        List<BaseIdTranStruVo> baseIdTranStruVoList = roleEmployeeInfo.IsEmpty()
+            ? new List<BaseIdTranStruVo>()
+            : roleEmployeeInfo.Select(a => new BaseIdTranStruVo(a.Key, a.Value)).ToList();
+        return base.ProvideAssigneeList(bpmnNodeVo, baseIdTranStruVoList);
     }
 }

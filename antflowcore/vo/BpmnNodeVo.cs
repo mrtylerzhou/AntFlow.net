@@ -149,4 +149,6 @@ namespace antflowcore.vo;
 
         [JsonPropertyName("elementId")]
         public string ElementId { get; set; }
+        [JsonPropertyName("noHeaderAction")]
+        public int? NoHeaderAction { get; set; }
     }

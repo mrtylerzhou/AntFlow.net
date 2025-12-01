@@ -3,6 +3,7 @@ using antflowcore.dto;
 using AntFlowCore.Entities;
 using antflowcore.entity;
 using AntFlowCore.Entity;
+using antflowcore.entityj;
 using antflowcore.exception;
 using antflowcore.service.interf.repository;
 using antflowcore.util;
@@ -15,11 +16,11 @@ namespace antflowcore.service.repository;
 
 public class UserService: AFBaseCurdRepositoryService<User>,IUserService
 {
-    private readonly RoleService _roleService;
+    private readonly IRoleService _roleService;
     private readonly DepartmentService _departmentService;
 
     public UserService(IFreeSql freeSql,
-        RoleService roleService,
+        IRoleService roleService,
         DepartmentService departmentService) : base(freeSql)
     {
         _roleService = roleService;
@@ -203,7 +204,7 @@ public class UserService: AFBaseCurdRepositoryService<User>,IUserService
      */
     public Dictionary<string,string> ProvideRoleEmployeeInfo(List<string> roleIds)
     {
-        List<User> users = _roleService.QueryUserByRoleIds(roleIds);
+        List<BaseIdTranStruVo> users = _roleService.QueryUserByRoleIds(roleIds);
         if (users == null || users.Count == 0)
         {
             return new Dictionary<string, string>();
@@ -257,28 +258,19 @@ public class UserService: AFBaseCurdRepositoryService<User>,IUserService
             .ToList<BaseIdTranStruVo>(a=>new BaseIdTranStruVo(a.Id.ToString(),a.Name));
         return results;
     }
-    public List<Employee> QryLiteEmployeeInfoByIds(IEnumerable<string> ids)
-    {
-        var baseIdTranStruVos = this.QueryUserByIds(ids);
-        return EmployeeUtil.BasicEmployeeInfos(baseIdTranStruVos);
-    }
+   
+    
 
-    public Employee QryLiteEmployeeInfoById(string id)
-    {
-        var baseIdTranStruVo = this.GetById(id);
-        return EmployeeUtil.BasicEmployeeInfo(baseIdTranStruVo);
-    }
-
-    public Employee GetEmployeeDetailById(string id)
+    public DetailedUser GetEmployeeDetailById(string id)
     {
         
-        Employee employee = this
+        DetailedUser employee = this
             .baseRepo
             .Where(a=>a.Id == Convert.ToInt64(id))
-            .ToOne<Employee>(a=>new Employee()
+            .ToOne<DetailedUser>(a=>new DetailedUser()
             {
                 Id = a.Id.ToString(),
-                Username = a.Name,
+                UserName = a.Name,
             });
         return employee;
     }
@@ -288,16 +280,16 @@ public class UserService: AFBaseCurdRepositoryService<User>,IUserService
     /// </summary>
     /// <param name="ids"></param>
     /// <returns></returns>
-    public List<Employee> GetEmployeeDetailByIds(IEnumerable<string> ids)
+    public List<DetailedUser> GetEmployeeDetailByIds(IEnumerable<string> ids)
     {
         List<long> longIds = ids.Select(a=>Convert.ToInt64(a)).ToList();
         List<User> users = this.baseRepo
             .Where(a => longIds.Contains(a.Id))
             .ToList();
-        List<Employee> employees = users.Select(a=>new Employee()
+        List<DetailedUser> employees = users.Select(a=>new DetailedUser()
             {
                 Id = a.Id.ToString(),
-                Username = a.Name,
+                UserName = a.Name,
             })
             .ToList();
         return employees;
@@ -319,5 +311,18 @@ public class UserService: AFBaseCurdRepositoryService<User>,IUserService
     public long CheckEmployeeEffective(string userId)
     {
         return this.baseRepo.Where(a=>a.Id==Convert.ToInt64(userId)).Count();
+    }
+
+    public DetailedUser GetDetailedUserById(string Id)
+    {
+      return  this
+            .baseRepo
+            .Where(a=>a.Id == Convert.ToInt64(Id))
+            .ToOne<DetailedUser>(a=>new DetailedUser()
+            {
+                Id = a.Id.ToString(),
+                UserName = a.Name,
+            });
+        
     }
 }

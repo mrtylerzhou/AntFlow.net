@@ -1,6 +1,8 @@
 ﻿using AntFlowCore.Entities;
 using antflowcore.entity;
 using AntFlowCore.Entity;
+using antflowcore.entityj;
+using antflowcore.service.interf.repository;
 using antflowcore.service.repository;
 using antflowcore.util;
 using antflowcore.vo;
@@ -12,10 +14,10 @@ using System.Linq;
 
 public class EmployeeService
 {
-    private readonly UserService _userService;
+    private readonly IUserService _userService;
 
 
-    public EmployeeService(UserService userService)
+    public EmployeeService(IUserService userService)
     {
         _userService = userService;
     }
@@ -32,33 +34,15 @@ public class EmployeeService
         return EmployeeUtil.BasicEmployeeInfo(baseIdTranStruVo);
     }
 
-    public Employee GetEmployeeDetailById(string id)
+    public DetailedUser GetEmployeeDetailById(string id)
     {
-        
-        Employee employee = _userService
-            .baseRepo
-            .Where(a=>a.Id == Convert.ToInt64(id))
-            .ToOne<Employee>(a=>new Employee()
-            {
-                Id = a.Id.ToString(),
-                Username = a.Name,
-            });
-        return employee;
+
+        return _userService.GetDetailedUserById(id);
     }
 
-    public List<Employee> GetEmployeeDetailByIds(IEnumerable<string> ids)
+    public List<DetailedUser> GetEmployeeDetailByIds(IEnumerable<string> ids)
     {
-        List<long> longIds = ids.Select(a=>Convert.ToInt64(a)).ToList();
-        List<User> users = _userService.baseRepo
-            .Where(a => longIds.Contains(a.Id))
-            .ToList();
-        List<Employee> employees = users.Select(a=>new Employee()
-            {
-                Id = a.Id.ToString(),
-                Username = a.Name,
-            })
-            .ToList();
-        return employees;
+        return _userService.GetEmployeeDetailByIds(ids);
     }
 
    

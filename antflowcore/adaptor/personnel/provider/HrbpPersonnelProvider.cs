@@ -1,16 +1,18 @@
 ﻿using antflowcore.conf.di;
 using antflowcore.exception;
+using antflowcore.service.interf.repository;
 using antflowcore.service.repository;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 
 namespace antflowcore.adaptor.personnel.provider;
 [NamedService(nameof(HrbpPersonnelProvider))]
-public class HrbpPersonnelProvider : AbstractNodeAssigneeVoProvider
+public class HrbpPersonnelProvider : AbstractMissingAssignNodeAssigneeVoProvider
 {
-    private readonly UserService _userService;
+    private readonly IUserService _userService;
 
-    public HrbpPersonnelProvider(UserService userService,AssigneeVoBuildUtils assigneeVoBuildUtils) : base(assigneeVoBuildUtils)
+
+    public HrbpPersonnelProvider(AssigneeVoBuildUtils assigneeVoBuildUtils, IBpmnProcessAdminProvider processAdminProvider, IUserService userService) : base(assigneeVoBuildUtils, processAdminProvider)
     {
         _userService = userService;
     }
@@ -20,12 +22,8 @@ public class HrbpPersonnelProvider : AbstractNodeAssigneeVoProvider
         string startUserId = startConditionsVo.StartUserId;
         BaseIdTranStruVo baseIdTranStruVo = _userService.QueryEmployeeHrpbByEmployeeId(startUserId);
 
-        if (baseIdTranStruVo == null)
-        {
-            throw new AFBizException("发起人HRBP不存在");
-        }
-
-        var userIds = new List<string> { baseIdTranStruVo.Id.ToString() };
-        return base.ProvideAssigneeList(bpmnNodeVo, userIds);
+       
+        
+        return base.ProvideAssigneeList(bpmnNodeVo, new List<BaseIdTranStruVo>(){baseIdTranStruVo});
     }
 }

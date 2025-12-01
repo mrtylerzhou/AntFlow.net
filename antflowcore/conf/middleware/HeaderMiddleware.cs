@@ -2,6 +2,7 @@
 using AntFlowCore.Constants;
 using AntFlowCore.Entities;
 using antflowcore.service.interf;
+using antflowcore.service.interf.repository;
 using antflowcore.service.repository;
 using AntFlowCore.Util;
 using antflowcore.vo;
@@ -19,7 +20,7 @@ public class HeaderMiddleware
         _next = next;
     }
 
-    public async Task InvokeAsync(HttpContext context, UserService userService,ITenantIdHolder tenantIdHolder)
+    public async Task InvokeAsync(HttpContext context, IUserService userService,ITenantIdHolder tenantIdHolder)
     {
         if (context.Request.Method != HttpMethod.Options.Method)
         {

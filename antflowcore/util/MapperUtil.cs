@@ -92,6 +92,7 @@ public static class MapperUtil
             IsLowCodeFlow = node.IsLowCodeFlow,
             IsDynamicCondition = node.IsDynamicCondition,
             IsParallel = node.IsParallel,
+            NoHeaderAction = node.NoHeaderAction,
         };
     }
 
@@ -122,7 +123,8 @@ public static class MapperUtil
             UpdateTime = vo.UpdateTime,
             NodeFroms = vo.NodeFroms,
             IsOutSideProcess = vo.IsOutSideProcess,
-            IsLowCodeFlow = vo.IsLowCodeFlow
+            IsLowCodeFlow = vo.IsLowCodeFlow,
+            NoHeaderAction = vo.NoHeaderAction,
         };
     }
 

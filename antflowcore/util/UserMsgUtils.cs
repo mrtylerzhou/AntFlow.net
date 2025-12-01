@@ -2,6 +2,7 @@
 using antflowcore.constant.enums;
 using AntFlowCore.Entity;
 using antflowcore.service.biz;
+using antflowcore.service.interf.repository;
 using antflowcore.service.repository;
 using antflowcore.vo;
 using AntFlowCore.Vo;
@@ -195,9 +196,9 @@ public static class UserMsgUtils
         return service.CheckEmployeeEffective(userId) > 0;
     }
 
-    private static UserService GetAfUserService()
+    private static IUserService GetAfUserService()
     {
-       return ServiceProviderUtils.GetService<UserService>();
+       return ServiceProviderUtils.GetService<IUserService>();
     }
 
     private static MessageService GetMessageService()

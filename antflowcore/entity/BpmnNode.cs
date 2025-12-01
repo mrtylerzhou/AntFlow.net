@@ -55,4 +55,5 @@ public class BpmnNode
     public int? IsLowCodeFlow { get; set; }
 
     public int? ExtraFlags { get; set; }
+    public int?  NoHeaderAction { get; set; }
 }

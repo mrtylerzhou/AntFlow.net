@@ -1,4 +1,5 @@
 ﻿using AntFlowCore.Entity;
+using antflowcore.entityj;
 using antflowcore.vo;
 
 namespace antflowcore.service;
@@ -6,5 +7,5 @@ namespace antflowcore.service;
 public interface IBpmnEmployeeInfoProviderService
 {
     Dictionary<string, string> ProvideEmployeeInfo(IEnumerable<string> empIds);
-    public Employee QryLiteEmployeeInfoById(String id);
+    public DetailedUser QryLiteEmployeeInfoById(String id);
 }

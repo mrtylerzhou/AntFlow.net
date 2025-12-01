@@ -1,16 +1,17 @@
 ﻿using antflowcore.conf.di;
+using antflowcore.service.interf.repository;
 using antflowcore.service.repository;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 
 namespace antflowcore.adaptor.personnel.provider;
 [NamedService(nameof(DirectLeaderPersonnelProvider))]
-public class DirectLeaderPersonnelProvider : AbstractNodeAssigneeVoProvider
+public class DirectLeaderPersonnelProvider : AbstractMissingAssignNodeAssigneeVoProvider
 {
-    private readonly UserService _userService;
+    private readonly IUserService _userService;
 
-    public DirectLeaderPersonnelProvider(UserService userService, AssigneeVoBuildUtils assigneeVoBuildUtils)
-        : base(assigneeVoBuildUtils)
+
+    public DirectLeaderPersonnelProvider(AssigneeVoBuildUtils assigneeVoBuildUtils, IBpmnProcessAdminProvider processAdminProvider, IUserService userService) : base(assigneeVoBuildUtils, processAdminProvider)
     {
         _userService = userService;
     }
@@ -19,7 +20,7 @@ public class DirectLeaderPersonnelProvider : AbstractNodeAssigneeVoProvider
     {
         var startUserId = startConditionsVo.StartUserId;
         BaseIdTranStruVo baseIdTranStruVo = _userService.QueryEmployeeDirectLeaderById(startUserId);
-        var userIds = new List<string> { baseIdTranStruVo.Id };
-        return base.ProvideAssigneeList(bpmnNodeVo, userIds);
+      
+        return base.ProvideAssigneeList(bpmnNodeVo, new List<BaseIdTranStruVo>(){baseIdTranStruVo});
     }
 }

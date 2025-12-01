@@ -5,6 +5,7 @@ using antflowcore.constant.enus;
 using AntFlowCore.Entities;
 using antflowcore.entity;
 using AntFlowCore.Entity;
+using antflowcore.entityj;
 using AntFlowCore.Enums;
 using antflowcore.exception;
 using antflowcore.service.biz;
@@ -23,8 +24,8 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
     private readonly BpmBusinessProcessService _bpmBusinessProcessService;
     private readonly AfTaskInstService _afTaskInstService;
     private readonly AFTaskService _taskService;
-    private readonly RoleService _roleService;
-    private readonly UserService _userService;
+    private readonly IRoleService _roleService;
+    private readonly IUserService _userService;
     private readonly BpmProcessNoticeService _bpmProcessNoticeService;
     private readonly BpmProcessForwardService _bpmProcessForwardService;
     private readonly ProcessBusinessContansService _processBusinessContansService;
@@ -37,8 +38,8 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
         BpmBusinessProcessService bpmBusinessProcessService,
         AfTaskInstService afTaskInstService,
         AFTaskService taskService,
-        RoleService roleService,
-        UserService userService,
+        IRoleService roleService,
+        IUserService userService,
         BpmProcessNoticeService bpmProcessNoticeService,
         BpmProcessForwardService bpmProcessForwardService,
         ProcessBusinessContansService processBusinessContansService,
@@ -443,7 +444,7 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
             return;
         }
 
-        List<Employee> employeeDetailByIds = _userService.GetEmployeeDetailByIds(sendToUsers.Distinct().ToList());
+        List<DetailedUser> employeeDetailByIds = _userService.GetEmployeeDetailByIds(sendToUsers.Distinct().ToList());
         if(employeeDetailByIds.IsEmpty()){
             return;
         }
@@ -462,7 +463,7 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
 
         //specified roles
         if (!bpmnTemplateVo.RoleIdList.IsEmpty()) {
-            List<User> users = _roleService.QueryUserByRoleIds(bpmnTemplateVo.RoleIdList);
+            List<BaseIdTranStruVo> users = _roleService.QueryUserByRoleIds(bpmnTemplateVo.RoleIdList);
             if (!users.IsEmpty())
             {
                 sendUsers.AddRange(users.Select(u => u.Id.ToString()));
@@ -518,7 +519,7 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
         }
         return sendUsers;
     }
-     private void SendMessage(BpmVariableMessageVo vo, BpmnTemplateVo bpmnTemplateVo, List<Employee> employees) {
+     private void SendMessage(BpmVariableMessageVo vo, BpmnTemplateVo bpmnTemplateVo, List<DetailedUser> employees) {
         //query all types of the messages
         List<MessageSendTypeEnum> messageSendTypeEnums = _bpmProcessNoticeService.ProcessNoticeList(vo.FormCode)
             .Select(o => MessageSendTypeEnum.GetEnumByCode(o.Type)).ToList();
@@ -556,7 +557,7 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
     }
 
     private UserMsgBatchVo GetUserMsgBatchVo(
-        Employee employee,
+        DetailedUser employee,
         string title,
         string content,
         string taskId,

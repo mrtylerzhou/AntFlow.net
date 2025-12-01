@@ -5,6 +5,7 @@ using AntFlowCore.Entity;
 using AntFlowCore.Enums;
 using antflowcore.exception;
 using antflowcore.factory;
+using antflowcore.service.interf.repository;
 using antflowcore.service.repository;
 using antflowcore.util;
 using antflowcore.vo;
@@ -20,7 +21,7 @@ public class OutSideAccessSubmitProcessService : IProcessOperationAdaptor
 {
     private readonly BpmnConfCommonService _bpmnConfCommonService;
     private readonly BpmBusinessProcessService _bpmBusinessProcessService;
-    private readonly UserService _employeeService;
+    private readonly IUserService _employeeService;
 
     private readonly OutSideBpmAccessBusinessService _outSideBpmAccessBusinessService;
     private readonly OutSideBpmConditionsTemplateService _outSideBpmConditionsTemplateService;
@@ -30,7 +31,7 @@ public class OutSideAccessSubmitProcessService : IProcessOperationAdaptor
     public OutSideAccessSubmitProcessService(
         BpmnConfCommonService bpmnConfCommonService,
         BpmBusinessProcessService bpmBusinessProcessService,
-        UserService employeeService,
+        IUserService employeeService,
         OutSideBpmAccessBusinessService outSideBpmAccessBusinessService,
         OutSideBpmConditionsTemplateService outSideBpmConditionsTemplateService,
         FormFactory formFactory,

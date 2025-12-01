@@ -4,7 +4,7 @@ using FreeSql.DataAnnotations;
 
 namespace AntFlowCore.Entities
 {
-    [Table(Name = "t_user")]
+  
     public class Role
     {
         /// <summary>

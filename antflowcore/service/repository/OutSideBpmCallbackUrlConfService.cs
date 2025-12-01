@@ -1,6 +1,7 @@
 ﻿using antflowcore.constant.enus;
 using antflowcore.entity;
 using AntFlowCore.Entity;
+using antflowcore.entityj;
 using antflowcore.exception;
 using antflowcore.service.biz;
 using antflowcore.service.interf.repository;
@@ -13,12 +14,12 @@ public class OutSideBpmCallbackUrlConfService : AFBaseCurdRepositoryService<OutS
 {
    
     private readonly OutSideBpmAdminPersonnelService _outSideBpmAdminPersonnelService;
-    private readonly UserService _employeeService;
+    private readonly IUserService _employeeService;
 
     public OutSideBpmCallbackUrlConfService(
        
         OutSideBpmAdminPersonnelService outSideBpmAdminPersonnelService,
-        UserService employeeService,
+        IUserService employeeService,
         IFreeSql freeSql) : base(freeSql)
     {
         _outSideBpmAdminPersonnelService = outSideBpmAdminPersonnelService;
@@ -97,7 +98,7 @@ public class OutSideBpmCallbackUrlConfService : AFBaseCurdRepositoryService<OutS
 
             if (outSideBpmAdminPersonnels != null && outSideBpmAdminPersonnels.Any())
             {
-                List<Employee> employees = _employeeService.GetEmployeeDetailByIds(outSideBpmAdminPersonnels
+                List<DetailedUser> employees = _employeeService.GetEmployeeDetailByIds(outSideBpmAdminPersonnels
                     .Select(a => a.EmployeeId)
                     .ToList());
 
@@ -105,7 +106,7 @@ public class OutSideBpmCallbackUrlConfService : AFBaseCurdRepositoryService<OutS
                     .Select(emp => new Employee
                     {
                         Id = emp.Id,
-                        Username = emp.Username
+                        Username = emp.UserName
                     })
                     .ToList();
             }

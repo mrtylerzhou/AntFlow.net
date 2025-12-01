@@ -1,5 +1,6 @@
 ﻿using antflowcore.conf.di;
 using antflowcore.exception;
+using antflowcore.service.interf.repository;
 using antflowcore.service.repository;
 using antflowcore.vo;
 using AntFlowCore.Vo;
@@ -9,11 +10,12 @@ namespace antflowcore.adaptor.personnel.provider;
 using System;
 using System.Collections.Generic;
 [NamedService(nameof(LevelPersonnelProvider))]
-public class LevelPersonnelProvider : AbstractNodeAssigneeVoProvider
+public class LevelPersonnelProvider : AbstractMissingAssignNodeAssigneeVoProvider
 {
-    private readonly UserService _userService;
+    private readonly IUserService _userService;
 
-    public LevelPersonnelProvider(UserService userService,AssigneeVoBuildUtils assigneeVoBuildUtils) : base(assigneeVoBuildUtils)
+
+    public LevelPersonnelProvider(AssigneeVoBuildUtils assigneeVoBuildUtils, IBpmnProcessAdminProvider processAdminProvider, IUserService userService) : base(assigneeVoBuildUtils, processAdminProvider)
     {
         _userService = userService;
     }
@@ -33,12 +35,6 @@ public class LevelPersonnelProvider : AbstractNodeAssigneeVoProvider
 
         BaseIdTranStruVo baseIdTranStruVo = _userService.QueryLeaderByEmployeeIdAndLevel(startUserId, assignLevelGrade);
 
-        if (baseIdTranStruVo == null)
-        {
-            throw new AFBizException("未能根据发起人和指定层级找到审批人信息");
-        }
-
-        var userIds = new List<string> { baseIdTranStruVo.Id.ToString() };
-        return base.ProvideAssigneeList(bpmnNodeVo, userIds);
+        return  base.ProvideAssigneeList(bpmnNodeVo,new List<BaseIdTranStruVo>(){baseIdTranStruVo});
     }
 }

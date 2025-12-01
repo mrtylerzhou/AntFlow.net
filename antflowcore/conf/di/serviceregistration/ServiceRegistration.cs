@@ -18,6 +18,7 @@ using antflowcore.service.biz;
 using antflowcore.service.repository;
 using antflowcore.service.formprocess;
 using antflowcore.service.interf;
+using antflowcore.service.interf.repository;
 using antflowcore.service.processor;
 using antflowcore.service.processor.filter;
 using antflowcore.service.processor.lowcodeflow;
@@ -46,8 +47,8 @@ public static class ServiceRegistration
         services.AddSingleton<BpmnNodePersonnelConfService>();
         services.AddSingleton<BpmnNodePersonnelEmplConfService>();
         services.AddSingleton<IBpmnEmployeeInfoProviderService, BpmnEmployeeInfoProviderService>();
-        services.AddSingleton<UserService>();
-        services.AddSingleton<RoleService>();
+        services.AddSingleton<IUserService,UserService>();
+        services.AddSingleton<IRoleService,RoleService>();
         services.AddSingleton<DepartmentService>();
         services.AddSingleton<BpmnConfLfFormdataService>();
         services.AddSingleton<BpmnConfLfFormdataFieldService>();
@@ -157,6 +158,7 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmnPersonnelProviderService, StartUserPersonnelProvider>();
         services.AddSingleton<IBpmnPersonnelProviderService, UserPointedPersonnelProvider>();
         services.AddSingleton<IBpmnPersonnelProviderService, BusinessTablePersonnelProvider>();
+        services.AddSingleton<IBpmnProcessAdminProvider, ProcessAddminProvider>();
         #endregion
         
         

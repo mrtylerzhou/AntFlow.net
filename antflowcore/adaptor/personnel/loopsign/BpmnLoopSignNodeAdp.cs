@@ -1,5 +1,6 @@
 ﻿using antflowcore.constant.enus;
 using antflowcore.exception;
+using antflowcore.service.interf.repository;
 using antflowcore.service.repository;
 using antflowcore.vo;
 using AntFlowCore.Vo;
@@ -10,10 +11,10 @@ namespace antflowcore.adaptor.personnel;
 
     public class BpmnLoopSignNodeAdp : AbstractOrderedSignNodeAdp
     {
-        private readonly UserService userService;
+        private readonly IUserService userService;
         
         
-        public BpmnLoopSignNodeAdp(UserService userService,AssigneeVoBuildUtils assigneeVoBuildUtils) : base(assigneeVoBuildUtils)
+        public BpmnLoopSignNodeAdp(IUserService userService,AssigneeVoBuildUtils assigneeVoBuildUtils) : base(assigneeVoBuildUtils)
         {
             this.userService = userService;
         }

@@ -13,7 +13,7 @@ public abstract class AbstractNodeAssigneeVoProvider : IBpmnPersonnelProviderSer
         _assigneeVoBuildUtils = assigneeVoBuildUtils;
     }
 
-    protected List<BpmnNodeParamsAssigneeVo> ProvideAssigneeList(BpmnNodeVo bpmnNodeVo, ICollection<string> assignees)
+    protected virtual List<BpmnNodeParamsAssigneeVo> ProvideAssigneeList(BpmnNodeVo bpmnNodeVo, ICollection<BaseIdTranStruVo>  assignees)
     {
         if (bpmnNodeVo.IsOutSideProcess != null && bpmnNodeVo.IsOutSideProcess == 1)
         {
@@ -25,7 +25,7 @@ public abstract class AbstractNodeAssigneeVoProvider : IBpmnPersonnelProviderSer
 
             return _assigneeVoBuildUtils.BuildVOs(emplList, bpmnNodeVo.NodeName, false);
         }
-        return _assigneeVoBuildUtils.BuildVos(assignees, bpmnNodeVo.NodeName, false);
+        return _assigneeVoBuildUtils.BuildVOs(assignees, bpmnNodeVo.NodeName, false);
     }
 
     public abstract List<BpmnNodeParamsAssigneeVo> GetAssigneeList(BpmnNodeVo bpmnNodeVo,
