@@ -1,5 +1,6 @@
 ﻿using System;
 using antflowcore.constant.enus;
+using AntFlowCore.Constants;
 using antflowcore.util;
 
 namespace AntFlowCore.Entity;
@@ -26,7 +27,7 @@ public class BpmnViewPageButton
 
     public string ButtonName { get; set; }
 
-    public string Remark { get; set; }
+    public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
 
     public int IsDel { get; set; }
     public string TenantId { get; set; }
@@ -52,6 +53,7 @@ public class BpmnViewPageButton
             UpdateUser = SecurityUtils.GetLogInEmpNameSafe(),
             UpdateTime = DateTime.Now,
             TenantId = MultiTenantUtil.GetCurrentTenantId(),
+            Remark = StringConstants.BIG_WHITE_BLANK,
         };
     }
 }

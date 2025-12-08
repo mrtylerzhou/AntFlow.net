@@ -1,4 +1,5 @@
 ﻿using System;
+using AntFlowCore.Constants;
 using FreeSql;
 using FreeSql.DataAnnotations;
 
@@ -9,7 +10,7 @@ public class BpmnNodeHrbpConf
     public long Id { get; set; }
     public long BpmnNodeId { get; set; }
     public int? HrbpConfType { get; set; }
-    public string Remark { get; set; }
+    public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
     public int IsDel { get; set; }
     public string TenantId { get; set; }
     public string CreateUser { get; set; }

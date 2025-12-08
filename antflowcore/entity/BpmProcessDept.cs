@@ -1,4 +1,5 @@
 ﻿using System;
+using AntFlowCore.Constants;
 
 namespace AntFlowCore.Entity;
 
@@ -36,7 +37,7 @@ public class BpmProcessDept
     /// <summary>
     /// Process remark.
     /// </summary>
-    public string Remarks { get; set; }
+    public string Remarks { get; set; } = StringConstants.BIG_WHITE_BLANK;
 
     /// <summary>
     /// Create time.

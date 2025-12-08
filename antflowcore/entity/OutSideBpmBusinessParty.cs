@@ -1,4 +1,6 @@
-﻿namespace AntFlowCore.Entity
+﻿using AntFlowCore.Constants;
+
+namespace AntFlowCore.Entity
 {
     /// <summary>
     /// Represents an external BPM business party.
@@ -9,7 +11,7 @@
         public string BusinessPartyMark { get; set; }
         public string Name { get; set; }
         public int Type { get; set; }
-        public string Remark { get; set; }
+        public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
         public int IsDel { get; set; }
         public string CreateUser { get; set; }
         public DateTime? CreateTime { get; set; }

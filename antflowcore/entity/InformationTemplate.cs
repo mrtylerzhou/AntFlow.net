@@ -1,4 +1,5 @@
 ﻿using System;
+using AntFlowCore.Constants;
 using AntFlowCore.Enums;
 
 namespace AntFlowCore.Entity
@@ -56,7 +57,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// Remark.
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
 
         /// <summary>
         /// Status (0: enabled, 1: disabled).

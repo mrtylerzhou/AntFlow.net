@@ -292,7 +292,7 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
             GroupRelation = bpmnNodeConditionsConfBaseVo.GroupRelation,
             ExtJson = bpmnNodeConditionsConfBaseVo.ExtJson,
             CreateTime = DateTime.Now,
-            Remark = "",
+            Remark = StringConstants.BIG_WHITE_BLANK,
             CreateUser = SecurityUtils.GetLogInEmpNameSafe(),
             TenantId = MultiTenantUtil.GetCurrentTenantId(),
         };
@@ -381,7 +381,7 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
                             CondGroup = extField.CondGroup,
                             CondRelation = ConditionRelationShipEnum.GetCodeByValue(extField.CondRelation),
                             CreateUser = SecurityUtils.GetLogInEmpNameSafe(),
-                            Remark = "",
+                            Remark = StringConstants.BIG_WHITE_BLANK,
                             CreateTime = DateTime.Now,
                             TenantId = MultiTenantUtil.GetCurrentTenantId(),
                         });

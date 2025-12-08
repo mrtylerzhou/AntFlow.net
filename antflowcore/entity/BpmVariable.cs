@@ -1,4 +1,6 @@
-﻿namespace antflowcore.entity;
+﻿using AntFlowCore.Constants;
+
+namespace antflowcore.entity;
 
 using System;
 
@@ -40,7 +42,7 @@ public class BpmVariable
     /// <summary>
     /// Remark.
     /// </summary>
-    public string Remark { get; set; } = "";
+    public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
 
     /// <summary>
     /// Indicates whether the record is deleted (0 normal, 1 deleted).

@@ -1,4 +1,6 @@
-﻿namespace antflowcore.entity;
+﻿using AntFlowCore.Constants;
+
+namespace antflowcore.entity;
 /// <summary>
 /// Represents the third party business access table.
 /// </summary>
@@ -13,7 +15,7 @@ public class OutSideBpmAccessBusiness
     public string FormDataApp { get; set; }
     public string TemplateMark { get; set; }
     public string StartUsername { get; set; }
-    public string Remark { get; set; }
+    public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
     public int IsDel { get; set; }
     public string CreateUser { get; set; }
     public DateTime? CreateTime { get; set; }

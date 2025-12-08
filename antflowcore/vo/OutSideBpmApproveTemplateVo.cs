@@ -1,4 +1,5 @@
 ﻿using antflowcore.conf.json;
+using AntFlowCore.Constants;
 
 namespace antflowcore.vo;
 
@@ -40,7 +41,7 @@ public class OutSideBpmApproveTemplateVo
     public string ApiUrl { get; set; }
 
     [JsonPropertyName("remark")]
-    public string Remark { get; set; }
+    public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
 
     [JsonPropertyName("isDel")]
     public int? IsDel { get; set; }

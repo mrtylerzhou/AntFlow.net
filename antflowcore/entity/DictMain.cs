@@ -1,4 +1,5 @@
-﻿using FreeSql.DataAnnotations;
+﻿using AntFlowCore.Constants;
+using FreeSql.DataAnnotations;
 
 namespace antflowcore.entity;
 
@@ -16,5 +17,5 @@ public class DictMain
     public string CreateUser { get; set; }
     public DateTime? UpdateTime { get; set; }
     public string UpdateUser { get; set; }
-    public string Remark { get; set; }
+    public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
 }

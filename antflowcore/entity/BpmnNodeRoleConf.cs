@@ -1,4 +1,5 @@
 ﻿using System;
+using AntFlowCore.Constants;
 
 namespace AntFlowCore.Entity;
 
@@ -35,7 +36,7 @@ public class BpmnNodeRoleConf
     /// <summary>
     /// Remarks.
     /// </summary>
-    public string Remark { get; set; }
+    public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
 
     /// <summary>
     /// Deletion flag (0 for normal, 1 for deleted).

@@ -1,4 +1,5 @@
 ﻿using System;
+using AntFlowCore.Constants;
 using antflowcore.exception;
 
 namespace AntFlowCore.Entity;
@@ -46,7 +47,7 @@ public class BpmnOutsideConf
     /// <summary>
     /// Remarks.
     /// </summary>
-    public string Remark { get; set; }
+    public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
 
     /// <summary>
     /// Create user ID.

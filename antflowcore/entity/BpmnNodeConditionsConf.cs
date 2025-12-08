@@ -1,4 +1,5 @@
 ﻿using System;
+using AntFlowCore.Constants;
 
 namespace AntFlowCore.Entity;
 
@@ -10,7 +11,7 @@ public class BpmnNodeConditionsConf
     public int? Sort { get; set; }
     public string ExtJson { get; set; }
     public int? GroupRelation { get; set; }
-    public string Remark { get; set; }
+    public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
     public int IsDel { get; set; }
     public string TenantId { get; set; }
     public string CreateUser { get; set; }

@@ -1,4 +1,6 @@
-﻿namespace antflowcore.entity;
+﻿using AntFlowCore.Constants;
+
+namespace antflowcore.entity;
 
 /// <summary>
 /// 变量多方人员
@@ -33,7 +35,7 @@ public class BpmVariableMultiplayerPersonnel
     /// <summary>
     /// 备注
     /// </summary>
-    public string Remark { get; set; } = "";
+    public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
 
     /// <summary>
     /// 是否删除，0表示否，1表示是

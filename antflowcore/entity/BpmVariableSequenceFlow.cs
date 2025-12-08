@@ -1,4 +1,6 @@
-﻿namespace antflowcore.entity;
+﻿using AntFlowCore.Constants;
+
+namespace antflowcore.entity;
 
 using System;
 
@@ -48,9 +50,9 @@ public class BpmVariableSequenceFlow
     public string SequenceFlowConditions { get; set; } = "";
 
     /// <summary>
-    /// Remark.
+    /// `.
     /// </summary>
-    public string Remark { get; set; } = "";
+    public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
 
     /// <summary>
     /// 0 for normal, 1 for delete.

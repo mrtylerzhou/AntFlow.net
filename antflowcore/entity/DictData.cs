@@ -1,4 +1,5 @@
 ﻿using System;
+using AntFlowCore.Constants;
 
 namespace antflowcore.entity
 {
@@ -18,6 +19,6 @@ namespace antflowcore.entity
         public string CreateUser { get; set; }
         public DateTime? UpdateTime { get; set; }
         public string UpdateUser { get; set; }
-        public string Remark { get; set; }
+        public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
     }
 }

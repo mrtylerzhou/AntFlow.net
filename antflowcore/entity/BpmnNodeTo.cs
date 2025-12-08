@@ -1,4 +1,5 @@
 ﻿using System;
+using AntFlowCore.Constants;
 
 namespace AntFlowCore.Entity;
 
@@ -25,7 +26,7 @@ public class BpmnNodeTo
     /// <summary>
     /// Remark or additional information.
     /// </summary>
-    public string Remark { get; set; }
+    public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
 
     /// <summary>
     /// Deletion status (0 for normal, 1 for delete).

@@ -1,4 +1,6 @@
-﻿namespace AntFlowCore.Entity
+﻿using AntFlowCore.Constants;
+
+namespace AntFlowCore.Entity
 {
     /// <summary>
     /// Represents the configuration for external BPM business party callback URLs.
@@ -15,7 +17,7 @@
         public string ApiClientId { get; set; }
         public string ApiClientSecret { get; set; }
         public int Status { get; set; }
-        public string Remark { get; set; }
+        public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
         public int IsDel { get; set; }
         public string CreateUser { get; set; }
         public DateTime? CreateTime { get; set; }

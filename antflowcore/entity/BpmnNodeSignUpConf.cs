@@ -1,4 +1,5 @@
 ﻿using System;
+using AntFlowCore.Constants;
 
 namespace AntFlowCore.Entity;
 
@@ -30,7 +31,7 @@ public class BpmnNodeSignUpConf
     /// <summary>
     /// Remark
     /// </summary>
-    public string Remark { get; set; } = "";
+    public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
 
     /// <summary>
     /// Deletion Status (0: normal, 1: deleted)

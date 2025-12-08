@@ -1,4 +1,6 @@
-﻿namespace antflowcore.entity;
+﻿using AntFlowCore.Constants;
+
+namespace antflowcore.entity;
 
 using System;
 
@@ -50,7 +52,7 @@ public class BpmVariableSingle
     /// <summary>
     /// 备注
     /// </summary>
-    public string Remark { get; set; } = "";
+    public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
 
     /// <summary>
     /// 是否删除，0表示否，1表示是

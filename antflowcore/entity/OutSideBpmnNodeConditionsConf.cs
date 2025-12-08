@@ -1,4 +1,6 @@
-﻿namespace AntFlowCore.Entity
+﻿using AntFlowCore.Constants;
+
+namespace AntFlowCore.Entity
 {
     /// <summary>
     /// Represents the node conditions configuration for the external BPM system.
@@ -8,7 +10,7 @@
         public long Id { get; set; }
         public long BpmnNodeId { get; set; }
         public string OutSideId { get; set; }
-        public string Remark { get; set; }
+        public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
         public int IsDel { get; set; }
         public string CreateUser { get; set; }
         public DateTime? CreateTime { get; set; }

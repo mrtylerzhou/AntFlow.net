@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using antflowcore.conf.json;
+using AntFlowCore.Constants;
 
 namespace antflowcore.vo;
 
@@ -11,7 +12,7 @@ public class BaseKeyValueStruVo
     public string Value { get; set; }
     [JsonPropertyName("type")] public string Type { get; set; }
     [JsonPropertyName("remark")] 
-    public string Remark { get; set; }
+    public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
     [JsonPropertyName("createTime")] 
     public DateTime CreateTime { get; set; }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using AntFlowCore.Constants;
 using antflowcore.vo;
 
 namespace AntFlowCore.Vo
@@ -79,7 +80,7 @@ namespace AntFlowCore.Vo
         /// Gets or sets the remark.
         /// </summary>
         [JsonPropertyName("remark")]
-        public string Remark { get; set; }
+        public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
 
         /// <summary>
         /// Gets or sets the deletion status (0 for normal, 1 for deleted).

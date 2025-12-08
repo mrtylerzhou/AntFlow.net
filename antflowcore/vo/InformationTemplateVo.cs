@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using AntFlowCore.Constants;
 
 namespace AntFlowCore.Vo
 {
@@ -37,7 +38,7 @@ namespace AntFlowCore.Vo
         public string JumpUrlValue { get; set; }
 
         [JsonPropertyName("remark")]
-        public string Remark { get; set; }
+        public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
 
         [JsonPropertyName("status")]
         public int? Status { get; set; }

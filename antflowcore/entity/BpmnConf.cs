@@ -69,7 +69,7 @@ using System.Text.RegularExpressions;
     /// <summary>
     /// remark
     /// </summary>
-    public string Remark { get; set; }
+    public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
 
     /// <summary>
     /// is del 0 for no and 1 yes

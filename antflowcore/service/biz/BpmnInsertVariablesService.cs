@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using antflowcore.adaptor.variable;
 using antflowcore.constant.enus;
+using AntFlowCore.Constants;
 using antflowcore.entity;
 using AntFlowCore.Entity;
 using antflowcore.service.repository;
@@ -182,7 +183,8 @@ namespace antflowcore.service.biz;
                     VariableId = variableId,
                     ViewType = (int)ViewPageTypeEnum.VIEW_PAGE_TYPE_START,
                     ButtonType = o.ButtonType,
-                    ButtonName = o.ButtonName
+                    ButtonName = o.ButtonName,
+                    Remark = StringConstants.BIG_WHITE_BLANK,
                 }).ToList();
 
                 _bpmVariableViewPageButtonService.baseRepo.Insert(startPageButtons);
@@ -195,7 +197,8 @@ namespace antflowcore.service.biz;
                     VariableId = variableId,
                     ViewType = (int)ViewPageTypeEnum.VIEW_PAGE_TYPE_OTHER,
                     ButtonType = o.ButtonType,
-                    ButtonName = o.ButtonName
+                    ButtonName = o.ButtonName,
+                    Remark = StringConstants.BIG_WHITE_BLANK,
                 }).ToList();
 
                 _bpmVariableViewPageButtonService.baseRepo.Insert(otherPageButtons);

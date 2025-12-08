@@ -1,4 +1,5 @@
-﻿using FreeSql.DataAnnotations;
+﻿using AntFlowCore.Constants;
+using FreeSql.DataAnnotations;
 
 namespace AntFlowCore.Entity
 {
@@ -96,7 +97,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// Operation remarks
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
 
         // Default constructor for FreeSQL
         public OpLog() { }

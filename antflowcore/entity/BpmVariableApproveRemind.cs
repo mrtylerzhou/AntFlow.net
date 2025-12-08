@@ -1,4 +1,6 @@
-﻿namespace antflowcore.entity;
+﻿using AntFlowCore.Constants;
+
+namespace antflowcore.entity;
 
 using System;
 
@@ -30,7 +32,7 @@ public class BpmVariableApproveRemind
     /// <summary>
     /// 备注
     /// </summary>
-    public string Remark { get; set; }
+    public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
 
     /// <summary>
     /// 删除标志

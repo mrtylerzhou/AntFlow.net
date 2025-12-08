@@ -17,7 +17,10 @@
         BUTTON_TYPE_FORWARD = 15,         // 转发
         BUTTON_TYPE_BACK_TO_MODIFY = 18,  // 打回修改
         BUTTON_TYPE_JP = 19,              // 加批
-        BUTTON_TYPE_ZB = 21               // 转办
+        BUTTON_TYPE_ZB = 21 ,              // 转办
+        BUTTON_TYPE_CHOOSE_ASSIGNEE=22,//自选审批人
+        BUTTON_TYPE_BACK_TO_ANY_NODE=23,//退回任意节点
+        BUTTON_TYPE_PROCESS_DRAW_BACK=29,//流程撤回
     }
 
     public static class ButtonTypeEnumExtensions
@@ -58,6 +61,12 @@
                     return "加批";
                 case (int)ButtonTypeEnum.BUTTON_TYPE_ZB:
                     return "转办";
+                case (int) ButtonTypeEnum.BUTTON_TYPE_CHOOSE_ASSIGNEE:
+                    return "自选审批人";
+                case (int)ButtonTypeEnum.BUTTON_TYPE_BACK_TO_ANY_NODE:
+                    return "退回任意节点";
+                case (int)ButtonTypeEnum.BUTTON_TYPE_PROCESS_DRAW_BACK:
+                    return "流程撤回";
                 default:
                     return null;
             }

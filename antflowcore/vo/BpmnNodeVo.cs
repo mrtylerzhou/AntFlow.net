@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using AntFlowCore.Constants;
 
 namespace antflowcore.vo;
 
@@ -90,7 +91,7 @@ namespace antflowcore.vo;
         public int? OrderedNodeType { get; set; }
 
         [JsonPropertyName("remark")]
-        public string Remark { get; set; }
+        public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
 
         [JsonPropertyName("isDel")]
         public int IsDel { get; set; }

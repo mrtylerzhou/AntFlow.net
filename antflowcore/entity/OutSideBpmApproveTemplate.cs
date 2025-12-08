@@ -1,4 +1,6 @@
-﻿namespace antflowcore.entity
+﻿using AntFlowCore.Constants;
+
+namespace antflowcore.entity
 {
     /// <summary>
     /// Third party process service, condition template conf
@@ -14,7 +16,7 @@
         public string ApiClientSecret { get; set; }
         public string ApiToken { get; set; }
         public string ApiUrl { get; set; }
-        public string Remark { get; set; }
+        public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
         public int? IsDel { get; set; }
         public string CreateUser { get; set; }
         public DateTime? CreateTime { get; set; }

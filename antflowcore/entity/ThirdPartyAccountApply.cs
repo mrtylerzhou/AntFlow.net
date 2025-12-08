@@ -1,4 +1,6 @@
-﻿namespace antflowcore.entity
+﻿using AntFlowCore.Constants;
+
+namespace antflowcore.entity
 {
     /// <summary>
     /// ThirdPartyAccountApply 实体类
@@ -23,6 +25,6 @@
         /// <summary>
         /// 备注
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
     }
 }

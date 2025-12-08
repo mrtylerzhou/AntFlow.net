@@ -1,4 +1,5 @@
 ﻿using System;
+using AntFlowCore.Constants;
 
 namespace AntFlowCore.Entity
 {
@@ -36,7 +37,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// Remark.
         /// </summary>
-        public string Remark { get; set; }
+        public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
 
         /// <summary>
         /// 0 for normal, 1 for delete.

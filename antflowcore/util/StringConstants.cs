@@ -50,5 +50,6 @@ namespace AntFlowCore.Constants
         public const string DYNAMIC_APPROVER = "--";
         public const String TENANT_ID="tenantId";
         public const String DEFAULT_TENANT="default";
+        public const string BIG_WHITE_BLANK = " ";
     }
 }
