@@ -31,21 +31,68 @@ public class BpmvariableBizService
         _logger = logger;
     }
 
-    public string GetNodeIdByElementId(string processNumber, string elementId)
+    public NodeElementDto GetNodeIdByElementId(string processNumber, string elementId)
     {
-        string nodeIdSingle = _bpmVariableService.Frsql
+        NodeElementDto? nodeSingleElementDto = null;
+        HzyTuple<BpmVariable,BpmVariableSingle>? firstOrDefault = _bpmVariableService.Frsql
             .Select<BpmVariable,BpmVariableSingle>()
             .InnerJoin((a,b)=>a.Id==b.VariableId)
             .Where((a,b)=>a.ProcessNum==processNumber&&b.ElementId==elementId)
-            .ToList<string>((a,b)=>b.NodeId)
-            .First();
-        string nodeIdMultiplayer = _bpmVariableService.Frsql
-            .Select<BpmVariable,BpmVariableMultiplayer>()
-            .InnerJoin((a,b)=>a.Id==b.VariableId)
-            .Where((a,b)=>a.ProcessNum==processNumber&&b.ElementId==elementId)
-            .ToList<string>((a,b)=>b.NodeId)
-            .First();
-        return !string.IsNullOrEmpty(nodeIdSingle) ? nodeIdSingle : nodeIdMultiplayer;
+            .ToList<HzyTuple<BpmVariable,BpmVariableSingle>>((a,b)=>new HzyTuple<BpmVariable, BpmVariableSingle>(a,b))
+            .FirstOrDefault();
+        if (firstOrDefault != null)
+        {
+            nodeSingleElementDto = new NodeElementDto();
+            nodeSingleElementDto.IsSingle = true;
+            nodeSingleElementDto.NodeId = firstOrDefault.t2.NodeId;;
+            nodeSingleElementDto.ElementId =elementId;
+            nodeSingleElementDto.AssigneeInfoList = new List<BaseInfoTranStructVo>()
+            {
+                new BaseInfoTranStructVo()
+                {
+                    Id = firstOrDefault.t2.Assignee,
+                    Name = firstOrDefault.t2.AssigneeName,
+                    VariableId = firstOrDefault.t2.Id.ToString(),//存储有人的节点的id
+                }
+            };
+        }
+        
+        var tuples = _bpmVariableService.Frsql
+            .Select<BpmVariable,BpmVariableMultiplayer,BpmVariableMultiplayerPersonnel>()
+            .InnerJoin((a,b,c)=>a.Id==b.VariableId)
+            .InnerJoin((a, b, c) => b.Id == c.VariableMultiplayerId)
+            .Where((a,b,c)=>a.ProcessNum==processNumber&&b.ElementId==elementId)
+            .OrderBy((a,b,c)=>c.UpdateTime)
+            .ToList<HzyTuple<BpmVariable, BpmVariableMultiplayer, BpmVariableMultiplayerPersonnel>>(
+                (a,b,c)=>new HzyTuple<BpmVariable, BpmVariableMultiplayer, BpmVariableMultiplayerPersonnel>(a,b,c)
+            );
+        NodeElementDto nodeMultiplayerElementDto = null;
+        if (!tuples.IsEmpty())
+        {
+            nodeMultiplayerElementDto = new NodeElementDto();
+            nodeMultiplayerElementDto.NodeId = tuples[0].t2.NodeId;
+            nodeMultiplayerElementDto.ElementId = elementId;
+            nodeMultiplayerElementDto.IsSingle = false;
+            nodeMultiplayerElementDto.AssigneeInfoList = new List<BaseInfoTranStructVo>();
+            
+            nodeMultiplayerElementDto.AssigneeInfoList
+                .AddRange(tuples.Select(a=>new BaseInfoTranStructVo
+                {
+                    Id = a.t3.Assignee,
+                    Name = a.t3.AssigneeName,
+                    VariableId = a.t3.Id.ToString(),
+                }));
+        }
+
+        if (nodeSingleElementDto != null)
+        {
+            return nodeSingleElementDto;
+        }else if (nodeMultiplayerElementDto != null)
+        {
+            return nodeMultiplayerElementDto;
+        }
+
+        throw new AFBizException("未能根据指定节点Id找到elementId");
     }
 
     public NodeElementDto GetElementIdByNodeId(String processNumber, String nodeId)

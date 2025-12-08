@@ -1,5 +1,6 @@
 ﻿using antflowcore.bpmn.service;
 using AntFlowCore.Constants;
+using antflowcore.dto;
 using antflowcore.entity;
 using AntFlowCore.Enums;
 using antflowcore.exception;
@@ -64,9 +65,9 @@ namespace antflowcore.adaptor.processoperation;
             {
                 if (task.Assignee == originalUserId)
                 {
-                    string nodeIdByElementId = _bpmvariableBizService.GetNodeIdByElementId(vo.ProcessNumber,task.TaskDefKey);
+                    NodeElementDto nodeIdByElementId = _bpmvariableBizService.GetNodeIdByElementId(vo.ProcessNumber,task.TaskDefKey);
                     _bpmFlowrunEntrustService.AddFlowrunEntrust(transferToUserId, transferToUserName, originalUserId, 
-                        originalUserName, task.TaskDefKey, 0, bpmBusinessProcess.ProcInstId, vo.ProcessKey,nodeIdByElementId,0);
+                        originalUserName, task.TaskDefKey, 0, bpmBusinessProcess.ProcInstId, vo.ProcessKey,nodeIdByElementId.NodeId,0);
 
                     var taskMgmtVO = new TaskMgmtVO
                     {

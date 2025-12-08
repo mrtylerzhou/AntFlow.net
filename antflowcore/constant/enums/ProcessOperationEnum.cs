@@ -26,6 +26,10 @@ namespace AntFlowCore.Enums
         BUTTON_TYPE_REMOVE_FUTURE_ASSIGNEE=27,//未来节点减签
         BUTTON_TYPE_ADD_FUTURE_ASSIGNEE=28,//未来节点加签
         BUTTON_TYPE_PROCESS_DRAW_BACK=29,//流程撤回
+        BUTTON_TYPE_SAVE_DRAFT=30,//保存草稿
+        BUTTON_TYPE_RECOVER_TO_HIS=31,//恢复已结束流程
+        BUTTON_TYPE_DRAW_BACK_AGREE=32,//撤销同意,同意之后反悔了,撤销同意重新审批
+        BUTTON_TYPE_PROCESS_MOVE_AHEAD=33,//流程推进,管理员向前推进流程进度
         
     }
 
@@ -78,6 +82,14 @@ namespace AntFlowCore.Enums
                     return "未来节点加签";
                 case ProcessOperationEnum.BUTTON_TYPE_PROCESS_DRAW_BACK:
                     return "撤回";
+                case ProcessOperationEnum.BUTTON_TYPE_SAVE_DRAFT:
+                    return "保存草稿";
+                case ProcessOperationEnum.BUTTON_TYPE_RECOVER_TO_HIS:
+                    return "恢复已结束流程";
+                case ProcessOperationEnum.BUTTON_TYPE_DRAW_BACK_AGREE:
+                    return "撤销同意";
+                case ProcessOperationEnum.BUTTON_TYPE_PROCESS_MOVE_AHEAD:
+                    return "流程推进";
                 default:
                     return null;
             }
