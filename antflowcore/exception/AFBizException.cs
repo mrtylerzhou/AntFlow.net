@@ -53,6 +53,13 @@ public class AFBizException : Exception
         {
         }
 
+        public AFBizException(BusinessError businessError):this(businessError.Code.ToString(),businessError.Msg){
+        }
+
+        public AFBizException(BusinessError businessError, string errMsg) : this(businessError.Code.ToString(), errMsg)
+        {
+            
+        }
         // Constructor with type, code, message, and sub message
         public AFBizException(int type, string code, string msg, string subMessage)
             : this(code, msg)

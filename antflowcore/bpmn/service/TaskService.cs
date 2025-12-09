@@ -8,6 +8,7 @@ using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.service.repository;
 using antflowcore.util;
+using antflowcore.util.Extension;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 using FreeSql;

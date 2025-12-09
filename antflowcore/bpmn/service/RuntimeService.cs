@@ -1,9 +1,12 @@
-﻿using antflowcore.bpmn.listener;
+﻿using System.Text.Json;
+using antflowcore.bpmn.listener;
 using antflowcore.constant.enus;
 using AntFlowCore.Constants;
 using antflowcore.entity;
+using antflowcore.exception;
 using antflowcore.service.repository;
 using antflowcore.util;
+using antflowcore.util.Extension;
 using AntFlowCore.Vo;
 
 namespace antflowcore.bpmn.service;
@@ -11,16 +14,30 @@ namespace antflowcore.bpmn.service;
 public class RuntimeService
 {
      private readonly AfTaskInstService _taskInstService;
-     private readonly AFTaskService _taskService;
+     private readonly AFTaskService _afTaskService;
+     private readonly TaskService _taskService;
+     private readonly AfTaskInstService _afTaskInstService;
+     private readonly AFDeploymentService _afDeploymentService;
      private readonly ITaskListener _taskListener;
      private readonly AFExecutionService _executionService;
 
      public RuntimeService(
-          AfTaskInstService taskInstService, AFTaskService taskService, ITaskListener taskListener, 
+          AfTaskInstService taskInstService, 
+          AFTaskService afTaskService,
+          TaskService taskService,
+          AfTaskInstService afTaskInstService,
+          AFExecutionService afExecutionService,
+          AFDeploymentService afDeploymentService,
+          ITaskListener taskListener, 
           AFExecutionService executionService)
      {
-          _taskInstService = taskInstService; _taskService = taskService;
-          _taskListener = taskListener; _executionService = executionService;
+          _taskInstService = taskInstService; 
+          _afTaskService = afTaskService;
+          _taskService = taskService;
+          _afTaskInstService = afTaskInstService;
+          _afDeploymentService = afDeploymentService;
+          _taskListener = taskListener;
+          _executionService = executionService;
      }
 
      public ExecutionEntity StartProcessInstance(BpmnConfCommonVo bpmnConfCommonVo,
@@ -107,7 +124,7 @@ public class RuntimeService
                     }
                }
                
-               _taskService.InsertTasks(tasks);
+               _afTaskService.InsertTasks(tasks);
                foreach (BpmAfTask bpmAfTask in tasks)
                {
                     historyTaskInsts.Add(bpmAfTask.ToInst());
@@ -124,4 +141,85 @@ public class RuntimeService
           return executionEntity;
      }
      
+     public void InsertTasks(BpmBusinessProcess bpmBusinessProcess,string taskDefKey)
+     {
+          string procInstId = bpmBusinessProcess.ProcInstId;
+          string businessKey = bpmBusinessProcess.ProcessinessKey;
+          DateTime nowTime = DateTime.Now;
+
+          List<BpmAfTaskInst> bpmAfTaskInsts = _afTaskInstService.baseRepo
+               .Where(a=>a.ProcInstId==procInstId&&a.TaskDefKey==taskDefKey).ToList();
+
+          if (bpmAfTaskInsts.IsEmpty())
+          {
+               throw new AFBizException(BusinessError.STATUS_ERROR, "未能找到流程信息");
+          }
+
+          string procDefId = bpmAfTaskInsts[0].ProcDefId;
+          BpmAfDeployment bpmAfDeployment = _afDeploymentService.baseRepo.Where(a=>a.Id==procDefId).First();
+          if (bpmAfDeployment == null)
+          {
+               throw new ApplicationException($"deployment with id {procDefId} not found");
+          }
+          string content = bpmAfDeployment.Content;
+          List<BpmnConfCommonElementVo> elements = JsonSerializer.Deserialize<List<BpmnConfCommonElementVo>>(content);
+          BpmnConfCommonElementVo? bpmnConfCommonElementVo = elements.FirstOrDefault(a => a.ElementId==taskDefKey);
+          if (bpmnConfCommonElementVo == null)
+          {
+               throw new AFBizException(BusinessError.STATUS_ERROR,"未能找到流程定义信息!");
+          }
+          string newExecutionId=StrongUuidGenerator.GetNextId();
+          string deploymentId = bpmAfDeployment.Id;
+          int signType = bpmnConfCommonElementVo.SignType;
+          BpmAfExecution execution = new BpmAfExecution
+          {
+               Id = newExecutionId,
+               ProcInstId = procInstId,
+               BusinessKey = businessKey,
+               ProcDefId = procDefId,
+               ActId = taskDefKey,
+               Name = bpmnConfCommonElementVo.ElementName,
+               StartTime = nowTime,
+               StartUserId = SecurityUtils.GetLogInEmpId(),
+               SignType =signType,
+               TaskCount = bpmnConfCommonElementVo.AssigneeMap.Count,
+               TenantId = MultiTenantUtil.GetCurrentTenantId(),
+          };
+          IDictionary<string,string> assigneeMap = bpmnConfCommonElementVo.AssigneeMap;
+          
+          List<BpmAfTaskInst> historyTaskInsts = new List<BpmAfTaskInst>();
+          List<BpmAfTask> tasks = new List<BpmAfTask>();
+
+          foreach (var (key, value) in assigneeMap)
+          {
+               BpmAfTask bpmAfTask = new BpmAfTask()
+               {
+                    Id = StrongUuidGenerator.GetNextId(),
+                    ProcInstId = procInstId,
+                    ProcDefId = deploymentId,
+                    ExecutionId = newExecutionId,
+                    Name = bpmnConfCommonElementVo.ElementName,
+                    TaskDefKey = bpmnConfCommonElementVo.ElementId,
+                    Owner = bpmBusinessProcess.CreateUser,
+                    Assignee = key,
+                    AssigneeName = value,
+                    CreateTime = nowTime.AddSeconds(1),
+                    FormKey = bpmBusinessProcess.ProcessinessKey,
+               };
+               tasks.Add(bpmAfTask);
+               if (signType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode())
+               {
+                    break;
+               }
+          }
+          _afTaskService.InsertTasks(tasks);
+          foreach (BpmAfTask afTask in tasks)
+          {
+               BpmAfTaskInst bpmAfTaskInst = afTask.ToInst();
+               historyTaskInsts.Add(bpmAfTaskInst);
+          }
+          
+          _afTaskInstService.baseRepo.Insert(historyTaskInsts);
+        
+     }
 }
