@@ -1,4 +1,6 @@
-﻿namespace antflowcore.constant.enus;
+﻿using antflowcore.exception;
+
+namespace antflowcore.constant.enus;
 
 /// <summary>
     /// Process node static class
@@ -6,7 +8,7 @@
     public static class ProcessNodeEnum
     {
         public static readonly ProcessNode START_TASK_KEY = new ProcessNode(1, "task1418018332271");
-        public static readonly ProcessNode TOW_TASK_KEY = new ProcessNode(2, "task1418018332272");
+        public static readonly ProcessNode TWO_TASK_KEY = new ProcessNode(2, "task1418018332272");
         public static readonly ProcessNode THREE_TASK_KEY = new ProcessNode(3, "task1418018332273");
         public static readonly ProcessNode FOUR_TASK_KEY = new ProcessNode(4, "task1418018332274");
         public static readonly ProcessNode FIVE_TASK_KEY = new ProcessNode(5, "task1418018332275");
@@ -43,7 +45,7 @@
 
         private static readonly List<ProcessNode> _nodes = new List<ProcessNode>
         {
-            START_TASK_KEY, TOW_TASK_KEY, THREE_TASK_KEY, FOUR_TASK_KEY, FIVE_TASK_KEY,
+            START_TASK_KEY, TWO_TASK_KEY, THREE_TASK_KEY, FOUR_TASK_KEY, FIVE_TASK_KEY,
             SIX_TASK_KEY, SEVEN_TASK_KEY, EIGHT_TASK_KEY, NINE_TASK_KEY, TEN_TASK_KEY,
             THIRTEEN_TASK_KEY, FOURTTEEN_TASK_KEY, FIFTTEEN_TASK_KEY, FOURTEEN_TASK_KEY,
             SEX_TASK_KEY, SEXTEEN_TASK_KEY, SEVENTEEN_TASK_KEY, EIGHTEEN_TASK_KEY, NIGHTEEN_TASK_KEY,
@@ -63,6 +65,17 @@
         {
             var node = _nodes.Find(n => n.Description == description);
             return node?.Code;
+        }
+
+        public static int Compare(String taskDefKey1,String taskDefKey2)
+        {
+            if(string.IsNullOrEmpty(taskDefKey1)||string.IsNullOrEmpty(taskDefKey2)){
+                throw new AFBizException(BusinessError.PARAMS_IS_NULL,"请传入taskDefKey");
+            }
+
+            long longTaskDefKey1 = long.Parse(taskDefKey1.Replace("task",""));
+            long longTaskDefkey2 = long.Parse(taskDefKey2.Replace("task",""));
+            return longTaskDefKey1.CompareTo(longTaskDefkey2);
         }
     }
 

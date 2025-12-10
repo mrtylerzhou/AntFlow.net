@@ -30,6 +30,7 @@ using System.Linq;
         private readonly TaskMgmtService _taskMgmtService;
         private readonly BpmVariableService _bpmVariableService;
         private readonly AFExecutionService _afExecutionService;
+        private readonly BpmVerifyInfoBizService _bpmVerifyInfoBizService;
         private readonly ProcessBusinessContansService _processConstants;
 
         public BackToModifyService(
@@ -42,6 +43,7 @@ using System.Linq;
             TaskMgmtService taskMgmtService,
             BpmVariableService bpmVariableService,
             AFExecutionService afExecutionService,
+            BpmVerifyInfoBizService bpmVerifyInfoBizService,
             ProcessBusinessContansService processConstants)
         {
             _bpmBusinessProcessService = bpmBusinessProcessService;
@@ -53,6 +55,7 @@ using System.Linq;
             _taskMgmtService = taskMgmtService;
             _bpmVariableService = bpmVariableService;
             _afExecutionService = afExecutionService;
+            _bpmVerifyInfoBizService = bpmVerifyInfoBizService;
             _processConstants = processConstants;
         }
 
@@ -70,6 +73,12 @@ using System.Linq;
                 throw new AFBizException($"未获取到当前流程信息!, 流程编号: {bpmBusinessProcess.ProcessinessKey}");
 
             BpmAfTask taskData = taskList.FirstOrDefault(t => SecurityUtils.GetLogInEmpIdStr() == t.Assignee);
+            bool isStartUserDrawBack=(int)ProcessOperationEnum.BUTTON_TYPE_PROCESS_DRAW_BACK==vo.OperationType;
+            bool isOtherApproverDrawBack=(int)ProcessOperationEnum.BUTTON_TYPE_DRAW_BACK_AGREE==vo.OperationType;
+            if(isStartUserDrawBack||isOtherApproverDrawBack)
+            {
+                taskData = taskList[0];
+            }
             if (taskData == null)
             {
                 throw new AFBizException("当前流程已审批！");
@@ -77,8 +86,30 @@ using System.Linq;
 
             List<BpmAfTask> otherNodeTasks = taskList.Where(a=>a.TaskDefKey!=taskData.TaskDefKey).ToList();
             string restoreNodeKey, backToNodeKey;
+            if(isStartUserDrawBack){
+                String createUser = bpmBusinessProcess.CreateUser;
+                if(SecurityUtils.GetLogInEmpIdSafe()!=createUser){
+                    throw new AFBizException(BusinessError.RIGHT_VIOLATE,"只有发起人可以操作撤回");
+                }
+                if(taskList.Count>1){
+                    throw new AFBizException(BusinessError.RIGHT_INVALID,"流程已审批,不允许操作!");
+                }
+                String taskDefinitionKey = taskList[0].TaskDefKey;
+                String twoTaskKeyDesc = ProcessNodeEnum.TWO_TASK_KEY.Description;
+                if (ProcessNodeEnum.Compare(taskDefinitionKey,twoTaskKeyDesc)>0) {
+                    throw new AFBizException(BusinessError.RIGHT_INVALID,"已被审批的流程允许撤回!");
+                }
+                vo.BackToModifyType=ProcessDisagreeTypeEnum.TWO_DISAGREE.Code;
+            }else if(isOtherApproverDrawBack){
+                vo.BackToModifyType=ProcessDisagreeTypeEnum.FOUR_DISAGREE.Code;
+            }
 
+            List<String> taskDefKeys = taskList.Select(a => a.TaskDefKey).ToList();
+            
             int backToModifyType = vo.BackToModifyType ?? ProcessDisagreeTypeEnum.THREE_DISAGREE.Code;
+            if (taskDefKeys.Count > 1 && backToModifyType == ProcessDisagreeTypeEnum.FIVE_DISAGREE.Code) {
+                backToModifyType = ProcessDisagreeTypeEnum.FOUR_DISAGREE.Code;
+            }
             ProcessDisagreeTypeEnum processDisagreeType = ProcessDisagreeTypeEnum.GetByCode(backToModifyType);
 
 
@@ -92,7 +123,7 @@ using System.Linq;
                 }
                 else if (ProcessDisagreeTypeEnum.TWO_DISAGREE == processDisagreeType)
                 {
-                    restoreNodeKey = ProcessNodeEnum.TOW_TASK_KEY.Description;
+                    restoreNodeKey = ProcessNodeEnum.TWO_TASK_KEY.Description;
                     backToNodeKey = ProcessNodeEnum.START_TASK_KEY.Description;
                 }
                 else if (ProcessDisagreeTypeEnum.THREE_DISAGREE == processDisagreeType)
@@ -102,7 +133,21 @@ using System.Linq;
                 }
                 else if(ProcessDisagreeTypeEnum.FOUR_DISAGREE == processDisagreeType)
                 {
-                    String elementId = _bpmVariableService.GetElementIdsdByNodeId(vo.ProcessNumber, vo.BackToNodeId)[0];
+                    String elementId = null;
+                    if (isOtherApproverDrawBack)
+                    {
+                        String logInEmpId = SecurityUtils.GetLogInEmpId();
+                        BpmVerifyInfo lastProcessNodeByAssignee = _bpmVerifyInfoBizService.GetLastProcessNodeByAssignee(bpmBusinessProcess.BusinessNumber, logInEmpId);
+                        if(lastProcessNodeByAssignee==null){
+                            throw new AFBizException(BusinessError.DATA_NOT_FOUND,"未能找到当前用户的审批信息");
+                        }
+                        elementId=lastProcessNodeByAssignee.TaskDefKey;
+                    }
+                    else
+                    {
+                        elementId=_bpmVariableService.GetElementIdsdByNodeId(vo.ProcessNumber, vo.BackToNodeId)[0];
+                    }
+                        
                     backToNodeKey = elementId;
                     List<BpmnConfCommonElementVo> elements = BpmnFlowUtil.GetElementVosByDeployId(taskData.ProcDefId);
                     var (assigneeNode, flowNode) = BpmnFlowUtil.GetNextNodeAndFlowNode(elements, elementId);
@@ -251,6 +296,8 @@ using System.Linq;
         {
             ((IAdaptorService)this).AddSupportBusinessObjects(ProcessOperationEnum.BUTTON_TYPE_BACK_TO_MODIFY);
             ((IAdaptorService)this).AddSupportBusinessObjects(StringConstants.outSideAccessmarker, ProcessOperationEnum.BUTTON_TYPE_BACK_TO_MODIFY);
+            ((IAdaptorService)this).AddSupportBusinessObjects(ProcessOperationEnum.BUTTON_TYPE_DRAW_BACK_AGREE);
+            ((IAdaptorService)this).AddSupportBusinessObjects(ProcessOperationEnum.BUTTON_TYPE_DRAW_BACK_AGREE);
         }
 
       

@@ -447,4 +447,10 @@ public class BpmVerifyInfoBizService
         return signUpNodeCollectionNameMap;
     }
 
+    public BpmVerifyInfo GetLastProcessNodeByAssignee(String processNumber, String assignee)
+    {
+        BpmVerifyInfo bpmVerifyInfo = _bpmVerifyInfoService.baseRepo
+            .Where(a=>a.ProcessCode==processNumber&&a.VerifyUserId==assignee).First();
+        return bpmVerifyInfo;
+    }
 }
