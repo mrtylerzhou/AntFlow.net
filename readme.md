@@ -5,12 +5,11 @@
  <img src="https://img.shields.io/badge/freesql-yellow.svg" alt="Downloads">
  <img src="https://img.shields.io/badge/license-Apache 2.0-green.svg" alt="Downloads">
 
-
-
 ### 📢 考虑到.net生态下MS SqlServer采用率比较高,现将mssql脚本开源!
+
 ### 📢 ABP官方集成版来啦,在项目的antflow.abp目录下!
 
-### 📢 Oracle,PostGres不开源,只收取辛苦钱,99元一份!
+### 📢 Oracle,PostGres脚本捐赠任意金额获得,之前捐赠过的用户可联系作者获取。
 
 ## **DotNet💖workflow，AntFlow.Net让工作流开发像普通CURD一样简单,即便没有流程开发经验的程序员也能快速开发流程!让NET项目如虎添翼!**
 
@@ -25,6 +24,8 @@
 <img src="https://img.shields.io/badge/AntFlow可用于个人或者公司项目,禁止将源码二次开源(联系作者获得授权的除外)-注意-purple.svg" alt="Downloads">
 
 > 关于版权说明,任何公司和个人都可以直接使用antflow或者二次开发定制。公开发售的请合理支付作者费用（即商用限于对大客户的一对一定制开发，一个副本卖多个客户的请合理支付作者费用），公开发售包含且不限于通过以盈利为目的通过各种媒介进行商业推广。
+>
+>
 > 原则上禁止将antflow源码再二次开源。BSD，MIT协议开源的可联系作者获得授权，后期协议变更或者有商业行为的请及时删除antflow模块或者沟通重新授权。
 
 📢📢📢 操作手册来了，查看项目antflownet目录下的docs文件夹下的操作手册文档。
