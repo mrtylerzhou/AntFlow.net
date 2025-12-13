@@ -64,6 +64,14 @@ public class UserEntrustService :AFBaseCurdRepositoryService<UserEntrust>,IUserE
                 userEntrust.PowerId = idsVo.PowerId;
                 userEntrust.CreateUser = SecurityUtils.GetLogInEmpNameSafe();
                 userEntrust.TenantId = MultiTenantUtil.GetCurrentTenantId();
+                List<UserEntrust> userEntrusts = this.baseRepo
+                    .Where(a=>a.Sender==userEntrust.Sender
+                              &&a.ReceiverId==userEntrust.ReceiverId
+                              &&a.PowerId==userEntrust.PowerId).ToList();
+                if (!userEntrusts.IsEmpty())
+                {
+                    throw new AFBizException(BusinessError.DATA_ALREADY_EXISTED, "委托记录已存在,请确认!");
+                }
                 this.baseRepo.Insert(userEntrust);
                 
             }
