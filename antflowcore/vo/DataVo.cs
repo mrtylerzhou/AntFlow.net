@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using antflowcore.conf.json;
 
 namespace AntFlowCore.Vo
 {
@@ -17,10 +18,10 @@ namespace AntFlowCore.Vo
         [JsonPropertyName("receiverName")]
         public string ReceiverName { get; set; }
 
-        [JsonPropertyName("beginTime")]
+        [JsonPropertyName("beginTime"),JsonConverter(typeof(DateOnlyConverter))]
         public DateTime? BeginTime { get; set; }
 
-        [JsonPropertyName("endTime")]
+        [JsonPropertyName("endTime"),JsonConverter(typeof(DateOnlyConverter))]
         public DateTime? EndTime { get; set; }
     }
     
