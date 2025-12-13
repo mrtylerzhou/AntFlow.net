@@ -1,0 +1,102 @@
+.el-drawer__header {
+  padding: 0px 0px 0px 0px !important;
+  border-bottom: 1px solid #f2f2f2 !important;
+  color: #323232 !important;
+  font-size: 16px !important;
+  margin-bottom: 5px !important;
+}
+.el-drawer__header .el-drawer__title {
+  font-size: 16px !important;
+}
+.el-main {
+  padding: 0px !important;
+}
+.el-avatar {
+  background-color: #1890ff;
+}
+.el-dialog {
+  width: 520px;
+  border: 1px solid #dde1e5 !important;
+  border-radius: 3px !important;
+}
+
+.el-dialog__header {
+  padding: 0 0 0 15px !important;
+  line-height: 45px !important;
+  height: 45px !important;
+  background: #fff !important;
+  border-bottom: 1px solid #f2f2f2 !important;
+  font-weight: 900;
+}
+
+.el-dialog__header .el-dialog__title {
+  font-size: 16px !important;
+  line-height: 45px !important;
+  color: #333333 !important;
+}
+
+.el-dialog__header .el-dialog__headerbtn {
+  height: 12px !important;
+  width: 12px !important;
+  margin: 15px !important;
+}
+
+.el-dialog__header .el-icon-close {
+  width: 12px !important;
+  height: 12px !important;
+  float: left !important;
+}
+
+.el-dialog__header .el-icon-close::before {
+  display: block !important;
+  width: 12px !important;
+  height: 12px !important;
+  background: url(../../images/antflow/close.png) no-repeat center !important;
+  background-size: 100% 100% !important;
+  content: "" !important;
+}
+.el-drawer__body {
+  padding: 0 !important;
+}
+.el-dialog__footer {
+  border-top: 1px solid #f2f2f2 !important;
+  padding-bottom: 10px !important;
+}
+
+.el-checkbox,
+.el-checkbox__input.is-checked + .el-checkbox__label,
+.el-radio,
+.el-radio__input.is-checked + .el-radio__label,
+.el-dialog__body,
+.el-tree {
+  color: #333 !important;
+}
+
+.el-radio__label,
+.el-checkbox__label {
+  font-size: 12px !important;
+}
+.my-el-custom-spinner {
+  display: inline-block !important;
+  width: 80px !important;
+  height: 80px !important;
+  background: url(../../images/antflow/loading.gif) no-repeat center !important;
+}
+
+.el-timeline {
+  --el-timeline-node-size-normal: 25px !important;
+  --el-timeline-node-size-large: 25px !important;
+}
+.el-timeline-item__node--normal {
+  left: -8px !important;
+}
+.el-timeline-item__node--large {
+  left: -8px !important;
+}
+.el-timeline-item__wrapper {
+  top: -10px !important;
+}
+.el-tabs--border-card {
+  min-width: 800px !important;
+  min-height: 550px !important;
+}

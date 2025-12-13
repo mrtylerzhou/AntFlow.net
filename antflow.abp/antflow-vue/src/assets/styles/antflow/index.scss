@@ -1,0 +1,120 @@
+/** 基础通用 **/
+.pt5 {
+  padding-top: 5px;
+}
+
+.pr5 {
+  padding-right: 5px;
+}
+.pl5 {
+  padding-left: 5px;
+}
+.pb10 {
+  padding-bottom: 10px;
+}
+.pt10 {
+  padding-top: 10px;
+}
+
+.pr10 {
+  padding-right: 10px;
+}
+
+.pl10 {
+  padding-left: 10px;
+}
+
+.pb5 {
+  padding-bottom: 5px;
+}
+.mt5 {
+  margin-top: 5px;
+}
+
+.mr5 {
+  margin-right: 5px;
+}
+
+.mb5 {
+  margin-bottom: 5px;
+}
+
+.mb8 {
+  margin-bottom: 8px;
+}
+
+.ml5 {
+  margin-left: 5px;
+}
+
+.mt10 {
+  margin-top: 10px;
+}
+
+.mr10 {
+  margin-right: 10px;
+}
+
+.mb10 {
+  margin-bottom: 10px;
+}
+
+.ml10 {
+  margin-left: 10px;
+}
+
+.mt20 {
+  margin-top: 20px;
+}
+
+.mr20 {
+  margin-right: 20px;
+}
+
+.mb20 {
+  margin-bottom: 20px;
+}
+
+.ml20 {
+  margin-left: 20px;
+}
+.l {
+  float: left;
+}
+
+.r {
+  float: right;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.page-close-box {
+  position: absolute;
+  top: -0;
+  right: -0;
+  width: 42px;
+  height: 42px;
+  text-align: center;
+  cursor: pointer;
+  z-index: 999;
+}
+
+.page-close-box img {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background-image: url();
+}
+
+.page-close-box::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border: 20px solid #1890ff;
+  border-color: #1890ff #1890ff transparent transparent;
+  content: "";
+}

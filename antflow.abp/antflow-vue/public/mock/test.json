@@ -1,0 +1,63 @@
+{
+  "nodeId": "ODNXLX",
+  "nodeName": "动态网关",
+  "nodeType": 2,
+  "nodeFrom": "",
+  "nodeTo": [],
+  "childNode": null,
+  "error": true,
+  "property": null,
+  "conditionNodes": [
+    {
+      "nodeId": "RENXLX",
+      "nodeName": "动态条件1",
+      "nodeDisplayName": "籍贯：select 3",
+      "nodeType": 3,
+      "nodeFrom": "",
+      "nodeTo": [],
+      "priorityLevel": 1,
+      "isDynamicCondition": true,
+      "isParallel": false,
+      "conditionList": [
+        {
+          "formId": 4,
+          "columnId": "10000",
+          "showType": "2",
+          "type": 2,
+          "showName": "籍贯",
+          "optType": "5",
+          "zdy1": 3,
+          "opt1": "<",
+          "zdy2": "",
+          "opt2": "<",
+          "columnDbname": "select83481",
+          "columnType": "Int",
+          "fieldTypeName": "select",
+          "multiple": false,
+          "multipleLimit": 0,
+          "fixedDownBoxValue": "[{\"key\":1,\"value\":\"select 1\"},{\"key\":2,\"value\":\"select 2\"},{\"key\":3,\"value\":\"select 3\"}]"
+        }
+      ],
+      "nodeApproveList": [],
+      "error": false,
+      "childNode": null,
+      "isDefault": 0
+    },
+    {
+      "nodeId": "7ZNXLX",
+      "nodeName": "动态条件2",
+      "nodeDisplayName": "其他条件进入此流程",
+      "nodeType": 3,
+      "nodeFrom": "",
+      "nodeTo": [],
+      "priorityLevel": 2,
+      "isDynamicCondition": true,
+      "isParallel": false,
+      "conditionList": [],
+      "nodeApproveList": [],
+      "error": false,
+      "childNode": null,
+      "isDefault": 1
+    }
+  ]
+}

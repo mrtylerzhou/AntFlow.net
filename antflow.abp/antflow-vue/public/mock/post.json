@@ -1,0 +1,59 @@
+{
+    "total": 4,
+    "rows": [
+        {
+            "createBy": "admin",
+            "createTime": "2024-08-03 10:34:48",
+            "updateBy": null,
+            "updateTime": null,
+            "remark": "",
+            "postId": 1,
+            "postCode": "ceo",
+            "postName": "董事长",
+            "postSort": 1,
+            "status": "0",
+            "flag": false
+        },
+        {
+            "createBy": "admin",
+            "createTime": "2024-08-03 10:34:48",
+            "updateBy": null,
+            "updateTime": null,
+            "remark": "",
+            "postId": 2,
+            "postCode": "se",
+            "postName": "项目经理",
+            "postSort": 2,
+            "status": "0",
+            "flag": false
+        },
+        {
+            "createBy": "admin",
+            "createTime": "2024-08-03 10:34:48",
+            "updateBy": null,
+            "updateTime": null,
+            "remark": "",
+            "postId": 3,
+            "postCode": "hr",
+            "postName": "人力资源",
+            "postSort": 3,
+            "status": "0",
+            "flag": false
+        },
+        {
+            "createBy": "admin",
+            "createTime": "2024-08-03 10:34:48",
+            "updateBy": null,
+            "updateTime": null,
+            "remark": "",
+            "postId": 4,
+            "postCode": "user",
+            "postName": "普通员工",
+            "postSort": 4,
+            "status": "0",
+            "flag": false
+        }
+    ],
+    "code": 200,
+    "msg": "查询成功"
+}

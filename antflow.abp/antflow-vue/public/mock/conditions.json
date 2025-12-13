@@ -1,0 +1,66 @@
+{
+  "code": "200",
+  "msg": "操作成功",
+  "data": [
+    {
+      "formId": "1",
+      "columnId": "1",
+      "showType": "3",
+      "showName": "账户类型",
+      "columnName": "accountType",
+      "columnType": "String",
+      "fieldTypeName": "checkbox",
+      "multiple": false,
+      "multipleLimit": 0,
+      "fixedDownBoxValue": "[{\"key\":1,\"value\":\"百度云\"},{\"key\":2,\"value\":\"腾讯云\"},{\"key\":3,\"value\":\"中通云\"}]"
+    },
+    {
+      "formId": "2",
+      "columnId": "2",
+      "showType": "1",
+      "showName": "请假时长",
+      "columnName": "leaveHour",
+      "columnType": "Double",
+      "fieldTypeName": "input-number",
+      "multiple": false,
+      "multipleLimit": 0,
+      "fixedDownBoxValue": ""
+    },
+    {
+      "formId": "3",
+      "columnId": "3",
+      "showType": "1",
+      "showName": "采购费用",
+      "columnName": "planProcurementTotalMoney",
+      "columnType": "Double",
+      "fieldTypeName": "input-number",
+      "multiple": false,
+      "multipleLimit": 0,
+      "fixedDownBoxValue": ""
+    },
+    {
+      "formId": "4",
+      "columnId": "4",
+      "showType": "1",
+      "showName": "支出费用",
+      "columnName": "outTotalMoney",
+      "columnType": "Double",
+      "fieldTypeName": "input-number",
+      "multiple": false,
+      "multipleLimit": 0,
+      "fixedDownBoxValue": ""
+    },
+    {
+      "formId": "6",
+      "columnId": "6",
+      "showType": "2",
+      "showName": "采购类型",
+      "columnName": "purchaseType",
+      "columnType": "String",
+      "fieldTypeName": "select",
+      "multiple": false,
+      "multipleLimit": 0,
+      "fixedDownBoxValue": "[{\"key\":1,\"value\":\"台式机\"},{\"key\":2,\"value\":\"笔记本\"},{\"key\":3,\"value\":\"一体机\"}]"
+    }
+  ]
+}

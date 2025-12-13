@@ -1,0 +1,163 @@
+{
+  "code": "200",
+  "msg": "success",
+  "data": {
+    "tableId": 1,
+    "workFlowDef": {
+      "name": "合同审批"
+    },
+    "directorMaxLevel": 3,
+    "flowPermission": [],
+    "nodeConfig": {
+      "nodeId": "Gb2",
+      "nodeName": "发起人66",
+      "nodeDisplayName": "发起人66",
+      "nodeType": 1,
+      "nodeFrom": "",
+      "prevId": [],
+      "nodeTo": [],
+      "priorityLevel": "",
+      "setType": "",
+      "directorLevel": "",
+      "signType": "",
+      "noHeaderAction": "",
+      "ccSelfSelectFlag": "",
+      "conditionList": [],
+      "nodeApproveList": [],
+      "childNode": {
+        "nodeId": "y270h5",
+        "nodeName": "审核人",
+        "error": false,
+        "nodeType": 4,
+        "nodeFrom": "",
+        "prevId": [],
+        "nodeTo": [],
+        "setType": 2,
+        "directorLevel": 1,
+        "signType": 1,
+        "noHeaderAction": 2,
+        "childNode": {
+          "nodeId": "9u60h5",
+          "nodeName": "网关节点",
+          "nodeType": 2,
+          "nodeFrom": "",
+          "prevId": [],
+          "nodeTo": [],
+          "priorityLevel": 1,
+          "setType": 1,
+          "directorLevel": 1,
+          "signType": 1,
+          "noHeaderAction": 2,
+          "ccSelfSelectFlag": 1,
+          "conditionList": [],
+          "nodeApproveList": [],
+          "childNode": {
+            "nodeId": "5UMcT",
+            "nodeName": "抄送人",
+            "error": false,
+            "nodeType": 5,
+            "nodeFrom": "",
+            "prevId": [],
+            "nodeTo": [],
+            "ccSelfSelectFlag": 1,
+            "childNode": null,
+            "nodeApproveList": []
+          },
+          "conditionNodes": [
+            {
+              "nodeId": "r170h5",
+              "nodeName": "条件1",
+              "error": false,
+              "nodeType": 3,
+              "nodeFrom": "",
+              "prevId": [],
+              "nodeTo": [],
+              "priorityLevel": 1,
+              "setType": 1,
+              "directorLevel": 1,
+              "signType": 1,
+              "noHeaderAction": 2,
+              "ccSelfSelectFlag": 1,
+              "conditionList": [
+                {
+                  "columnId": 0,
+                  "type": 1,
+                  "optType": "",
+                  "zdy1": "",
+                  "zdy2": "",
+                  "opt1": "",
+                  "opt2": "",
+                  "columnDbname": "",
+                  "columnType": "",
+                  "showType": "",
+                  "showName": "",
+                  "fixedDownBoxValue": ""
+                }
+              ],
+              "nodeApproveList": [
+                {
+                  "targetId": 53128112,
+                  "type": 1,
+                  "name": "张三"
+                }
+              ],
+              "childNode": {
+                "nodeId": "ble98k",
+                "nodeName": "审核人",
+                "error": false,
+                "nodeType": 4,
+                "nodeFrom": "",
+                "prevId": [],
+                "nodeTo": [],
+                "priorityLevel": 1,
+                "setType": 1,
+                "directorLevel": 1,
+                "signType": 1,
+                "noHeaderAction": 2,
+                "ccSelfSelectFlag": 1,
+                "conditionList": [],
+                "nodeApproveList": [
+                  {
+                    "targetId": 53128113,
+                    "type": 1,
+                    "name": "李四"
+                  }
+                ],
+                "childNode": {},
+                "conditionNodes": []
+              },
+              "conditionNodes": []
+            },
+            {
+              "nodeId": "qb7abt",
+              "nodeName": "条件2",
+              "error": false,
+              "nodeType": 3,
+              "nodeFrom": "",
+              "prevId": [],
+              "nodeTo": [],
+              "priorityLevel": 2,
+              "setType": 1,
+              "directorLevel": 1,
+              "signType": 1,
+              "noHeaderAction": 2,
+              "ccSelfSelectFlag": 1,
+              "conditionList": [],
+              "nodeApproveList": [],
+              "childNode": {},
+              "conditionNodes": []
+            }
+          ]
+        },
+        "nodeApproveList": [
+          {
+            "targetId": 12,
+            "type": 2,
+            "name": "第2主管"
+          }
+        ]
+      },
+      "conditionNodes": []
+    }
+  }
+}
