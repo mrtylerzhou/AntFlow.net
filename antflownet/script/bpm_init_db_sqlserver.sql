@@ -51,6 +51,7 @@ CREATE TABLE t_bpmn_node
     remark               NVARCHAR(255)        DEFAULT '',
     tenant_id            NVARCHAR(64)         DEFAULT '',
     is_del               TINYINT  NOT NULL DEFAULT 0,
+    no_header_action  tinyint             NULL,
     create_user          NVARCHAR(50)         DEFAULT '',
     create_time          DATETIME NOT NULL DEFAULT GETDATE(),
     update_user          NVARCHAR(50)         DEFAULT '',
