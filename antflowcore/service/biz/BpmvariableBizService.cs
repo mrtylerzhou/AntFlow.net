@@ -204,7 +204,8 @@ public class BpmvariableBizService
             _bpmVariableService.Frsql
                 .Update<BpmVariableSignUp>()
                 .Set(a => a.IsDel, 1)
-                .Set(a=>a.Remark,"管理员减签")
+                .Set(a=> a.Remark,"管理员减签")
+                .Set(a=> a.UpdateTime, DateTime.Now)
                 .Where(a => a.Id == bpmVariableId)
                 .ExecuteAffrows();
             return;
