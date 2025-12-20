@@ -177,4 +177,12 @@ public class BpmnConfController
         TaskMgmtVO taskMgmtVO = _processApprovalService.ProcessStatistics();
         return ResultHelper.Success(taskMgmtVO);
     }
+
+    [HttpPost("loadNodeOperationUser")]
+    public Result<List<BaseIdTranStruVo>> LoadNodeOperationUser([FromBody] string requestParams)
+    {
+        List<BaseIdTranStruVo> baseIdTranStruVos = _bpmnConfCommonService.LoadNodeOperationUser(requestParams);
+        return ResultHelper.Success(baseIdTranStruVos);
+    }
+    
 }

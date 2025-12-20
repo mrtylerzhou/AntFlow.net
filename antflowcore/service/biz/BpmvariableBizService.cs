@@ -46,6 +46,7 @@ public class BpmvariableBizService
             nodeSingleElementDto.IsSingle = true;
             nodeSingleElementDto.NodeId = firstOrDefault.t2.NodeId;;
             nodeSingleElementDto.ElementId =elementId;
+            nodeSingleElementDto.VarName = firstOrDefault.t2.AssigneeParamName;
             nodeSingleElementDto.AssigneeInfoList = new List<BaseInfoTranStructVo>()
             {
                 new BaseInfoTranStructVo()
@@ -73,6 +74,7 @@ public class BpmvariableBizService
             nodeMultiplayerElementDto.NodeId = tuples[0].t2.NodeId;
             nodeMultiplayerElementDto.ElementId = elementId;
             nodeMultiplayerElementDto.IsSingle = false;
+            nodeMultiplayerElementDto.VarName = tuples[0].t2.CollectionName;
             nodeMultiplayerElementDto.AssigneeInfoList = new List<BaseInfoTranStructVo>();
             
             nodeMultiplayerElementDto.AssigneeInfoList
@@ -110,6 +112,7 @@ public class BpmvariableBizService
             nodeSingleElementDto.IsSingle = true;
             nodeSingleElementDto.NodeId = nodeId;
             nodeSingleElementDto.ElementId = firstOrDefault.t2.ElementId;
+            nodeSingleElementDto.VarName = firstOrDefault.t2.AssigneeParamName;
             nodeSingleElementDto.AssigneeInfoList = new List<BaseInfoTranStructVo>()
             {
                 new BaseInfoTranStructVo()
@@ -137,6 +140,7 @@ public class BpmvariableBizService
             nodeMultiplayerElementDto.NodeId = nodeId;
             nodeMultiplayerElementDto.ElementId = tuples[0].t2.ElementId;
             nodeMultiplayerElementDto.IsSingle = false;
+            nodeMultiplayerElementDto.VarName = tuples[0].t2.CollectionName;
             nodeMultiplayerElementDto.AssigneeInfoList = new List<BaseInfoTranStructVo>();
             
             nodeMultiplayerElementDto.AssigneeInfoList

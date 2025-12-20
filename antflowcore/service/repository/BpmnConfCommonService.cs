@@ -1,7 +1,9 @@
-﻿using System.Text.Json;
+﻿using System.Collections.ObjectModel;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using antflowcore.constant.enus;
+using antflowcore.dto;
 using antflowcore.entity;
 using AntFlowCore.Entity;
 using antflowcore.exception;
@@ -22,6 +24,7 @@ public class BpmnConfCommonService
 {
     private readonly BpmnConfBizService _bpmnConfBizService;
     private readonly BpmnConfService _bpmnConfService;
+    private readonly BpmnNodeService _nodeService;
     private readonly BpmnStartFormatFactory _bpmnStartFormatFactory;
     private readonly IBpmnPersonnelFormat _personnelFormat;
     private readonly IBpmnDeduplicationFormat _deduplicationFormat;
@@ -34,12 +37,16 @@ public class BpmnConfCommonService
     private readonly BpmVariableService _bpmVariableService;
     private readonly BpmFlowrunEntrustService _flowrunEntrustService;
     private readonly FormFactory _formFactory;
+    private readonly BpmBusinessProcessService _bpmBusinessProcessService;
+    private readonly BpmvariableBizService _bpmvariableBizService;
+    private readonly AFTaskService _afTaskService;
     private readonly IFreeSql _freeSql;
     private readonly ILogger<BpmnConfCommonService> _logger;
 
     public BpmnConfCommonService(
         BpmnConfBizService bpmnConfBizService,
         BpmnConfService bpmnConfService,
+        BpmnNodeService nodeService,
         BpmnStartFormatFactory bpmnStartFormatFactory,
         IBpmnPersonnelFormat personnelFormat,
         IBpmnDeduplicationFormat deduplicationFormat,
@@ -52,11 +59,15 @@ public class BpmnConfCommonService
         BpmVariableService bpmVariableService,
         BpmFlowrunEntrustService flowrunEntrustService,
         FormFactory formFactory,
+        BpmBusinessProcessService bpmBusinessProcessService,
+        BpmvariableBizService bpmvariableBizService,
+        AFTaskService afTaskService,
         IFreeSql freeSql,
         ILogger<BpmnConfCommonService> logger)
     {
         _bpmnConfBizService = bpmnConfBizService;
         _bpmnConfService = bpmnConfService;
+        _nodeService = nodeService;
         _bpmnStartFormatFactory = bpmnStartFormatFactory;
         _personnelFormat = personnelFormat;
         _deduplicationFormat = deduplicationFormat;
@@ -69,6 +80,9 @@ public class BpmnConfCommonService
         _bpmVariableService = bpmVariableService;
         _flowrunEntrustService = flowrunEntrustService;
         _formFactory = formFactory;
+        _bpmBusinessProcessService = bpmBusinessProcessService;
+        _bpmvariableBizService = bpmvariableBizService;
+        _afTaskService = afTaskService;
         _freeSql = freeSql;
         _logger = logger;
     }
@@ -600,5 +614,73 @@ public class BpmnConfCommonService
             }
         }
        
+    }
+
+    public List<BaseIdTranStruVo> LoadNodeOperationUser(String requestParams)
+    {
+        JsonNode? jsonObject = JsonNodeHelper.SafeParse(requestParams);
+        String processNumber = jsonObject["processNumber"]?.GetValue<string>();
+        String nodeId = jsonObject["nodeId"]?.GetValue<string>();
+        List<BaseIdTranStruVo> userList = new List<BaseIdTranStruVo>();
+        BpmnNode bpmnNode = _nodeService.baseRepo.Where(a => a.NodeId == nodeId).ToOne();
+        if (bpmnNode == null)
+        {
+            return userList;
+        }
+        BpmVariable bpmnVariable=_bpmVariableService.baseRepo.Where(a=>a.ProcessNum==processNumber).ToOne();
+        BpmnConfVo detail = _bpmnConfBizService.Detail(bpmnVariable.BpmnCode);
+        //当前节点
+        String currentNodeIdStr = _bpmVerifyInfoBizService.FindCurrentNodeIds(processNumber);
+        List<String> currentNodeIds = currentNodeIdStr.Split(',').ToList();
+        List<BpmnNodeVo> bpmnNodeList = detail.Nodes;
+        Dictionary<String, BpmnNodeVo> bpmnNodeVoMap = bpmnNodeList
+            .GroupBy(node => node.NodeId)
+            .ToDictionary(g => g.Key, g => g.First());
+        //后续未来节点
+        List<String> afterNodeIds = new List<string>();
+        ProcessNodeToRecursively(currentNodeIds, bpmnNodeVoMap, afterNodeIds);
+        BpmBusinessProcess bpmBusinessProcess = this._bpmBusinessProcessService.GetBpmBusinessProcess(processNumber);
+        if(null == bpmBusinessProcess) {
+            return userList;
+        }
+        List<BaseIdTranStruVo> userInfos = new List<BaseIdTranStruVo>();
+        //拿到选中节点 当前节点直接获取 task 未处理任务 未来节点获取getVariables 拿到实际操作人配置
+        if(currentNodeIds.Contains(bpmnNode.NodeId)) {
+            List<String> elementList = this._bpmVariableService.GetElementIdsdByNodeId(processNumber, nodeId);
+            if(elementList.IsEmpty()) {
+                return userList;
+            }
+
+            List<BpmAfTask> list = _afTaskService.baseRepo
+                .Where(a => a.ProcInstId == bpmBusinessProcess.ProcInstId && a.TaskDefKey == elementList[0]).ToList();
+
+           foreach (BpmAfTask bpmAfTask in list)
+           {
+               userInfos.Add(new BaseIdTranStruVo(bpmAfTask.Assignee,bpmAfTask.AssigneeName));
+           }
+        }
+        if(afterNodeIds.Contains(bpmnNode.NodeId)) {
+            NodeElementDto elementIdByNodeId = _bpmvariableBizService.GetElementIdByNodeId(processNumber, nodeId);
+            if (elementIdByNodeId == null)
+            {
+                throw new AFBizException(BusinessError.STATUS_ERROR, "未能根据节点id找到元素信息");
+            }
+
+            string varName = elementIdByNodeId.VarName;
+            if (string.IsNullOrEmpty(varName))
+            {
+                throw new AFBizException(BusinessError.STATUS_ERROR, "未能根据节点id找到节点变量信息");
+            }
+
+            List<BaseInfoTranStructVo> baseInfoTranStructVos = elementIdByNodeId.AssigneeInfoList;
+            if (baseInfoTranStructVos.IsEmpty())
+            {
+                throw new AFBizException(BusinessError.STATUS_ERROR, "未能根据节点找到当前节点审批人信息");
+            }
+
+            userInfos.AddRange(baseInfoTranStructVos.Select(a=>new BaseIdTranStruVo(a.Id,a.Name)));
+        }
+
+        return userInfos;
     }
 }
