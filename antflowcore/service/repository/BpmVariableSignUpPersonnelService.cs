@@ -47,6 +47,7 @@ public class BpmVariableSignUpPersonnelService: AFBaseCurdRepositoryService<BpmV
             AssigneeName = a.Name,
             ElementId = bpmnConfCommonElementVo.ElementId,
             Remark = "",
+            CreateTime = DateTime.Now,
         }).ToList();
         this.baseRepo.Insert(bpmVariableSignUpPersonnels);
     }

@@ -134,7 +134,8 @@ namespace antflowcore.service.biz;
                     ElementId = key,
                     NodeId = elementVo.NodeId,
                     Remark = "",
-                    SubElements = JsonSerializer.Serialize(subElements)
+                    SubElements = JsonSerializer.Serialize(subElements),
+                    CreateTime = DateTime.Now,
                 });
             }
 

@@ -65,7 +65,7 @@ namespace AntFlowCore.Vo
                 [JsonPropertyName("fieldType"),JsonConverter(typeof(StringToIntConverter))]
                 public int FieldType { get; set; }
 
-                [JsonPropertyName("defaultValue"),JsonConverter(typeof(IntToStringConverter))]
+                [JsonPropertyName("defaultValue"),JsonConverter(typeof(CoerciveStringConverter))]
                 public string DefaultValue { get; set; }
 
                 [JsonPropertyName("startPlaceholder")]
