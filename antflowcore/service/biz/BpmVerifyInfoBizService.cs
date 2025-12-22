@@ -231,7 +231,7 @@ public class BpmVerifyInfoBizService
             TaskName = "流程结束",
             VerifyStatus = endVerifyStatus
         });
-        bpmVerifyInfoVos= bpmVerifyInfoVos.Where(a => a.NodeType != (int)NodeTypeEnum.NODE_TYPE_COPY).ToList();
+        bpmVerifyInfoVos= bpmVerifyInfoVos.Where(a => a.NodeType != (int)NodeTypeEnum.NODE_TYPE_COPY&&a.VerifyUserName!=StringConstants.DYNAMIC_APPROVER).ToList();
         return bpmVerifyInfoVos;
     }
 
