@@ -17,7 +17,7 @@ public class ConfigFlowButtonSortEnum
         Sort = sort;
     }
 
-   
+   public static readonly ConfigFlowButtonSortEnum NOTHING = new ConfigFlowButtonSortEnum(9999, "按钮不存在", 9999);
     public static readonly ConfigFlowButtonSortEnum SUBMIT = new ConfigFlowButtonSortEnum(1, "提交", 1);
     public static readonly ConfigFlowButtonSortEnum AGAIN_SUBMIT = new ConfigFlowButtonSortEnum(2, "重新提交", 2);
     public static readonly ConfigFlowButtonSortEnum AGREED = new ConfigFlowButtonSortEnum(3, "同意", 10);
@@ -36,7 +36,7 @@ public class ConfigFlowButtonSortEnum
     public static readonly ConfigFlowButtonSortEnum ZB = new ConfigFlowButtonSortEnum(21, "转办", 21);
     public static readonly ConfigFlowButtonSortEnum CHOOSE_ASSIGNEE = new ConfigFlowButtonSortEnum(22, "自选审批人", 22);
     public static readonly ConfigFlowButtonSortEnum BACK_TO_ANY_NODE = new ConfigFlowButtonSortEnum(23, "退回任意节点", 23);
-
+    public static readonly ConfigFlowButtonSortEnum  PROCESS_DRAW_BACK = new ConfigFlowButtonSortEnum(29, "撤回", 29);
     // Static list of all instances for easy lookup
     private static readonly List<ConfigFlowButtonSortEnum> AllValues = new List<ConfigFlowButtonSortEnum>
     {

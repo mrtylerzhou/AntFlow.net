@@ -228,9 +228,11 @@ public class ConfigFlowButtonContantService
     {
         buttons.Sort((o1, o2) =>
         {
-            var sort1 = ConfigFlowButtonSortEnum.GetEnumByCode(o1.ButtonType);
-            var sort2 = ConfigFlowButtonSortEnum.GetEnumByCode(o2.ButtonType);
-            
+            ConfigFlowButtonSortEnum sort1 = ConfigFlowButtonSortEnum.GetEnumByCode(o1.ButtonType);
+            ConfigFlowButtonSortEnum sort2 = ConfigFlowButtonSortEnum.GetEnumByCode(o2.ButtonType);
+
+            sort1 ??= ConfigFlowButtonSortEnum.NOTHING;
+            sort2 ??= ConfigFlowButtonSortEnum.NOTHING;
             Debug.Assert(sort1 != null, "sort1 should not be null");
             Debug.Assert(sort2 != null, "sort2 should not be null");
 
