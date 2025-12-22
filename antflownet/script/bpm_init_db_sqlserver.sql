@@ -210,6 +210,8 @@ CREATE TABLE bpm_flowrun_entrust
     is_view       INT NOT NULL DEFAULT 0,
     tenant_id     NVARCHAR(64)      DEFAULT '',
     is_del        INT          DEFAULT 0,
+    node_id       NVARCHAR(100),
+    action_type   INT         default 0,
     CONSTRAINT PK_bpm_flowrun_entrust PRIMARY KEY (id)
 );
 
