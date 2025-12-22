@@ -620,9 +620,9 @@ public class BpmnConfCommonService
     {
         JsonNode? jsonObject = JsonNodeHelper.SafeParse(requestParams);
         String processNumber = jsonObject["processNumber"]?.GetValue<string>();
-        String nodeId = jsonObject["nodeId"]?.GetValue<string>();
+        var nodeId = jsonObject["nodeId"]?.GetValue <long>();
         List<BaseIdTranStruVo> userList = new List<BaseIdTranStruVo>();
-        BpmnNode bpmnNode = _nodeService.baseRepo.Where(a => a.NodeId == nodeId).ToOne();
+        BpmnNode bpmnNode = _nodeService.baseRepo.Where(a => a.Id == nodeId).ToOne();
         if (bpmnNode == null)
         {
             return userList;
@@ -646,7 +646,7 @@ public class BpmnConfCommonService
         List<BaseIdTranStruVo> userInfos = new List<BaseIdTranStruVo>();
         //拿到选中节点 当前节点直接获取 task 未处理任务 未来节点获取getVariables 拿到实际操作人配置
         if(currentNodeIds.Contains(bpmnNode.NodeId)) {
-            List<String> elementList = this._bpmVariableService.GetElementIdsdByNodeId(processNumber, nodeId);
+            List<String> elementList = this._bpmVariableService.GetElementIdsdByNodeId(processNumber, nodeId.ToString());
             if(elementList.IsEmpty()) {
                 return userList;
             }
@@ -660,7 +660,7 @@ public class BpmnConfCommonService
            }
         }
         if(afterNodeIds.Contains(bpmnNode.NodeId)) {
-            NodeElementDto elementIdByNodeId = _bpmvariableBizService.GetElementIdByNodeId(processNumber, nodeId);
+            NodeElementDto elementIdByNodeId = _bpmvariableBizService.GetElementIdByNodeId(processNumber, nodeId.ToString());
             if (elementIdByNodeId == null)
             {
                 throw new AFBizException(BusinessError.STATUS_ERROR, "未能根据节点id找到元素信息");

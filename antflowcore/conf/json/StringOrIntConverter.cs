@@ -21,6 +21,11 @@ public class StringOrIntConverter : JsonConverter<string>
             case JsonTokenType.True:
             case JsonTokenType.False:
                 return reader.GetBoolean().ToString();
+            case JsonTokenType.StartObject:
+            case JsonTokenType.StartArray:
+                // 对于对象或数组，可以返回序列化的 JSON 字符串
+                var document = JsonDocument.ParseValue(ref reader);
+                return document.RootElement.GetRawText();
             default:
                 try
                 {
