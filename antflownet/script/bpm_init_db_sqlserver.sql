@@ -48,6 +48,7 @@ CREATE TABLE t_bpmn_node
     is_dynamicCondition  INT               DEFAULT 0,
     is_parallel          INT               DEFAULT 0,
     is_sign_up           INT      NOT NULL DEFAULT 0,
+    no_header_action     TINYINT,
     remark               NVARCHAR(255)        DEFAULT '',
     tenant_id            NVARCHAR(64)         DEFAULT '',
     is_del               TINYINT  NOT NULL DEFAULT 0,
