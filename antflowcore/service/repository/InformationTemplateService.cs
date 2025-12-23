@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using antflowcore.constant.enus;
+using AntFlowCore.Constants;
 using antflowcore.dto;
 using antflowcore.entity;
 using AntFlowCore.Entity;
@@ -101,8 +102,15 @@ public class InformationTemplateService: AFBaseCurdRepositoryService<Information
             informationTemplate.CreateUser=SecurityUtils.GetLogInEmpNameSafe();
             informationTemplate.UpdateUser=SecurityUtils.GetLogInEmpNameSafe();
             informationTemplate.TenantId = MultiTenantUtil.GetCurrentTenantId();
+            informationTemplate.Num=("LCTZ_" + String.Format("%03d", informationTemplate.Id));
+            informationTemplate.MailTitle ??= StringConstants.BIG_WHITE_BLANK;
+            informationTemplate.MailContent ??= StringConstants.BIG_WHITE_BLANK;
+            informationTemplate.NoteContent ??= StringConstants.BIG_WHITE_BLANK;
+            informationTemplate.SystemTitle ??= StringConstants.BIG_WHITE_BLANK;
+            informationTemplate.CreateTime=DateTime.Now;
+            informationTemplate.UpdateTime=DateTime.Now;
             this.baseRepo.Insert(informationTemplate);
-            informationTemplate.Name=("LCTZ_" + String.Format("%03d", informationTemplate.Id));
+            
         }
 
         this.baseRepo.Update(informationTemplate);
