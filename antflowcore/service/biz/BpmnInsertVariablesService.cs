@@ -186,6 +186,7 @@ namespace antflowcore.service.biz;
                     ButtonType = o.ButtonType,
                     ButtonName = o.ButtonName,
                     Remark = StringConstants.BIG_WHITE_BLANK,
+                    CreateTime = DateTime.Now,
                 }).ToList();
 
                 _bpmVariableViewPageButtonService.baseRepo.Insert(startPageButtons);
@@ -200,6 +201,7 @@ namespace antflowcore.service.biz;
                     ButtonType = o.ButtonType,
                     ButtonName = o.ButtonName,
                     Remark = StringConstants.BIG_WHITE_BLANK,
+                    CreateTime = DateTime.Now,
                 }).ToList();
 
                 _bpmVariableViewPageButtonService.baseRepo.Insert(otherPageButtons);
