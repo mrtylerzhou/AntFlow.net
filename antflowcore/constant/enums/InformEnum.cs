@@ -8,7 +8,9 @@ namespace AntFlowCore.Enums
         APPLICANT = 1,           // 申请人
         ALL_APPROVER = 2,        // 所有已审批人
         AT_APPROVER = 3,         // 当前节点审批人
-        BY_TRANSPOND = 4         // 被转发人
+        BY_TRANSPOND = 4,         // 被转发人
+        ASSIGNED_USER=5,        //指定审批人
+        ASSIGNEED_ROLES=6,        //指定审批角色
     }
 
     public static class InformEnumExtensions
@@ -26,6 +28,10 @@ namespace AntFlowCore.Enums
                     return "当前节点审批人";
                 case InformEnum.BY_TRANSPOND:
                     return "被转发人";
+                case InformEnum.ASSIGNED_USER:
+                    return "指定审批人";
+                case InformEnum.ASSIGNEED_ROLES:
+                    return "指定审批角色";
                 default:
                     return null;
             }
@@ -44,6 +50,10 @@ namespace AntFlowCore.Enums
                     return "Assignee";
                 case InformEnum.BY_TRANSPOND:
                     return "ForwardUsers";
+                case InformEnum.ASSIGNED_USER:
+                    return "Assignee";
+                case InformEnum.ASSIGNEED_ROLES:
+                    return "AssigneeRoles";
                 default:
                     return null;
             }

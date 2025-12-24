@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections;
+using System.Reflection;
 using System.Text.Json;
 using antflowcore.constant.enums;
 using antflowcore.constant.enus;
@@ -379,27 +380,21 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
             }
         }
 
+        List<BpmVariableMessage> bpmVariableMessages = null;
         if (vo.MessageType == 1)
         {
             //out of node messages
-            List<BpmVariableMessage> bpmVariableMessages = this.baseRepo
+            bpmVariableMessages = this.baseRepo
                 .Where(a =>
                     a.VariableId == vo.VariableId
                     && a.MessageType == 1
                     && a.EventType == vo.EventType).ToList();
-
-            if (!bpmVariableMessages.IsEmpty())
-            {
-                foreach (BpmVariableMessage bpmVariableMessage in bpmVariableMessages)
-                {
-                    DoSendTemplateMessages(bpmVariableMessage, vo);
-                }
-            }
+            
         }
-        else if (vo.MessageType == 1)
+        else if (vo.MessageType == 2)
         {
             //in node messages
-            List<BpmVariableMessage> bpmVariableMessages = this.baseRepo
+             bpmVariableMessages = this.baseRepo
                 .Where(a =>
                     a.VariableId == vo.VariableId
                     && a.EventType == vo.EventType)
@@ -462,8 +457,18 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
         }
 
         //specified roles
-        if (!bpmnTemplateVo.RoleIdList.IsEmpty()) {
-            List<BaseIdTranStruVo> users = _roleService.QueryUserByRoleIds(bpmnTemplateVo.RoleIdList);
+        if (!bpmnTemplateVo.RoleIdList.IsEmpty())
+        {
+            List<BaseIdTranStruVo> users;
+            if (vo.IsOutside && ConfigUtil.IsFullSassMode())
+            {
+                users = _roleService.QuerySassUserByRoleIds(bpmnTemplateVo.RoleIdList);
+            }
+            else
+            {
+               users = _roleService.QueryUserByRoleIds(bpmnTemplateVo.RoleIdList);
+            }
+           
             if (!users.IsEmpty())
             {
                 sendUsers.AddRange(users.Select(u => u.Id.ToString()));
@@ -503,6 +508,9 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
         if (!bpmnTemplateVo.InformIdList.IsEmpty()) {
             foreach (String informId in bpmnTemplateVo.InformIdList) {
                 InformEnum? informEnum = InformEnumExtensions.GetEnumByCode(int.Parse(informId));
+                if(informEnum==InformEnum.ASSIGNED_USER||informEnum==InformEnum.ASSIGNEED_ROLES){
+                    continue;
+                }
                 //todo check whether the result is valid
                 string? fileName = informEnum?.GetFileName();
                 Object filObject = null;
@@ -510,8 +518,15 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
                 {
                     filObject = vo.GetType().GetProperty(fileName);
                 }
-                if (filObject is IList<string>) {
-                    sendUsers.AddRange((List<string>) filObject);
+                if (filObject  is IEnumerable enumerable)
+                {
+                    foreach (object o in enumerable)
+                    {
+                        if (o != null)
+                        {
+                            sendUsers.Add(o.ToString());
+                        }
+                    }
                 } else if (filObject!=null) {
                     sendUsers.Add(filObject.ToString());
                 }
