@@ -1027,7 +1027,7 @@ public static class FreesqlFluentConfiguration
             }).ConfigEntity<InformationTemplate>(a =>
             {
                 a.Name("t_information_template");
-                a.Property(b => b.Id).IsPrimary(true);
+                a.Property(b => b.Id).IsPrimary(true).IsIdentity(true);
                 a.Property(b => b.Name).Name("name");
                 a.Property(b => b.Num).Name("num");
                 a.Property(b => b.SystemTitle).Name("system_title");

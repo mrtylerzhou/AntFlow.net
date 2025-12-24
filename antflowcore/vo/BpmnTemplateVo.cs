@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using antflowcore.conf.json;
 
 namespace antflowcore.vo
 {
     public class BpmnTemplateVo
     {
-        public long Id { get; set; }
+       
+        public long? Id { get; set; }
 
         [JsonPropertyName("confId")]
         public long ConfId { get; set; }
 
-        [JsonPropertyName("nodeId")]
-        public long NodeId { get; set; }
+        [JsonPropertyName("nodeId"),JsonConverter(typeof(StringToLongConverter))]
+        public long? NodeId { get; set; }
 
         public int Event { get; set; }
 

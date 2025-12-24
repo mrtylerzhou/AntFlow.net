@@ -66,7 +66,7 @@ public class InformationTemplateService: AFBaseCurdRepositoryService<Information
         List<InformationTemplate> list = this.baseRepo
             .Where(expression)
             .ToList();
-        if (list.Count>1) {
+        if (list.Count>0) {
             throw new AFBizException("模板名称重复");
         }
 
@@ -102,7 +102,7 @@ public class InformationTemplateService: AFBaseCurdRepositoryService<Information
             informationTemplate.CreateUser=SecurityUtils.GetLogInEmpNameSafe();
             informationTemplate.UpdateUser=SecurityUtils.GetLogInEmpNameSafe();
             informationTemplate.TenantId = MultiTenantUtil.GetCurrentTenantId();
-            informationTemplate.Num=("LCTZ_" + String.Format("%03d", informationTemplate.Id));
+            informationTemplate.Num=StringConstants.BIG_WHITE_BLANK;
             informationTemplate.MailTitle ??= StringConstants.BIG_WHITE_BLANK;
             informationTemplate.MailContent ??= StringConstants.BIG_WHITE_BLANK;
             informationTemplate.NoteContent ??= StringConstants.BIG_WHITE_BLANK;
@@ -110,7 +110,7 @@ public class InformationTemplateService: AFBaseCurdRepositoryService<Information
             informationTemplate.CreateTime=DateTime.Now;
             informationTemplate.UpdateTime=DateTime.Now;
             this.baseRepo.Insert(informationTemplate);
-            
+            informationTemplate.Num= $"LCTZ_{informationTemplate.Id:D3}";
         }
 
         this.baseRepo.Update(informationTemplate);

@@ -57,7 +57,7 @@ public class BpmnTemplateService : AFBaseCurdRepositoryService<BpmnTemplate>, IB
             bpmnTemplate.Informs = string.Join(",", bpmnTemplateVo.InformList);
             bpmnTemplate.Emps = string.Join(",", bpmnTemplateVo.EmpList);
             bpmnTemplate.Roles = string.Join(",", bpmnTemplateVo.RoleList);
-            bpmnTemplate.Funcs = string.Join(",", bpmnTemplateVo.FuncList);
+            bpmnTemplate.Funcs = string.Join(",", bpmnTemplateVo.FuncList??new List<BaseIdTranStruVo>());
             bpmnTemplate.MessageSendType = string.Join(",",
                 bpmnTemplateVo.MessageSendTypeList?.Select(x => x.Id) ?? new List<long>());
             bpmnTemplate.FormCode = formCode;
