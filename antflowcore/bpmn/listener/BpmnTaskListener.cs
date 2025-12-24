@@ -130,7 +130,7 @@ public class BpmnTaskListener: ITaskListener
                 AppPushUrl = appUrl,
                 TaskId = delegateTask.ProcInstId,
             };
-            
+            ActivitiTemplateMsgUtils.sendBpmApprovalMsg(activitiBpmMsgVo);
         }
     }
 }

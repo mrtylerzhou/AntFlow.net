@@ -35,4 +35,8 @@ public class ActivitiTemplateMsgUtils
         service.SendBpmChangePersonOrgiMsgAsync(activitiBpmMsgVoOrgi);
         service.SendBpmChangePersonNewMsgAsync(activitiBpmMsgVoNew);
     }
+    public static void sendBpmApprovalMsg(ActivitiBpmMsgVo activitiBpmMsgVo) {
+        var service = GetMessageSendService();
+        service.SendBpmApprovalMsg(activitiBpmMsgVo);
+    }
 }

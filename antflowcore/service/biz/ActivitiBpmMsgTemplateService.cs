@@ -491,4 +491,13 @@ public class ActivitiBpmMsgTemplateService
         };
     }
 
+    public void SendBpmApprovalMsg(ActivitiBpmMsgVo activitiBpmMsgVo)
+    {
+        if (activitiBpmMsgVo==null) {
+            return;
+        }
+        
+        String content = GetContent(activitiBpmMsgVo, (int)MsgNoticeTypeEnum.PROCESS_FLOW);
+        DoUserMsgSend(activitiBpmMsgVo, content);
+    }
 }
