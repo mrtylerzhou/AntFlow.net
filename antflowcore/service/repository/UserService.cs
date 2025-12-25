@@ -290,6 +290,9 @@ public class UserService: AFBaseCurdRepositoryService<User>,IUserService
             {
                 Id = a.Id.ToString(),
                 UserName = a.Name,
+                Email = a.Email,
+                Mobile = a.Mobile,
+                MobileIsShow = a.MobileIsShow??false,
             })
             .ToList();
         return employees;

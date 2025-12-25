@@ -69,7 +69,7 @@ public class Program
         builder.Services.FreeSqlSet(builder.Configuration);//注册freesql的相关服务
         builder.Services.AddFreeRepository();//freesql仓储
         builder.Services.AddScoped<UnitOfWorkManager>();//freesql uow
-        builder.Services.AntFlowServiceSetUp();//注册AntFlow本身使用到的服务
+        builder.Services.AntFlowServiceSetUp(builder.Configuration);//注册AntFlow本身使用到的服务
         WebApplication app = builder.Build();
         app.Services.AddFreeSqlFluentConfig();
         app.MapOpenApi();

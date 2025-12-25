@@ -1,15 +1,15 @@
-﻿using antflowcore.dto;
+﻿using System.Net.Mail;
+using antflowcore.dto;
 using antflowcore.util.Extension;
 using AntFlowCore.Vo;
+using MailKit.Security;
+using MimeKit;
+using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
 namespace antflowcore.util;
 
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Net.Mail;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -19,99 +19,152 @@ public class MailUtils
     private readonly MailSettings _settings;
     private readonly ILogger<MailUtils> _logger;
 
-    public MailUtils(IOptions<MailSettings> options, ILogger<MailUtils> logger)
+    private MailUtils()
     {
-        _settings = options.Value;
+        
+    }
+    public MailUtils(IOptionsMonitor<MailSettings> options, ILogger<MailUtils> logger)
+    {
+        _settings = options.CurrentValue;
         _logger = logger;
     }
 
-    public async Task SendMailAsync(MailInfo mail)
+    public async Task SendMailBatchAsync(
+        IEnumerable<MailInfo> mails,
+        CancellationToken ct = default)
     {
+        if (mails == null) return;
+
+        var mailList = mails
+            .Where(m => m != null)
+            .ToList();
+
+        if (!mailList.Any()) return;
+
+        using var client = new SmtpClient();
+
         try
         {
-            using var smtpClient = CreateSmtpClient();
-            using var message = CreateMailMessage(mail);
-            await smtpClient.SendMailAsync(message);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "发送单封邮件失败");
-        }
-    }
+            await client.ConnectAsync(
+                _settings.Host,
+                _settings.Port,
+                SecureSocketOptions.SslOnConnect,
+                ct);
 
-    public async Task SendMailBatchAsync(List<MailInfo> mails)
-    {
-        try
-        {
-            using var smtpClient = CreateSmtpClient();
+            await client.AuthenticateAsync(
+                _settings.Account,
+                _settings.Password,
+                ct);
 
-            foreach (var mail in mails)
+            foreach (var mail in mailList)
             {
-                using var message = CreateMailMessage(mail);
-                await smtpClient.SendMailAsync(message);
+                try
+                {
+                    var message = CreateMimeMessage(mail);
+                    await client.SendAsync(message, ct);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(
+                        ex,
+                        "发送邮件失败，Title={Title}",
+                        mail.Title);
+                }
             }
         }
-        catch (Exception ex)
+        finally
         {
-            _logger.LogError(ex, "批量发送邮件失败");
+            await client.DisconnectAsync(true, ct);
         }
     }
 
-    private SmtpClient CreateSmtpClient()
+    public async Task SendMailAsync(MailInfo mail, CancellationToken ct = default)
     {
-        return new SmtpClient(_settings.Host)
+        var message = CreateMimeMessage(mail);
+
+        using var client = new SmtpClient();
+        client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+        try
         {
-            Port = _settings.Port,
-            Credentials = new NetworkCredential(_settings.Account, _settings.Password),
-            EnableSsl = _settings.EnableSsl
-        };
+            
+            await client.ConnectAsync(
+                _settings.Host,
+                _settings.Port,
+                SecureSocketOptions.SslOnConnect,
+                ct);
+
+            await client.AuthenticateAsync(
+                _settings.Account,
+                _settings.Password,
+                ct);
+
+            await client.SendAsync(message, ct);
+        }
+        finally
+        {
+            await client.DisconnectAsync(true, ct);
+        }
     }
 
-    private MailMessage CreateMailMessage(MailInfo mail)
+    private MimeMessage CreateMimeMessage(MailInfo mail)
     {
-        var message = new MailMessage
-        {
-            From = new MailAddress(_settings.Account),
-            Subject = TruncateTitle(mail.Title),
-            Body = mail.Content ?? string.Empty,
-            IsBodyHtml = true
-        };
+        var message = new MimeMessage();
 
+        // 发件人
+        message.From.Add(
+            MailboxAddress.Parse(_settings.Account));
+
+        // 收件人（单个）
         if (!string.IsNullOrWhiteSpace(mail.Receiver))
         {
-            message.To.Add(mail.Receiver);
+            message.To.Add(MailboxAddress.Parse(mail.Receiver));
         }
 
-        if (mail.Receivers != null && mail.Receivers.Any())
+        // 收件人（多个）
+        if (mail.Receivers != null)
         {
-            foreach (var r in mail.Receivers)
+            foreach (var r in mail.Receivers.Where(x => !string.IsNullOrWhiteSpace(x)))
             {
-                if (!string.IsNullOrWhiteSpace(r))
-                    message.To.Add(r);
+                message.To.Add(MailboxAddress.Parse(r));
             }
         }
 
+        // 抄送
         if (!mail.Cc.IsEmpty())
         {
-            foreach (string cc in mail.Cc)
+            foreach (var cc in mail.Cc)
             {
-                message.CC.Add(cc);
+                message.Cc.Add(MailboxAddress.Parse(cc));
             }
         }
 
+        message.Subject = TruncateTitle(mail.Title);
+
+        var body = new BodyBuilder
+        {
+            HtmlBody = mail.Content ?? string.Empty
+        };
+
+        // 文件附件（磁盘）
         if (mail.File != null && File.Exists(mail.File.FullName))
         {
-            message.Attachments.Add(new Attachment(mail.File.FullName));
+            body.Attachments.Add(mail.File.FullName);
         }
 
+        // 流附件
         if (mail.FileInputStream != null)
         {
-            var attachment = new Attachment(mail.FileInputStream, mail.FileName ?? "attachment");
-            message.Attachments.Add(attachment);
+            body.Attachments.Add(
+                mail.FileName ?? "attachment",
+                mail.FileInputStream);
         }
+
+        message.Body = body.ToMessageBody();
 
         return message;
     }
+    
+    
 
     private string TruncateTitle(string title)
     {

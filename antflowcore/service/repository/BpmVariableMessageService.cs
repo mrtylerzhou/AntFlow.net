@@ -439,13 +439,13 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
             return;
         }
 
-        List<DetailedUser> employeeDetailByIds = _userService.GetEmployeeDetailByIds(sendToUsers.Distinct().ToList());
-        if(employeeDetailByIds.IsEmpty()){
+        List<DetailedUser> detailedUserDetailByIds = _userService.GetEmployeeDetailByIds(sendToUsers.Distinct().ToList());
+        if(detailedUserDetailByIds.IsEmpty()){
             return;
         }
 
         //send messages
-        SendMessage(vo, bpmnTemplateVo, employeeDetailByIds);
+        SendMessage(vo, bpmnTemplateVo, detailedUserDetailByIds);
 
     }
      private List<String> GetSendToUsers(BpmVariableMessageVo vo, BpmnTemplateVo bpmnTemplateVo)
@@ -516,9 +516,10 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
                 Object filObject = null;
                 if (!string.IsNullOrEmpty(fileName))
                 {
-                    filObject = vo.GetType().GetProperty(fileName);
+
+                    filObject = ReflectionUtils.GetPropertyValue(vo, fileName);
                 }
-                if (filObject  is IEnumerable enumerable)
+                if (filObject  is IEnumerable enumerable and not string)
                 {
                     foreach (object o in enumerable)
                     {
@@ -604,7 +605,7 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
     {
         var wildcardCharacterMap = new Dictionary<int, string>();
 
-        foreach (var wildcardCharacterEnum in Enum.GetValues(typeof(WildcardCharacterEnum)).Cast<WildcardCharacterEnum>())
+        foreach (var wildcardCharacterEnum in WildcardCharacterEnum.Values)
         {
             var filName = wildcardCharacterEnum.FilName;
             if (string.IsNullOrWhiteSpace(filName))

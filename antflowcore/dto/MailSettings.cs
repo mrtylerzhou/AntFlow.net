@@ -24,9 +24,5 @@ public class MailSettings
     /// 邮箱密码或授权码
     /// </summary>
     public string Password { get; set; }
-
-    /// <summary>
-    /// 是否启用SSL/TLS
-    /// </summary>
-    public bool EnableSsl { get; set; } = true;
+    
 }

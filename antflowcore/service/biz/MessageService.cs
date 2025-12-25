@@ -59,7 +59,7 @@ public class MessageService
 
         if (mailsToSend.Any())
         {
-             _mailUtils.SendMailBatchAsync(mailsToSend);
+            _mailUtils.SendMailBatchAsync(mailsToSend);
         }
     }
 

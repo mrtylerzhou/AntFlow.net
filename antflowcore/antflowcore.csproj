@@ -18,6 +18,7 @@
       <PackageReference Include="FreeSql"  />
       <PackageReference Include="FreeSql.DbContext" />
       <PackageReference Include="hyjiacan.pinyin4net"  />
+      <PackageReference Include="MailKit" />
       <PackageReference Include="murmurhash"  />
       <PackageReference Include="Rougamo.Fody"  />
      

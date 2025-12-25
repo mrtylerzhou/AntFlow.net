@@ -15,7 +15,9 @@ public class MessageSendTypeEnum
     public static readonly MessageSendTypeEnum MAIL = new MessageSendTypeEnum(1, "邮件");
     public static readonly MessageSendTypeEnum MESSAGE = new MessageSendTypeEnum(2, "短信");
     public static readonly MessageSendTypeEnum PUSH = new MessageSendTypeEnum(3, "APP-PUSH");
-    public static readonly MessageSendTypeEnum WECHAT_PUSH = new MessageSendTypeEnum(4, "企微消息");
+    public static readonly MessageSendTypeEnum WECHAT_PUSH = new MessageSendTypeEnum(5, "企微消息");
+    public static readonly MessageSendTypeEnum DING_TALK_TYPE = new MessageSendTypeEnum(6, "钉钉消息");
+    public static readonly MessageSendTypeEnum FEISHU_TYPE = new MessageSendTypeEnum(7, "飞书通知");
 
     private static readonly Dictionary<int, MessageSendTypeEnum> _codeMap = new Dictionary<int, MessageSendTypeEnum>
     {

@@ -11,6 +11,7 @@ using antflowcore.adaptor.variable;
 using antflowcore.aop;
 using antflowcore.bpmn.listener;
 using antflowcore.bpmn.service;
+using antflowcore.dto;
 using antflowcore.evt;
 using antflowcore.factory;
 using antflowcore.service;
@@ -33,8 +34,12 @@ namespace antflowcore.conf.serviceregistration;
 
 public static class ServiceRegistration
 {
-    public static void AntFlowServiceSetUp(this IServiceCollection services)
+    public static void AntFlowServiceSetUp(this IServiceCollection services,IConfiguration configuration)
     {
+       
+        services.Configure<MailSettings>(
+            configuration.GetSection("MailSettings"));
+        
         services.AddSingleton<BpmnConfService>();
         services.AddSingleton<BpmnConfCommonService>();
         services.AddSingleton<BpmnConfBizService>();

@@ -24,7 +24,7 @@ namespace antflowcore.vo
         [JsonPropertyName("informs")]
         public string Informs { get; set; }
 
-        [JsonPropertyName("informIdList")]
+        [JsonPropertyName("informIdList"),JsonConverter(typeof(IntToStringListConverter))]
         public List<string> InformIdList { get; set; }
 
         [JsonPropertyName("informList")]
