@@ -1,6 +1,7 @@
 ﻿using antflowcore.adaptor.bpmnprocessnotice;
 using antflowcore.constant.enums;
 using AntFlowCore.Entity;
+using antflowcore.factory;
 using antflowcore.service.biz;
 using antflowcore.service.interf.repository;
 using antflowcore.service.repository;
@@ -38,16 +39,30 @@ public static class UserMsgUtils
     {
         if (types == null || types.Length == 0 || !CheckEmployeeStatus(vo.UserId)) return;
 
-        var typeList = types.ToList();
+        foreach (MessageSendTypeEnum messageSendTypeEnum in types)
+        {
+            if(messageSendTypeEnum==null){
+                continue;
+            }
+            IEnumerable<IProcessNoticeAdaptor> processNoticeAdaptors = ServiceProviderUtils.GetServices<IProcessNoticeAdaptor>();
+            bool currentSend = false;
+            foreach (IProcessNoticeAdaptor processNoticeAdaptor in processNoticeAdaptors)
+            {
+                if (processNoticeAdaptor!=null)
+                {
+                    if (processNoticeAdaptor.GetSupportCode() == messageSendTypeEnum.Code)
+                    {
+                        currentSend = true;
+                        processNoticeAdaptor.SendMessageBatchByType(new List<UserMsgVo>{vo});
+                    }
+                }
+            }
 
-        if (typeList.Contains(MessageSendTypeEnum.MAIL))
-            service.SendMail(BuildMailInfo(vo), vo.UserId);
-
-        if (typeList.Contains(MessageSendTypeEnum.MESSAGE))
-            service.SendSms(BuildMessageInfo(vo), vo.UserId);
-
-        if (typeList.Contains(MessageSendTypeEnum.PUSH))
-            service.SendAppPush(BuildBaseMsgInfo(vo), vo.UserId);
+            if (!currentSend)
+            {
+                AfStaticLogUtil.Logger.LogInformation($"未实现的消息发送策略!{messageSendTypeEnum}");
+            }
+        }
     }
 
     private static void InsertUserMessage(UserMsgVo vo, MessageService service)

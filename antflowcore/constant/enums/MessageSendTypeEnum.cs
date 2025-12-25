@@ -25,7 +25,9 @@ public class MessageSendTypeEnum
         { MAIL.Code, MAIL },
         { MESSAGE.Code, MESSAGE },
         { PUSH.Code, PUSH },
-        { WECHAT_PUSH.Code, WECHAT_PUSH }
+        { WECHAT_PUSH.Code, WECHAT_PUSH },
+        {DING_TALK_TYPE.Code,DING_TALK_TYPE},
+        {FEISHU_TYPE.Code,FEISHU_TYPE}
     };
 
     public static MessageSendTypeEnum GetEnumByCode(int code)
