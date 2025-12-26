@@ -11,6 +11,8 @@
 
 ### 📢 Oracle,PostGres脚本捐赠任意金额获得,之前捐赠过的用户可联系作者获取。
 
+### 项目的swagger不是项目的前端!项目前端在antflow-activiti仓库里,链接地址自己搜索或者往下看项目仓库一览
+
 ## **DotNet💖workflow，AntFlow.Net让工作流开发像普通CURD一样简单,即便没有流程开发经验的程序员也能快速开发流程!让NET项目如虎添翼!**
 
 **AntFlow.NET** 是一款仿钉钉的开源低代码工作流引擎,，采用纯血 .NET 技术栈编写，无缝融入 .NET 应用生态。
@@ -24,7 +26,6 @@
 <img src="https://img.shields.io/badge/AntFlow可用于个人或者公司项目,禁止将源码二次开源(联系作者获得授权的除外)-注意-purple.svg" alt="Downloads">
 
 > 关于版权说明,任何公司和个人都可以直接使用antflow或者二次开发定制。公开发售的请合理支付作者费用（即商用限于对大客户的一对一定制开发，一个副本卖多个客户的请合理支付作者费用）。
->
 >
 > 原则上禁止将antflow源码再二次开源。BSD，MIT协议开源的可联系作者获得授权，后期协议变更或者有商业行为的请及时删除antflow模块或者沟通重新授权。
 
@@ -51,14 +52,14 @@
 
 ## 项目仓库一览
 
-| 项目名               | 地址                                                                                                                                                                       | 描述                                                                                                                                                                                                                       |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 前端独立设计器地址   | [⭐Gitee](https://gitee.com/ldhnet/AntFlow-Designer)<br />⭐[GitHub](https://github.com/ldhnet/AntFlow-Designer)<br />⭐[GitCode](https://gitcode.com/ldhnet/FlowDesigner/overview) | 项目独立前端设计器地址,主要用于用户只需要集成设计器,代办,已办等列表都自己设计的自定义程度较高场景,<br />目前项目官网demo上部署的是集成ruoyi的,**和后端项目在一个仓库里,**即后端仓库的**antflow-vue**文件夹下面 |
-| 开源.net后端项目地址 | ⭐[github](https://github.com/mrtylerzhou/AntFlow.net)                                                                                                                        | .net 版和java版共用同一套前端,用户可以使用独立设计器,如果需要和官网demo一样的效果,可以下载后端java仓库,然后取出antflow-vue                                                                                                |
-| 开源Java后端项目地址 | [⭐Gitee](https://gitee.com/tylerzhou/Antflow)<br />[⭐Github](https://github.com/mrtylerzhou/AntFlow)<br />[⭐GitCode](https://gitcode.com/zypqqgc/AntFlow/overview)               | Antflow**后端代码**,其中antflow-vue为官网展示的demo项目,包含了一套去除了后端系统的ruoyi前端                                                                                                                          |
-| 独立设计器预览地址   | [预览入口](http://14.103.207.27/ant-flow/dist/#/)                                                                                                                             | 仅独立设计器的预览地址,独立设计器主要用于前端ui定制化需求较高的场景                                                                                                                                                        |
-| 成品案例预览地址     | [预览入口](http://14.103.207.27/admin/)                                                                                                                                       | 即java后端项目里的antflow-vue项目的预览,用于快速和ruoyi集成                                                                                                                                                                |
-| 系统操作手册地址     | [查看入口](https://gitee.com/tylerzhou/Antflow/wikis/)                                                                                                                        |                                                                                                                                                                                                                            |
+| 项目名               | 地址                                                                                                                                                                       | 描述                                                                                                                                                                                                                                            |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 前端独立设计器地址   | [⭐Gitee](https://gitee.com/ldhnet/AntFlow-Designer)<br />⭐[GitHub](https://github.com/ldhnet/AntFlow-Designer)<br />⭐[GitCode](https://gitcode.com/ldhnet/FlowDesigner/overview) | 项目独立前端设计器地址,主要用于用户只需要集成设计器,代办,已办等列表都自己设计的自定义程度较高场景,<br />目前项目官网demo上部署的是前端在java版antflow-activiti目录下的antflow-vue 目录,使用说明在java项目的readme.zh-CN.md的**[前端运行]**一节 |
+| 开源.net后端项目地址 | ⭐[github](https://github.com/mrtylerzhou/AntFlow.net)                                                                                                                        | .net 版和java版共用同一套前端,用户可以使用独立设计器,如果需要和官网demo一样的效果,可以下载后端java仓库,然后取出antflow-vue                                                                                                                     |
+| 开源Java后端项目地址 | [⭐Gitee](https://gitee.com/tylerzhou/Antflow)<br />[⭐Github](https://github.com/mrtylerzhou/AntFlow)<br />[⭐GitCode](https://gitcode.com/zypqqgc/AntFlow/overview)               | Antflow**后端代码**,其中antflow-vue为官网展示的demo项目,包含了一套去除了后端系统的ruoyi前端                                                                                                                                               |
+| 独立设计器预览地址   | [预览入口](http://14.103.207.27/ant-flow/dist/#/)                                                                                                                             | 仅独立设计器的预览地址,独立设计器主要用于前端ui定制化需求较高的场景                                                                                                                                                                             |
+| 成品案例预览地址     | [预览入口](http://14.103.207.27/admin/)                                                                                                                                       | 即java后端项目里的antflow-vue项目的预览,用于快速和ruoyi集成                                                                                                                                                                                     |
+| 系统操作手册地址     | [查看入口](https://gitee.com/tylerzhou/Antflow/wikis/)                                                                                                                        |                                                                                                                                                                                                                                                 |
 
 ## 使用案例
 
