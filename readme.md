@@ -11,7 +11,9 @@
 
 ### 📢 Oracle,PostGres脚本捐赠任意金额获得,之前捐赠过的用户可联系作者获取。
 
-### 项目的swagger不是项目的前端!项目前端在antflow-activiti仓库里,链接地址自己搜索或者往下看项目仓库一览
+#### 项目的swagger不是项目的前端!项目前端在antflow-activiti仓库里的antflow-vue文件夹(注意不是antflow-web,这个是java版的出口模块),链接地址自己搜索或者往下看项目仓库一览
+
+> 目前antflow-activiti和antflow.net共享一套前端,也仅共享了前端,从里面拿出antflow-vue,其它的不共享,都删除掉就行了!!!不要用java仓库的数据库脚本来初始化antflow.net数据库
 
 ## **DotNet💖workflow，AntFlow.Net让工作流开发像普通CURD一样简单,即便没有流程开发经验的程序员也能快速开发流程!让NET项目如虎添翼!**
 
