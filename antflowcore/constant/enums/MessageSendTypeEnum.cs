@@ -19,7 +19,7 @@ public class MessageSendTypeEnum
     public static readonly MessageSendTypeEnum DING_TALK_TYPE = new MessageSendTypeEnum(6, "钉钉消息");
     public static readonly MessageSendTypeEnum FEISHU_TYPE = new MessageSendTypeEnum(7, "飞书通知");
 
-    private static readonly Dictionary<int, MessageSendTypeEnum> _codeMap = new Dictionary<int, MessageSendTypeEnum>
+    public static readonly Dictionary<int, MessageSendTypeEnum> _codeMap = new Dictionary<int, MessageSendTypeEnum>
     {
         { ALL.Code, ALL },
         { MAIL.Code, MAIL },

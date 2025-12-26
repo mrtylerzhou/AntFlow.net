@@ -33,13 +33,19 @@ public class MailUtils
         IEnumerable<MailInfo> mails,
         CancellationToken ct = default)
     {
-        if (mails == null) return;
+        if (mails == null)
+        {
+            return;
+        };
 
         var mailList = mails
             .Where(m => m != null)
             .ToList();
 
-        if (!mailList.Any()) return;
+        if (!mailList.Any())
+        {
+            return;
+        };
 
         using var client = new SmtpClient();
 

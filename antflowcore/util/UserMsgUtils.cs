@@ -21,13 +21,13 @@ public static class UserMsgUtils
     public static void SendMessages(UserMsgVo vo, params MessageSendTypeEnum[] types)
     {
         var service = GetMessageService();
-        DoSendMessages(vo, service, types);
+        DoSendMessages(vo, types);
         InsertUserMessage(vo, service);
     }
 
-    public static void SendMessagesNoUserMessage(UserMsgVo vo, params MessageSendTypeEnum[] types)
+    public static void SendGeneralPurposeMessages(UserMsgVo vo, params MessageSendTypeEnum[] types)
     {
-        DoSendMessages(vo, GetMessageService(), types);
+        DoSendMessages(vo,  types);
     }
 
     public static void InsertUserMessage(UserMsgVo vo)
@@ -35,9 +35,12 @@ public static class UserMsgUtils
         InsertUserMessage(vo, GetMessageService());
     }
 
-    private static void DoSendMessages(UserMsgVo vo, MessageService service, MessageSendTypeEnum[] types)
+    private static void DoSendMessages(UserMsgVo vo, MessageSendTypeEnum[] types)
     {
-        if (types == null || types.Length == 0 || !CheckEmployeeStatus(vo.UserId)) return;
+        if (types == null || types.Length == 0 || !CheckEmployeeStatus(vo.UserId))
+        {
+            return;
+        }
 
         foreach (MessageSendTypeEnum messageSendTypeEnum in types)
         {
@@ -56,6 +59,10 @@ public static class UserMsgUtils
                         processNoticeAdaptor.SendMessageBatchByType(new List<UserMsgVo>{vo});
                     }
                 }
+                else
+                {
+                    AfStaticLogUtil.Logger.LogInformation($"未实现的消息发送策略!{messageSendTypeEnum}");
+                }
             }
 
             if (!currentSend)
@@ -72,6 +79,12 @@ public static class UserMsgUtils
         service.InsertUserMessage(msg);
     }
 
+    public static void sendAllMsg(UserMsgVo userMsgVo) {
+        MessageSendTypeEnum[] messageSendTypeEnums= MessageSendTypeEnum._codeMap.Values.ToArray();
+        MessageSendTypeEnum[] allSendTypes =
+            messageSendTypeEnums.Where(x => x != MessageSendTypeEnum.ALL).ToArray();
+        DoSendMessages(userMsgVo, allSendTypes);
+    }
     public static void SendMessageBatch(List<UserMsgBatchVo> list)
     {
         var service = GetMessageService();
@@ -97,7 +110,16 @@ public static class UserMsgUtils
 
     }
     
-
+    public static void sendAppPush(UserMsgVo userMsgVo) {
+        MessageSendTypeEnum[] messageSendTypeEnums=new MessageSendTypeEnum[1];
+        messageSendTypeEnums[0]= MessageSendTypeEnum.PUSH;
+        DoSendMessages(userMsgVo, messageSendTypeEnums);
+    }
+    public static void sendSms(UserMsgVo userMsgVo) {
+        MessageSendTypeEnum[] messageSendTypeEnums=new MessageSendTypeEnum[1];
+        messageSendTypeEnums[0]=MessageSendTypeEnum.MESSAGE;
+        DoSendMessages(userMsgVo, messageSendTypeEnums);
+    }
     private static void DoSendMessageBatch(List<UserMsgBatchVo> list, MessageService service)
     {
         Dictionary<MessageSendTypeEnum, List<UserMsgVo>> map = FormatUserMsgBatchVos(list);
@@ -148,6 +170,11 @@ public static class UserMsgUtils
             .SelectMany(x => x.MessageSendTypeEnums.Select(type => new { Type = type, Vo = x.UserMsgVo }))
             .GroupBy(x => x.Type)
             .ToDictionary(g => g.Key, g => g.Select(x => x.Vo).ToList());
+    }
+    public static void sendMail(UserMsgVo userMsgVo) {
+        MessageSendTypeEnum[] messageSendTypeEnums=new MessageSendTypeEnum[1];
+        messageSendTypeEnums[0]=MessageSendTypeEnum.MAIL;
+        DoSendMessages(userMsgVo, messageSendTypeEnums);
     }
 
     private static UserMessage BuildUserMessage(UserMsgVo vo)
@@ -206,7 +233,10 @@ public static class UserMsgUtils
 
     private static bool CheckEmployeeStatus(string userId)
     {
-        if (string.IsNullOrEmpty(userId)) return false;
+        if (string.IsNullOrEmpty(userId))
+        {
+            return false;
+        }
         var service = GetAfUserService();
         return service.CheckEmployeeEffective(userId) > 0;
     }
