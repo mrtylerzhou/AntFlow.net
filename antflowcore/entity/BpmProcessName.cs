@@ -25,6 +25,6 @@ public class BpmProcessName
     /// <summary>
     /// Creation Time
     /// </summary>
-    public DateTime? CreateTime { get; set; }
+    public DateTime? CreateTime { get; set; } = DateTime.Now;
     
 }

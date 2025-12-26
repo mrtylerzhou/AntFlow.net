@@ -85,7 +85,7 @@ public class BpmAfTaskInst
     /// <summary>
     /// 任务开始时间
     /// </summary>
-    public DateTime StartTime { get; set; } = DateTime.Now;
+    public DateTime StartTime { get; set; }
 
     /// <summary>
     /// 任务认领时间

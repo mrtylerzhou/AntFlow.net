@@ -297,6 +297,7 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
                 MessageType = messageType,
                 EventType = o.Event,
                 Content = JsonSerializer.Serialize(o)
+                ,CreateTime = DateTime.Now
             })
             .ToList();
     }

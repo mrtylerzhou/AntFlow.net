@@ -64,22 +64,24 @@ public class ButtonOperationService
                     )
                     .Where((a, b) => b.BusinessNumber == vo.ProcessNumber)
                     .ToList();
+                string eventName = "";
                 if (vo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_AGREE)
                 {
-                    foreach (BpmAfTask bpmAfTask in bpmAfTasks)
-                    {
-                        bpmAfTask.ProcessNumber = vo.ProcessNumber;
-                        _taskListener.Notify(bpmAfTask,ITaskListener.EVENTNAME_COMPLETE);
-                    }
+                    eventName = ITaskListener.EVENTNAME_COMPLETE;
                 }else if (vo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_SUBMIT)
                 {
-                    _taskListener.Notify(new BpmAfTask{ProcessNumber = vo.ProcessNumber},ITaskListener.EVENTNAME_CREATE);
+                    eventName = ITaskListener.EVENTNAME_CREATE;
                 }else if (vo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_RESUBMIT)
                 {
-                    _taskListener.Notify(new BpmAfTask{ProcessNumber = vo.ProcessNumber},ITaskListener.EVENTNAME_RE_SUBMIT);
+                    eventName = ITaskListener.EVENTNAME_RE_SUBMIT;
                 }else if (vo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_DIS_AGREE)
                 {
-                    _taskListener.Notify(new BpmAfTask{ProcessNumber = vo.ProcessNumber},ITaskListener.EVENTNAME_COMPLETE);
+                    eventName= ITaskListener.EVENTNAME_DELETE;
+                }
+                foreach (BpmAfTask bpmAfTask in bpmAfTasks)
+                {
+                    bpmAfTask.ProcessNumber = vo.ProcessNumber;
+                    _taskListener.Notify(bpmAfTask,eventName);
                 }
             }
            

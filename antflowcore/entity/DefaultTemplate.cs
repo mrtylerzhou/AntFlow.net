@@ -30,7 +30,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// Creation time.
         /// </summary>
-        public DateTime? CreateTime { get; set; }
+        public DateTime? CreateTime { get; set; } = DateTime.Now;
 
         /// <summary>
         /// Creator of the template.
@@ -40,7 +40,7 @@ namespace AntFlowCore.Entity
         /// <summary>
         /// Update time.
         /// </summary>
-        public DateTime? UpdateTime { get; set; }
+        public DateTime? UpdateTime { get; set; }=DateTime.Now;
 
         /// <summary>
         /// User who updated the template.

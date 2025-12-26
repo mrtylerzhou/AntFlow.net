@@ -57,7 +57,7 @@ public class BpmVariableSignUp
     /// <summary>
     /// Create time.
     /// </summary>
-    public DateTime? CreateTime { get; set; }
+    public DateTime? CreateTime { get; set; } = DateTime.Now;
 
     /// <summary>
     /// Update user.
@@ -67,5 +67,5 @@ public class BpmVariableSignUp
     /// <summary>
     /// Update time.
     /// </summary>
-    public DateTime? UpdateTime { get; set; }
+    public DateTime? UpdateTime { get; set; }=DateTime.Now;
 }

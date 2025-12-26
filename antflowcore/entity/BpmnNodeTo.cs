@@ -41,7 +41,7 @@ public class BpmnNodeTo
     /// <summary>
     /// Time when this record was created.
     /// </summary>
-    public DateTime? CreateTime { get; set; }
+    public DateTime? CreateTime { get; set; } = DateTime.Now;
 
     /// <summary>
     /// User who last updated this record.
@@ -51,5 +51,5 @@ public class BpmnNodeTo
     /// <summary>
     /// Time when this record was last updated.
     /// </summary>
-    public DateTime? UpdateTime { get; set; }
+    public DateTime? UpdateTime { get; set; }=DateTime.Now;
 }

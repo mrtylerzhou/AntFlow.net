@@ -441,9 +441,9 @@ public class ActivitiBpmMsgTemplateService
     }
     public string ReplaceTemplateDetail(ActivitiBpmMsgVo activitiBpmMsgVo, string content)
     {
-        var noticeReplaceEnums = new List<NoticeReplaceEnum>();
-
-        foreach (var noticeReplaceEnum in noticeReplaceEnums)
+        List<NoticeReplaceEnum> noticeReplaceEnums = new List<NoticeReplaceEnum>();
+        
+        foreach (var noticeReplaceEnum in NoticeReplaceEnum.Values)
         {
             if (content.Contains("{" + noticeReplaceEnum.Desc + "}"))
             {

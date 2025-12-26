@@ -52,7 +52,7 @@ public class BpmProcessApplicationType
     /// <summary>
     /// Creation time.
     /// </summary>
-    public DateTime? CreateTime { get; set; }
+    public DateTime? CreateTime { get; set; } = DateTime.Now;
 
     /// <summary>
     /// Common use state.

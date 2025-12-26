@@ -79,7 +79,7 @@ public class BpmAfTask
     /// <summary>
     /// 创建时间
     /// </summary>
-    public DateTime CreateTime { get; set; } = DateTime.Now;
+    public DateTime CreateTime { get; set; }
 
     /// <summary>
     /// 到期时间

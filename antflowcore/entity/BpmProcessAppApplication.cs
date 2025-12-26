@@ -92,7 +92,7 @@ public class BpmProcessAppApplication
     /// <summary>
     /// Creation time.
     /// </summary>
-    public DateTime? CreateTime { get; set; }
+    public DateTime? CreateTime { get; set; } = DateTime.Now;
 
     /// <summary>
     /// Last update user.
@@ -102,7 +102,7 @@ public class BpmProcessAppApplication
     /// <summary>
     /// Last update time.
     /// </summary>
-    public DateTime? UpdateTime { get; set; }
+    public DateTime? UpdateTime { get; set; }=DateTime.Now;
 
     /// <summary>
     /// Is for all (page with no configuration function, default writes to database).

@@ -27,12 +27,12 @@ public class BpmManualNotify
     /// <summary>
     /// Creation time.
     /// </summary>
-    public DateTime? CreateTime { get; set; }
+    public DateTime? CreateTime { get; set; } = DateTime.Now;
 
     /// <summary>
     /// Update time.
     /// </summary>
-    public DateTime? UpdateTime { get; set; }
+    public DateTime? UpdateTime { get; set; }=DateTime.Now;
     /// <summary>
     /// Logical delete flag (0: not deleted, 1: deleted).
     /// </summary>

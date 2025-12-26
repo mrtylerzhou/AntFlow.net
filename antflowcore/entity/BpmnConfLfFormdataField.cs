@@ -53,7 +53,7 @@ public class BpmnConfLfFormdataField
     /// <summary>
     /// Creation time.
     /// </summary>
-    public DateTime? CreateTime { get; set; }
+    public DateTime? CreateTime { get; set; } = DateTime.Now;
 
     /// <summary>
     /// Updated by user.
@@ -63,5 +63,5 @@ public class BpmnConfLfFormdataField
     /// <summary>
     /// Update time.
     /// </summary>
-    public DateTime? UpdateTime { get; set; }
+    public DateTime? UpdateTime { get; set; }=DateTime.Now;
 }

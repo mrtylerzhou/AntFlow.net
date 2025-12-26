@@ -13,9 +13,9 @@ public class DictMain
     public string DictType { get; set; }
     public int? IsDel { get; set; }
     public string TenantId { get; set; }
-    public DateTime? CreateTime { get; set; }
+    public DateTime? CreateTime { get; set; } = DateTime.Now;
     public string CreateUser { get; set; }
-    public DateTime? UpdateTime { get; set; }
+    public DateTime? UpdateTime { get; set; }=DateTime.Now;
     public string UpdateUser { get; set; }
     public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
 }

@@ -95,7 +95,7 @@ using System.Text.RegularExpressions;
     /// <summary>
     /// update time
     /// </summary>
-    public DateTime? UpdateTime { get; set; }
+    public DateTime? UpdateTime { get; set; }=DateTime.Now;
 
     public int? ExtraFlags { get; set; }
 

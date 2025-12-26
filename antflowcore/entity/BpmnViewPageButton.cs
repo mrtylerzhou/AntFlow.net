@@ -34,11 +34,11 @@ public class BpmnViewPageButton
 
     public string CreateUser { get; set; }
 
-    public DateTime? CreateTime { get; set; }
+    public DateTime? CreateTime { get; set; } = DateTime.Now;
 
     public string UpdateUser { get; set; }
 
-    public DateTime? UpdateTime { get; set; }
+    public DateTime? UpdateTime { get; set; }=DateTime.Now;
 
     public static BpmnViewPageButton BuildViewPageButton(long confId, int buttonTypeCode, int viewPageTypeCode)
     {

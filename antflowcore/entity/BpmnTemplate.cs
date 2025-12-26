@@ -64,7 +64,7 @@ public class BpmnTemplate
     /// <summary>
     /// Creation time.
     /// </summary>
-    public DateTime? CreateTime { get; set; }
+    public DateTime? CreateTime { get; set; } = DateTime.Now;
 
     /// <summary>
     /// User who created this record.
@@ -74,7 +74,7 @@ public class BpmnTemplate
     /// <summary>
     /// Last update time.
     /// </summary>
-    public DateTime? UpdateTime { get; set; }
+    public DateTime? UpdateTime { get; set; }=DateTime.Now;
 
     /// <summary>
     /// User who last updated this record.

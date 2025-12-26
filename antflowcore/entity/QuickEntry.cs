@@ -15,7 +15,7 @@
         public string TenantId { get; set; }
         public string Route { get; set; }
         public int Sort { get; set; }
-        public DateTime? CreateTime { get; set; }
+        public DateTime? CreateTime { get; set; } = DateTime.Now;
         public int Status { get; set; }
         public int VariableUrlFlag { get; set; }
 

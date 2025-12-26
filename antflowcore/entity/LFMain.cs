@@ -32,7 +32,7 @@ public class LFMain
     /// <summary>
     /// 创建时间
     /// </summary>
-    public DateTime? CreateTime { get; set; }
+    public DateTime? CreateTime { get; set; } = DateTime.Now;
 
     /// <summary>
     /// 更新人
@@ -42,5 +42,5 @@ public class LFMain
     /// <summary>
     /// 更新时间
     /// </summary>
-    public DateTime? UpdateTime { get; set; }
+    public DateTime? UpdateTime { get; set; }=DateTime.Now;
 }

@@ -17,9 +17,9 @@ namespace AntFlowCore.Entity
 
         public string Content { get; set; }
 
-        public DateTime? CreateTime { get; set; }
+        public DateTime? CreateTime { get; set; } = DateTime.Now;
 
-        public DateTime? UpdateTime { get; set; }
+        public DateTime? UpdateTime { get; set; }=DateTime.Now;
 
         public string CreateUser { get; set; }
 

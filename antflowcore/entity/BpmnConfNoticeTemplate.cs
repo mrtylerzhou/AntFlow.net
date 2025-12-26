@@ -28,7 +28,7 @@ public class BpmnConfNoticeTemplate
     /// <summary>
     /// Creation Time
     /// </summary>
-    public DateTime? CreateTime { get; set; }
+    public DateTime? CreateTime { get; set; } = DateTime.Now;
 
     /// <summary>
     /// Updated By
@@ -38,5 +38,5 @@ public class BpmnConfNoticeTemplate
     /// <summary>
     /// Update Time
     /// </summary>
-    public DateTime? UpdateTime { get; set; }
+    public DateTime? UpdateTime { get; set; }=DateTime.Now;
 }

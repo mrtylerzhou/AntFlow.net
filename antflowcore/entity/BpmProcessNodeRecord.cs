@@ -20,7 +20,7 @@ public class BpmProcessNodeRecord
     /// <summary>
     /// Creation time.
     /// </summary>
-    public DateTime? CreateTime { get; set; }
+    public DateTime? CreateTime { get; set; } = DateTime.Now;
     /// <summary>
     /// Deletion Status (0: Not Deleted, 1: Deleted)
     /// </summary>

@@ -38,10 +38,10 @@ namespace AntFlowCore.Entity
         [JsonPropertyName("tenant_id")]
         public string TenantId { get; set; }
         [JsonPropertyName("create_time")]
-        public DateTime? CreateTime { get; set; }
+        public DateTime? CreateTime { get; set; } = DateTime.Now;
 
         [JsonPropertyName("update_time")]
-        public DateTime? UpdateTime { get; set; }
+        public DateTime? UpdateTime { get; set; }=DateTime.Now;
 
         [JsonPropertyName("create_user")]
         public string CreateUser { get; set; }

@@ -46,7 +46,7 @@ public class BpmnNodePersonnelEmplConf
     /// <summary>
     /// Creation time.
     /// </summary>
-    public DateTime? CreateTime { get; set; }
+    public DateTime? CreateTime { get; set; } = DateTime.Now;
 
     /// <summary>
     /// Updated by user (email prefix).
@@ -56,5 +56,5 @@ public class BpmnNodePersonnelEmplConf
     /// <summary>
     /// Update time.
     /// </summary>
-    public DateTime? UpdateTime { get; set; }
+    public DateTime? UpdateTime { get; set; }=DateTime.Now;
 }

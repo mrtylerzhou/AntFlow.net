@@ -9,8 +9,8 @@
         public static readonly int HIDE_STATUS_1 = 1;
 
         public long Id { get; set; }
-        public DateTime? CreateTime { get; set; }
-        public DateTime? UpdateTime { get; set; }
+        public DateTime? CreateTime { get; set; } = DateTime.Now;
+        public DateTime? UpdateTime { get; set; }=DateTime.Now;
         public int IsDel { get; set; }
         public string TenantId { get; set; }
         public string Version { get; set; }

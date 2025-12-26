@@ -42,7 +42,7 @@ public class BpmProcessDept
     /// <summary>
     /// Create time.
     /// </summary>
-    public DateTime? CreateTime { get; set; }
+    public DateTime? CreateTime { get; set; } = DateTime.Now;
 
     /// <summary>
     /// Create user ID.
@@ -57,7 +57,7 @@ public class BpmProcessDept
     /// <summary>
     /// Modify time.
     /// </summary>
-    public DateTime? UpdateTime { get; set; }
+    public DateTime? UpdateTime { get; set; }=DateTime.Now;
 
     /// <summary>
     /// Process key.
