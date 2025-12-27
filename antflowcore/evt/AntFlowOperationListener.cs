@@ -110,7 +110,7 @@ namespace antflowcore.evt;
         /// </summary>
         public void onStop(BusinessDataVo businessData)
         {
-            /*_bpmVariableMessageListenerService.SendProcessMessages(EventTypeEnum.PROCESS_CANCELLATION, businessData);*/
+            _bpmVariableMessageListenerService.SendProcessMessages(EventTypeEnum.PROCESS_CANCELLATION, businessData);
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace antflowcore.evt;
         /// </summary>
         public void onForward(BusinessDataVo businessData)
         {
-            /*_bpmVariableMessageListenerService.SendProcessMessages(EventTypeEnum.PROCESS_FORWARD, businessData);*/
+            _bpmVariableMessageListenerService.SendProcessMessages(EventTypeEnum.PROCESS_FORWARD, businessData);
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace antflowcore.evt;
         /// </summary>
         public void onBackToModify(BusinessDataVo businessData)
         {
-            /*_variableMessageBizService.SendTemplateMessages(businessData);*/
+            _variableMessageBizService.SendTemplateMessages(businessData);
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace antflowcore.evt;
         /// </summary>
         public void onJp(BusinessDataVo businessData)
         {
-            /*_variableMessageBizService.SendTemplateMessages(businessData);*/
+            _variableMessageBizService.SendTemplateMessages(businessData);
         }
 
         /// <summary>

@@ -374,7 +374,10 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
     {
         DoSendTemplateMessages(vo);
     }
-
+    public void SendTemplateMessages(BusinessDataVo businessDataVo) {
+        BpmVariableMessageVo bpmVariableMessageVo = FromBusinessDataVo(businessDataVo);
+        DoSendTemplateMessages(bpmVariableMessageVo);
+    }
     /**
    * do send templated messages
    *
@@ -717,5 +720,45 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
         urlMap["appUrl"] = appUrl;
 
         return urlMap;
+    }
+    public BpmVariableMessageVo FromBusinessDataVo(BusinessDataVo businessDataVo) {
+
+
+        if (businessDataVo == null) {
+            return null;
+        }
+
+        //get event type by operation type
+        EventTypeEnum eventTypeEnum = (EventTypeEnum)businessDataVo.OperationType;
+
+        if (eventTypeEnum==null) {
+            return null;
+        }
+
+
+        //default link type is process type
+        int type = 2;
+
+
+        //if event type is cancel operation then link type is view type
+        if (eventTypeEnum==EventTypeEnum.PROCESS_CANCELLATION) {
+            type = 1;
+        }
+
+        BpmVariableMessageVo bpmVariableMessageVo = new BpmVariableMessageVo()
+        {
+            ProcessNumber = businessDataVo.ProcessNumber,
+            FormCode = businessDataVo.FormCode,
+            EventType = (int)eventTypeEnum,
+            ForwardUsers = businessDataVo.UserIds ?? new List<string>(),
+            SignUpUsers = businessDataVo.SignUpUsers?.Select(o => o.Id).ToList() ?? new List<string>(),
+            MessageType = eventTypeEnum.IsInNode() ? 2 : 1,
+            EventTypeEnum = eventTypeEnum,
+            Type = type,
+        };
+
+        //build message vo
+        return this.GetBpmVariableMessageVo(bpmVariableMessageVo);
+
     }
 }

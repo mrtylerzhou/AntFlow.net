@@ -92,6 +92,18 @@ namespace antflowcore.service.processor.lowcodeflow;
                 case ProcessOperationEnum.BUTTON_TYPE_PROCESS_DRAW_BACK:
                     _workflowButtonHandler.onProcessDrawBack(vo);
                     break;
+                case ProcessOperationEnum.BUTTON_TYPE_SAVE_DRAFT:
+                    //_workflowButtonHandler.onSaveDraft(vo);
+                    break;
+                case ProcessOperationEnum.BUTTON_TYPE_RECOVER_TO_HIS:
+                    //_workflowButtonHandler.onRecoverToHis(vo);
+                    break;
+                case ProcessOperationEnum.BUTTON_TYPE_DRAW_BACK_AGREE:
+                   // _workflowButtonHandler.onDrawBackAgree(vo);
+                    break;
+                case ProcessOperationEnum.BUTTON_TYPE_PROCESS_MOVE_AHEAD:
+                    //_workflowButtonHandler.onProcessMoveAhead(vo);
+                    break;
                 default:
                     throw new NotSupportedException("不支持的操作类型: " + poEnum);
             }

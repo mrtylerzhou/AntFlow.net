@@ -14,7 +14,7 @@ namespace AntFlowCore.Enums
         PROCESS_DISAGREE = 5,         // 不同意操作
         PROCESS_ADDAPPROVE = 6,       // 加批操作
         PROCESS_REPULSE = 7,          // 打回修改操作
-        PROCESS_TRANSPOND = 8,        // 转发操作
+        PROCESS_FORWARD = 8,        // 转发操作
         PROCESS_END = 9               // 流程结束
     }
 
@@ -29,7 +29,7 @@ namespace AntFlowCore.Enums
             { EventTypeEnum.PROCESS_DISAGREE, new EventTypeProperties(true, "不同意操作", (int)ProcessOperationEnum.BUTTON_TYPE_DIS_AGREE, 4, new List<int> { (int)InformEnum.APPLICANT }) },
             { EventTypeEnum.PROCESS_ADDAPPROVE, new EventTypeProperties(true, "加批操作", (int) ProcessOperationEnum.BUTTON_TYPE_JP, 4, new List<int>()) },
             { EventTypeEnum.PROCESS_REPULSE, new EventTypeProperties(true, "打回修改操作", (int)ProcessOperationEnum.BUTTON_TYPE_BACK_TO_MODIFY, 4, new List<int>()) },
-            { EventTypeEnum.PROCESS_TRANSPOND, new EventTypeProperties(false, "转发操作", (int)ProcessOperationEnum.BUTTON_TYPE_FORWARD, 0, new List<int> { (int)InformEnum.BY_TRANSPOND }) },
+            { EventTypeEnum.PROCESS_FORWARD, new EventTypeProperties(false, "转发操作", (int)ProcessOperationEnum.BUTTON_TYPE_FORWARD, 0, new List<int> { (int)InformEnum.BY_TRANSPOND }) },
             { EventTypeEnum.PROCESS_END, new EventTypeProperties(false, "流程结束", 0, 0, new List<int> { (int)InformEnum.APPLICANT }) }
         };
         // 获取描述
