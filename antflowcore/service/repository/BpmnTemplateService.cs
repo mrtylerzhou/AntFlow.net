@@ -54,10 +54,10 @@ public class BpmnTemplateService : AFBaseCurdRepositoryService<BpmnTemplate>, IB
         {
             BpmnTemplate bpmnTemplate = bpmnTemplateVo.MapToEntity();
             bpmnTemplate.ConfId = confId;
-            bpmnTemplate.Informs = string.Join(",", bpmnTemplateVo.InformList);
-            bpmnTemplate.Emps = string.Join(",", bpmnTemplateVo.EmpList);
-            bpmnTemplate.Roles = string.Join(",", bpmnTemplateVo.RoleList);
-            bpmnTemplate.Funcs = string.Join(",", bpmnTemplateVo.FuncList??new List<BaseIdTranStruVo>());
+            bpmnTemplate.Informs = string.Join(",", bpmnTemplateVo.InformList?.Select(x=>x.Id)??new List<string>());
+            bpmnTemplate.Emps = string.Join(",", bpmnTemplateVo.EmpList?.Select(x=>x.Id)??new List<string>());
+            bpmnTemplate.Roles = string.Join(",", bpmnTemplateVo.RoleList?.Select(x=>x.Id)??new List<string>());
+            bpmnTemplate.Funcs = string.Join(",", bpmnTemplateVo.FuncList?.Select(x=>x.Id)??new List<string>());
             bpmnTemplate.MessageSendType = string.Join(",",
                 bpmnTemplateVo.MessageSendTypeList?.Select(x => x.Id) ?? new List<long>());
             bpmnTemplate.FormCode = formCode;

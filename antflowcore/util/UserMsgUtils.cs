@@ -88,13 +88,13 @@ public static class UserMsgUtils
     public static void SendMessageBatch(List<UserMsgBatchVo> list)
     {
         var service = GetMessageService();
-        DoSendMessageBatch(list, service);
+        DoSendMessageBatch(list);
         InsertUserMessageBatch(list, service);
     }
 
-    public static void SendMessageBatchNoUserMessage(List<UserMsgBatchVo> list)
+    public static void SendGeneralPurposeMessages(List<UserMsgBatchVo> list)
     {
-        DoSendMessageBatch(list, GetMessageService());
+        DoSendMessageBatch(list);
     }
 
     public static void InsertUserMessageBatch(List<UserMsgBatchVo> list)
@@ -106,7 +106,7 @@ public static class UserMsgUtils
         MessageService messageService = GetMessageService();
 
         //执行发送信息(批量)
-        DoSendMessageBatch(userMsgBathVos, messageService);
+        DoSendMessageBatch(userMsgBathVos);
 
     }
     
@@ -120,7 +120,7 @@ public static class UserMsgUtils
         messageSendTypeEnums[0]=MessageSendTypeEnum.MESSAGE;
         DoSendMessages(userMsgVo, messageSendTypeEnums);
     }
-    private static void DoSendMessageBatch(List<UserMsgBatchVo> list, MessageService service)
+    private static void DoSendMessageBatch(List<UserMsgBatchVo> list)
     {
         Dictionary<MessageSendTypeEnum, List<UserMsgVo>> map = FormatUserMsgBatchVos(list);
         foreach (KeyValuePair<MessageSendTypeEnum,List<UserMsgVo>> messageSendTypeEnumListEntry in map)

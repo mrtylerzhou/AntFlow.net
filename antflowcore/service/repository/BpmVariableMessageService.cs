@@ -294,7 +294,7 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
             {
                 VariableId = variableId,
                 ElementId = elementId,
-                MessageType = messageType,
+                MessageType = GetMessageSendType(o.Event,messageType),
                 EventType = o.Event,
                 Content = JsonSerializer.Serialize(o)
                 ,CreateTime = DateTime.Now
@@ -302,6 +302,21 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
             .ToList();
     }
 
+    
+    private int GetMessageSendType(int messageEvent,int defaultMessageSendType){
+        if(messageEvent==null){
+            return defaultMessageSendType;
+        }
+
+        EventTypeEnum eventTypeEnum = (EventTypeEnum)messageEvent;
+        if(eventTypeEnum==null){
+            return defaultMessageSendType;
+        }
+
+        EventTypeEnumExtensions.EventTypeMappings.TryGetValue(eventTypeEnum, out var eventTypeMapping);
+        bool isInNode = eventTypeMapping?.IsInNode??false;
+        return isInNode?2:1;
+    }
     /**
 
     * check whether to to send messages by template
@@ -569,7 +584,7 @@ public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariable
                     informationTemplateVo.MailContent,
                     vo.TaskId, emailUrl, appUrl, MessageSendTypeEnum.MAIL))
                 .ToList();
-            UserMsgUtils.SendMessageBatchNoUserMessage(userMsgBatchVos);
+            UserMsgUtils.SendGeneralPurposeMessages(userMsgBatchVos);
         }
     }
 

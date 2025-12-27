@@ -25,8 +25,8 @@ public class InformationTemplateUtils
             {
                 SystemTitle = Translate(informationTemplate.SystemTitle, informationTemplateVo.WildcardCharacterMap),
                 SystemContent = Translate(informationTemplate.SystemContent, informationTemplateVo.WildcardCharacterMap),
-                MailTitle = Translate(informationTemplate.MailTitle, informationTemplateVo.WildcardCharacterMap),
-                MailContent = Translate(informationTemplate.MailContent, informationTemplateVo.WildcardCharacterMap),
+                MailTitle = Translate(informationTemplate.SystemTitle, informationTemplateVo.WildcardCharacterMap),
+                MailContent = Translate(informationTemplate.SystemContent, informationTemplateVo.WildcardCharacterMap),
                 NoteContent = Translate(informationTemplate.NoteContent, informationTemplateVo.WildcardCharacterMap),
                 JumpUrl = informationTemplate.JumpUrl
             };
@@ -34,11 +34,14 @@ public class InformationTemplateUtils
 
         private static string Translate(string info, Dictionary<int, string> map)
         {
-            if (string.IsNullOrWhiteSpace(info)) return "";
+            if (string.IsNullOrWhiteSpace(info))
+            {
+                return info;
+            }
 
             foreach (var wildcard in WildcardCharacterEnum.Values)
             {
-                string pattern = Regex.Escape(wildcard.TransfDesc) + @"\(" + wildcard.Code + @"\)";
+                string pattern =wildcard.TransfDesc;
                 string replacement = map.TryGetValue(wildcard.Code, out var value) && !string.IsNullOrWhiteSpace(value)
                     ? value
                     : "";
