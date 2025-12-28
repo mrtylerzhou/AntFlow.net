@@ -1,4 +1,5 @@
 ﻿using antflowcore.bpmn.service;
+using antflowcore.constant.enus;
 using antflowcore.entity;
 using AntFlowCore.Enums;
 using antflowcore.exception;
@@ -35,6 +36,9 @@ public class TaskRecoverProcessSerivce: IProcessOperationAdaptor
         }
        
         _runtimeService.InsertTasks(bpmBusinessProcess,taskDefKey);
+        bpmBusinessProcess.UpdateTime=DateTime.Now;
+        bpmBusinessProcess.ProcessState=(int)ProcessStateEnum.HANDLE_STATE;
+        _businessProcessService.Update(bpmBusinessProcess);
     }
 
     public void SetSupportBusinessObjects()

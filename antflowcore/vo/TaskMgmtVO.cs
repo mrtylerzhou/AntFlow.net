@@ -218,5 +218,8 @@ namespace AntFlowCore.Vo
 
         [JsonPropertyName("versionProcessKeys")]
         public List<string> VersionProcessKeys { get; set; }
+        
+        [JsonPropertyName("includeAllFlag")]
+        public int IncludeAllFlag { get; set; }
     }
 }

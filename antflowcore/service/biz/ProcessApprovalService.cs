@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using antflowcore.constant.enus;
 using AntFlowCore.Constants;
 using antflowcore.dto;
@@ -12,8 +11,8 @@ using antflowcore.service.repository;
 using antflowcore.util;
 using AntFlowCore.Util;
 using AntFlowCore.Vo;
+using FreeSql;
 using FreeSql.Internal.Model;
-using Microsoft.Extensions.Logging;
 
 namespace antflowcore.service.biz;
 
@@ -456,9 +455,18 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
     }
     List<TaskMgmtVO> AllProcessList(Page<TaskMgmtVO> page,TaskMgmtVO taskMgmtVO){
         BasePagingInfo basePagingInfo = page.ToPagingInfo();
-        List<TaskMgmtVO> taskMgmtVos = _freeSql
-            .Select<BpmAfTask, BpmBusinessProcess>()
-            .LeftJoin((a, b) => a.ProcInstId == b.ProcInstId)
+        ISelect<BpmAfTask,BpmBusinessProcess> select = _freeSql
+            .Select<BpmAfTask, BpmBusinessProcess>();
+        if (taskMgmtVO.IncludeAllFlag == 1)
+        {
+            select.RightJoin((a, b) => a.ProcInstId == b.ProcInstId);
+        }
+        else
+        {
+            select.LeftJoin((a, b) => a.ProcInstId == b.ProcInstId);
+        }
+        List<TaskMgmtVO> taskMgmtVos =
+            select
             .Where((a,b)=>b.IsDel==0)
             .WithTempQuery(a=>new TaskMgmtVO()
             {
