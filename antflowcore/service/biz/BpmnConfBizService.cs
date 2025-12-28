@@ -677,14 +677,9 @@ public class BpmnConfBizService
         {
 
             BpmnNodeButtonConfBaseVo buttons = new BpmnNodeButtonConfBaseVo();
-
-
             buttons.StartPage = GetButtons(bpmnNodeButtonConfs, ButtonPageTypeEnum.INITIATE);
-
-
             buttons.ApprovalPage=GetButtons(bpmnNodeButtonConfs, ButtonPageTypeEnum.AUDIT);
-
-
+            buttons.ViewPage=GetButtons(bpmnNodeButtonConfs, ButtonPageTypeEnum.TOVIEW);
             bpmnNodeVo.Buttons=buttons;
 
         }

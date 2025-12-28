@@ -58,7 +58,7 @@ public class ProcessNodeJumpService
     }
     public void TurnTransition(BpmAfTask bpmAfTask, String taskToTurnToNodeKey,BpmAfDeployment bpmAfDeployment, Dictionary<String, Object> variables)
     {
-         string verifyComment=variables.ContainsKey(StringConstants.VERIFY_COMMENT)?variables[StringConstants.VERIFY_COMMENT].ToString():"";
+         string verifyComment=variables.ContainsKey(StringConstants.VERIFY_COMMENT)?variables[StringConstants.VERIFY_COMMENT]?.ToString():"";
         DateTime nowTime = DateTime.Now;
         _afTaskInstService.Frsql
             .Update<BpmAfTaskInst>()
