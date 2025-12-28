@@ -1,4 +1,5 @@
-﻿using antflowcore.entity;
+﻿using System.Collections.ObjectModel;
+using antflowcore.entity;
 using AntFlowCore.Entity;
 using antflowcore.service.interf.repository;
 
@@ -10,11 +11,11 @@ public class BpmVariableButtonService: AFBaseCurdRepositoryService<BpmVariableBu
     {
     }
 
-    public List<BpmVariableButton> GetButtonsByProcessNumber(string processNum, string elementId)
+    public List<BpmVariableButton> GetButtonsByProcessNumber(string processNum, List<string> elementIds)
     {
         List<BpmVariableButton> bpmVariableButtons = Frsql.Select<BpmVariableButton,BpmVariable>()
             .LeftJoin((a,b)=>a.VariableId==b.Id)
-            .Where((a,b)=>b.ProcessNum==processNum&&a.ElementId==elementId)
+            .Where((a,b)=>b.ProcessNum==processNum&&elementIds.Contains(a.ElementId))
             .ToList();
         return bpmVariableButtons;
     }

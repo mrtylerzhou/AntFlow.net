@@ -37,6 +37,10 @@ public class ConfigFlowButtonSortEnum
     public static readonly ConfigFlowButtonSortEnum CHOOSE_ASSIGNEE = new ConfigFlowButtonSortEnum(22, "自选审批人", 22);
     public static readonly ConfigFlowButtonSortEnum BACK_TO_ANY_NODE = new ConfigFlowButtonSortEnum(23, "退回任意节点", 23);
     public static readonly ConfigFlowButtonSortEnum  PROCESS_DRAW_BACK = new ConfigFlowButtonSortEnum(29, "撤回", 29);
+    public static readonly ConfigFlowButtonSortEnum  SAVE_DRAFT = new ConfigFlowButtonSortEnum(30, "保存草稿", 30);  
+    public static readonly ConfigFlowButtonSortEnum RECOVER_TO_HIS= new ConfigFlowButtonSortEnum(31, "恢复已结束流程", 31);
+    public static readonly ConfigFlowButtonSortEnum DRAW_BACK_AGREE= new ConfigFlowButtonSortEnum(32, "撤销同意", 32);
+    public static readonly ConfigFlowButtonSortEnum PROCESS_MOVE_AHEAD= new ConfigFlowButtonSortEnum(33, "流程推进", 33);
     // Static list of all instances for easy lookup
     private static readonly List<ConfigFlowButtonSortEnum> AllValues = new List<ConfigFlowButtonSortEnum>
     {

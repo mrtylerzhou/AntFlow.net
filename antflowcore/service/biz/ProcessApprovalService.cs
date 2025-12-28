@@ -153,6 +153,7 @@ public class ProcessApprovalService
         businessDataVo.ProcessRecordInfo.PcButtons = _configFlowButtonContantService.GetButtons(
             bpmBusinessProcess.BusinessNumber,
             businessDataVo.ProcessRecordInfo.NodeId,
+            businessDataVo.ProcessRecordInfo.ViewNodeIds,
             isJurisdiction,
             flag
         );

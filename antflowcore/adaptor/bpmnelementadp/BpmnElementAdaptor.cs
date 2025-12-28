@@ -238,7 +238,13 @@ using System.Linq;
                         ButtonType = o,
                         ButtonName = ButtonTypeEnumExtensions.GetDescByCode(o)
                     })
-                    .ToList()
+                    .ToList(),
+                ViewPage = nodeVo.Buttons.ViewPage
+                    .Select(o => new BpmnConfCommonButtonPropertyVo
+                    {
+                        ButtonType = o,
+                        ButtonName = ButtonTypeEnumExtensions.GetDescByCode(o)
+                    }).ToList()
             };
         }
 

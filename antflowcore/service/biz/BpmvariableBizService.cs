@@ -97,6 +97,30 @@ public class BpmvariableBizService
         throw new AFBizException("未能根据指定节点Id找到elementId");
     }
 
+    public List<string> GetNodeIdByElementIds(string processNumber, List<string> elementIds)
+    {
+        List<string> nodeIds = new List<string>();
+        List<BpmVariableSingle> bpmVariableSingles = _bpmVariableService.Frsql
+            .Select<BpmVariable,BpmVariableSingle>()
+            .InnerJoin((a,b)=>a.Id==b.VariableId)
+            .Where((a,b)=>a.ProcessNum==processNumber&&elementIds.Contains(b.ElementId))
+            .ToList<BpmVariableSingle>();
+        if (!bpmVariableSingles.IsEmpty())
+        {
+            nodeIds.AddRange(bpmVariableSingles.Select(a=>a.NodeId));
+        }
+
+        List<BpmVariableMultiplayer> bpmVariableMultiplayers = _bpmVariableService.Frsql
+            .Select<BpmVariable,BpmVariableMultiplayer>()
+            .InnerJoin((a,b)=>a.Id==b.VariableId)
+            .Where((a,b)=>a.ProcessNum==processNumber&&elementIds.Contains(b.ElementId))
+            .ToList<BpmVariableMultiplayer>();
+        if (!bpmVariableMultiplayers.IsEmpty())
+        {
+            nodeIds.AddRange(bpmVariableMultiplayers.Select(a=>a.NodeId));
+        }
+        return nodeIds.Distinct().ToList();
+    }
     public NodeElementDto GetElementIdByNodeId(String processNumber, String nodeId)
     {
         NodeElementDto? nodeSingleElementDto = null;

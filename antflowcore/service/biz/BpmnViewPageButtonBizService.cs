@@ -2,6 +2,7 @@
 using AntFlowCore.Entity;
 using antflowcore.service.repository;
 using antflowcore.util;
+using antflowcore.util.Extension;
 using antflowcore.vo;
 
 namespace antflowcore.service.biz;
@@ -27,7 +28,7 @@ public class BpmnViewPageButtonBizService
             .ExecuteAffrows();
 
         List<int> viewPageStarts = viewPageButtons.ViewPageStart;
-        if (viewPageStarts!=null)
+        if (!viewPageStarts.IsEmpty())
         {
             List<BpmnViewPageButton> viewPageButtonList = viewPageStarts
                 .Select(start =>
@@ -39,8 +40,8 @@ public class BpmnViewPageButtonBizService
 
         List<int> viewPageOthers = viewPageButtons.ViewPageOther;
 
-        if (viewPageOthers!=null) {
-            List<BpmnViewPageButton> viewPageButtonList = viewPageStarts
+        if (!viewPageOthers.IsEmpty()) {
+            List<BpmnViewPageButton> viewPageButtonList = viewPageOthers
                 .Select(other => BpmnViewPageButton.BuildViewPageButton(confId, other,(int)ViewPageTypeEnum.VIEW_PAGE_TYPE_OTHER))
                 .ToList();
             _bpmnViewPageButtonService.baseRepo.Insert(viewPageButtonList);

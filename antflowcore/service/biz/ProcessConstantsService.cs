@@ -4,6 +4,7 @@ using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.service.repository;
 using antflowcore.util;
+using antflowcore.util.Extension;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
@@ -112,15 +113,25 @@ public class ProcessConstantsService
         // 查询当前用户的任务
         var tasks = _afTaskService
             .baseRepo
-            .Where(a=>a.ProcInstId== processInstanceId&&a.Assignee==SecurityUtils.GetLogInEmpId())
+            .Where(a=>a.ProcInstId== processInstanceId)
             .ToList();
         string taskDefKey = "";
-
+        List<String> viewNodeIds=null;
         if (tasks.Any())
         {
-            var firstTask = tasks.First();
-            taskDefKey = firstTask.TaskDefKey;
-            processInfoVo.TaskId = firstTask.Id;
+            List<BpmAfTask> currentAssigneeTasks = tasks.Where(a => a.Assignee == SecurityUtils.GetLogInEmpIdStr()).ToList();
+           if (!currentAssigneeTasks.IsEmpty())
+           {
+               taskDefKey=currentAssigneeTasks.First().TaskDefKey;
+               viewNodeIds=currentAssigneeTasks.Select(a=>a.TaskDefKey).ToList();
+           }
+           else
+           {
+               viewNodeIds=tasks.Select(a=>a.TaskDefKey).ToList();
+           }
+           
+            processInfoVo.TaskId = tasks[0].Id;
+            processInfoVo.ViewNodeIds=viewNodeIds;
             processInfoVo.NodeId = taskDefKey;
         }
         else if (bpmBusinessProcess.IsLowCodeFlow == 1)

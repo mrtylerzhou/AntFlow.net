@@ -63,6 +63,7 @@ namespace AntFlowCore.Vo
         [JsonPropertyName("nodeId")]
         public string NodeId { get; set; }
 
+        public List<String> ViewNodeIds { get; set; }
         [JsonPropertyName("isCustomNode")]
         public bool? IsCustomNode { get; set; }
 

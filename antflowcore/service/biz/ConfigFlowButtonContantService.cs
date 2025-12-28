@@ -5,8 +5,11 @@ using antflowcore.entity;
 using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.service.repository;
+using antflowcore.util;
+using antflowcore.util.Extension;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
+using Org.BouncyCastle.Utilities;
 
 namespace antflowcore.service.biz;
 
@@ -15,28 +18,34 @@ public class ConfigFlowButtonContantService
     private readonly BpmBusinessProcessService _bpmbusinessProcessService;
     private readonly BpmVariableButtonService _bpmVariableButtonService;
     private readonly BpmVariableViewPageButtonService _bpmVariableViewPageButtonService;
+    private readonly BpmnNodeButtonConfService _bpmnNodeButtonConfService;
     private readonly AFDeploymentService _afDeploymentService;
     private readonly AfTaskInstService _afTaskInstService;
     private readonly BpmVariableSignUpService _bpmVariableSignUpService;
+    private readonly BpmvariableBizService _bpmvariableBizService;
     private readonly ILogger<ConfigFlowButtonContantService> _logger;
 
     public ConfigFlowButtonContantService(BpmBusinessProcessService bpmbusinessProcessService,
         BpmVariableButtonService bpmVariableButtonService,
         BpmVariableViewPageButtonService bpmVariableViewPageButtonService,
+        BpmnNodeButtonConfService bpmnNodeButtonConfService,
         AFDeploymentService afDeploymentService,
         AfTaskInstService afTaskInstService,
         BpmVariableSignUpService bpmVariableSignUpService,
+        BpmvariableBizService bpmvariableBizService,
         ILogger<ConfigFlowButtonContantService> logger)
     {
         _bpmbusinessProcessService = bpmbusinessProcessService;
         _bpmVariableButtonService = bpmVariableButtonService;
         _bpmVariableViewPageButtonService = bpmVariableViewPageButtonService;
+        _bpmnNodeButtonConfService = bpmnNodeButtonConfService;
         _afDeploymentService = afDeploymentService;
         _afTaskInstService = afTaskInstService;
         _bpmVariableSignUpService = bpmVariableSignUpService;
+        _bpmvariableBizService = bpmvariableBizService;
         _logger = logger;
     }
-    public Dictionary<string, List<ProcessActionButtonVo>> GetButtons(string processNum, string elementId,
+    public Dictionary<string, List<ProcessActionButtonVo>> GetButtons(string processNum, string elementId,List<String> viewNodeIds,
         bool? isJurisdiction, bool? isInitiate)
     {
         var buttonMap = new Dictionary<string, List<ProcessActionButtonVo>>();
@@ -54,7 +63,7 @@ public class ConfigFlowButtonContantService
             if (!string.IsNullOrEmpty(processNum) && !string.IsNullOrEmpty(elementId))
             {
                 List<BpmVariableButton> bpmVariableButtons = _bpmVariableButtonService
-                    .GetButtonsByProcessNumber(processNum, elementId);
+                    .GetButtonsByProcessNumber(processNum, new List<string>(){elementId});
 
                 initiateButtons = GetButtons(bpmVariableButtons, ButtonPageTypeEnum.INITIATE);
                 auditButtons = GetButtons(bpmVariableButtons, ButtonPageTypeEnum.AUDIT);
@@ -62,10 +71,25 @@ public class ConfigFlowButtonContantService
 
             if (!string.IsNullOrEmpty(processNum))
             {
+                if(!viewNodeIds.IsEmpty()){
+                    List<BpmVariableButton> bpmVariableButtons = _bpmVariableButtonService
+                        .GetButtonsByProcessNumber(processNum, viewNodeIds);
+                    toViewButtons=GetButtons(bpmVariableButtons,ButtonPageTypeEnum.TOVIEW);
+                }
+                
                 List<BpmVariableViewPageButton> bpmVariableViewPageButtons = _bpmVariableViewPageButtonService
                     .GetButtonsByProcessNumber(processNum);
 
-                toViewButtons = ToViewButtons(bpmVariableViewPageButtons, isInitiate.HasValue && isInitiate.Value);
+                List<ProcessActionButtonVo> globalViewButtons = ToViewButtons(bpmVariableViewPageButtons, isInitiate.HasValue && isInitiate.Value);
+                if (!globalViewButtons.IsEmpty())
+                {
+                    toViewButtons.AddRange(globalViewButtons);
+                }
+                /*List<ProcessActionButtonVo> nodeConfButtons = getNodeConfButtons(bpmBusinessProcess,isInitiate.HasValue&&isInitiate.Value);
+                if (!nodeConfButtons.IsEmpty())
+                {
+                    toViewButtons.AddRange(nodeConfButtons);
+                }*/
             }
 
             if (isJurisdiction == true)
@@ -119,10 +143,16 @@ public class ConfigFlowButtonContantService
                     .GetButtonsByProcessNumber(processNum);
 
                 toViewButtons = ToViewButtons(bpmVariableViewPageButtons, isInitiate.HasValue && isInitiate.Value);
-
+                List<ProcessActionButtonVo> nodeConfButtons = getNodeConfButtons(bpmBusinessProcess,isInitiate.HasValue&&isInitiate.Value);
+                if (!nodeConfButtons.IsEmpty())
+                {
+                    toViewButtons=nodeConfButtons;
+                }
                 // 过滤无效按钮
                 var toViewButtonsComplete = toViewButtons
-                    .Where(btn => btn.ButtonType != (int)ButtonTypeEnum.BUTTON_TYPE_ABANDONED)
+                    .Where(btn => btn.ButtonType != (int)ButtonTypeEnum.BUTTON_TYPE_ABANDONED
+                    && btn.ButtonType != (int)ButtonTypeEnum.BUTTON_TYPE_PROCESS_DRAW_BACK
+                    && btn.ButtonType != (int)ButtonTypeEnum.BUTTON_TYPE_STOP)
                     .ToList();
 
                 initiateButtons.AddRange(toViewButtonsComplete);
@@ -254,5 +284,56 @@ public class ConfigFlowButtonContantService
             .ToList();
  
         return lists;
+    }
+      private List<ProcessActionButtonVo> getNodeConfButtons(BpmBusinessProcess bpmBusinessProcess,Boolean isInitiate){
+        List<BpmnNodeButtonConf> bpmnNodeButtonConfs=null;
+        if(isInitiate){
+            bpmnNodeButtonConfs= _bpmnNodeButtonConfService.QueryConfByBpmnConde(bpmBusinessProcess.Version);
+
+        }else
+        {
+            List<BpmAfTaskInst> bpmAfTaskInsts = _afTaskInstService
+                .baseRepo
+                .Where(a=>a.ProcInstId==bpmBusinessProcess.ProcInstId)
+                .OrderBy(a=>a.EndTime).ToList();
+
+            List<String> hisTaskDefKeys = bpmAfTaskInsts
+                .Where(a => a.EndTime.HasValue && SecurityUtils.GetLogInEmpIdSafe() == a.Assignee)
+                .Select(a => a.TaskDefKey).ToList();
+           
+            if(!hisTaskDefKeys.IsEmpty())
+            {
+                List<String> nodeIdsByElementIds = _bpmvariableBizService.GetNodeIdByElementIds(bpmBusinessProcess.BusinessNumber, hisTaskDefKeys);
+                    
+                if (!nodeIdsByElementIds.IsEmpty())
+                {
+                    bpmnNodeButtonConfs = _bpmnNodeButtonConfService.baseRepo.Where(a =>
+                            nodeIdsByElementIds.Contains(a.BpmnNodeId.ToString()) &&
+                            a.ButtonPageType == (int)ButtonPageTypeEnum.TOVIEW)
+                        .ToList();
+                }
+                //只能显示在发起人页的按钮不应显示在其它页面
+                if(isInitiate&&!bpmnNodeButtonConfs.IsEmpty()){
+                    bpmnNodeButtonConfs=bpmnNodeButtonConfs.Where(a=>a.ButtonPageType==(int)ButtonPageTypeEnum.INITIATE).ToList();
+                }
+            }
+
+        }
+
+        if(!bpmnNodeButtonConfs.IsEmpty())
+        {
+            List<ProcessActionButtonVo> processActionButtonVos =
+                bpmnNodeButtonConfs
+                    .Select(item => new ProcessActionButtonVo
+                    {
+                        ButtonType = item.ButtonType,
+                        Name = item.ButtonName,
+                        Show = ProcessButtonEnum.VIEW_TYPE.Code,
+                    })
+                    .ToList();
+            
+            return processActionButtonVos;
+        }
+       return new List<ProcessActionButtonVo>();
     }
 }

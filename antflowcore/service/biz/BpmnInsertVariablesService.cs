@@ -173,6 +173,21 @@ namespace antflowcore.service.biz;
 
                 _bpmVariableButtonService.baseRepo.Insert(approvalPageButtons);
             }
+
+            if (elementVo.Buttons?.ViewPage != null)
+            {
+                var viewPageButtons = elementVo.Buttons.ViewPage.Select(o => new BpmVariableButton
+                {
+                    VariableId = variableId,
+                    ElementId = elementId,
+                    ButtonPageType = (int)ButtonPageTypeEnum.TOVIEW,
+                    ButtonType = o.ButtonType,
+                    ButtonName = o.ButtonName,
+                    CreateTime = DateTime.Now,
+                }).ToList();
+
+                _bpmVariableButtonService.baseRepo.Insert(viewPageButtons);
+            }
         }
 
         private void InsertViewPageButton(BpmnConfCommonVo bpmnConfCommonVo, long variableId)
