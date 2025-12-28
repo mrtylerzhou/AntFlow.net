@@ -99,7 +99,7 @@ public class TaskMgmtService
         List<string> formCodes = diyProcessInfoDTOS.Select(dto => dto.Key).ToList();
 
         var bpmnConfs = _bpmnConfService.baseRepo
-            .Where(b => formCodes.Contains(b.FormCode) && b.EffectiveStatus == 1 && b.ExtraFlags != null)
+            .Where(b => formCodes.Contains(b.FormCode) && b.EffectiveStatus == 1)
             .ToList(b => new { b.FormCode, b.ExtraFlags });
 
         if (bpmnConfs.Count > 0)

@@ -175,7 +175,7 @@ public class DictService
 
                 List<BpmnConf> bpmnConfs = bpmnConfService
                     .baseRepo
-                    .Where(a => formCodes.Contains(a.FormCode) && a.EffectiveStatus == 1 && a.ExtraFlags != null)
+                    .Where(a => formCodes.Contains(a.FormCode) && a.EffectiveStatus == 1)
                     .ToList();
                 if (bpmnConfs != null && bpmnConfs.Any())
                 {
