@@ -176,14 +176,27 @@ public class TaskService
                         new KeyValuePair<string, string>(c.Assignee, c.AssigneeName));
                 if (signupNodeAssigneeMap.Count <= 0)
                 {
-                    var (nextUserElement, nextFlowElement) =
+                    var (nextUserElement, nextFlowElement) = GetNextAssigneeNodeRecursively(elements, elementToDeal);
                         BpmnFlowUtil.GetNextNodeAndFlowNode(elements, elementToDeal.ElementId);
                     elementToDeal = nextUserElement;
                     assigneeMap = elementToDeal.AssigneeMap;
                 }
                 else
                 {
-                    assigneeMap = signupNodeAssigneeMap.ToDictionary(k => k.Key, v => v.Value);
+                    if (elementToDeal.IsBackSignUp == 1)
+                    {
+                        BpmnConfCommonElementVo? confCommonElementVo = elements
+                            .FirstOrDefault(a => a.CollectionName==elementToDeal.CollectionName&&a.ElementId!=elementToDeal.ElementId);
+                        if (confCommonElementVo == null)
+                        {
+                            throw new AFBizException(BusinessError.DATA_NOT_FOUND, "未能找到加批原节点,请联系管理员");
+                        } 
+                        assigneeMap=confCommonElementVo.AssigneeMap;
+                    }
+                    else
+                    {
+                        assigneeMap = signupNodeAssigneeMap.ToDictionary(k => k.Key, v => v.Value);
+                    }
                 }
             }
 
@@ -280,5 +293,19 @@ public class TaskService
             _afTaskInstService.baseRepo.Insert(historyTaskInsts);
         }
        
+    }
+
+    private (BpmnConfCommonElementVo assigneeNode,BpmnConfCommonElementVo flowNode) GetNextAssigneeNodeRecursively(List<BpmnConfCommonElementVo> elements,BpmnConfCommonElementVo elementToDeal)
+    {
+        var (nextUserElement, nextFlowElement) =
+            BpmnFlowUtil.GetNextNodeAndFlowNode(elements, elementToDeal.ElementId);
+        if (nextUserElement.AssigneeMap.IsEmpty())
+        {
+          return  GetNextAssigneeNodeRecursively(elements,nextUserElement);
+        }
+        else
+        {
+            return (nextUserElement, nextFlowElement);
+        }
     }
 }

@@ -97,7 +97,7 @@ using System.Linq;
             elementVo.SignUpType = nodeVo.Property?.SignUpType ?? 0;
         }
 
-        // 处理签到
+        // 处理加批
         private void DoSignUp(List<BpmnConfCommonElementVo> bpmnConfCommonElementVos, BpmnConfCommonElementVo fatherElementVo, Dictionary<string, int> numMap)
         {
             if (fatherElementVo.IsSignUp == 1)
@@ -131,10 +131,10 @@ using System.Linq;
 
             var backApprovalElementVo = BpmnElementUtils.GetSignUpElement(elementId, signUpSubElementVo, ElementPropertyEnum.ELEMENT_PROPERTY_SIGN_UP_SERIAL.Code);
             backApprovalElementVo.CollectionName = fatherElementVo.CollectionName;
-            backApprovalElementVo.ElementName = fatherElementVo.ElementName; // 设置元素名称（与签到元素相同）
-            backApprovalElementVo.IsSignUpSubElement = 1; // 设置为签到子元素
-            backApprovalElementVo.IsBackSignUp = 1; // 设置为回到签到
-            backApprovalElementVo.SignUpElementId = fatherElementVo.ElementId; // 设置签到元素 ID
+            backApprovalElementVo.ElementName = fatherElementVo.ElementName; // 设置元素名称（与加签元素相同）
+            backApprovalElementVo.IsSignUpSubElement = 1; // 设置为加签子元素
+            backApprovalElementVo.IsBackSignUp = 1; // 设置为回到加批人
+            backApprovalElementVo.SignUpElementId = fatherElementVo.ElementId;
 
             SetSignUpElementButtons(backApprovalElementVo);
             bpmnConfCommonElementVos.Add(backApprovalElementVo);

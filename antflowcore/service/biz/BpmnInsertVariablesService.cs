@@ -81,7 +81,9 @@ namespace antflowcore.service.biz;
                     if (elementVo.IsSignUp == 1)
                     {
                         if (!signUpMultimap.ContainsKey(elementVo.ElementId))
+                        {
                             signUpMultimap[elementVo.ElementId] = new List<BpmnConfCommonElementVo>();
+                        }
                         signUpMultimap[elementVo.ElementId].Add(new BpmnConfCommonElementVo());
                     }
 
