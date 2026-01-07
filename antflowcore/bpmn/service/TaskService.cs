@@ -299,7 +299,7 @@ public class TaskService
     {
         var (nextUserElement, nextFlowElement) =
             BpmnFlowUtil.GetNextNodeAndFlowNode(elements, elementToDeal.ElementId);
-        if (nextUserElement.AssigneeMap.IsEmpty())
+        if (nextUserElement.AssigneeMap.IsEmpty() && nextFlowElement.FlowTo.IndexOf("EndEvent") == -1)
         {
           return  GetNextAssigneeNodeRecursively(elements,nextUserElement);
         }
