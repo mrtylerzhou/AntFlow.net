@@ -187,7 +187,8 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
         // 检查数据是否重复
         if (this.CheckData(vo) > 0)
         {
-            throw new AFBizException("业务方标识或业务方名称重复");
+            //throw new AFBizException("业务方标识或业务方名称重复");
+
         }
 
         OutSideBpmBusinessParty outSideBpmBusinessParty = this.baseRepo

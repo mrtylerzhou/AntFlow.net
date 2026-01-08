@@ -126,7 +126,7 @@ public class OutSideBpmCallbackUrlConfService : AFBaseCurdRepositoryService<OutS
 
             if (count > 0)
             {
-                throw new AFBizException("一个业务方只能配置一条接口回调数据");
+               // throw new AFBizException("一个业务方只能配置一条接口回调数据");
             }
         }
 
