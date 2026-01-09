@@ -13,6 +13,7 @@ using antflowcore.util;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 using System.Reflection;
+using AntFlowCore.Constants;
 using antflowcore.factory.tagparser;
 
 namespace antflowcore.service.processor.lowcodeflow;
@@ -92,7 +93,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
     public void OnInitData(UDLFApplyVo vo)
     {
         IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
-        foreach (var o in lfFormOperationAdaptors)
+        foreach (ILFFormOperationAdaptor o in lfFormOperationAdaptors)
         {
             LFFormServiceAnnoAttribute? lfFormServiceAnnoAttribute = o.GetType().GetCustomAttribute<LFFormServiceAnnoAttribute>();
            
@@ -370,14 +371,17 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
                 throw new AFBizException($"confId {confId}, formCode:{vo.FormCode} does not have a field config");
             }
         }
-        foreach (var field in lfMainFields)
+        foreach (LFMainField field in lfMainFields)
         {
             string fValue = lfFields[field.FieldId]?.ToString()??null;
-            field.FieldValue = fValue;
+            if (!StringConstants.HIDDEN_FIELD_VALUE.Equals(fValue))//如果是******,实际上是隐藏字段,不更新
+            {
+                field.FieldValue = fValue;
+            }
         }
         _lfMainFieldService.baseRepo.Update(lfMainFields);
         IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
-        foreach (var o in lfFormOperationAdaptors)
+        foreach (ILFFormOperationAdaptor o in lfFormOperationAdaptors)
         {
             
             LFFormServiceAnnoAttribute? lfFormServiceAnnoAttribute = o.GetType().GetCustomAttribute<LFFormServiceAnnoAttribute>();
@@ -392,7 +396,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
     public void OnBackToModifyData(UDLFApplyVo vo)
     {
         IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
-        foreach (var o in lfFormOperationAdaptors)
+        foreach (ILFFormOperationAdaptor o in lfFormOperationAdaptors)
         {
             
             LFFormServiceAnnoAttribute? lfFormServiceAnnoAttribute = o.GetType().GetCustomAttribute<LFFormServiceAnnoAttribute>();
@@ -407,7 +411,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
     public void OnCancellationData(UDLFApplyVo vo)
     {
         IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
-        foreach (var o in lfFormOperationAdaptors)
+        foreach (ILFFormOperationAdaptor o in lfFormOperationAdaptors)
         {
             LFFormServiceAnnoAttribute? lfFormServiceAnnoAttribute = o.GetType().GetCustomAttribute<LFFormServiceAnnoAttribute>();
            
@@ -421,7 +425,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
     public void OnFinishData(BusinessDataVo vo)
     {
         IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
-        foreach (var o in lfFormOperationAdaptors)
+        foreach (ILFFormOperationAdaptor o in lfFormOperationAdaptors)
         {
             LFFormServiceAnnoAttribute? lfFormServiceAnnoAttribute = o.GetType().GetCustomAttribute<LFFormServiceAnnoAttribute>();
            

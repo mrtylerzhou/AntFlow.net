@@ -119,7 +119,7 @@ public class ProcessApprovalService
 
         vo.BusinessId = bpmBusinessProcess.BusinessId;
 
-        dynamic businessDataVo;
+        BusinessDataVo businessDataVo;
         if (vo.IsOutSideAccessProc == null || !vo.IsOutSideAccessProc.Value || vo.IsLowCodeFlow == 1)
         {
             var formAdaptor = _formFactory.GetFormAdaptor(vo);
@@ -168,7 +168,8 @@ public class ProcessApprovalService
             AddApproverButton(businessDataVo);
         }
 
-        return businessDataVo;
+        dynamic d = businessDataVo;
+        return d;
     }
 
     private void AddApproverButton(BusinessDataVo businessDataVo)

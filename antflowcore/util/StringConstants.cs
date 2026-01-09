@@ -51,5 +51,8 @@ namespace AntFlowCore.Constants
         public const String TENANT_ID="tenantId";
         public const String DEFAULT_TENANT="default";
         public const string BIG_WHITE_BLANK = " ";
+        
+        public const String HIDDEN_FIELD_PERMISSION="H";
+        public const string HIDDEN_FIELD_VALUE = "******";
     }
 }
