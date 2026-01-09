@@ -1895,7 +1895,7 @@ CREATE TABLE t_bpmn_node_lf_formdata_field_control
 -- ----------------------------
 CREATE TABLE t_lf_main
 (
-    id          BIGINT IDENTITY(1,1) NOT NULL,
+    id          BIGINT  NOT NULL,
     conf_id     BIGINT,
     form_code   NVARCHAR(255),
     is_del      TINYINT  DEFAULT 0,
@@ -1914,7 +1914,7 @@ CREATE TABLE t_lf_main
 -- ----------------------------
 CREATE TABLE t_lf_main_field
 (
-    id                 BIGINT IDENTITY(1,1) NOT NULL,
+    id                 BIGINT  NOT NULL,
     main_id            BIGINT,
     form_code          NVARCHAR(255),
     field_id           NVARCHAR(255),

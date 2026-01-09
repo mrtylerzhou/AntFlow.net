@@ -64,6 +64,8 @@ public class Program
                 options.JsonSerializerOptions.Converters.Add(new NullAbleBooleanJsonConverter());
                 options.JsonSerializerOptions.Converters.Add(new BooleanToIntJsonConverter());
                 options.JsonSerializerOptions.Converters.Add(new BooleanToNullableIntJsonConverter());
+               //fixed https://gitee.com/antswarm/antflowcore/issues/IDI57X
+               options.JsonSerializerOptions.Converters.Add(new GlobalNullableIntConverter());
             });
         //freesqlset是创建的freesql的帮助类的方法名称
         builder.Services.FreeSqlSet(builder.Configuration);//注册freesql的相关服务

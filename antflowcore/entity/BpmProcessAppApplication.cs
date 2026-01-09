@@ -7,12 +7,12 @@ namespace AntFlowCore.Entity;
 /// </summary>
 public class BpmProcessAppApplication
 {
-    public int Id { get; set; }
+    public int? Id { get; set; } //应该要nuallable
 
     /// <summary>
     /// Business code (default is empty for the main program).
     /// </summary>
-    public string BusinessCode { get; set; }
+    public string BusinessCode { get; set; }    
 
     /// <summary>
     /// Application name.
