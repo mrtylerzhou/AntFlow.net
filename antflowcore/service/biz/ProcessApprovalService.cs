@@ -10,6 +10,8 @@ using antflowcore.factory;
 using antflowcore.service.repository;
 using antflowcore.util;
 using AntFlowCore.Util;
+using antflowcore.util.Extension;
+using antflowcore.vo;
 using AntFlowCore.Vo;
 using FreeSql;
 using FreeSql.Internal.Model;
@@ -168,6 +170,24 @@ public class ProcessApprovalService
             AddApproverButton(businessDataVo);
         }
 
+        if (vo.IsOutSideAccessProc == null || !vo.IsOutSideAccessProc.Value || vo.IsLowCodeFlow == 1)
+        {
+            UDLFApplyVo udlfApplyVo = (UDLFApplyVo) vo;
+            List<LFFieldControlVO> lfFieldControlVOs = vo.ProcessRecordInfo.LfFieldControlVOs;
+            Dictionary<string,object> lfFields = udlfApplyVo.LfFields;
+            if (!lfFields.IsEmpty())
+            {
+                foreach (var item in lfFields)
+                {
+                    LFFieldControlVO? lfFieldControlVo = lfFieldControlVOs.FirstOrDefault(a=>a.FieldId==item.Key);
+                    if (lfFieldControlVo != null &&
+                        StringConstants.HIDDEN_FIELD_PERMISSION.Equals(lfFieldControlVo.Perm))
+                    {
+                        lfFields[item.Key] = default;
+                    }
+                }
+            }
+        }
         dynamic d = businessDataVo;
         return d;
     }
@@ -531,54 +551,54 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
         
         if (!string.IsNullOrEmpty(paramVo.Search))
         {
-            exp=exp.And(a => a.Search.Contains(paramVo.Search));
+            exp=LambadaExpressionExtensions.And(exp, a => a.Search.Contains(paramVo.Search));
         }
 
         if (paramVo.ApplyUserId != 0)
         {
-            exp=exp.And(a => a.ApplyUserId == paramVo.ApplyUserId);
+            exp=LambadaExpressionExtensions.And(exp, a => a.ApplyUserId == paramVo.ApplyUserId);
         }
 
         if (!string.IsNullOrEmpty(paramVo.Description))
         {
-            exp=exp.And(a => a.Description.Contains(paramVo.Description));
+            exp=LambadaExpressionExtensions.And(exp, a => a.Description.Contains(paramVo.Description));
         }
 
         if (!string.IsNullOrEmpty(paramVo.ProcessNumber))
         {
-            exp=exp.And(a => a.ProcessNumber == paramVo.ProcessNumber);
+            exp=LambadaExpressionExtensions.And(exp, a => a.ProcessNumber == paramVo.ProcessNumber);
         }
 
         if (paramVo.ProcessState != null)
         {
-            exp=exp.And(a => a.ProcessState == paramVo.ProcessState);
+            exp=LambadaExpressionExtensions.And(exp, a => a.ProcessState == paramVo.ProcessState);
         }
 
         if (!string.IsNullOrEmpty(paramVo.StartTime) && !string.IsNullOrEmpty(paramVo.EndTime))
         {
             DateTime start = DateTime.Parse(paramVo.StartTime);
             DateTime end = DateTime.Parse(paramVo.EndTime);
-            exp=exp.And(a => a.RunTime.Value.Date.Between(start, end));
+            exp=LambadaExpressionExtensions.And(exp, a => a.RunTime.Value.Date.Between(start, end));
         }
 
         if (paramVo.ProcessKeyList != null && !paramVo.ProcessKeyList.Any())
         {
-            exp=exp.And(a => paramVo.ProcessKeyList.Contains(a.ProcessKey));
+            exp=LambadaExpressionExtensions.And(exp, a => paramVo.ProcessKeyList.Contains(a.ProcessKey));
         }
 
         if (paramVo.ProcessNumbers != null && paramVo.ProcessNumbers.Any())
         {
-            exp=exp.And(a => !paramVo.ProcessNumbers.Contains(a.ProcessNumber));
+            exp=LambadaExpressionExtensions.And(exp, a => !paramVo.ProcessNumbers.Contains(a.ProcessNumber));
         }
 
         if (paramVo.VersionProcessKeys != null && !paramVo.VersionProcessKeys.Any())
         {
-            exp=exp.And(a => !paramVo.VersionProcessKeys.Contains(a.ProcessKey));
+            exp=LambadaExpressionExtensions.And(exp, a => !paramVo.VersionProcessKeys.Contains(a.ProcessKey));
         }
 
         if (!string.IsNullOrEmpty(paramVo.ProcessDigest))
         {
-            exp=exp.And(a => !a.ProcessDigest.Contains(paramVo.ProcessDigest));
+            exp=LambadaExpressionExtensions.And(exp, a => !a.ProcessDigest.Contains(paramVo.ProcessDigest));
         }
 
         return exp;

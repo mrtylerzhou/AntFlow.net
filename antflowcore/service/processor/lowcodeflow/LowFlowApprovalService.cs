@@ -15,6 +15,7 @@ using AntFlowCore.Vo;
 using System.Reflection;
 using AntFlowCore.Constants;
 using antflowcore.factory.tagparser;
+using antflowcore.service.interf.repository;
 
 namespace antflowcore.service.processor.lowcodeflow;
 
@@ -29,6 +30,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
     private readonly LFMainFieldService _lfMainFieldService;
     private readonly BpmnConfLfFormdataService _lfformdataService;
     private readonly BpmnConfLfFormdataFieldService _lfformdataFieldService;
+    private readonly BpmnNodeLfFormdataFieldControlService _bpmnNodeLfFormdataFieldControlService;
 
     private static Dictionary<long, List<String>> conditionFieldNameMap = new Dictionary<long, List<string>>();
 
@@ -39,13 +41,15 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
     public LowFlowApprovalService(ILogger<LowFlowApprovalService> logger, LFMainService mainService,
         LFMainFieldService lfMainFieldService,
         BpmnConfLfFormdataService lfformdataService,
-        BpmnConfLfFormdataFieldService lfformdataFieldService)
+        BpmnConfLfFormdataFieldService lfformdataFieldService,
+        BpmnNodeLfFormdataFieldControlService _bpmnNodeLfFormdataFieldControlService)
     {
         _logger = logger;
         _mainService = mainService;
         _lfMainFieldService = lfMainFieldService;
         _lfformdataService = lfformdataService;
         _lfformdataFieldService = lfformdataFieldService;
+        this._bpmnNodeLfFormdataFieldControlService = _bpmnNodeLfFormdataFieldControlService;
     }
 
     public BpmnStartConditionsVo PreviewSetCondition(UDLFApplyVo vo)
@@ -371,8 +375,16 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
                 throw new AFBizException($"confId {confId}, formCode:{vo.FormCode} does not have a field config");
             }
         }
+        List<LFFieldControlVO> currentFieldControls = _bpmnNodeLfFormdataFieldControlService
+            .GetFieldControlByProcessNumberAndElementId(vo.ProcessNumber, vo.TaskDefKey);
         foreach (LFMainField field in lfMainFields)
         {
+            LFFieldControlVO? lfFieldControlVo = currentFieldControls.FirstOrDefault(a=>a.FieldId==field.FieldId);
+            if (lfFieldControlVo != null && (StringConstants.HIDDEN_FIELD_PERMISSION.Equals(lfFieldControlVo.Perm) ||
+                                             StringConstants.READ_ONLY_FIELD_PERMISSION.Equals(lfFieldControlVo.Perm)))
+            {
+                continue;
+            }
             string fValue = lfFields[field.FieldId]?.ToString()??null;
             if (!StringConstants.HIDDEN_FIELD_VALUE.Equals(fValue))//如果是******,实际上是隐藏字段,不更新
             {

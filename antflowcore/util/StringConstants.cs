@@ -54,5 +54,6 @@ namespace AntFlowCore.Constants
         
         public const String HIDDEN_FIELD_PERMISSION="H";
         public const string HIDDEN_FIELD_VALUE = "******";
+        public const string READ_ONLY_FIELD_PERMISSION="R";
     }
 }

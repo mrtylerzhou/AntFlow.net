@@ -76,6 +76,7 @@ public class ResubmitProcessService: IProcessOperationAdaptor
             }
 
             vo.TaskId = task.Id;
+            vo.TaskDefKey = task.TaskDefKey;
             task.ProcessNumber = bpmBusinessProcess.BusinessNumber;
             if (vo.IsOutSideAccessProc!=null&&!vo.IsOutSideAccessProc.Value)
             {
