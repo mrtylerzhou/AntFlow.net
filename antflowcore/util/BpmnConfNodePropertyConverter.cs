@@ -193,7 +193,7 @@ public class BpmnConfNodePropertyConverter
                         actualValue = JsonSerializer.Deserialize(zdy2, fieldCls);
                         if (optType != null && JudgeOperatorEnum.BinaryOperator().Contains(optType.Value))
                         {
-                            zdy1 = zdy1 + "," + zdy2; //antflow目前只有一个自定义值,介于之间的提前定义好JudgeOperatorEnum,值用字符串拼接,使用时再分割
+                            actualValue = zdy1 + "," + zdy2; //antflow目前只有一个自定义值,介于之间的提前定义好JudgeOperatorEnum,值用字符串拼接,使用时再分割
                         }
 
                         if (enumByCode.Value.IsLowCodeFlow())

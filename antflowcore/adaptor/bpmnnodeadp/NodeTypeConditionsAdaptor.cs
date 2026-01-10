@@ -164,7 +164,7 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
                     {
                         object obj = conditionTypeAttributes.FieldClass == typeof(string)
                             ? conditionParamJson
-                            : JsonSerializer.Deserialize(conditionParamJson, conditionTypeAttributes.FieldClass);
+                            :JudgeOperatorEnum.BinaryOperator().Contains(theOperator.Value)?conditionParamJson: JsonSerializer.Deserialize(conditionParamJson, conditionTypeAttributes.FieldClass) ;
 
                         if (conditionTypeEnum.Value.IsLowCodeFlow())
                         {

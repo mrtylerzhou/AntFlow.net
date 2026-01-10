@@ -52,7 +52,7 @@ namespace antflowcore.vo
         public string OutTotalMoney { get; set; }
 
         [JsonPropertyName("leaveHour")]
-        public double? LeaveHour { get; set; }
+        public string LeaveHour { get; set; }
 
         [JsonPropertyName("numberOperator")]
         public int? NumberOperator { get; set; }
