@@ -51,6 +51,7 @@ CREATE TABLE t_bpmn_node
     no_header_action     TINYINT,
     remark               NVARCHAR(255)        DEFAULT '',
     tenant_id            NVARCHAR(64)         DEFAULT '',
+    extra_flags          INT                         null,
     is_del               TINYINT  NOT NULL DEFAULT 0,
     create_user          NVARCHAR(50)         DEFAULT '',
     create_time          DATETIME NOT NULL DEFAULT GETDATE(),
@@ -2212,6 +2213,28 @@ CREATE
 NONCLUSTERED INDEX AF_IDX_EXEC_BUSKEY 
 ON bpm_af_execution (business_key);
 
+
+CREATE TABLE t_bpmn_node_additional_sign_conf
+(
+    id                 INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+    bpmn_node_id       INT           NOT NULL,
+    sign_infos         VARCHAR(3000) NOT NULL,
+    sign_property      SMALLINT      NOT NULL,
+    sign_property_type SMALLINT      NOT NULL,
+    sign_type          TINYINT NULL,
+    remark             VARCHAR(100) NULL,
+    is_del             TINYINT NULL DEFAULT 0,
+    tenant_id          VARCHAR(255)  NOT NULL DEFAULT '',
+    create_user        VARCHAR(50) NULL,
+    create_time        DATETIME     NOT NULL DEFAULT GETDATE(),
+    update_user        VARCHAR(50) NULL,
+    update_time        DATETIME     NOT NULL DEFAULT GETDATE()
+);
+
+-- 创建索引
+CREATE
+NONCLUSTERED INDEX t_bpmn_node_adc__index_node_id 
+ON t_bpmn_node_additional_sign_conf (bpmn_node_id);
 
 -- ----------------------------
 -- Records of t_user

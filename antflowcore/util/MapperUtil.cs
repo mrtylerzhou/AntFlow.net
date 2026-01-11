@@ -93,6 +93,7 @@ public static class MapperUtil
          IsDynamicCondition = node.IsDynamicCondition,
          IsParallel = node.IsParallel,
          NoHeaderAction = node.NoHeaderAction,
+         ExtraFlags = node.ExtraFlags
       };
    }
 
@@ -125,6 +126,7 @@ public static class MapperUtil
          IsOutSideProcess = vo.IsOutSideProcess,
          IsLowCodeFlow = vo.IsLowCodeFlow,
          NoHeaderAction = vo.NoHeaderAction,
+         ExtraFlags = vo.ExtraFlags
       };
    }
 

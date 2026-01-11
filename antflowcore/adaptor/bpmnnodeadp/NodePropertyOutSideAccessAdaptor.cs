@@ -10,7 +10,7 @@ namespace antflowcore.adaptor;
     /// NodePropertyOutSideAccessAdp
     /// 外部节点访问属性适配器
     /// </summary>
-    public class NodePropertyOutSideAccessAdaptor : BpmnNodeAdaptor
+    public class NodePropertyOutSideAccessAdaptor : IBpmnNodeAdaptor
     {
         private readonly BpmnNodeOutSideAccessConfService _bpmnNodeOutSideAccessConfService;
         private readonly ILogger<NodePropertyOutSideAccessAdaptor> _logger;
@@ -23,7 +23,7 @@ namespace antflowcore.adaptor;
             _logger = logger;
         }
 
-        public override BpmnNodeVo FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
+        public  void FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
         {
             var nodeOutSideAccessConf = _bpmnNodeOutSideAccessConfService.baseRepo.Where(conf => conf.BpmnNodeId == bpmnNodeVo.Id).First();
 
@@ -37,11 +37,10 @@ namespace antflowcore.adaptor;
 
                 bpmnNodeVo.OrderedNodeType = (int)OrderNodeTypeEnum.OUT_SIDE_NODE;
             }
-
-            return bpmnNodeVo;
+            
         }
 
-        public override void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
+        public  void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
         {
             var propertysVo = bpmnNodeVo.Property ?? new BpmnNodePropertysVo();
 
@@ -55,7 +54,7 @@ namespace antflowcore.adaptor;
             _bpmnNodeOutSideAccessConfService.baseRepo.Insert(nodeOutSideAccessConf);
         }
         
-        public override void SetSupportBusinessObjects()
+        public  void SetSupportBusinessObjects()
         {
             ((IAdaptorService)this).AddSupportBusinessObjects(BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_OUT_SIDE_ACCESS);
         }

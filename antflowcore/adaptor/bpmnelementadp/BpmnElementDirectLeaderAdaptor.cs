@@ -18,17 +18,25 @@ public class BpmnElementDirectLeaderAdaptor : BpmnElementAdaptor
     protected override BpmnConfCommonElementVo GetElementVo(BpmnNodePropertysVo property, BpmnNodeParamsVo paramsVo, int elementCode, string elementId)
     {
         // Get the assignee and assignee name or initialize with default values
-        var bpmnNodeParamsAssigneeVo = paramsVo.Assignee ?? new BpmnNodeParamsAssigneeVo();
-        string assignee = bpmnNodeParamsAssigneeVo.Assignee;
-        string assigneeName = bpmnNodeParamsAssigneeVo.AssigneeName;
-
-        var singleAssigneeMap = new Dictionary<string, string>
+        var bpmnNodeParamsAssigneeVos = paramsVo.AssigneeList ?? new List<BpmnNodeParamsAssigneeVo>();
+        string elementName = bpmnNodeParamsAssigneeVos.FirstOrDefault()?.ElementName;
+        var assigneeMap = bpmnNodeParamsAssigneeVos
+            .Where(o => o.IsDeduplication == 0)
+            .ToDictionary(
+                assigneeVo => assigneeVo.Assignee,
+                assigneeVo => assigneeVo.AssigneeName,
+                StringComparer.OrdinalIgnoreCase);
+        
+        string collectionName = "directLeader";
+        string elementCodeStr = $"directLeader{elementCode}";
+        if (property.SignType == (int)SignTypeEnum.SIGN_TYPE_SIGN)
         {
-            { assignee, assigneeName }
-        };
-
-        return BpmnElementUtils.GetSingleElement(elementId, bpmnNodeParamsAssigneeVo.ElementName,
-            $"directLeader{elementCode}", assignee, singleAssigneeMap);
+            return BpmnElementUtils.GetMultiplayerSignElement(elementId, elementName, elementCodeStr, assigneeMap.Keys.ToList(), assigneeMap);
+        }
+        else
+        {
+            return BpmnElementUtils.GetMultiplayerOrSignElement(elementId, elementName, elementCodeStr, assigneeMap.Keys.ToList(), assigneeMap);
+        }
     }
 
     public override void SetSupportBusinessObjects()

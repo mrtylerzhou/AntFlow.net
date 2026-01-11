@@ -2,13 +2,14 @@
 using AntFlowCore.Entity;
 using antflowcore.exception;
 using antflowcore.service;
+using antflowcore.service.interf.repository;
 using antflowcore.service.repository;
 using antflowcore.util;
 using antflowcore.vo;
 
 namespace antflowcore.adaptor;
 
-public class NodePropertyPersonnelAdaptor : BpmnNodeAdaptor
+public class NodePropertyPersonnelAdaptor : AbstractAdditionSignNodeAdaptor
 {
     private readonly BpmnNodePersonnelConfService _bpmnNodePersonnelConfService;
     private readonly BpmnNodePersonnelEmplConfService _bpmnNodePersonnelEmplConfService;
@@ -17,15 +18,18 @@ public class NodePropertyPersonnelAdaptor : BpmnNodeAdaptor
     public NodePropertyPersonnelAdaptor(
         BpmnNodePersonnelConfService bpmnNodePersonnelConfService,
         BpmnNodePersonnelEmplConfService bpmnNodePersonnelEmplConfService,
-        IBpmnEmployeeInfoProviderService bpmnEmployeeInfoProviderService
-        )
+        IBpmnEmployeeInfoProviderService bpmnEmployeeInfoProviderService,
+        BpmnNodeAdditionalSignConfService bpmnNodeAdditionalSignConfService,
+        IRoleService roleService
+        ) : base(bpmnNodeAdditionalSignConfService, roleService)
     {
         _bpmnNodePersonnelConfService = bpmnNodePersonnelConfService;
         _bpmnNodePersonnelEmplConfService = bpmnNodePersonnelEmplConfService;
         _bpmnEmployeeInfoProviderService = bpmnEmployeeInfoProviderService;
     }
-    public override BpmnNodeVo FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
+    public override void FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
     {
+        base.FormatToBpmnNodeVo(bpmnNodeVo);
         BpmnNodePersonnelConf bpmnNodePersonnelConf = _bpmnNodePersonnelConfService.baseRepo.Where(a => a.BpmnNodeId == bpmnNodeVo.Id).First();
         if (bpmnNodePersonnelConf == null)
         {
@@ -50,17 +54,19 @@ public class NodePropertyPersonnelAdaptor : BpmnNodeAdaptor
             }
         }
 
-        bpmnNodeVo.Property = new BpmnNodePropertysVo
+        AfNodeUtils.AddOrEditProperty(bpmnNodeVo, p =>
         {
-            SignType = bpmnNodePersonnelConf.SignType,
-            EmplIds = emplIds,
-            EmplList = GetEmplList(emplIds, emplNames)
-        };
-     return bpmnNodeVo;
+            p.SignType = bpmnNodePersonnelConf.SignType;
+            p.EmplIds = emplIds;
+            p.EmplList = GetEmplList(emplIds, emplNames);
+        });
+       
+   
     }
 
     public override void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
     {
+        base.EditBpmnNode(bpmnNodeVo);
         var bpmnNodePropertysVo = bpmnNodeVo.Property ?? new BpmnNodePropertysVo();
 
         var bpmnNodePersonnelConf = new BpmnNodePersonnelConf

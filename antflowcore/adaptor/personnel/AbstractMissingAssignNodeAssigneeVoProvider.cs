@@ -1,6 +1,8 @@
 ﻿using antflowcore.adaptor.personnel.provider;
 using antflowcore.constant.enums;
+using antflowcore.constant.enus;
 using antflowcore.exception;
+using antflowcore.service.biz;
 using antflowcore.util.Extension;
 using antflowcore.vo;
 
@@ -20,6 +22,81 @@ public abstract class AbstractMissingAssignNodeAssigneeVoProvider: AbstractNodeA
     {
         int? missingAssigneeDealWay = nodeVo.NoHeaderAction;
         emplList = emplList.Where(a => a != null).ToList();
+        if (nodeVo.Property != null)
+        {
+            var property = nodeVo.Property;
+            List<ExtraSignInfoVo> additionalSignInfoList = property.AdditionalSignInfoList;
+            List<BaseIdTranStruVo> additionalAssigneeListToAdd=null;
+            List<BaseIdTranStruVo> additionalAssigneeListToDel=null;
+            if (!additionalSignInfoList.IsEmpty())
+            {
+                foreach (ExtraSignInfoVo signInfoVo in additionalSignInfoList)
+                {
+                    int? nodeProperty = signInfoVo.NodeProperty;
+                    int? propertyType = signInfoVo.PropertyType;
+                    NodePropertyEnum nodePropertyEnum = (NodePropertyEnum)nodeProperty;
+                    switch (nodePropertyEnum)
+                    {
+                        case NodePropertyEnum.NODE_PROPERTY_ROLE:
+                            List<BaseIdTranStruVo> roleList = signInfoVo.OtherSignInfos;
+                            if(propertyType==1){//add
+                                if(additionalAssigneeListToAdd==null){
+                                    additionalAssigneeListToAdd=new List<BaseIdTranStruVo>();
+                                }
+                                additionalAssigneeListToAdd.AddRange(roleList);
+                            }else if (propertyType==2){//del
+                                if(additionalAssigneeListToDel==null){
+                                    additionalAssigneeListToDel=new List<BaseIdTranStruVo>();
+                                }
+                                additionalAssigneeListToDel.AddRange(roleList);
+                            }
+                            break;
+                        case NodePropertyEnum.NODE_PROPERTY_PERSONNEL:
+                            List<BaseIdTranStruVo> personnelList = signInfoVo.SignInfos;
+                            if(propertyType==1) {//add
+                                if(additionalAssigneeListToAdd==null){
+                                    additionalAssigneeListToAdd=new List<BaseIdTranStruVo>();
+                                }
+                                additionalAssigneeListToAdd.AddRange(personnelList);
+                            }else if (propertyType==2){//del
+                                if(additionalAssigneeListToDel==null){
+                                    additionalAssigneeListToDel=new List<BaseIdTranStruVo>();
+                                }
+                                additionalAssigneeListToDel.AddRange(personnelList);
+                            }
+                            break;
+                    }
+                }
+            }
+            if(!additionalAssigneeListToAdd.IsEmpty())
+            {
+                foreach (BaseIdTranStruVo addsign in additionalAssigneeListToAdd)
+                {
+                    emplList.Add(addsign);
+                }
+            }
+            if(!additionalAssigneeListToDel.IsEmpty()){
+                foreach (BaseIdTranStruVo toDel in additionalAssigneeListToDel)
+                {
+                    List<BaseIdTranStruVo> toDelList = emplList.Where(a=>a.Id==toDel.Id).ToList();
+                       
+                    if(!toDelList.IsEmpty()){
+                        foreach (BaseIdTranStruVo delSign in toDelList)
+                        {
+                            emplList.Remove(delSign);
+                        }
+                    }
+                }
+            }
+        }
+
+        emplList = 
+        #if NET6_0_OR_GREATER
+            emplList.DistinctBy(a => a.Id).ToList();
+        #else
+            emplList.Distinct(new BaseIdStructVoComparer()).ToList();
+        #endif
+       
         if(!emplList.IsEmpty()){
             return base.ProvideAssigneeList(nodeVo, emplList);
         }

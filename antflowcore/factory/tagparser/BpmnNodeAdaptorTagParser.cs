@@ -6,9 +6,9 @@ using antflowcore.util;
 
 namespace antflowcore.factory;
 
-public class BpmnNodeAdaptorTagParser:TagParser<BpmnNodeAdaptor, BpmnNodeAdpConfEnum>
+public class BpmnNodeAdaptorTagParser:TagParser<IBpmnNodeAdaptor, BpmnNodeAdpConfEnum>
 {
-    public  BpmnNodeAdaptor ParseTag(BpmnNodeAdpConfEnum data)
+    public  IBpmnNodeAdaptor ParseTag(BpmnNodeAdpConfEnum data)
     {
         if(data==null){
             throw new AFBizException("provided data to find a bpmnNodeAdaptor method is null");
@@ -17,7 +17,7 @@ public class BpmnNodeAdaptorTagParser:TagParser<BpmnNodeAdaptor, BpmnNodeAdpConf
         IEnumerable<IAdaptorService> bpmnNodeAdaptors = ServiceProviderUtils.GetServices<IAdaptorService>();
         foreach (IAdaptorService bpmnNodeAdaptor in bpmnNodeAdaptors) {
             if(bpmnNodeAdaptor.IsSupportBusinessObject(data)){
-                return (BpmnNodeAdaptor)bpmnNodeAdaptor;
+                return (IBpmnNodeAdaptor)bpmnNodeAdaptor;
             }
         }
         return null;

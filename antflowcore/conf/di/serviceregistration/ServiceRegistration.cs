@@ -128,6 +128,7 @@ public static class ServiceRegistration
         services.AddSingleton<UserMessageService>();
         services.AddSingleton<ConfigFlowButtonContantService>();
         services.AddSingleton<UserEntrustService>();
+        services.AddSingleton<BpmnNodeAssignLevelConfService>();
         
         services.AddSingleton<AbstractOrderedSignNodeAdp, BpmnLoopSignNodeAdp>();
         services.AddSingleton<AbstractOrderedSignNodeAdp, OutSideOrderedSignNodeAdp>();
@@ -138,7 +139,7 @@ public static class ServiceRegistration
         services.AddSingleton<OutSideBpmApproveTemplateService>();
         services.AddSingleton<OutSideBpmAdminPersonnelService>();
         services.AddSingleton<OutSideBpmBaseService>();
-        
+        services.AddSingleton<BpmnNodeAdditionalSignConfService>();
         #region IBpmnPersonnelProviderService with different register ways
         
         services.AddSingleton<DirectLeaderPersonnelProvider>();

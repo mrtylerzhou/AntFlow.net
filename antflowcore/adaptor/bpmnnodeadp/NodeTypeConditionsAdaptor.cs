@@ -17,7 +17,7 @@ using Antflowcore.Vo;
 
 namespace antflowcore.adaptor;
 
-public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
+public class NodeTypeConditionsAdaptor : IBpmnNodeAdaptor
 {
     private readonly BpmnNodeConditionsConfService _bpmnNodeConditionsConfService;
     private readonly BpmnNodeConditionsParamConfService _bpmnNodeConditionsParamConfService;
@@ -32,7 +32,7 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
         _lfFormdataFieldService = lfFormdataFieldService;
     }
 
-    public override BpmnNodeVo FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
+    public  void FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
     {
         BpmnNodeConditionsConf bpmnNodeConditionsConf =
             _bpmnNodeConditionsConfService.baseRepo.Where(a => a.BpmnNodeId == bpmnNodeVo.Id).First();
@@ -40,7 +40,7 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
 
         if (bpmnNodeConditionsConf == null)
         {
-            return bpmnNodeVo;
+            return;
         }
 
         string extJson = bpmnNodeConditionsConf.ExtJson;
@@ -68,7 +68,7 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
             SetProperty(bpmnNodeVo, bpmnNodeConditionsConfBaseVo);
             bpmnNodeVo.Property.IsDefault = bpmnNodeConditionsConf.IsDefault;
             bpmnNodeVo.Property.Sort = bpmnNodeConditionsConf.Sort;
-            return bpmnNodeVo;
+            return;
         }
 
         List<BpmnNodeConditionsParamConf> nodeConditionsParamConfs = _bpmnNodeConditionsParamConfService.baseRepo
@@ -259,7 +259,6 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
         bpmnNodeVo.Property.GroupRelation =
             ConditionRelationShipEnum.GetValueByCode(bpmnNodeConditionsConf.GroupRelation);
         bpmnNodeVo.Property.ConditionList = extFieldsGroup;
-        return bpmnNodeVo;
     }
 
 
@@ -271,7 +270,7 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
         };
     }
 
-    public override void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
+    public  void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
     {
         BpmnNodePropertysVo bpmnNodePropertysVo = bpmnNodeVo.Property;
         BpmnNodeConditionsConfBaseVo bpmnNodeConditionsConfBaseVo = null;
@@ -415,7 +414,7 @@ public class NodeTypeConditionsAdaptor : BpmnNodeAdaptor
         }
     }
 
-    public override void SetSupportBusinessObjects()
+    public void SetSupportBusinessObjects()
     {
         ((IAdaptorService)this).AddSupportBusinessObjects(BpmnNodeAdpConfEnum.ADP_CONF_NODE_TYPE_CONDITIONS);
     }

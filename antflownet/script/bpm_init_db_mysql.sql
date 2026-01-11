@@ -50,6 +50,7 @@ CREATE TABLE if not exists `t_bpmn_node`
     `no_header_action`  tinyint             ,
     `remark`            varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
     `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
+    `extra_flags`          int                                        null,
     `is_del`            tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:No,1:yes',
     `create_user`       varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time`       timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
@@ -1822,6 +1823,8 @@ create index AF_IDX_TASK_DEF_KEY
     on bpm_af_task (task_def_key);
 create index AF_IDX_TASK_ASSIGNEE
     on bpm_af_task (assignee);
+
+
 create table bpm_af_execution
 (
     id                   varchar(64)             not null
@@ -1868,6 +1871,27 @@ create table t_bpmn_node_customize_conf
     update_time  datetime     null comment 'update time'
 )
     comment 'customize config entity';
+
+
+CREATE TABLE t_bpmn_node_additional_sign_conf
+(
+    id                 INT AUTO_INCREMENT COMMENT 'id' PRIMARY KEY,
+    bpmn_node_id       INT                                    NOT NULL COMMENT '节点id',
+    sign_infos           VARCHAR(3000)                          NOT NULL COMMENT 'additional sign id stored as json value',
+    sign_property      SMALLINT                               NOT NULL COMMENT 'see NodePropertyEnum',
+    sign_property_type SMALLINT                               NOT NULL COMMENT '1 for add,2 for exclude',
+    sign_type          TINYINT                                NULL COMMENT 'sign type 1: all sign 2:or sign,it is meaning less for additional sign,it will inhere from parent',
+    remark             VARCHAR(100)                           NULL COMMENT 'remark',
+    is_del             tinyint      default 0                 null comment '0:no,1:yes',
+    tenant_id          VARCHAR(255) DEFAULT ''                NOT NULL COMMENT 'tenantId',
+    create_user        VARCHAR(50)                            NULL COMMENT 'as its name says',
+    create_time        TIMESTAMP    DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT 'as its name says',
+    update_user        VARCHAR(50)                            NULL COMMENT 'as its name says',
+    update_time        TIMESTAMP    DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
+
+    INDEX t_bpmn_node_adc__index_node_id (bpmn_node_id)
+)
+    COMMENT 'nodes additional sign';
 
 -- ----------------------------
 -- Records of t_user

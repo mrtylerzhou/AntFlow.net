@@ -1,5 +1,6 @@
 ﻿using antflowcore.constant.enus;
 using AntFlowCore.Entity;
+using antflowcore.service.interf.repository;
 using antflowcore.service.repository;
 using antflowcore.util;
 using antflowcore.vo;
@@ -11,35 +12,37 @@ namespace antflowcore.adaptor;
  /// <summary>
     /// NodePropertyHrbpAdp Class for HRBP Node Properties
     /// </summary>
-    public class NodePropertyHrbpAdaptor : BpmnNodeAdaptor
+    public class NodePropertyHrbpAdaptor : AbstractAdditionSignNodeAdaptor
     {
         private readonly BpmnNodeHrbpConfService _bpmnNodeHrbpConfService;
         private readonly ILogger<NodePropertyHrbpAdaptor> _logger;
 
-        public NodePropertyHrbpAdaptor(BpmnNodeHrbpConfService bpmnNodeHrbpConfService, ILogger<NodePropertyHrbpAdaptor> logger)
+        public NodePropertyHrbpAdaptor(BpmnNodeHrbpConfService bpmnNodeHrbpConfService,
+            BpmnNodeAdditionalSignConfService bpmnNodeAdditionalSignConfService,
+            IRoleService roleService,
+            ILogger<NodePropertyHrbpAdaptor> logger) : base(bpmnNodeAdditionalSignConfService, roleService)
         {
             _bpmnNodeHrbpConfService = bpmnNodeHrbpConfService;
             _logger = logger;
         }
 
-        public override BpmnNodeVo FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
+        public override void FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
         {
+            base.FormatToBpmnNodeVo(bpmnNodeVo);
             var bpmnNodeHrbpConf = _bpmnNodeHrbpConfService.baseRepo.Where(conf => conf.BpmnNodeId == bpmnNodeVo.Id).First();
 
             if (bpmnNodeHrbpConf != null)
             {
-                bpmnNodeVo.Property = new BpmnNodePropertysVo
-                {
-                    HrbpConfType = bpmnNodeHrbpConf.HrbpConfType
-                };
+                AfNodeUtils.AddOrEditProperty(bpmnNodeVo, p=>p.HrbpConfType= bpmnNodeHrbpConf.HrbpConfType);
+               
             }
-
-            return bpmnNodeVo;
+            
         }
         
 
         public override void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
         {
+            base.EditBpmnNode(bpmnNodeVo);
             var bpmnNodePropertysVo = bpmnNodeVo.Property ?? new BpmnNodePropertysVo();
 
             var bpmnNodeHrbpConf = new BpmnNodeHrbpConf

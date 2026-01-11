@@ -108,6 +108,8 @@ namespace antflowcore.vo;
         [JsonPropertyName("updateTime")]
         public DateTime? UpdateTime { get; set; }
 
+        [JsonPropertyName("extraFlags")]
+        public int? ExtraFlags { get; set; }
         //===============>>ext fields<<===================
 
         [JsonPropertyName("nodeTo")]

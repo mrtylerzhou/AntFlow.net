@@ -1,6 +1,7 @@
 ﻿using antflowcore.constant.enus;
 using AntFlowCore.Entity;
 using antflowcore.service;
+using antflowcore.service.interf.repository;
 using antflowcore.service.repository;
 using antflowcore.util;
 using antflowcore.vo;
@@ -9,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace antflowcore.adaptor;
 
-public class NodePropertyLoopAdaptor : BpmnNodeAdaptor
+public class NodePropertyLoopAdaptor : AbstractAdditionSignNodeAdaptor
     {
         private readonly BpmnNodeLoopConfService _bpmnNodeLoopConfService;
         private readonly IBpmnEmployeeInfoProviderService _bpmnEmployeeInfoProviderService;
@@ -18,15 +19,18 @@ public class NodePropertyLoopAdaptor : BpmnNodeAdaptor
         public NodePropertyLoopAdaptor(
             BpmnNodeLoopConfService bpmnNodeLoopConfService,
             IBpmnEmployeeInfoProviderService bpmnEmployeeInfoProviderService,
-            ILogger<NodePropertyLoopAdaptor> logger)
+            BpmnNodeAdditionalSignConfService bpmnNodeAdditionalSignConfService,
+            IRoleService roleService,
+            ILogger<NodePropertyLoopAdaptor> logger) : base(bpmnNodeAdditionalSignConfService, roleService)
         {
             _bpmnNodeLoopConfService = bpmnNodeLoopConfService;
             _bpmnEmployeeInfoProviderService = bpmnEmployeeInfoProviderService;
             _logger = logger;
         }
 
-        public override BpmnNodeVo FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
+        public override void FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
         {
+            base.FormatToBpmnNodeVo(bpmnNodeVo);
             BpmnNodeLoopConf bpmnNodeLoopConf = _bpmnNodeLoopConfService
                 .baseRepo.Where(conf => conf.BpmnNodeId == bpmnNodeVo.Id)
                 .First();
@@ -55,25 +59,26 @@ public class NodePropertyLoopAdaptor : BpmnNodeAdaptor
                         Name = entry.Value
                     }).ToList();
 
-                bpmnNodeVo.Property = new BpmnNodePropertysVo
+                AfNodeUtils.AddOrEditProperty(bpmnNodeVo, p =>
                 {
-                    LoopEndType = bpmnNodeLoopConf.LoopEndType,
-                    LoopNumberPlies = bpmnNodeLoopConf.LoopNumberPlies,
-                    LoopEndGrade = bpmnNodeLoopConf.LoopEndGrade,
-                    LoopEndPersonList = loopEndPersonIds,
-                    LoopEndPersonObjList = loopEndPersonList,
-                    NoparticipatingStaffIds = noParticipatingStaffIds,
-                    NoparticipatingStaffs = noParticipatingStaffList
-                };
+                    p.LoopEndType = bpmnNodeLoopConf.LoopEndType;
+                    p.LoopNumberPlies = bpmnNodeLoopConf.LoopNumberPlies;
+                    p.LoopEndGrade = bpmnNodeLoopConf.LoopEndGrade;
+                    p.LoopEndPersonList = loopEndPersonIds;
+                    p.LoopEndPersonObjList = loopEndPersonList;
+                    p.NoparticipatingStaffIds = noParticipatingStaffIds;
+                    p.NoparticipatingStaffs = noParticipatingStaffList;
+                    
+                });
                 bpmnNodeVo.OrderedNodeType = (int)OrderNodeTypeEnum.LOOP_NODE;
             }
-
-            return bpmnNodeVo;
+            
         }
 
 
         public override void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
         {
+            base.EditBpmnNode(bpmnNodeVo);
             var property = bpmnNodeVo.Property ?? new BpmnNodePropertysVo();
 
             var bpmnNodeLoopConf = new BpmnNodeLoopConf

@@ -30,7 +30,7 @@ public static class NodePropertyEnumExtensions
             { NodePropertyEnum.NODE_PROPERTY_BUSINESSTABLE, ("关联业务表", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) },
             { NodePropertyEnum.NODE_PROPERTY_OUT_SIDE_ACCESS, ("外部传入人员", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) },
             { NodePropertyEnum.NODE_PROPERTY_START_USER, ("发起人", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_SINGLE) },
-            { NodePropertyEnum.NODE_PROPERTY_DIRECT_LEADER, ("直属领导", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_SINGLE) }
+            { NodePropertyEnum.NODE_PROPERTY_DIRECT_LEADER, ("直属领导", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) }
         };
 
     public static BpmnNodeParamTypeEnum GetParamTypeEnum(this NodePropertyEnum property)

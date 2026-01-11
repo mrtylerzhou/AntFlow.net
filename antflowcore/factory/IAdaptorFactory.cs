@@ -12,7 +12,7 @@ public interface IAdaptorFactory
 {
     //[SpfService(typeof(BpmnNodeAdaptorTagParser))]
     [AutoParse]
-    BpmnNodeAdaptor GetBpmnNodeAdaptor(BpmnNodeAdpConfEnum adpConfEnum);
+    IBpmnNodeAdaptor GetBpmnNodeAdaptor(BpmnNodeAdpConfEnum adpConfEnum);
     
     
     [SpfService(typeof(ActivitiTagParser<>))]

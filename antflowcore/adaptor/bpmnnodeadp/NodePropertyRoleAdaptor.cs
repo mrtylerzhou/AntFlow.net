@@ -1,5 +1,6 @@
 ﻿using antflowcore.constant.enus;
 using AntFlowCore.Entity;
+using antflowcore.service.interf.repository;
 using antflowcore.service.repository;
 using antflowcore.util;
 using antflowcore.vo;
@@ -8,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace antflowcore.adaptor;
 
- public class NodePropertyRoleAdaptor : BpmnNodeAdaptor
+ public class NodePropertyRoleAdaptor : AbstractAdditionSignNodeAdaptor
     {
         private readonly BpmnNodeRoleConfService _bpmnNodeRoleConfService;
         private readonly BpmnNodeRoleOutsideEmpConfService _bpmnNodeRoleOutsideEmpConfService;
@@ -16,20 +17,25 @@ namespace antflowcore.adaptor;
 
         public NodePropertyRoleAdaptor(
             BpmnNodeRoleConfService bpmnNodeRoleConfService,
-          
             BpmnNodeRoleOutsideEmpConfService bpmnNodeRoleOutsideEmpConfService,
-            ILogger<NodePropertyRoleAdaptor> logger)
+            BpmnNodeAdditionalSignConfService bpmnNodeAdditionalSignConfService,
+            IRoleService roleService,
+            ILogger<NodePropertyRoleAdaptor> logger) : base(bpmnNodeAdditionalSignConfService, roleService)
         {
             _bpmnNodeRoleConfService = bpmnNodeRoleConfService;
             _bpmnNodeRoleOutsideEmpConfService = bpmnNodeRoleOutsideEmpConfService;
             _logger = logger;
         }
 
-        public override BpmnNodeVo FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
+        public override void FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
         {
+            base.FormatToBpmnNodeVo(bpmnNodeVo);
             var list = _bpmnNodeRoleConfService.baseRepo.Where(conf => conf.BpmnNodeId == bpmnNodeVo.Id).ToList();
 
-            if (list == null || !list.Any()) return bpmnNodeVo;
+            if (list == null || !list.Any())
+            {
+                return;
+            };
 
             var roles = list.Select(conf => new BaseIdTranStruVo
             {
@@ -37,33 +43,37 @@ namespace antflowcore.adaptor;
                 Name = conf.RoleName
             }).ToList();
 
-            bpmnNodeVo.Property = new BpmnNodePropertysVo
+            AfNodeUtils.AddOrEditProperty(bpmnNodeVo, p =>
             {
-                RoleIds = roles.Select(r => r.Id).ToList(),
-                RoleList = roles,
-                SignType = list.First().SignType
-            };
+                p.RoleIds = roles.Select(r => r.Id).ToList();
+                p.RoleList = roles;
+                p.SignType = list.First().SignType;
+            });
+           
 
             if (bpmnNodeVo.IsOutSideProcess == 1)
             {
                 var outsideEmpConfs = _bpmnNodeRoleOutsideEmpConfService.baseRepo.Where(conf => conf.NodeId == bpmnNodeVo.Id).ToList();
                 if (outsideEmpConfs != null && outsideEmpConfs.Any())
                 {
-                    bpmnNodeVo.Property.EmplIds = outsideEmpConfs.Select(e => e.EmplId).ToList();
-                    bpmnNodeVo.Property.EmplList = outsideEmpConfs.Select(e => new BaseIdTranStruVo
+                    AfNodeUtils.AddOrEditProperty(bpmnNodeVo, p =>
                     {
-                        Id = e.EmplId,
-                        Name = e.EmplName
-                    }).ToList();
+                        p.EmplIds = outsideEmpConfs.Select(e => e.EmplId).ToList();
+                        p.EmplList = outsideEmpConfs.Select(e => new BaseIdTranStruVo
+                        {
+                            Id = e.EmplId,
+                            Name = e.EmplName
+                        }).ToList();
+                    });
                 }
             }
-
-            return bpmnNodeVo;
+            
         }
         
 
         public override void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
         {
+            base.EditBpmnNode(bpmnNodeVo);
             var property = bpmnNodeVo.Property ?? new BpmnNodePropertysVo();
 
             if (property.RoleList != null && property.RoleList.Any())

@@ -1,5 +1,6 @@
 ﻿using antflowcore.constant.enus;
 using AntFlowCore.Entity;
+using antflowcore.service.interf.repository;
 using antflowcore.service.repository;
 using antflowcore.util;
 using antflowcore.vo;
@@ -11,38 +12,41 @@ namespace antflowcore.adaptor;
 /// <summary>
     /// NodePropertyLevelAdp Class for Level Node Properties
     /// </summary>
-    public class NodePropertyLevelAdaptor : BpmnNodeAdaptor
+    public class NodePropertyLevelAdaptor : AbstractAdditionSignNodeAdaptor
     {
         private readonly BpmnNodeAssignLevelConfService _bpmnNodeAssignLevelConfService;
         private readonly ILogger<NodePropertyLevelAdaptor> _logger;
 
         public NodePropertyLevelAdaptor(
             BpmnNodeAssignLevelConfService bpmnNodeAssignLevelConfService, 
-            ILogger<NodePropertyLevelAdaptor> logger)
+            BpmnNodeAdditionalSignConfService bpmnNodeAdditionalSignConfService,
+            IRoleService roleService,
+            ILogger<NodePropertyLevelAdaptor> logger) : base(bpmnNodeAdditionalSignConfService, roleService)
         {
             _bpmnNodeAssignLevelConfService = bpmnNodeAssignLevelConfService;
             _logger = logger;
         }
 
-        public override BpmnNodeVo FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
+        public override void FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
         {
+            base.FormatToBpmnNodeVo(bpmnNodeVo);
             BpmnNodeAssignLevelConf bpmnNodeAssignLevelConf = _bpmnNodeAssignLevelConfService.baseRepo.Where(conf => conf.BpmnNodeId == bpmnNodeVo.Id).First();
 
             if (bpmnNodeAssignLevelConf != null)
             {
-                bpmnNodeVo.Property = new BpmnNodePropertysVo
+                AfNodeUtils.AddOrEditProperty(bpmnNodeVo, p =>
                 {
-                    AssignLevelType = bpmnNodeAssignLevelConf.AssignLevelType,
-                    AssignLevelGrade = bpmnNodeAssignLevelConf.AssignLevelGrade
-                };
+                    p.AssignLevelType = bpmnNodeAssignLevelConf.AssignLevelType;
+                    p.AssignLevelGrade = bpmnNodeAssignLevelConf.AssignLevelGrade;
+                });
             }
 
-            return bpmnNodeVo;
         }
 
        
         public override void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
         {
+            base.EditBpmnNode(bpmnNodeVo);
             BpmnNodePropertysVo bpmnNodePropertysVo = bpmnNodeVo.Property ?? new BpmnNodePropertysVo();
 
             BpmnNodeAssignLevelConf bpmnNodeAssignLevelConf = new BpmnNodeAssignLevelConf

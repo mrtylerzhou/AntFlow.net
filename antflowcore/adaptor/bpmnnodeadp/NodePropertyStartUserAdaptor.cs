@@ -1,19 +1,28 @@
 ﻿using antflowcore.constant.enus;
+using antflowcore.service.interf.repository;
+using antflowcore.service.repository;
+using antflowcore.util;
 using antflowcore.vo;
 
 namespace antflowcore.adaptor;
 
-public class NodePropertyStartUserAdaptor: BpmnNodeAdaptor
+public class NodePropertyStartUserAdaptor: AbstractAdditionSignNodeAdaptor
 {
-    public override BpmnNodeVo FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
+    public NodePropertyStartUserAdaptor(BpmnNodeAdditionalSignConfService bpmnNodeAdditionalSignConfService,
+        IRoleService roleService) : base(bpmnNodeAdditionalSignConfService, roleService)
     {
+        
+    }
+    public override void FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
+    {
+        base.FormatToBpmnNodeVo(bpmnNodeVo);
         bpmnNodeVo.DeduplicationExclude = true;
-        return bpmnNodeVo;
+       
     }
 
     public override void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
     {
-       
+        base.EditBpmnNode(bpmnNodeVo);
     }
 
     public override void SetSupportBusinessObjects()

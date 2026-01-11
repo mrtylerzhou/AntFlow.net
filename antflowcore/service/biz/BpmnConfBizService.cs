@@ -138,6 +138,7 @@ public class BpmnConfBizService
 
             //if the node has no property,the node property default is "1-no property"
             bpmnNodeVo.NodeProperty=bpmnNodeVo.NodeProperty ?? 1;
+            EditNodeExtraFlags(bpmnNodeVo);
             BpmnNode bpmnNode = bpmnNodeVo.MapToEntity();
             bpmnNode.ConfId=confId;
             bpmnNode.CreateTime=DateTime.Now;
@@ -169,10 +170,10 @@ public class BpmnConfBizService
             //edit in node approver remind conf
             _approveRemindService.EditBpmnApproveRemind(bpmnNodeVo);
             //get node adaptor
-            BpmnNodeAdaptor bpmnNodeAdaptor = GetBpmnNodeAdaptor(bpmnNodeAdpConfEnum);
+            IBpmnNodeAdaptor iBpmnNodeAdaptor = GetBpmnNodeAdaptor(bpmnNodeAdpConfEnum);
 
             //then edit the node
-            bpmnNodeAdaptor.EditBpmnNode(bpmnNodeVo);
+            iBpmnNodeAdaptor.EditBpmnNode(bpmnNodeVo);
             
             if((int)NodeTypeEnum.NODE_TYPE_COPY==bpmnNodeVo.NodeType&&bpmnNodeVo.NodeTo!=null&&bpmnNodeVo.NodeTo.Any()){
                 hasLastNodeCopy=BpmnConfFlagsEnum.HAS_LAST_NODE_COPY.Code;
@@ -277,7 +278,7 @@ public class BpmnConfBizService
     * @param bpmnNodeAdpConfEnum
     * @return
     */
-    private BpmnNodeAdaptor GetBpmnNodeAdaptor(BpmnNodeAdpConfEnum? bpmnNodeAdpConfEnum) {
+    private IBpmnNodeAdaptor GetBpmnNodeAdaptor(BpmnNodeAdpConfEnum? bpmnNodeAdpConfEnum) {
         if (bpmnNodeAdpConfEnum == null)
         {
             throw new AFBizException("node has no property");
@@ -363,7 +364,7 @@ public class BpmnConfBizService
             foreach (BpmnNode bpmnNode in bpmnNodes) {
                 bpmnNode.IsOutSideProcess=bpmnConf.IsOutSideProcess;
                 bpmnNode.IsLowCodeFlow=bpmnConf.IsLowCodeFlow;
-                bpmnNode.ExtraFlags=bpmnConf.ExtraFlags;
+                bpmnNode.ConfExtraFlags=bpmnConf.ExtraFlags;
             }
         }
         bpmnConfVo.Nodes=GetBpmnNodeVoList(bpmnNodes, conditionsUrl);
@@ -601,10 +602,10 @@ public class BpmnConfBizService
             return bpmnNodeVo;
         }
         //get node adaptor
-        BpmnNodeAdaptor bpmnNodeAdaptor = GetBpmnNodeAdaptor(bpmnNodeAdpConfEnum);
+        IBpmnNodeAdaptor iBpmnNodeAdaptor = GetBpmnNodeAdaptor(bpmnNodeAdpConfEnum);
 
         //use adaptor to format nodevo
-        bpmnNodeAdaptor.FormatToBpmnNodeVo(bpmnNodeVo);
+        iBpmnNodeAdaptor.FormatToBpmnNodeVo(bpmnNodeVo);
         if ((int)NodeTypeEnum.NODE_TYPE_OUT_SIDE_CONDITIONS==bpmnNode.NodeType) {
             bpmnNodeVo.NodeType=(int)NodeTypeEnum.NODE_TYPE_CONDITIONS;
         }
@@ -767,5 +768,50 @@ public class BpmnConfBizService
             }
         }
         return confVo;
+    }
+     private void EditNodeExtraFlags(BpmnNodeVo bpmnNodeVo){
+        BpmnNodePropertysVo property = bpmnNodeVo.Property;
+        if(property!=null){
+            int flags=0;
+            List<ExtraSignInfoVo> additionalSignInfoList = property.AdditionalSignInfoList;
+            if(!additionalSignInfoList.IsEmpty()){
+                List<BpmnNodeFlagsEnum> additionalFlags=new List<BpmnNodeFlagsEnum>();
+                foreach (ExtraSignInfoVo extraSignInfoVo in additionalSignInfoList) {
+                    int? nodeProperty = extraSignInfoVo.NodeProperty;
+                    int? propertyType = extraSignInfoVo.PropertyType;
+                    NodePropertyEnum nodePropertyEnum = (NodePropertyEnum)nodeProperty;
+                    if(nodePropertyEnum==null){
+                        throw new AFBizException(BusinessError.STATUS_ERROR,"额外审批人节点类型未定义!");
+                    }
+                    switch (nodePropertyEnum){
+                        case NodePropertyEnum.NODE_PROPERTY_ROLE:
+                            if(propertyType==1){
+                                additionalFlags.Add(BpmnNodeFlagsEnum.HAS_ADDITIONAL_ASSIGNEE_ROLE);
+                            }else if(propertyType==2){
+                                additionalFlags.Add(BpmnNodeFlagsEnum.HAS_EXCLUDE_ASSIGNEE_ROLE);
+                            }else{
+                                throw new AFBizException(BusinessError.STATUS_ERROR,"额外审批人节propertyType点类型未定义!");
+                            }
+                            break;
+                        case NodePropertyEnum.NODE_PROPERTY_PERSONNEL:
+                            if(propertyType==1){
+                                additionalFlags.Add(BpmnNodeFlagsEnum.HAS_ADDITIONAL_ASSIGNEE);
+                            }else if(propertyType==2){
+                                additionalFlags.Add(BpmnNodeFlagsEnum.HAS_EXCLUDE_ASSIGNEE);
+                            }else{
+                                throw new AFBizException(BusinessError.STATUS_ERROR,"额外审批人节propertyType点类型未定义!");
+                            }
+                            break;
+                        default:
+                            throw new AFBizException(BusinessError.STATUS_ERROR,"暂不支持的额外操作类型!");
+                    }
+                }
+                foreach (BpmnNodeFlagsEnum additionalFlag in additionalFlags)
+                {
+                    flags = flags | additionalFlag.Code;
+                }
+                bpmnNodeVo.ExtraFlags=flags;
+            }
+        }
     }
 }

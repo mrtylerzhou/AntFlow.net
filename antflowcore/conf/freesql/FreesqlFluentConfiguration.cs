@@ -307,8 +307,9 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.IsParallel).Name("is_parallel");
                 a.Property(b => b.IsOutSideProcess).IsIgnore(true);
                 a.Property(b => b.IsLowCodeFlow).IsIgnore(true);
-                a.Property(b => b.ExtraFlags).IsIgnore(true);
+                a.Property(b => b.ConfExtraFlags).IsIgnore(true);
                 a.Property(b => b.NoHeaderAction).Name("no_header_action");
+                a.Property(b => b.ExtraFlags).Name("extra_flags");
             }).ConfigEntity<BpmnNodeAssignLevelConf>(a =>
             {
                 a.Name("t_bpmn_node_assign_level_conf");
@@ -1358,6 +1359,23 @@ public static class FreesqlFluentConfiguration
                 entity.Property(e => e.CreateTime).Name("create_time").CanInsert(true);
                 entity.Property(e => e.UpdateUser).Name("update_user");
                 entity.Property(e => e.UpdateTime).Name("update_time").CanInsert(true).CanUpdate(true);
-            });
+            }).ConfigEntity<BpmnNodeAdditionalSignConf>(a =>
+               {
+                   a.Name("t_bpmn_node_additional_sign_conf");
+                   
+                   a.Property(b => b.Id).IsPrimary(true).IsIdentity(true);
+                   a.Property(b => b.BpmnNodeId).Name("bpmn_node_id");
+                   a.Property(b => b.SignInfos).Name("sign_infos");
+                   a.Property(b => b.SignProperty).Name("sign_property");
+                   a.Property(b => b.SignPropertyType).Name("sign_property_type");
+                   a.Property(b => b.SignType).Name("sign_type");
+                   a.Property(b => b.Remark).Name("remark");
+                   a.Property(b => b.IsDel).Name("is_del");
+                   a.Property(b => b.TenantId).Name("tenant_id");
+                   a.Property(b => b.CreateUser).Name("create_user");
+                   a.Property(b => b.CreateTime).Name("create_time");
+                   a.Property(b => b.UpdateUser).Name("update_user");
+                   a.Property(b => b.UpdateTime).Name("update_time");
+               });
     }
 }

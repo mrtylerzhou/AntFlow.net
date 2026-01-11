@@ -1,5 +1,6 @@
 ﻿using antflowcore.constant.enus;
 using AntFlowCore.Entity;
+using antflowcore.service.interf.repository;
 using antflowcore.service.repository;
 using antflowcore.util;
 using antflowcore.vo;
@@ -8,39 +9,42 @@ using Microsoft.Extensions.Logging;
 
 namespace antflowcore.adaptor;
 
-public class NodePropertyBusinessTableAdaptor : BpmnNodeAdaptor
+public class NodePropertyBusinessTableAdaptor : AbstractAdditionSignNodeAdaptor
     {
         private readonly BpmnNodeBusinessTableConfService _bpmnNodeBusinessTableConfService;
         private readonly ILogger<NodePropertyBusinessTableAdaptor> _logger;
 
         public NodePropertyBusinessTableAdaptor(
             BpmnNodeBusinessTableConfService bpmnNodeBusinessTableConfService,
-            ILogger<NodePropertyBusinessTableAdaptor> logger)
+            BpmnNodeAdditionalSignConfService bpmnNodeAdditionalSignConfService,
+            IRoleService roleService,
+            ILogger<NodePropertyBusinessTableAdaptor> logger) : base(bpmnNodeAdditionalSignConfService, roleService)
         {
             _bpmnNodeBusinessTableConfService = bpmnNodeBusinessTableConfService;
             _logger = logger;
         }
 
-        public override BpmnNodeVo FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
+        public override void FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
         {
+            base.FormatToBpmnNodeVo(bpmnNodeVo);
             var bpmnNodeBusinessTableConf = _bpmnNodeBusinessTableConfService.baseRepo.Where(conf => conf.BpmnNodeId == bpmnNodeVo.Id).First();
 
             if (bpmnNodeBusinessTableConf != null)
             {
-                bpmnNodeVo.Property = new BpmnNodePropertysVo
+                AfNodeUtils.AddOrEditProperty(bpmnNodeVo, p =>
                 {
-                    ConfigurationTableType = bpmnNodeBusinessTableConf.ConfigurationTableType,
-                    TableFieldType = bpmnNodeBusinessTableConf.TableFieldType,
-                    SignType = bpmnNodeBusinessTableConf.SignType
-                };
+                    p.ConfigurationTableType = bpmnNodeBusinessTableConf.ConfigurationTableType;
+                    p.TableFieldType = bpmnNodeBusinessTableConf.TableFieldType;
+                    p.SignType = bpmnNodeBusinessTableConf.SignType;
+                });
             }
-
-            return bpmnNodeVo;
+            
         }
 
        
         public override void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
         {
+            base.EditBpmnNode(bpmnNodeVo);
             var bpmnNodePropertysVo = bpmnNodeVo.Property ?? new BpmnNodePropertysVo();
 
             var bpmnNodeBusinessTableConf = new BpmnNodeBusinessTableConf

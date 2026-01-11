@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
 using System.Text.Json.Serialization;
 using antflowcore.constant.enums;
 using Antflowcore.Vo;
@@ -94,6 +93,8 @@ namespace antflowcore.vo
         /// </summary>
         [JsonPropertyName("groupRelation")]
         public bool GroupRelation { get; set; } = true;
+        [JsonPropertyName("additionalSignInfoList")]
+        public List<ExtraSignInfoVo> AdditionalSignInfoList { get; set; }
         // 默认构造函数
         public BpmnNodePropertysVo() { }
         
