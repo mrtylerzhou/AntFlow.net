@@ -139,6 +139,7 @@ public class NodeTypeConditionsAdaptor : IBpmnNodeAdaptor
                         var objects = JsonSerializer.Deserialize(conditionParamJson, genericTypeToDeserialize);
                         if (conditionTypeEnum.Value.IsLowCodeFlow())
                         {
+                            isLowCodeFlow=true;
                             String columnDbname = name2confVueMap[paramKey].ColumnDbname;
                             if (wrappedValue == null)
                             {
