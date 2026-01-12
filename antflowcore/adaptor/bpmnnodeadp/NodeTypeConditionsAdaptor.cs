@@ -274,15 +274,10 @@ public class NodeTypeConditionsAdaptor : IBpmnNodeAdaptor
     public  void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
     {
         BpmnNodePropertysVo bpmnNodePropertysVo = bpmnNodeVo.Property;
-        BpmnNodeConditionsConfBaseVo bpmnNodeConditionsConfBaseVo = null;
-        if (bpmnNodePropertysVo != null)
-        {
-            bpmnNodeConditionsConfBaseVo = BpmnConfNodePropertyConverter.FromVue3Model(bpmnNodePropertysVo);
-        }
-        else
-        {
-            bpmnNodeConditionsConfBaseVo = new BpmnNodeConditionsConfBaseVo();
-        }
+        BpmnNodeConditionsConfBaseVo bpmnNodeConditionsConfBaseVo = bpmnNodePropertysVo!=null
+            ?BpmnConfNodePropertyConverter.FromVue3Model(bpmnNodePropertysVo)
+            :new BpmnNodeConditionsConfBaseVo();
+        
 
         BpmnNodeConditionsConf bpmnNodeConditionsConf = new BpmnNodeConditionsConf
         {
@@ -315,25 +310,19 @@ public class NodeTypeConditionsAdaptor : IBpmnNodeAdaptor
             foreach (List<BpmnNodeConditionsConfVueVo> extFields in extFieldsArray)
             {
                 index++;
-                foreach (var extField in extFields)
+                foreach (BpmnNodeConditionsConfVueVo extField in extFields)
                 {
                     string columnId = extField.ColumnId;
                     String columnDbname = extField.ColumnDbname;
-                    ConditionTypeEnum? conditionTypeEnum =
-                        ConditionTypeEnumExtensions.GetEnumByCode(int.Parse(columnId));
+                    ConditionTypeEnum? conditionTypeEnum = (ConditionTypeEnum)int.Parse(columnId);
                     if (conditionTypeEnum == null)
                     {
                         throw new AFBizException($"Cannot get node ConditionTypeEnum by code: {columnId}");
                     }
 
                     ConditionTypeAttributes conditionTypeAttributes =
-                        ConditionTypeEnumExtensions.GetAttributes(conditionTypeEnum.Value);
-                    PropertyInfo? fieldInfo =
-                        typeof(BpmnNodeConditionsConfBaseVo).GetProperty(conditionTypeAttributes.FieldName);
-                    if (fieldInfo == null)
-                    {
-                        throw new AFBizException("fieldInfo is null");
-                    }
+                        conditionTypeEnum.Value.GetAttributes();
+                   
 
                     Object conditionParam = null;
                     if(conditionTypeEnum.Value.IsLowCodeFlow())
@@ -346,6 +335,12 @@ public class NodeTypeConditionsAdaptor : IBpmnNodeAdaptor
                     }
                     else
                     {
+                        PropertyInfo? fieldInfo =
+                            typeof(BpmnNodeConditionsConfBaseVo).GetProperty(conditionTypeAttributes.FieldName);
+                        if (fieldInfo == null)
+                        {
+                            throw new AFBizException("fieldInfo is null");
+                        }
                         conditionParam=fieldInfo.GetValue(bpmnNodeConditionsConfBaseVo);
                     }
                     if (conditionParam != null)
@@ -364,7 +359,7 @@ public class NodeTypeConditionsAdaptor : IBpmnNodeAdaptor
                         if (conditionTypeAttributes.FieldType == 1)
                         {
                             JsonNode? jsonNode = JsonSerializer.Deserialize<JsonNode>(conditionParamJson);
-                            if (jsonNode == null || jsonNode is JsonArray { Count: 0 })
+                            if (jsonNode is null or JsonArray { Count: 0 })
                             {
                                 continue;
                             }
@@ -387,7 +382,7 @@ public class NodeTypeConditionsAdaptor : IBpmnNodeAdaptor
                         });
 
                         //if condition value doest not a collection and doest not a string type,it must have an operator
-                        if (conditionTypeAttributes.FieldType == 2 && !(conditionParam is string))
+                        if (conditionTypeAttributes.FieldType == 2 && conditionParam is not string)
                         {
                             _bpmnNodeConditionsParamConfService.baseRepo.Insert(new BpmnNodeConditionsParamConf
                             {
