@@ -64,10 +64,13 @@ public abstract class AbstractLowFlowSpyFormOperationAdaptor<T> : IFormOperation
         foreach (string fieldName in fieldNames)
         {
             PropertyInfo? prop = businessDataVo.GetType().GetProperty(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.IgnoreCase);
-            object? value = prop.GetValue(businessDataVo);
-            if (value != null)
+            if (prop != null)
             {
-                conditions.Add(fieldName, value);
+                object? value = prop.GetValue(businessDataVo);
+                if (value != null)
+                {
+                    conditions.Add(fieldName, value);
+                }
             }
         }
         return conditions;

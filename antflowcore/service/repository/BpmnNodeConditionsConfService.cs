@@ -31,7 +31,7 @@ public class BpmnNodeConditionsConfService: AFBaseCurdRepositoryService<BpmnNode
                 .InnerJoin((tbc, tbn, tbncc, tbncpc) => tbn.ConfId == tbc.Id && tbn.NodeType == 3)
                 .InnerJoin((tbc, tbn, tbncc, tbncpc) => tbncc.BpmnNodeId == tbn.Id)
                 .InnerJoin((tbc, tbn, tbncc, tbncpc) => tbncpc.BpmnNodeConditionsId == tbncc.Id)
-                .Where((tbc, tbn, tbncc, tbncpc) => tbc.FormCode == businessDataVo.FormCode)
+                .Where((tbc, tbn, tbncc, tbncpc) => tbc.FormCode == businessDataVo.FormCode&& tbc.EffectiveStatus==1)
                 .ToList<string>(((tbc, tbn, tbncc, tbncpc) => tbncpc.ConditionParamName));
         }
         return result;
