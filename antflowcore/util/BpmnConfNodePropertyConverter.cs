@@ -190,7 +190,11 @@ public class BpmnConfNodePropertyConverter
                         Object valueOrWrapper = null;
                         Object actualValue = null;
                         Object zdy2Value = null;
-                        actualValue = JsonSerializer.Deserialize(zdy2, fieldCls);
+                        if (!string.IsNullOrEmpty(zdy2))
+                        {
+                            zdy2Value = JsonSerializer.Deserialize(zdy2, fieldCls);
+                        }
+                       
                         if (optType != null && JudgeOperatorEnum.BinaryOperator().Contains(optType.Value))
                         {
                             actualValue = zdy1 + "," + zdy2; //antflow目前只有一个自定义值,介于之间的提前定义好JudgeOperatorEnum,值用字符串拼接,使用时再分割
