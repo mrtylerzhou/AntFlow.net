@@ -63,12 +63,12 @@ public static class ServiceRegistration
         services.AddSingleton<BpmnNodeLfFormdataFieldControlService>();
         services.AddSingleton<LFFieldControlPostProcessor>();
         services.AddSingleton<ProcessApprovalService>();
-        services.AddSingleton<IFormOperationAdaptor<ThirdPartyAccountApplyVo>, ThirdPartyAccountApplyService>();
+        services.AddSingleton<IFormOperationAdaptor<ThirdPartyAccountApplyVo>, ThirdPartyAccountApplyFlowService>();
         services.AddSingleton<IFormOperationAdaptor<UDLFApplyVo>,LowFlowApprovalService>();
         services.AddSingleton<LowFlowApprovalService>();
         services.AddSingleton<OutSideBpmAccessBusinessService>();
         services.AddSingleton<FormFactory>();
-        services.AddSingleton<ThirdPartyAccountApplyService>();
+        services.AddSingleton<ThirdPartyAccountApplyFlowService>();
         services.AddSingleton<ButtonOperationService>();
         services.AddSingleton<OutSideBpmBusinessPartyService>();
         services.AddSingleton<OutSideBpmCallbackUrlConfService>();
@@ -302,6 +302,7 @@ public static class ServiceRegistration
         services.AddSingleton<IProcessNoticeAdaptor, SMSSendAdaptor>();
         services.AddSingleton<AfStaticLogUtil>();
         services.AddSingleton<BpmvariableBizService>();
+        services.AddSingleton<ThirdPartyAccountApplyService>();
         //=================================不可越过的三八线==============================
         IAdaptorFactory adaptorFactory = AdaptorFactoryProxy.GetProxyInstance();
         services.AddSingleton(adaptorFactory);
