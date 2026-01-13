@@ -179,6 +179,10 @@ public class ProcessApprovalService
             {
                 foreach (var item in lfFields)
                 {
+                    if (lfFieldControlVOs.IsEmpty())
+                    {
+                        continue;
+                    }
                     LFFieldControlVO? lfFieldControlVo = lfFieldControlVOs.FirstOrDefault(a=>a.FieldId==item.Key);
                     if (lfFieldControlVo != null &&
                         StringConstants.HIDDEN_FIELD_PERMISSION.Equals(lfFieldControlVo.Perm))
