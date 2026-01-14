@@ -152,6 +152,8 @@ public class ConfigFlowButtonContantService
                 var toViewButtonsComplete = toViewButtons
                     .Where(btn => btn.ButtonType != (int)ButtonTypeEnum.BUTTON_TYPE_ABANDONED
                     && btn.ButtonType != (int)ButtonTypeEnum.BUTTON_TYPE_PROCESS_DRAW_BACK
+                    && btn.ButtonType != (int)ButtonTypeEnum.BUTTON_TYPE_SUBMIT
+                    && btn.ButtonType != (int)ButtonTypeEnum.BUTTON_TYPE_RESUBMIT
                     && btn.ButtonType != (int)ButtonTypeEnum.BUTTON_TYPE_STOP)
                     .ToList();
 
