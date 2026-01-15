@@ -170,16 +170,16 @@ public class ProcessApprovalService
             AddApproverButton(businessDataVo);
         }
 
-        if (vo.IsOutSideAccessProc == null || !vo.IsOutSideAccessProc.Value || vo.IsLowCodeFlow == 1)
+        if ((vo.IsOutSideAccessProc == null || !vo.IsOutSideAccessProc.Value) && vo.IsLowCodeFlow == 1)
         {
-            UDLFApplyVo udlfApplyVo = (UDLFApplyVo) vo;
+            UDLFApplyVo udlfApplyVo = (UDLFApplyVo)vo;
             List<LFFieldControlVO> lfFieldControlVOs = vo.ProcessRecordInfo.LfFieldControlVOs;
-            Dictionary<string,object> lfFields = udlfApplyVo.LfFields;
+            Dictionary<string, object> lfFields = udlfApplyVo.LfFields;
             if (!lfFields.IsEmpty())
             {
                 foreach (var item in lfFields)
                 {
-                    LFFieldControlVO? lfFieldControlVo = lfFieldControlVOs.FirstOrDefault(a=>a.FieldId==item.Key);
+                    LFFieldControlVO? lfFieldControlVo = lfFieldControlVOs.FirstOrDefault(a => a.FieldId == item.Key);
                     if (lfFieldControlVo != null &&
                         StringConstants.HIDDEN_FIELD_PERMISSION.Equals(lfFieldControlVo.Perm))
                     {
