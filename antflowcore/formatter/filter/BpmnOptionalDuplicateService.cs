@@ -1,4 +1,4 @@
-﻿using antflowcore.constant.enus;
+using antflowcore.constant.enus;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 
@@ -26,7 +26,7 @@ public class BpmnOptionalDuplicateService: IBpmnOptionalDuplicatesAdaptor
 
             string optionalNode = "";
 
-            while (string.IsNullOrEmpty(bpmnNodeVo.Params.NodeTo))
+            while (!string.IsNullOrEmpty(bpmnNodeVo.Params.NodeTo))
             {
                 bpmnNodeVo = mapNodes[bpmnNodeVo.Params.NodeTo];
 
