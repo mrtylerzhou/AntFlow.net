@@ -80,6 +80,21 @@ public class TaskService
         {
             _afTaskService.Frsql.Delete<BpmAfTask>().Where(a=>a.Id==taskId).ExecuteAffrows();
         }
+        TimeSpan taskDuration = nowTime - bpmAfTask.CreateTime;
+        int durationMinutes = taskDuration.Minutes;
+        IUpdate<BpmAfTaskInst> update = _afTaskInstService.Frsql
+            .Update<BpmAfTaskInst>()
+            .Set(a => a.Duration, durationMinutes)
+            .Set(a => a.EndTime, nowTime)
+            .Set(a => a.DeleteReason, deleteReason);
+        if(bpmAfTask.NodeType==(int)NodeTypeEnum.NODE_TYPE_COPY)
+        {
+            update.Set(a => a.Assignee, task.Assignee);
+            update.Set(a => a.AssigneeName, task.AssigneeName);
+        }
+        update
+            .Where(a => a.Id == taskId)
+            .ExecuteAffrows();
         BpmAfDeployment bpmAfDeployment = _afDeploymentService.baseRepo.Where(a=>a.Id==procDefId).First();
         if (bpmAfDeployment == null)
         {
@@ -225,22 +240,8 @@ public class TaskService
                 deleteReason = StringConstants.TASK_FINISH_REASON;
                 _executionListener.Notify(execution, IExecutionListener.EVENTNAME_END);
             }
-
-            TimeSpan taskDuration = nowTime - bpmAfTask.CreateTime;
-            int durationMinutes = taskDuration.Minutes;
-            IUpdate<BpmAfTaskInst> update = _afTaskInstService.Frsql
-                .Update<BpmAfTaskInst>()
-                .Set(a => a.Duration, durationMinutes)
-                .Set(a => a.EndTime, nowTime)
-                .Set(a => a.DeleteReason, deleteReason);
-            if(bpmAfTask.NodeType==(int)NodeTypeEnum.NODE_TYPE_COPY)
-            {
-                update.Set(a => a.Assignee, task.Assignee);
-                update.Set(a => a.AssigneeName, task.AssigneeName);
-            }
-            update
-                .Where(a => a.Id == taskId)
-                .ExecuteAffrows();
+            
+           
             if (deleteReason.Equals(StringConstants.TASK_FINISH_REASON))
             {
                 return;
