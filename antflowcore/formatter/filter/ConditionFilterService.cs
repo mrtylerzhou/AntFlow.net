@@ -342,9 +342,9 @@ public class ConditionFilterService
             if ((int)NodeTypeEnum.NODE_TYPE_APPROVER==bpmnNodeVo.NodeType
                 && (int)NodePropertyEnum.NODE_PROPERTY_CUSTOMIZE==bpmnNodeVo.NodeProperty) {
                 nodeCustomize += 1;
-                if (nodeCustomize > 1) {
-                    throw new AFBizException("self chose module is greater than 1");
-                }
+                //if (nodeCustomize > 1) {
+                //    throw new AFBizException("self chose module is greater than 1");
+                //}
             }
         }
     }
