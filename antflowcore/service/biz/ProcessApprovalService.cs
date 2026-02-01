@@ -266,7 +266,7 @@ public class ProcessApprovalService
                 break;
             // delegated tasks
             case 7:
-                //todo tobe implemented
+               page.Records=(this.BackToModifyList(page, vo));
                 break;
             //for administrator to view all the processes
             case 8:
@@ -545,6 +545,39 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
         page.Total = (int)basePagingInfo.Count;
         return taskMgmtVos;
     }
+    List<TaskMgmtVO> BackToModifyList(Page<TaskMgmtVO> page,  TaskMgmtVO taskMgmtVO){
+        BasePagingInfo basePagingInfo = page.ToPagingInfo();
+        List<TaskMgmtVO> taskMgmtVos = _freeSql
+            .Select<BpmAfTask, BpmVerifyInfo, BpmBusinessProcess>()
+            .InnerJoin((t, c, b) => c.RunInfoId == t.ProcInstId)
+            .InnerJoin((t, c, b) => b.ProcInstId == t.ProcInstId)
+            .Where((t, c, b) =>
+                t.TaskDefKey == "task1418018332271" && c.VerifyStatus == 8 && c.IsDel == 0 && b.IsDel == 0)
+            .WithTempQuery(a => new TaskMgmtVO()
+            {
+                ProcessInstanceId = a.t1.ProcInstId,
+                ProcessKey = a.t3.ProcessinessKey,
+                UserId = a.t3.CreateUser,
+                BusinessId= a.t3.BusinessId,
+                Description = a.t3.Description,
+                TaskStype = a.t3.ProcessState,
+                ProcessNumber = a.t3.BusinessNumber,
+                CreateTime = a.t3.CreateTime,
+                RunTime = a.t3.CreateTime,
+                ProcessState = a.t3.ProcessState,
+                TaskId = a.t1.Id,
+                ProcessDigest = a.t3.ProcessDigest,
+                TaskOwner = a.t1.Assignee,
+                TaskName = a.t1.TaskDefKey,
+            })
+            .Where(CommonCond(taskMgmtVO))
+            .OrderByDescending(a => a.CreateTime)
+            .Page(basePagingInfo)
+            .ToList();
+
+        page.Total = (int)basePagingInfo.Count;
+        return taskMgmtVos;
+    }
     private Expression<Func<TaskMgmtVO, bool>> CommonCond(TaskMgmtVO paramVo)
     {
         var param = Expression.Parameter(typeof(TaskMgmtVO), "a");
@@ -624,5 +657,6 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
         };
         return taskMgmtVo;
     }
+    
 }
 
