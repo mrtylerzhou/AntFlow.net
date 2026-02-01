@@ -43,7 +43,7 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>,IB
 
     public void AddVerifyInfo(BpmVerifyInfo verifyInfo)
     {
-        BpmFlowrunEntrust entrustByTaskId = _bpmFlowrunEntrustService.GetEntrustByTaskId(SecurityUtils.GetLogInEmpIdStr(), verifyInfo.RunInfoId, verifyInfo.TaskId);
+        BpmFlowrunEntrust entrustByTaskId = _bpmFlowrunEntrustService.GetEntrustByTaskId(SecurityUtils.GetLogInEmpIdStr(), verifyInfo.RunInfoId, verifyInfo.TaskDefKey);
         if (entrustByTaskId != null)
         {
             verifyInfo.OriginalId = entrustByTaskId.Original;
@@ -248,6 +248,7 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>,IB
                     w.VerifyStatus == 6 ? "终止" :
                     w.VerifyStatus == 8 ? "退回修改" :
                     w.VerifyStatus == 9 ? "加批" :
+                    w.VerifyStatus == 10 ? "转交" :
                     "",
                 VerifyDate = w.VerifyDate,
                 VerifyDesc = w.VerifyDesc,

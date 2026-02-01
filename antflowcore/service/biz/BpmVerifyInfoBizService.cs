@@ -171,16 +171,17 @@ public class BpmVerifyInfoBizService
 
             List<BpmFlowrunEntrust> flowrunEntrustList = _bpmFlowrunEntrustService
                 .baseRepo
-                .Where(a => a.RunInfoId == taskVo.Id).ToList();
+                .Where(a => a.RunInfoId == bpmBusinessProcess.ProcInstId && a.Actual == taskVo.VerifyUserId).ToList();
 
 
             if (flowrunEntrustList.Any())
             {
                 var flowrunEntrust = flowrunEntrustList.First();
-                if (taskVo.VerifyUserId == flowrunEntrust.Actual)
-                {
-                    taskVo.VerifyUserName = $"{taskVo.VerifyUserName} 代 {flowrunEntrust.OriginalName} 审批";
-                }
+                //if (taskVo.VerifyUserId == flowrunEntrust.Actual)
+                //{
+                //    taskVo.VerifyUserName = $"{taskVo.VerifyUserName} 代 {flowrunEntrust.OriginalName} 审批";
+                //}
+                taskVo.VerifyUserName = $"{taskVo.VerifyUserName} 代 {flowrunEntrust.OriginalName} 审批";
             }
 
             if (taskVo.ElementId == ProcessNodeEnum.START_TASK_KEY.Description)

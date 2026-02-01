@@ -34,7 +34,8 @@ public class ProcessNodeJumpService
     public void CommitProcess(BpmAfTask task, Dictionary<String, Object> variables,
         String backNodeKey)
     {
-        if (variables == null) {
+        if (variables == null)
+        {
             variables = new Dictionary<string, object>();
         }
 
@@ -44,7 +45,7 @@ public class ProcessNodeJumpService
         }
         else
         {
-            TurnTransition(task.Id, backNodeKey,variables);
+            TurnTransition(task.Id, backNodeKey, variables);
         }
     }
     public void TurnTransition(String taskId, String taskToTurnToNodeKey, Dictionary<String, Object> variables)
@@ -54,11 +55,11 @@ public class ProcessNodeJumpService
         {
             throw new AFBizException($"can not find task by id: {taskId}");
         }
-        TurnTransition(bpmAfTask, taskToTurnToNodeKey,null,variables);
+        TurnTransition(bpmAfTask, taskToTurnToNodeKey, null, variables);
     }
-    public void TurnTransition(BpmAfTask bpmAfTask, String taskToTurnToNodeKey,BpmAfDeployment bpmAfDeployment, Dictionary<String, Object> variables)
+    public void TurnTransition(BpmAfTask bpmAfTask, String taskToTurnToNodeKey, BpmAfDeployment bpmAfDeployment, Dictionary<String, Object> variables)
     {
-         string verifyComment=variables.ContainsKey(StringConstants.VERIFY_COMMENT)?variables[StringConstants.VERIFY_COMMENT]?.ToString():"";
+        string verifyComment = variables.ContainsKey(StringConstants.VERIFY_COMMENT) ? variables[StringConstants.VERIFY_COMMENT]?.ToString() : "";
         DateTime nowTime = DateTime.Now;
         _afTaskInstService.Frsql
             .Update<BpmAfTaskInst>()
@@ -67,7 +68,7 @@ public class ProcessNodeJumpService
             .Set(a => a.VerifyDesc, verifyComment)
             .Set(a => a.EndTime, nowTime)
             .Set(a => a.Duration, (nowTime - bpmAfTask.CreateTime).Seconds)
-            .Where(a => a.Id == taskToTurnToNodeKey)
+            .Where(a => a.Id == bpmAfTask.Id)
             .ExecuteAffrows();
 
         string procInstId = bpmAfTask.ProcInstId;
@@ -86,18 +87,18 @@ public class ProcessNodeJumpService
 
         string content = bpmAfDeployment.Content;
         List<BpmnConfCommonElementVo> elements = JsonSerializer.Deserialize<List<BpmnConfCommonElementVo>>(content);
-        BpmnConfCommonElementVo turnToElement = elements.First(a => a.ElementId==taskToTurnToNodeKey);
+        BpmnConfCommonElementVo turnToElement = elements.First(a => a.ElementId == taskToTurnToNodeKey);
         int signType = turnToElement.SignType;
-        IDictionary<string,string> assigneeMap = turnToElement.AssigneeMap;
-        string executionId=StrongUuidGenerator.GetNextId();
-        
+        IDictionary<string, string> assigneeMap = turnToElement.AssigneeMap;
+        string executionId = StrongUuidGenerator.GetNextId();
+
         _executionService.Frsql
             .Delete<BpmAfExecution>()
             .Where(a => a.Id == bpmAfTask.ExecutionId)
             .ExecuteAffrows();
-        
+
         List<BpmAfTaskInst> historyTaskInsts = new List<BpmAfTaskInst>();
-        List<BpmAfTask> tasks=new List<BpmAfTask>();
+        List<BpmAfTask> tasks = new List<BpmAfTask>();
         int index = 0;
         foreach (var (key, value) in assigneeMap)
         {
@@ -121,9 +122,9 @@ public class ProcessNodeJumpService
             };
             tasks.Add(newTask);
             BpmAfTaskInst bpmAfTaskInst = newTask.ToInst();
-            TimeSpan taskDuration = nowTime-bpmAfTask.CreateTime;
-            bpmAfTaskInst.Duration=taskDuration.Minutes;
-            bpmAfTaskInst.EndTime=nowTime;
+            TimeSpan taskDuration = nowTime - bpmAfTask.CreateTime;
+            bpmAfTaskInst.Duration = taskDuration.Minutes;
+            bpmAfTaskInst.EndTime = nowTime;
             bpmAfTaskInst.Description = StringConstants.BACK_TO_MODIFY_DESC;
             historyTaskInsts.Add(bpmAfTaskInst);
             index++;
@@ -138,13 +139,13 @@ public class ProcessNodeJumpService
             Name = turnToElement.ElementName,
             StartTime = nowTime,
             StartUserId = SecurityUtils.GetLogInEmpId(),
-            TaskCount = signType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode()?1:assigneeMap.Count,
+            TaskCount = signType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode() ? 1 : assigneeMap.Count,
         };
         _executionService.baseRepo.Insert(execution);
         _afTaskService.baseRepo.Delete(bpmAfTask);
         _afTaskService.baseRepo.Insert(tasks);
         //_afTaskInstService.baseRepo.Insert(historyTaskInsts);
-       
+
     }
-   
+
 }
