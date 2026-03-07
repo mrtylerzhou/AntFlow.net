@@ -34,6 +34,7 @@ using System.Linq;
             int signType = property.SignType ?? 1;
 
             BpmnConfCommonElementVo elementVo = GetElementVo(nodeVo.Property, nodeVo.Params, nodeCode + 1, elementId);
+            elementVo.AggregationNode = nodeVo.AggregationNode;
             SetElementButtons(nodeVo, elementVo);
 
             elementVo.TemplateVos = nodeVo.TemplateVos;
@@ -118,7 +119,7 @@ using System.Linq;
         // 回到分配者审批
         private void BackApproval(List<BpmnConfCommonElementVo> bpmnConfCommonElementVos, BpmnConfCommonElementVo fatherElementVo, Dictionary<string, int> numMap)
         {
-            var signUpSubElementVo = SetAndGetSignUpSubElement(bpmnConfCommonElementVos, fatherElementVo, numMap["nodeCode"], numMap["sequenceFlowNum"], numMap);
+            BpmnConfCommonElementVo signUpSubElementVo = SetAndGetSignUpSubElement(bpmnConfCommonElementVos, fatherElementVo, numMap["nodeCode"], numMap["sequenceFlowNum"], numMap);
             AddBackApproval(bpmnConfCommonElementVos, fatherElementVo, signUpSubElementVo, numMap["nodeCode"], numMap["sequenceFlowNum"], numMap);
         }
 

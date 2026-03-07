@@ -192,8 +192,21 @@ public class TaskService
                 if (signupNodeAssigneeMap.Count <= 0)
                 {
                     var (nextUserElement, nextFlowElement) = GetNextAssigneeNodeRecursively(elements, elementToDeal);
+                    if (nextUserElement == null)
+                    {
+                        long count = _afTaskService.baseRepo.Where(a=>a.ProcInstId==procInstId).Count();
+                        if (count > 0)
+                        {
+                            return;
+                        }
+
+                        elementToDeal = BpmnFlowUtil.GetAggNode(elements, elementToDeal);
+                    }
+                    else
+                    {
                         BpmnFlowUtil.GetNextNodeAndFlowNode(elements, elementToDeal.ElementId);
-                    elementToDeal = nextUserElement;
+                        elementToDeal = nextUserElement;
+                    }
                     assigneeMap = elementToDeal.AssigneeMap;
                 }
                 else
@@ -300,7 +313,7 @@ public class TaskService
     {
         var (nextUserElement, nextFlowElement) =
             BpmnFlowUtil.GetNextNodeAndFlowNode(elements, elementToDeal.ElementId);
-        if (nextUserElement.AssigneeMap.IsEmpty() && nextFlowElement.FlowTo.IndexOf("EndEvent") == -1)
+        if (nextUserElement!=null&&nextUserElement.AssigneeMap.IsEmpty() && nextFlowElement.FlowTo.IndexOf("EndEvent") == -1)
         {
           return  GetNextAssigneeNodeRecursively(elements,nextUserElement);
         }

@@ -94,9 +94,29 @@ public static class BpmnFlowUtil
             }
         }
 
+        BpmnConfCommonElementVo currentNode = commonElements.First(a => a.ElementId==currentTaskDefKey);
+        if (currentNode.IsBackSignUp == 1)
+        {
+           
+            return (null,null);
+        }
         throw new AFBizException("logic error,can not find next element,please contact the administrator");
     }
 
+    public static BpmnConfCommonElementVo GetAggNode(List<BpmnConfCommonElementVo> commonElements, BpmnConfCommonElementVo currentNode)
+    {
+        int indexOf = commonElements.IndexOf(currentNode);
+        for (int i = indexOf; i < commonElements.Count; i++)
+        {
+            BpmnConfCommonElementVo bpmnConfCommonElementVo = commonElements[i];
+            if (bpmnConfCommonElementVo.AggregationNode.HasValue &&
+                bpmnConfCommonElementVo.AggregationNode.Value)
+            {
+                return bpmnConfCommonElementVo;
+            }
+        }
+        throw new AFBizException("logic error,can not find nearest agg node,please contact the administrator");
+    }
     /// <summary>
     /// 获取从当前节点流向的(即当前节点下一节点)的下一个节点
     /// </summary>

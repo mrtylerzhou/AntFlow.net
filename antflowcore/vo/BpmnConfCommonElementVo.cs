@@ -82,5 +82,7 @@ namespace AntFlowCore.Vo
         public BpmnApproveRemindVo ApproveRemindVo { get; set; }
         [JsonPropertyName("signType")]
         public int SignType { get; set; }
+        
+        public bool? AggregationNode { get; set; }
     }
 }
