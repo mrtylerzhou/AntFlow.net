@@ -182,14 +182,15 @@ public class TaskService
             IDictionary<string, string> assigneeMap = elementToDeal.AssigneeMap;
             if (elementToDeal.IsSignUpSubElement == 1)
             {
+                
                 List<KeyValuePair<string, string>> signupNodeAssigneeMap = this._signUpPersonnelService.Frsql
                     .Select<BpmBusinessProcess, BpmVariable, BpmVariableSignUpPersonnel>()
                     .InnerJoin((a, b, c) => a.BusinessNumber == b.ProcessNum)
                     .InnerJoin((a, b, c) => b.Id == c.VariableId)
-                    .Where((a, b, c) => a.ProcInstId == procInstId)
+                    .Where((a, b, c) => a.ProcInstId == procInstId&&c.ElementId==elementToDeal.ElementId)
                     .ToList<KeyValuePair<string, string>>((a, b, c) =>
                         new KeyValuePair<string, string>(c.Assignee, c.AssigneeName));
-                if (signupNodeAssigneeMap.Count <= 0)
+                if (signupNodeAssigneeMap.Count <= 0&& elementToDeal.IsBackSignUp!=1)
                 {
                     var (nextUserElement, nextFlowElement) = GetNextAssigneeNodeRecursively(elements, elementToDeal);
                     if (nextUserElement == null)
