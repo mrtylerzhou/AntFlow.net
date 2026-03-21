@@ -71,7 +71,7 @@ public static class BpmnFlowUtil
         throw new AFBizException("can not find  first assignee node,logic error,please contact the administrator");
     }
 
-    public static BpmnConfCommonElementVo GetCurrentTaskElement(List<BpmnConfCommonElementVo> commonElements,string taskDefKey )
+    public static BpmnConfCommonElementVo? GetCurrentTaskElement(List<BpmnConfCommonElementVo> commonElements,string taskDefKey )
     {
         foreach (BpmnConfCommonElementVo bpmnConfCommonElementVo in commonElements)
         {
@@ -82,7 +82,7 @@ public static class BpmnFlowUtil
         }
         return null;
     }
-    public static (BpmnConfCommonElementVo assigneeNode,BpmnConfCommonElementVo flowNode) GetNextNodeAndFlowNode(List<BpmnConfCommonElementVo> commonElements,string currentTaskDefKey)
+    public static (BpmnConfCommonElementVo? assigneeNode,BpmnConfCommonElementVo? flowNode) GetNextNodeAndFlowNode(List<BpmnConfCommonElementVo> commonElements,string currentTaskDefKey)
     {
         for (var i = 0; i < commonElements.Count; i++)
         {

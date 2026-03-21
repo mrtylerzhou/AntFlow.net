@@ -117,7 +117,7 @@ public class TaskService
         List<string> verifyUserIds = new List<string>();
         if (currentSignType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode())
         {
-            BpmnConfCommonElementVo currentElement = BpmnFlowUtil.GetCurrentTaskElement(elements,taskDefKey);
+            BpmnConfCommonElementVo? currentElement = BpmnFlowUtil.GetCurrentTaskElement(elements,taskDefKey);
             if (currentElement == null)
             {
                 throw new AFBizException($"can not get current element by element id: {currentElement}");
@@ -164,11 +164,9 @@ public class TaskService
             {
                 return;
             }
-            else
-            {
-                List<BpmnConfCommonElementVo> bpmnConfCommonElementVos = BpmnFlowUtil.GetNodeFromCurrentNexts(elements,elementToDeal.ElementId);
-                elementToDealList.AddRange(bpmnConfCommonElementVos);
-            }
+
+            List<BpmnConfCommonElementVo> bpmnConfCommonElementVos = BpmnFlowUtil.GetNodeFromCurrentNexts(elements,elementToDeal.ElementId);
+            elementToDealList.AddRange(bpmnConfCommonElementVos);
         }
 
         if (elementToDealList.Count <= 0)

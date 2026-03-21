@@ -76,6 +76,11 @@ public class AddAssigneeProcessService: IProcessOperationAdaptor
             throw new AFBizException("顺序会签节点禁止加签!");
         }
         List<string> currentList = tasks.Select(a=>a.Assignee).ToList();
+        BpmAfExecution afExecution = _executionService.baseRepo.Where(a=>a.Id==tasks[0].ExecutionId).First();
+        if (afExecution == null)
+        {
+            throw new AFBizException(BusinessError.STATUS_ERROR,$"未能根据流程实例id:{procInstId}和任务节点key:{taskDefKey}找到当前审批任务的执行实例");
+        }
         foreach (BaseIdTranStruVo userinfo in userInfos)
         {
             if (currentList.Contains(userinfo.Id))
@@ -83,15 +88,15 @@ public class AddAssigneeProcessService: IProcessOperationAdaptor
                 throw new AFBizException("不可重复添加已存在的操作人!");
             }
 
-            BpmAfExecution bpmAfExecution = BuildExecution(bpmBusinessProcess, tasks[0], currentElementSignType);
-            BpmAfTask bpmAfTask = BuildTask(bpmBusinessProcess,tasks[0],bpmAfExecution,userinfo);
-            _executionService.baseRepo.Insert(bpmAfExecution);
+            
+            BpmAfTask bpmAfTask = BuildTask(bpmBusinessProcess,tasks[0],afExecution,userinfo);
             _afTaskService.baseRepo.Insert(bpmAfTask);
             _flowrunEntrustService.AddFlowrunEntrust(userinfo.Id,userinfo.Name,"0","管理员加签",taskDefKey,0,
                 bpmBusinessProcess.ProcInstId,bpmBusinessProcess.ProcessinessKey,vo.NodeId,2);
             _bpmvariableBizService.AddNodeAssignees(processNumber,taskDefKey,userInfos);
         }
-
+        afExecution.TaskCount = afExecution.TaskCount + userInfos.Count;
+        _executionService.baseRepo.Update(afExecution);
         
     }
 
