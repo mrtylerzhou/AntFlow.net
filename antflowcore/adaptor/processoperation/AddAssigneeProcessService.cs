@@ -1,4 +1,5 @@
 ﻿using antflowcore.constant.enus;
+using antflowcore.dto;
 using antflowcore.entity;
 using AntFlowCore.Enums;
 using antflowcore.exception;
@@ -73,7 +74,10 @@ public class AddAssigneeProcessService: IProcessOperationAdaptor
         int currentElementSignType = currentElement.SignType;
         if ((int)SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER == currentElementSignType)
         {
-            throw new AFBizException("顺序会签节点禁止加签!");
+            NodeElementDto nodeIdByElementId = _bpmvariableBizService.GetNodeIdByElementId(processNumber,taskDefKey);
+            _bpmvariableBizService.AddNodeAssignees(processNumber,taskDefKey,userInfos);
+            _deploymentService.UpdateNodeAssignee(processNumber,userInfos,nodeIdByElementId.NodeId,1);
+            return;
         }
         List<string> currentList = tasks.Select(a=>a.Assignee).ToList();
         BpmAfExecution afExecution = _executionService.baseRepo.Where(a=>a.Id==tasks[0].ExecutionId).First();
@@ -95,7 +99,8 @@ public class AddAssigneeProcessService: IProcessOperationAdaptor
                 bpmBusinessProcess.ProcInstId,bpmBusinessProcess.ProcessinessKey,vo.NodeId,2);
             _bpmvariableBizService.AddNodeAssignees(processNumber,taskDefKey,userInfos);
         }
-        afExecution.TaskCount = afExecution.TaskCount + userInfos.Count;
+       
+        afExecution.TaskCount += userInfos.Count;
         _executionService.baseRepo.Update(afExecution);
         
     }
