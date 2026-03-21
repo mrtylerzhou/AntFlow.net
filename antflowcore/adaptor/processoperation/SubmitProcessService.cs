@@ -44,6 +44,7 @@ public class SubmitProcessService: IProcessOperationAdaptor
         bpmnStartConditionsVo.ProcessNum=(businessDataVo.FormCode + "_" + businessDataVo.BusinessId);
         bpmnStartConditionsVo.EntryId=entryId;
         bpmnStartConditionsVo.BusinessId=businessDataVo.BusinessId;
+        bpmnStartConditionsVo.ApprovalEmpls=businessDataVo.ApprovalEmpls;
         if (!_bpmBusinessProcessService.CheckProcessData(entryId)) {
             throw new AFBizException("the process has already been submitted！");
         }

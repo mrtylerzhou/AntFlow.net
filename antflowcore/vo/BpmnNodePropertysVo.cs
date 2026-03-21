@@ -95,8 +95,10 @@ namespace antflowcore.vo
         public bool GroupRelation { get; set; } = true;
         [JsonPropertyName("additionalSignInfoList")]
         public List<ExtraSignInfoVo> AdditionalSignInfoList { get; set; }
-        // 默认构造函数
-        public BpmnNodePropertysVo() { }
+        
+        [JsonPropertyName("contextEmplList")]
+        public List<BaseIdTranStruVo> ContextEmplList { get; set; }
+       
         
     }
 }

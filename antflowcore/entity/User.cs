@@ -3,6 +3,9 @@ using antflowcore.vo;
 
 namespace antflowcore.entity
 {
+    /**
+     * 用户表实际上是demo表,用户改为自己的数据库时不必映射为User,只需要将自己的用户表实体转成BaseIdTranStruVo(只需要用户id和用户名)
+     */
     public class User
     {
         /// <summary>

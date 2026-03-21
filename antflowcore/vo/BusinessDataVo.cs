@@ -183,5 +183,8 @@ namespace AntFlowCore.Vo
 
         [JsonPropertyName("lfConditions")]
         public Dictionary<String,Object> LfConditions { get; set; }
+        
+        [JsonPropertyName("approvalEmpls")]
+        public List<BaseIdTranStruVo> ApprovalEmpls { get; set; }
     }
 }

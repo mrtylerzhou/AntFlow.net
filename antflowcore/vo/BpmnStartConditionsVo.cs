@@ -205,5 +205,8 @@ namespace AntFlowCore.Vo
         public List<string> TemplateMarkIds { get; set; }
         [JsonPropertyName("isPreview")]
         public bool IsPreview { get; set; }
+        
+        [JsonPropertyName("approvalEmpls")]
+        public List<BaseIdTranStruVo> ApprovalEmpls { get; set; }
     }
 }

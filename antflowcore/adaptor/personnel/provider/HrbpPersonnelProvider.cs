@@ -7,7 +7,7 @@ using AntFlowCore.Vo;
 
 namespace antflowcore.adaptor.personnel.provider;
 [NamedService(nameof(HrbpPersonnelProvider))]
-public class HrbpPersonnelProvider : AbstractMissingAssignNodeAssigneeVoProvider
+public class HrbpPersonnelProvider : AbstractDifferentStandardAssignNodeAssigneeVoProvider
 {
     private readonly IUserService _userService;
 
@@ -16,14 +16,10 @@ public class HrbpPersonnelProvider : AbstractMissingAssignNodeAssigneeVoProvider
     {
         _userService = userService;
     }
+    
 
-    public override List<BpmnNodeParamsAssigneeVo> GetAssigneeList(BpmnNodeVo bpmnNodeVo, BpmnStartConditionsVo startConditionsVo)
+    protected override List<BaseIdTranStruVo> QueryUsers(List<string> userIds)
     {
-        string startUserId = startConditionsVo.StartUserId;
-        BaseIdTranStruVo baseIdTranStruVo = _userService.QueryEmployeeHrpbByEmployeeId(startUserId);
-
-       
-        
-        return base.ProvideAssigneeList(bpmnNodeVo, new List<BaseIdTranStruVo>(){baseIdTranStruVo});
+        return _userService.QueryEmployeeHrpbsByEmployeeIds(userIds);
     }
 }

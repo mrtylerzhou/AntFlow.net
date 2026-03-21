@@ -6,7 +6,7 @@ using AntFlowCore.Vo;
 
 namespace antflowcore.adaptor.personnel.provider;
 [NamedService(nameof(DirectLeaderPersonnelProvider))]
-public class DirectLeaderPersonnelProvider : AbstractMissingAssignNodeAssigneeVoProvider
+public class DirectLeaderPersonnelProvider : AbstractDifferentStandardAssignNodeAssigneeVoProvider
 {
     private readonly IUserService _userService;
 
@@ -15,12 +15,11 @@ public class DirectLeaderPersonnelProvider : AbstractMissingAssignNodeAssigneeVo
     {
         _userService = userService;
     }
+    
 
-    public override List<BpmnNodeParamsAssigneeVo> GetAssigneeList(BpmnNodeVo bpmnNodeVo, BpmnStartConditionsVo startConditionsVo)
+    protected override List<BaseIdTranStruVo> QueryUsers(List<string> userIds)
     {
-        var startUserId = startConditionsVo.StartUserId;
-        BaseIdTranStruVo baseIdTranStruVo = _userService.QueryEmployeeDirectLeaderById(startUserId);
-      
-        return base.ProvideAssigneeList(bpmnNodeVo, new List<BaseIdTranStruVo>(){baseIdTranStruVo});
+        List<BaseIdTranStruVo> employeeDirectLeaderByIds = _userService.QueryEmployeeDirectLeaderByIds(userIds);
+        return employeeDirectLeaderByIds;
     }
 }

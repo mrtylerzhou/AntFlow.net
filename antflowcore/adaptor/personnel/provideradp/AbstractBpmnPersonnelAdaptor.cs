@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using antflowcore.adaptor.personnel.provider;
 using antflowcore.conf.di;
+using antflowcore.constant.enums;
 using antflowcore.constant.enus;
 using antflowcore.exception;
 using antflowcore.service;
@@ -77,7 +78,26 @@ namespace antflowcore.adaptor.personnel;
             }
 
             paramsVo.ParamType = (int)nodeParamTypeEnum;
-            var assigneeList = AssigneeListUniq(
+            int approvalStandard = nodeVo.ApprovalStandard;
+            if (ApprovalStandardEnum.FROM_PREV_NODE.Code == approvalStandard)
+            {
+                BpmnNodePropertysVo property = nodeVo.Property;
+                if(property==null){
+                    
+                }else
+                {
+                    BpmnNodeVo bpmnNodeVo = mapPreNodes[nodeVo.NodeId];
+                    if(bpmnNodeVo==null){
+                       
+                    }else
+                    {
+                        List<BaseIdTranStruVo> emplList = bpmnNodeVo.Property.EmplList;
+                        property.ContextEmplList = emplList;
+                    }
+                }
+            }
+            
+            List<BpmnNodeParamsAssigneeVo> assigneeList = AssigneeListUniq(
                 _bpmnPersonnelProviderService.GetAssigneeList(nodeVo, startConditionsVo));
             SetAssigneeOrList(paramsVo, assigneeList, nodeParamTypeEnum);
             SetEmployeeName(assigneeList, nodeName);

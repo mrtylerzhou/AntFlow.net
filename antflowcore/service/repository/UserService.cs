@@ -8,6 +8,7 @@ using antflowcore.exception;
 using antflowcore.service.interf.repository;
 using antflowcore.util;
 using AntFlowCore.Util;
+using antflowcore.util.Extension;
 using antflowcore.vo;
 using AntFlowCore.Vo;
 using FreeSql.Internal.Model;
@@ -45,26 +46,28 @@ public class UserService: AFBaseCurdRepositoryService<User>,IUserService
     //根据发起人查找发起人的直属领导,用户实现时不用关心函数参数哪里来的(模块太多,一口吃不了胖子,先把功能实现,用户起来,然后再逐步搞清楚)
     //这里面逻辑是:1.根据发起人Id找到发起人,t_user表里面发起人记录里面包含了发起人的直属领导的Id,然后再根据直属领导Id找到直属领导员工信息(实际上只需要Id,name两个字段)
     //实际上,用户的组织架构系统用户的直属领导可能不是这样设计的,这里只是demo, 最终只要根据发起人id拿到他的领导信息即可
-    public BaseIdTranStruVo QueryEmployeeDirectLeaderById(string startUserId)
+    public List<BaseIdTranStruVo> QueryEmployeeDirectLeaderByIds(IEnumerable<string> userIds)
     {
-        User first = baseRepo.Where(a=>a.Id==Convert.ToInt64(startUserId)).First();
-        if(first==null)
+        List<User> usersByIds = baseRepo.Where(a => userIds.Select(b => Convert.ToInt64(b)).Contains(a.Id)).ToList();
+        if(usersByIds.IsEmpty())
         {
-            throw new AFBizException($"未能根据发起人Id:{startUserId}找到发起人");
+            throw new AFBizException($"未能根据人员Id:{userIds}找到人员信息");
         }
 
-        long? leaderId = first.LeaderId;
-        if (leaderId == null)
+        List<long?> leaderIdsByEmplIds = usersByIds.Select(a=>a.LeaderId).ToList();
+        
+        if (leaderIdsByEmplIds.IsEmpty())
         {
-            throw new AFBizException("发起人没有直属领导信息,请检查发起人信息");
+            throw new AFBizException("发起人没有直属领导信息,请检查人员信息");
         }
 
-        User leader = baseRepo.Where(a => a.Id == leaderId).First();
-        if(leader==null)
+
+        List<User> leaders = baseRepo.Where(a => leaderIdsByEmplIds.Contains(a.Id)).ToList();
+        if(leaders.IsEmpty())
         {
-            throw new AFBizException($"未能根据发起人直属领导Id:{leaderId}找到发起人直属领导");
+            throw new AFBizException($"未能根据人员直属领导Id:{leaderIdsByEmplIds}找到人员直属领导");
         }
-        return leader.ToBaseIdTranStruVo();
+        return leaders.Select(a=>a.ToBaseIdTranStruVo()).ToList();
     }
 
     /// <summary>
@@ -74,26 +77,28 @@ public class UserService: AFBaseCurdRepositoryService<User>,IUserService
     /// <returns></returns>
     /// <exception cref="AFBizException"></exception>
     
-    public BaseIdTranStruVo QueryEmployeeHrpbByEmployeeId(string startUserId)
+    public List<BaseIdTranStruVo> QueryEmployeeHrpbsByEmployeeIds(IEnumerable<string> userIds)
     {
-        User first = baseRepo.Where(a=>a.Id==Convert.ToInt64(startUserId)).First();
-        if(first==null)
+        List<User> usersByIds = baseRepo.Where(a => userIds.Select(b => Convert.ToInt64(b)).Contains(a.Id)).ToList();
+        if(usersByIds.IsEmpty())
         {
-            throw new AFBizException($"未能根据发起人Id:{startUserId}找到发起人");
+            throw new AFBizException($"未能根据人员Id:{userIds}找到人员信息");
         }
 
-        long? hrbpId = first.HrbpId;
-        if (hrbpId == null)
+        List<long?> hrbpIdsByEmplIds = usersByIds.Select(a=>a.HrbpId).ToList();
+        
+        if (hrbpIdsByEmplIds.IsEmpty())
         {
-            throw new AFBizException("发起人没有hrbp信息,请检查发起人信息");
+            throw new AFBizException("发起人没有hrbp信息,请检查人员信息");
         }
 
-        User hrbp = baseRepo.Where(a=>a.Id==hrbpId).First();
-        if(hrbp==null)
+
+        List<User> hrbpList = baseRepo.Where(a => hrbpIdsByEmplIds.Contains(a.Id)).ToList();
+        if(hrbpList.IsEmpty())
         {
-            throw new AFBizException($"未能根据发起人hrbpId:{hrbpId}找到发起人hrbp");
+            throw new AFBizException($"未能根据人员直属领导Id:{hrbpIdsByEmplIds}找到人员直属领导");
         }
-        return hrbp.ToBaseIdTranStruVo();
+        return hrbpList.Select(a=>a.ToBaseIdTranStruVo()).ToList();
     }
 
     /// <summary>
@@ -240,7 +245,7 @@ public class UserService: AFBaseCurdRepositoryService<User>,IUserService
         Expression<Func<User, bool>> expression = a => 1 == 1;
         if (!string.IsNullOrEmpty(taskMgmtVo?.Description))
         {
-            expression=expression.And(a=>a.Name.Contains(taskMgmtVo.Description));
+            expression=LambadaExpressionExtensions.And(expression, a=>a.Name.Contains(taskMgmtVo.Description));
         }
 
         BasePagingInfo basePagingInfo = page.ToPagingInfo();

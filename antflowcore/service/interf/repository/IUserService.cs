@@ -10,9 +10,9 @@ public interface IUserService
 {
     List<BaseIdTranStruVo> QueryUserByIds(IEnumerable<String> userIds);
     BaseIdTranStruVo QueryUserById(string userId);
-    BaseIdTranStruVo QueryEmployeeDirectLeaderById(string startUserId);
+    List<BaseIdTranStruVo> QueryEmployeeDirectLeaderByIds(IEnumerable<string> userIds);
     List<BaseIdTranStruVo> QueryLeadersByEmployeeIdAndGrade(String employeeId, int grade);
-    BaseIdTranStruVo QueryEmployeeHrpbByEmployeeId(string startUserId);
+    List<BaseIdTranStruVo> QueryEmployeeHrpbsByEmployeeIds(IEnumerable<string> userIds);
     List<BaseIdTranStruVo> QueryLeadersByEmployeeIdAndTier(String employeeId, int tier);
     BaseIdTranStruVo QueryLeaderByEmployeeIdAndLevel(string startUserId, int assignLevelGrade);
     Dictionary<string, string> ProvideRoleEmployeeInfo(List<string> roleIds);
