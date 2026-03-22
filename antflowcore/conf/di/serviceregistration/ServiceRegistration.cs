@@ -7,6 +7,7 @@ using antflowcore.adaptor.nodetypecondition.judge;
 using antflowcore.adaptor.personnel;
 using antflowcore.adaptor.personnel.businesstableadp;
 using antflowcore.adaptor.personnel.provider;
+using antflowcore.adaptor.personnel.provideradp;
 using antflowcore.adaptor.processoperation;
 using antflowcore.adaptor.variable;
 using antflowcore.aop;
@@ -154,6 +155,7 @@ public static class ServiceRegistration
         services.AddSingleton<UserPointedPersonnelProvider>();
         services.AddSingleton<BusinessTablePersonnelProvider>();
         services.AddSingleton<FormRelatedPersonnelProvider>();
+        services.AddSingleton<DepartmentLeaderPersonnelProvider>();
         
         
         services.AddSingleton<IBpmnPersonnelProviderService, DirectLeaderPersonnelProvider>();
@@ -167,6 +169,7 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmnPersonnelProviderService, UserPointedPersonnelProvider>();
         services.AddSingleton<IBpmnPersonnelProviderService, BusinessTablePersonnelProvider>();
         services.AddSingleton<IBpmnPersonnelProviderService, FormRelatedPersonnelProvider>();
+        services.AddSingleton<IBpmnPersonnelProviderService, DepartmentLeaderPersonnelProvider>();
         services.AddSingleton<IBpmnProcessAdminProvider, ProcessAddminProvider>();
         #endregion
         
@@ -183,6 +186,7 @@ public static class ServiceRegistration
         services.AddSingleton<AbstractBpmnPersonnelAdaptor, UserPointedPersonnelAdaptor>();
         services.AddSingleton<AbstractBpmnPersonnelAdaptor, BusinessTablePersonnelAdaptor>();
         services.AddSingleton<AbstractBpmnPersonnelAdaptor, FormRelatedPersonnelAdaptor>();
+        services.AddSingleton<AbstractBpmnPersonnelAdaptor, DepartmentLeaderPersonnelAdaptor>();
 
 
         services.AddSingleton<IBpmnNodeConditionsAdaptor, BpmnNodeConditionsAccountTypeAdaptor>();
@@ -223,6 +227,7 @@ public static class ServiceRegistration
         services.AddSingleton<IAdaptorService, NodeTypeConditionsAdaptor>();
         services.AddSingleton<IAdaptorService, NodePropertyCustomizeAdaptor>();
         services.AddSingleton<IAdaptorService, NodePropertyFormRelatedAdaptor>();
+        services.AddSingleton<IAdaptorService, NodePropertyDepartmentLeaderAdaptor>();
         
         
         
@@ -237,6 +242,7 @@ public static class ServiceRegistration
         services.AddSingleton<IAdaptorService, BpmnElementRoleAdaptor>();
         services.AddSingleton<IAdaptorService, BpmnElementStartUserAdaptor>();
         services.AddSingleton<IAdaptorService, BpmnElementFormRelatedAdaptor>();
+        services.AddSingleton<IAdaptorService, BpmnElementDepartmentLeaderAdaptor>();
 
         services.AddSingleton<IBpmnAddFlowElementAdaptor, BpmnAddFlowElementSingleAdaptor>();
         services.AddSingleton<IBpmnAddFlowElementAdaptor, BpmnAddFlowElementLoopAdaptor>();

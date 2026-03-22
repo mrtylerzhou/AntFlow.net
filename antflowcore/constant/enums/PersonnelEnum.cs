@@ -11,6 +11,7 @@ public enum PersonnelEnum
         OUT_SIDE_ACCESS_PERSONNEL,
         START_USER_PERSONNEL,
         DIRECT_LEADER_PERSONNEL,
+        DEPARTMENT_LEADER_PERSONNEL,
         BUSINESS_TABLE_PERSONNEL,
         FORM_USERS_PERSONNEL
     }
@@ -29,6 +30,7 @@ public enum PersonnelEnum
             { PersonnelEnum.OUT_SIDE_ACCESS_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_OUT_SIDE_ACCESS, "外部传入人员") },
             { PersonnelEnum.START_USER_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_START_USER, "发起人自己") },
             { PersonnelEnum.DIRECT_LEADER_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_DIRECT_LEADER, "直属领导") },
+            { PersonnelEnum.DEPARTMENT_LEADER_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_DEPARTMENT_LEADER, "部门负责人") },
             { PersonnelEnum.BUSINESS_TABLE_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_BUSINESSTABLE, "关联业务表") },
             { PersonnelEnum.FORM_USERS_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_FORM_RELATED, "表单上下文人员") }
         };
