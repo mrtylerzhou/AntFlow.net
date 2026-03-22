@@ -20,4 +20,10 @@ public class BaseNumIdStruVo
         Id = id;
         Name = name;
     }
+    public BaseNumIdStruVo(long id, string name,bool active)
+    {
+        Id = id;
+        Name = name;
+        Active = active;
+    }
 }

@@ -98,7 +98,19 @@ namespace antflowcore.vo
         
         [JsonPropertyName("contextEmplList")]
         public List<BaseIdTranStruVo> ContextEmplList { get; set; }
-       
-        
+
+        /// <summary>
+        /// 表单关联人员属性类型
+        /// </summary>
+        [JsonPropertyName("formAssigneeProperty")]
+        public int? FormAssigneeProperty { get; set; }
+
+        /// <summary>
+        /// 表单元素信息列表
+        /// </summary>
+        [JsonPropertyName("formInfos")]
+        public List<BaseIdTranStruVo> FormInfos { get; set; }
+
+
     }
 }

@@ -1,5 +1,6 @@
 ﻿using antflowcore.adaptor;
 using antflowcore.adaptor.bpmnelementadp;
+using antflowcore.adaptor.bpmnnodeadp;
 using antflowcore.adaptor.bpmnprocessnotice;
 using antflowcore.adaptor.nodetypecondition;
 using antflowcore.adaptor.nodetypecondition.judge;
@@ -218,6 +219,7 @@ public static class ServiceRegistration
         services.AddSingleton<IAdaptorService, NodePropertyStartUserAdaptor>();
         services.AddSingleton<IAdaptorService, NodeTypeConditionsAdaptor>();
         services.AddSingleton<IAdaptorService, NodePropertyCustomizeAdaptor>();
+        services.AddSingleton<IAdaptorService, NodePropertyFormRelatedAdaptor>();
         
         
         
@@ -279,6 +281,7 @@ public static class ServiceRegistration
         services.AddSingleton<RemoveAssigneeProcessService>();
         services.AddSingleton<BpmBusinessDraftService>();
         services.AddSingleton<BpmProcessDraftBizService>();
+        services.AddSingleton<BpmnNodeFormRelatedUserConfService>();
 
         services.AddSingleton<AFDeploymentService>();
         services.AddSingleton<AfTaskInstService>();

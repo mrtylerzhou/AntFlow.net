@@ -1392,6 +1392,23 @@ public static class FreesqlFluentConfiguration
                    a.Property(b => b.IsDel).Name("is_del");
                    a.Property(b => b.UpdateTime).Name("update_time");
                    a.Property(b => b.TenantId).Name("tenant_id");
+               }).ConfigEntity<BpmnNodeFormRelatedUserConf>(a =>
+               {
+                   a.Name("t_bpmn_node_form_related_user_conf");
+                   
+                   a.Property(b => b.Id).IsPrimary(true).IsIdentity(true);
+                   a.Property(b => b.BpmnNodeId).Name("bpmn_node_id");
+                   a.Property(b => b.ValueJson).Name("value_json");
+                   a.Property(b => b.SignType).Name("sign_type");
+                   a.Property(b => b.ValueType).Name("value_type");
+                   a.Property(b => b.ValueTypeName).Name("value_type_name");
+                   a.Property(b => b.Remark).Name("remark");
+                   a.Property(b => b.IsDel).Name("is_del");
+                   a.Property(b => b.TenantId).Name("tenant_id");
+                   a.Property(b => b.CreateUser).Name("create_user");
+                   a.Property(b => b.CreateTime).Name("create_time");
+                   a.Property(b => b.UpdateUser).Name("update_user");
+                   a.Property(b => b.UpdateTime).Name("update_time");
                });
     }
 }
