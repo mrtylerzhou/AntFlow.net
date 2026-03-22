@@ -64,7 +64,8 @@ public class NodePropertyFormRelatedAdaptor : AbstractCommonBpmnNodeAdaptor<Bpmn
             CreateUser = SecurityUtils.GetLogInEmpName(),
             CreateTime = DateTime.Now,
             UpdateUser = SecurityUtils.GetLogInEmpName(),
-            UpdateTime = DateTime.Now
+            UpdateTime = DateTime.Now,
+            IsDel = 0,
         };
 
         return new List<BpmnNodeFormRelatedUserConf> { entity };

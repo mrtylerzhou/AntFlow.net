@@ -207,6 +207,26 @@ CREATE TABLE if not exists `bpm_flowrun_entrust`
     COMMENT ='entrust and forward view conf table';
 
 
+DROP TABLE IF EXISTS t_bpmn_node_form_related_user_conf;
+create table t_bpmn_node_form_related_user_conf
+(
+    id              bigint auto_increment comment 'auto incr id'
+        primary key,
+    bpmn_node_id    bigint                                 not null comment 'node id',
+    value_json      varchar(3000)                          not null comment 'value as json array',
+    sign_type       int                                    not null comment 'sign type 1 all sign,2 or sign',
+    value_type      int                            not null comment 'value type see NodeFormAssigneePropertyEnum',
+    value_type_name varchar(64)                            not null comment 'value type name',
+    remark          varchar(255)                           null comment 'remark',
+    is_del          tinyint      default 0                 not null comment '0:normal,1:deleted',
+    tenant_id       varchar(255) default ''                not null comment 'tenantId',
+    create_user     varchar(50)                            not null comment 'create user',
+    create_time     timestamp    default CURRENT_TIMESTAMP not null comment 'create time',
+    update_user     varchar(50)                            null comment 'update user',
+    update_time     timestamp    default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment 'update time'
+)
+    comment 'specified role approver configs';
+
 CREATE TABLE if not exists `bpm_flowruninfo`
 (
     `id`            bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',

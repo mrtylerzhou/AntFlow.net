@@ -30,7 +30,8 @@ public static class MapperUtil
          CreateUser = entity.CreateUser,
          CreateTime = entity.CreateTime,
          UpdateUser = entity.UpdateUser,
-         UpdateTime = entity.UpdateTime
+         UpdateTime = entity.UpdateTime,
+         ExtraFlags = entity.ExtraFlags,
       };
    }
 
