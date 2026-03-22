@@ -40,6 +40,7 @@ public class SubmitProcessService: IProcessOperationAdaptor
         formAdapter.OnSubmitData(businessDataVo);
         String entryId = businessDataVo.EntityName + ":" + businessDataVo.BusinessId;
         BpmnStartConditionsVo bpmnStartConditionsVo = formAdapter.PreviewSetCondition(businessDataVo);
+        bpmnStartConditionsVo.BusinessDataVo = businessDataVo;
         bpmnStartConditionsVo.ApproversList = businessDataVo.ApproversList;
         bpmnStartConditionsVo.ProcessNum=(businessDataVo.FormCode + "_" + businessDataVo.BusinessId);
         bpmnStartConditionsVo.EntryId=entryId;

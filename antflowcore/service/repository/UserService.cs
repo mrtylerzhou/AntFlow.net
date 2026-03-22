@@ -102,6 +102,51 @@ public class UserService: AFBaseCurdRepositoryService<User>,IUserService
     }
 
     /// <summary>
+    /// 查找用户所在部门的负责人,如果用户系统里没有这个概念,可以不用,忽略掉这个方法即可
+    /// </summary>
+    public List<BaseIdTranStruVo> QueryDepartmentLeaderByIds(IEnumerable<string> userIds)
+    {
+        List<long> userIdLongList = userIds.Select(b => Convert.ToInt64(b)).ToList();
+        List<User> usersByIds = baseRepo.Where(a => userIdLongList.Contains(a.Id)).ToList();
+        if (usersByIds.IsEmpty())
+        {
+            throw new AFBizException($"未能根据人员Id:{string.Join(",", userIds)}找到人员信息");
+        }
+
+        // 获取用户所在部门ID
+        List<long?> departmentIds = usersByIds.Select(a => a.DepartmentId).Distinct().ToList();
+        if (departmentIds.IsEmpty())
+        {
+            throw new AFBizException("用户没有部门信息,请检查人员信息");
+        }
+
+        // 查询部门负责人
+        List<Department> departments = _departmentService.baseRepo
+            .Where(a => departmentIds.Contains(a.Id))
+            .ToList();
+        
+        if (departments.IsEmpty())
+        {
+            throw new AFBizException($"未能根据部门Id:{string.Join(",", departmentIds)}找到部门信息");
+        }
+
+        // 获取部门负责人ID
+        List<long?> leaderIds = departments.Select(a => a.LeaderId).Where(a => a != null).ToList();
+        if (leaderIds.IsEmpty())
+        {
+            throw new AFBizException("部门没有负责人信息,请检查部门信息");
+        }
+
+        List<User> leaders = baseRepo.Where(a => leaderIds.Contains(a.Id)).ToList();
+        if (leaders.IsEmpty())
+        {
+            throw new AFBizException($"未能根据负责人Id:{string.Join(",", leaderIds)}找到负责人");
+        }
+
+        return leaders.Select(a => a.ToBaseIdTranStruVo()).ToList();
+    }
+
+    /// <summary>
     /// 查找用户指定层级的领导,比如用户有直属领导,上上级领导,上上上级领导.这样就可以做成层级(grade)
     /// </summary>
     /// <param name="employeeId"></param>

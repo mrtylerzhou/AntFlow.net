@@ -208,5 +208,11 @@ namespace AntFlowCore.Vo
         
         [JsonPropertyName("approvalEmpls")]
         public List<BaseIdTranStruVo> ApprovalEmpls { get; set; }
+        
+        /// <summary>
+        /// 业务数据VO
+        /// </summary>
+        [JsonPropertyName("businessDataVo")]
+        public BusinessDataVo BusinessDataVo { get; set; }
     }
 }

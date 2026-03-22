@@ -13,6 +13,7 @@ public interface IUserService
     List<BaseIdTranStruVo> QueryEmployeeDirectLeaderByIds(IEnumerable<string> userIds);
     List<BaseIdTranStruVo> QueryLeadersByEmployeeIdAndGrade(String employeeId, int grade);
     List<BaseIdTranStruVo> QueryEmployeeHrpbsByEmployeeIds(IEnumerable<string> userIds);
+    List<BaseIdTranStruVo> QueryDepartmentLeaderByIds(IEnumerable<string> userIds);
     List<BaseIdTranStruVo> QueryLeadersByEmployeeIdAndTier(String employeeId, int tier);
     BaseIdTranStruVo QueryLeaderByEmployeeIdAndLevel(string startUserId, int assignLevelGrade);
     Dictionary<string, string> ProvideRoleEmployeeInfo(List<string> roleIds);

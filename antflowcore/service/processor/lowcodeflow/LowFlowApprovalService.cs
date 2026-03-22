@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using antflowcore.adaptor;
@@ -31,6 +32,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
     private readonly BpmnConfLfFormdataService _lfformdataService;
     private readonly BpmnConfLfFormdataFieldService _lfformdataFieldService;
     private readonly BpmnNodeLfFormdataFieldControlService _bpmnNodeLfFormdataFieldControlService;
+    private readonly BpmnNodeFormRelatedUserConfService _bpmnNodeFormRelatedUserConfService;
 
     private static Dictionary<long, List<String>> conditionFieldNameMap = new Dictionary<long, List<string>>();
 
@@ -42,14 +44,16 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         LFMainFieldService lfMainFieldService,
         BpmnConfLfFormdataService lfformdataService,
         BpmnConfLfFormdataFieldService lfformdataFieldService,
-        BpmnNodeLfFormdataFieldControlService _bpmnNodeLfFormdataFieldControlService)
+        BpmnNodeLfFormdataFieldControlService bpmnNodeLfFormdataFieldControlService,
+        BpmnNodeFormRelatedUserConfService bpmnNodeFormRelatedUserConfService)
     {
         _logger = logger;
         _mainService = mainService;
         _lfMainFieldService = lfMainFieldService;
         _lfformdataService = lfformdataService;
         _lfformdataFieldService = lfformdataFieldService;
-        this._bpmnNodeLfFormdataFieldControlService = _bpmnNodeLfFormdataFieldControlService;
+        _bpmnNodeLfFormdataFieldControlService = bpmnNodeLfFormdataFieldControlService;
+        _bpmnNodeFormRelatedUserConfService = bpmnNodeFormRelatedUserConfService;
     }
 
     public BpmnStartConditionsVo PreviewSetCondition(UDLFApplyVo vo)
@@ -304,6 +308,56 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         vo.BusinessId = mainId.ToString();
         vo.ProcessDigest = vo.Remark;
         vo.EntityName = nameof(LowFlowApprovalService);
+
+        // 处理表单关联审批人
+        int? extraFlags = vo.BpmnConfVo.ExtraFlags;
+        if (extraFlags != null && BpmnConfFlagsEnum.HasFlag(extraFlags, BpmnConfFlagsEnum.HAS_FORM_RELATED_ASSIGNEES))
+        {
+            List<BpmnNodeFormRelatedUserConf> bpmnNodeFormRelatedUserConfs = _bpmnNodeFormRelatedUserConfService.QueryByConfId(confId);
+            if (bpmnNodeFormRelatedUserConfs == null || !bpmnNodeFormRelatedUserConfs.Any())
+            {
+                throw new AFBizException("无法从数据库获取表单关联审批人配置");
+            }
+
+            Dictionary<string, List<string>> node2formRelatedAssignees = new Dictionary<string, List<string>>();
+            foreach (var conf in bpmnNodeFormRelatedUserConfs)
+            {
+                long bpmnNodeId = conf.BpmnNodeId;
+                string valueJson = conf.ValueJson;
+                if (string.IsNullOrEmpty(valueJson))
+                {
+                    throw new AFBizException("表单关联审批人配置值不能为空");
+                }
+
+                List<BaseIdTranStruVo> formInfos = JsonSerializer.Deserialize<List<BaseIdTranStruVo>>(valueJson) ?? new List<BaseIdTranStruVo>();
+                List<string> formValues = new List<string>();
+
+                foreach (var formInfo in formInfos)
+                {
+                    string formName = formInfo.Id;
+                    // 用于存储人员相关的表单一般是下拉框，值可能是单个，也可能是数组
+                    if (lfFields.TryGetValue(formName, out var formVal))
+                    {
+                        if (formVal is IEnumerable enumerable && !(formVal is string))
+                        {
+                            foreach (var bValue in enumerable)
+                            {
+                                formValues.Add(bValue?.ToString() ?? "");
+                            }
+                        }
+                        else
+                        {
+                            formValues.Add(formVal?.ToString() ?? "");
+                        }
+                    }
+                }
+
+                node2formRelatedAssignees[bpmnNodeId.ToString()] = formValues;
+            }
+
+            vo.Node2formRelatedAssignees = node2formRelatedAssignees;
+        }
+
         IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
         foreach (var o in lfFormOperationAdaptors)
         {

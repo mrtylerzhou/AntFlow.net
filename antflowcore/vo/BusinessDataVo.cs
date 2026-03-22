@@ -186,5 +186,12 @@ namespace AntFlowCore.Vo
         
         [JsonPropertyName("approvalEmpls")]
         public List<BaseIdTranStruVo> ApprovalEmpls { get; set; }
+        
+        /// <summary>
+        /// 节点到表单关联审批人的映射
+        /// key: bpmnNodeId, value: 审批人ID列表
+        /// </summary>
+        [JsonPropertyName("node2formRelatedAssignees")]
+        public Dictionary<string, List<string>> Node2formRelatedAssignees { get; set; }
     }
 }

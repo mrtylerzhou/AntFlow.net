@@ -102,6 +102,7 @@ public class OutSideAccessSubmitProcessService : IProcessOperationAdaptor
         bpmnStartConditionsVo.EmbedNodes = businessDataVo.EmbedNodes;
         bpmnStartConditionsVo.OutSideLevelNodes = businessDataVo.OutSideLevelNodes;
         bpmnStartConditionsVo.IsOutSideAccessProc = true;
+        bpmnStartConditionsVo.BusinessDataVo = businessDataVo;
 
         // Set process title
         string processTitlePrefix;

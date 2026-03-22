@@ -8,10 +8,11 @@
         public static readonly BpmnConfFlagsEnum HAS_DYNAMIC_CONDITIONS = new BpmnConfFlagsEnum(0b100, "是否包含动态条件");
         public static readonly BpmnConfFlagsEnum HAS_COPY = new BpmnConfFlagsEnum(0b1000, "是否包含抄送");
         public static readonly BpmnConfFlagsEnum HAS_LAST_NODE_COPY = new BpmnConfFlagsEnum(0b10000, "最后一个节点是否包含抄送");
+        public static readonly BpmnConfFlagsEnum HAS_FORM_RELATED_ASSIGNEES = new BpmnConfFlagsEnum(0b100000, "是否包含表单关联审批人");
 
         private static readonly List<BpmnConfFlagsEnum> _allFlags = new List<BpmnConfFlagsEnum>
         {
-            NOTHING, HAS_NODE_LABELS, HAS_STARTUSER_CHOOSE_MODULES, HAS_DYNAMIC_CONDITIONS, HAS_COPY, HAS_LAST_NODE_COPY
+            NOTHING, HAS_NODE_LABELS, HAS_STARTUSER_CHOOSE_MODULES, HAS_DYNAMIC_CONDITIONS, HAS_COPY, HAS_LAST_NODE_COPY, HAS_FORM_RELATED_ASSIGNEES
         };
 
         public int Code { get; }
