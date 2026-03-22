@@ -8,6 +8,8 @@ using antflowcore.exception;
 using antflowcore.service.biz;
 using antflowcore.service.repository;
 using antflowcore.util;
+using antflowcore.util.Extension;
+using antflowcore.vo;
 using AntFlowCore.Vo;
 
 namespace antflowcore.adaptor.processoperation;
@@ -21,6 +23,7 @@ public class RemoveCurrentNodeProcessService: IProcessOperationAdaptor
     private readonly BpmBusinessProcessService _bpmBusinessProcessService;
     private readonly BpmvariableBizService _bpmvariableBizService;
     private readonly BpmVerifyInfoService _verifyInfoService;
+    private readonly AFDeploymentService _deploymentService;
 
     public RemoveCurrentNodeProcessService(
         AFTaskService afTaskService,
@@ -29,7 +32,8 @@ public class RemoveCurrentNodeProcessService: IProcessOperationAdaptor
         TaskMgmtService taskMgmtService,
         BpmBusinessProcessService bpmBusinessProcessService,
         BpmvariableBizService bpmvariableBizService,
-        BpmVerifyInfoService verifyInfoService)
+        BpmVerifyInfoService verifyInfoService,
+        AFDeploymentService deploymentService)
     {
         _afTaskService = afTaskService;
         _taskService = taskService;
@@ -38,6 +42,7 @@ public class RemoveCurrentNodeProcessService: IProcessOperationAdaptor
         _bpmBusinessProcessService = bpmBusinessProcessService;
         _bpmvariableBizService = bpmvariableBizService;
         _verifyInfoService = verifyInfoService;
+        _deploymentService = deploymentService;
     }
 
     public void DoProcessButton(BusinessDataVo vo)
@@ -83,6 +88,21 @@ public class RemoveCurrentNodeProcessService: IProcessOperationAdaptor
         // 获取当前节点ID
         NodeElementDto nodeElementDto = _bpmvariableBizService.GetNodeIdByElementId(processNumber, taskDefKey);
         string nodeId = nodeElementDto.NodeId;
+
+        // 获取流程定义，判断当前节点的签收类型
+        List<BpmnConfCommonElementVo> elements = _deploymentService.GetDeploymentByProcessNumber(processNumber);
+        if (elements.IsEmpty())
+        {
+            throw new AFBizException($"未能根据流程编号找到流程定义!{processNumber}");
+        }
+        BpmnConfCommonElementVo currentElement = BpmnFlowUtil.GetCurrentTaskElement(elements, taskDefKey);
+        if (currentElement == null)
+        {
+            throw new AFBizException($"未能根据节点elementId找到节点定义:{taskDefKey}");
+        }
+
+        int currentElementSignType = currentElement.SignType;
+        bool isSignInOrder = (int)SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER == currentElementSignType;
 
         // 如果当前节点有多个任务（多人审批），删除除最后一个之外的其他任务
         if (bpmAfTasks.Count > 1)
@@ -135,6 +155,19 @@ public class RemoveCurrentNodeProcessService: IProcessOperationAdaptor
             TenantId = MultiTenantUtil.GetCurrentTenantId(),
         };
         _verifyInfoService.AddVerifyInfo(bpmVerifyInfo);
+
+        // 如果是顺序会签，需要修改流程定义为"跳过"，防止complete后继续生成其他顺序审批人任务
+        if (isSignInOrder)
+        {
+            List<BaseInfoTranStructVo> assigneesToRemove = nodeElementDto.AssigneeInfoList.Where(a=>a.Id!=lastTask.Assignee).ToList();
+            List<string> assigneeIds = assigneesToRemove.Select(a => a.Id).ToList();
+            _bpmvariableBizService.InvalidNodeAssignees(assigneeIds, processNumber, nodeElementDto.IsSingle);
+            List<BaseIdTranStruVo> baseIdTranStruVos = assigneesToRemove
+                .Select(a=>(BaseIdTranStruVo)a)
+                .Where(a=>a.Id!=lastTask.Assignee)
+                .ToList();
+            _deploymentService.UpdateNodeAssignee(processNumber, baseIdTranStruVos, nodeId, 2);
+        }
 
         _taskService.Complete(lastTask);
     }
