@@ -227,6 +227,30 @@ create table t_bpmn_node_form_related_user_conf
 )
     comment 'specified role approver configs';
 
+DROP TABLE IF EXISTS t_bpmn_node_udr_conf;
+create table t_bpmn_node_udr_conf
+(
+    id              bigint auto_increment comment 'auto incr id'
+        primary key,
+    bpmn_node_id    bigint                                 not null comment 'node id',
+    value_json      varchar(3000)                          not null comment 'value as json array',
+    sign_type       int                                    not null comment 'sign type 1 all sign,2 or sign',
+    udr_property varchar(255)                                not null,
+    urd_property_name varchar(255)                           null,
+    ext1  varchar(255) comment 'customize field 1',
+    ext2  varchar(255) comment 'customize field 1',
+    ext3  varchar(255) comment 'customize field 1',
+    ext4  varchar(255) comment 'customize field 1',
+    remark          varchar(255)                           null comment 'remark',
+    is_del          tinyint      default 0                 not null comment '0:normal,1:deleted',
+    tenant_id       varchar(255) default ''                not null comment 'tenantId',
+    create_user     varchar(50)                            not null comment 'create user',
+    create_time     timestamp    default CURRENT_TIMESTAMP not null comment 'create time',
+    update_user     varchar(50)                            null comment 'update user',
+    update_time     timestamp    default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment 'update time'
+)
+    comment 'user custom assignee rule config,udr for user defined rules';
+
 CREATE TABLE if not exists `bpm_flowruninfo`
 (
     `id`            bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',

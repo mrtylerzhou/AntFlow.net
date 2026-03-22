@@ -90,7 +90,9 @@ public class OutSideAccessSubmitProcessService : IProcessOperationAdaptor
         bpmnStartConditionsVo.OutSideType = businessDataVo.OutSideType;
         bpmnStartConditionsVo.BusinessId = businessDataVo.BusinessId;
         bpmnStartConditionsVo.StartUserId = businessDataVo.StartUserId;
-
+        bpmnStartConditionsVo.ApprovalEmpls = businessDataVo.ApprovalEmpls;
+        bpmnStartConditionsVo.IsLowCodeFlow =
+            businessDataVo.IsLowCodeFlow.HasValue && businessDataVo.IsLowCodeFlow == 1;
         // Set approvers list
         bpmnStartConditionsVo.ApproversList = businessDataVo.ApproversList ?? new Dictionary<string, List<BaseIdTranStruVo>>();
 

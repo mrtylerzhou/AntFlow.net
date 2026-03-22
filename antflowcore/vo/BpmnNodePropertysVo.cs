@@ -111,6 +111,41 @@ namespace antflowcore.vo
         [JsonPropertyName("formInfos")]
         public List<BaseIdTranStruVo> FormInfos { get; set; }
 
+        /// <summary>
+        /// 自定义规则审批人属性（自定义规则类型标识，如zdysp1表示指定人员）
+        /// </summary>
+        [JsonPropertyName("udrAssigneeProperty")]
+        public BaseIdTranStruVo UdrAssigneeProperty { get; set; }
+
+        /// <summary>
+        /// 自定义规则值JSON（如指定的用户ID列表等，运行时由用户自定义）
+        /// </summary>
+        [JsonPropertyName("udrValueJson")]
+        public string UdrValueJson { get; set; }
+
+        /// <summary>
+        /// 自定义扩展字段1
+        /// </summary>
+        [JsonPropertyName("ext1")]
+        public string Ext1 { get; set; }
+
+        /// <summary>
+        /// 自定义扩展字段2
+        /// </summary>
+        [JsonPropertyName("ext2")]
+        public string Ext2 { get; set; }
+
+        /// <summary>
+        /// 自定义扩展字段3
+        /// </summary>
+        [JsonPropertyName("ext3")]
+        public string Ext3 { get; set; }
+
+        /// <summary>
+        /// 自定义扩展字段4
+        /// </summary>
+        [JsonPropertyName("ext4")]
+        public string Ext4 { get; set; }
 
     }
 }

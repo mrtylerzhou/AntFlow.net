@@ -157,6 +157,7 @@ public static class ServiceRegistration
         services.AddSingleton<FormRelatedPersonnelProvider>();
         services.AddSingleton<DepartmentLeaderPersonnelProvider>();
         services.AddSingleton<ApprovedUserPersonnelProvider>();
+        services.AddSingleton<UDRPersonnelProvider>();
         
         
         services.AddSingleton<IBpmnPersonnelProviderService, DirectLeaderPersonnelProvider>();
@@ -172,6 +173,7 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmnPersonnelProviderService, FormRelatedPersonnelProvider>();
         services.AddSingleton<IBpmnPersonnelProviderService, DepartmentLeaderPersonnelProvider>();
         services.AddSingleton<IBpmnPersonnelProviderService, ApprovedUserPersonnelProvider>();
+        services.AddSingleton<IBpmnPersonnelProviderService, UDRPersonnelProvider>();
         services.AddSingleton<IBpmnProcessAdminProvider, ProcessAddminProvider>();
         #endregion
         
@@ -190,6 +192,7 @@ public static class ServiceRegistration
         services.AddSingleton<AbstractBpmnPersonnelAdaptor, FormRelatedPersonnelAdaptor>();
         services.AddSingleton<AbstractBpmnPersonnelAdaptor, DepartmentLeaderPersonnelAdaptor>();
         services.AddSingleton<AbstractBpmnPersonnelAdaptor, ApprovedUsersPersonnelAdaptor>();
+        services.AddSingleton<AbstractBpmnPersonnelAdaptor, UDRPersonnelAdaptor>();
 
 
         services.AddSingleton<IBpmnNodeConditionsAdaptor, BpmnNodeConditionsAccountTypeAdaptor>();
@@ -232,6 +235,7 @@ public static class ServiceRegistration
         services.AddSingleton<IAdaptorService, NodePropertyFormRelatedAdaptor>();
         services.AddSingleton<IAdaptorService, NodePropertyDepartmentLeaderAdaptor>();
         services.AddSingleton<IAdaptorService, NodePropertyApprovedUsersAdaptor>();
+        services.AddSingleton<IAdaptorService, NodePropertyUDRAdaptor>();
         
         
         
@@ -248,6 +252,7 @@ public static class ServiceRegistration
         services.AddSingleton<IAdaptorService, BpmnElementFormRelatedAdaptor>();
         services.AddSingleton<IAdaptorService, BpmnElementDepartmentLeaderAdaptor>();
         services.AddSingleton<IAdaptorService, BpmnElementApprovedUsersAdaptor>();
+        services.AddSingleton<IAdaptorService, BpmnElementUDRAdaptor>();
 
         services.AddSingleton<IBpmnAddFlowElementAdaptor, BpmnAddFlowElementSingleAdaptor>();
         services.AddSingleton<IBpmnAddFlowElementAdaptor, BpmnAddFlowElementLoopAdaptor>();
@@ -297,6 +302,7 @@ public static class ServiceRegistration
         services.AddSingleton<BpmBusinessDraftService>();
         services.AddSingleton<BpmProcessDraftBizService>();
         services.AddSingleton<BpmnNodeFormRelatedUserConfService>();
+        services.AddSingleton<BpmnNodeUDRConfService>();
 
         services.AddSingleton<AFDeploymentService>();
         services.AddSingleton<AfTaskInstService>();

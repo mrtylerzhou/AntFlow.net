@@ -14,7 +14,8 @@ public enum PersonnelEnum
         DEPARTMENT_LEADER_PERSONNEL,
         APPROVED_USERS_PERSONNEL,
         BUSINESS_TABLE_PERSONNEL,
-        FORM_USERS_PERSONNEL
+        FORM_USERS_PERSONNEL,
+        UDR_USERS_PERSONNEL
     }
 
     public static class PersonnelEnumExtensions
@@ -34,7 +35,8 @@ public enum PersonnelEnum
             { PersonnelEnum.DEPARTMENT_LEADER_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_DEPARTMENT_LEADER, "部门负责人") },
             { PersonnelEnum.APPROVED_USERS_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_APPROVED_USERS, "被审批人自己") },
             { PersonnelEnum.BUSINESS_TABLE_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_BUSINESSTABLE, "关联业务表") },
-            { PersonnelEnum.FORM_USERS_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_FORM_RELATED, "表单上下文人员") }
+            { PersonnelEnum.FORM_USERS_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_FORM_RELATED, "表单上下文人员") },
+            { PersonnelEnum.UDR_USERS_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_ZDY_RULES, "用户自定义规则人员") }
         };
 
         public static NodePropertyEnum GetNodeProperty(this PersonnelEnum personnelEnum)
