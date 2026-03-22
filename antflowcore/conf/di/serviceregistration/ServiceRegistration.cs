@@ -236,6 +236,7 @@ public static class ServiceRegistration
         services.AddSingleton<IAdaptorService, BpmnElementPersonnelAdaptor>();
         services.AddSingleton<IAdaptorService, BpmnElementRoleAdaptor>();
         services.AddSingleton<IAdaptorService, BpmnElementStartUserAdaptor>();
+        services.AddSingleton<IAdaptorService, BpmnElementFormRelatedAdaptor>();
 
         services.AddSingleton<IBpmnAddFlowElementAdaptor, BpmnAddFlowElementSingleAdaptor>();
         services.AddSingleton<IBpmnAddFlowElementAdaptor, BpmnAddFlowElementLoopAdaptor>();
