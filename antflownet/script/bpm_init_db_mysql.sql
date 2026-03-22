@@ -163,20 +163,26 @@ CREATE TABLE if not exists `t_information_template`
     ) ENGINE = InnoDB
     COMMENT ='消息模板';
 
-CREATE TABLE if not exists `bpm_business`
+DROP TABLE IF EXISTS `bpm_business_draft`;
+CREATE TABLE if not exists `bpm_business_draft`
 (
-    `id`               bigint(20) NOT NULL AUTO_INCREMENT,
-    `business_id`      varchar(64)   DEFAULT NULL COMMENT 'business id',
+    `id`               bigint NOT NULL AUTO_INCREMENT,
+    `bpmn_code`      varchar(64)   DEFAULT NULL COMMENT 'business id',
     `create_time`      timestamp    not null default CURRENT_TIMESTAMP COMMENT 'as its name says',
     `process_code`     varchar(50)  DEFAULT NULL COMMENT 'process Number',
     `create_user_name` varchar(50)  DEFAULT NULL COMMENT 'as its name says',
     `create_user`      varchar(50)   DEFAULT NULL COMMENT 'as its name says',
     `process_key`      varchar(50) DEFAULT NULL COMMENT 'as its name says',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `is_del`           int(11)      DEFAULT '0',
-    PRIMARY KEY (`id`) USING BTREE
+    `draft_json`       text                                   null,
+    `is_del`           int      DEFAULT '0',
+    `tenant_id`              varchar(255)        NOT NULL DEFAULT '' COMMENT 'tenantId',
+    PRIMARY KEY (`id`) USING BTREE,
+    constraint bpm_business_draft_unq1
+    unique (bpmn_code, create_user),
+    KEY `bpm_business_idx1` (`process_key`)
     ) ENGINE = InnoDB
     COMMENT ='process draft';
+
 
 CREATE TABLE if not exists `bpm_flowrun_entrust`
 (

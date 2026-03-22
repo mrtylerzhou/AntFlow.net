@@ -274,8 +274,11 @@ public static class ServiceRegistration
         services.AddSingleton<IProcessOperationAdaptor, RemoveCurrentNodeProcessService>();
         services.AddSingleton<IProcessOperationAdaptor, RemoveFutureNodeProcessService>();
         services.AddSingleton<IProcessOperationAdaptor, InsertNodeAfterCurrentOrFutureService>();
+        services.AddSingleton<IProcessOperationAdaptor, SaveDraftProcessService>();
         services.AddSingleton<AddAssigneeProcessService>();
         services.AddSingleton<RemoveAssigneeProcessService>();
+        services.AddSingleton<BpmBusinessDraftService>();
+        services.AddSingleton<BpmProcessDraftBizService>();
 
         services.AddSingleton<AFDeploymentService>();
         services.AddSingleton<AfTaskInstService>();

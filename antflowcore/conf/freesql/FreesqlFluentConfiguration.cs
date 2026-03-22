@@ -1376,6 +1376,22 @@ public static class FreesqlFluentConfiguration
                    a.Property(b => b.CreateTime).Name("create_time");
                    a.Property(b => b.UpdateUser).Name("update_user");
                    a.Property(b => b.UpdateTime).Name("update_time");
+               }).ConfigEntity<BpmBusinessDraft>(a =>
+               {
+                   a.Name("t_bpm_business_draft");
+                   
+                   a.Property(b => b.Id).IsPrimary(true).IsIdentity(true);
+                   a.Property(b => b.BpmnCode).Name("bpmn_code");
+                   a.Property(b => b.ProcessKey).Name("process_key");
+                   a.Property(b => b.ProcessCode).Name("process_code");
+                   a.Property(b => b.ProcessNode).Name("process_node");
+                   a.Property(b => b.DraftJson).Name("draft_json");
+                   a.Property(b => b.CreateUser).Name("create_user");
+                   a.Property(b => b.CreateUserName).Name("create_user_name");
+                   a.Property(b => b.CreateTime).Name("create_time");
+                   a.Property(b => b.IsDel).Name("is_del");
+                   a.Property(b => b.UpdateTime).Name("update_time");
+                   a.Property(b => b.TenantId).Name("tenant_id");
                });
     }
 }
