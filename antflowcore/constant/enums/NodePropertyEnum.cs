@@ -15,6 +15,7 @@ public enum NodePropertyEnum
     NODE_PROPERTY_START_USER = 12,
     NODE_PROPERTY_DIRECT_LEADER = 13,
     NODE_PROPERTY_DEPARTMENT_LEADER = 14,
+    NODE_PROPERTY_APPROVED_USERS = 15,
     NODE_PROPERTY_FORM_RELATED = 16
 }
 public static class NodePropertyEnumExtensions
@@ -34,6 +35,7 @@ public static class NodePropertyEnumExtensions
             { NodePropertyEnum.NODE_PROPERTY_START_USER, ("发起人", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_SINGLE) },
             { NodePropertyEnum.NODE_PROPERTY_DIRECT_LEADER, ("直属领导", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) },
             { NodePropertyEnum.NODE_PROPERTY_DEPARTMENT_LEADER, ("部门负责人", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) },
+            { NodePropertyEnum.NODE_PROPERTY_APPROVED_USERS, ("被审批人自己", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) },
             { NodePropertyEnum.NODE_PROPERTY_FORM_RELATED, ("从表单中选择", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) }
         };
 
