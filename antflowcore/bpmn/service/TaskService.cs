@@ -287,7 +287,7 @@ public class TaskService
                     TenantId = MultiTenantUtil.GetCurrentTenantId(),
                 };
                 tasks.Add(newTask);
-                if (currentSignType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode())
+                if (elementToDeal.SignType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode())
                 {
                     break;
                 }

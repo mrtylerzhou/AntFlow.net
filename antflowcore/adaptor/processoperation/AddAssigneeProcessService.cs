@@ -53,7 +53,7 @@ public class AddAssigneeProcessService: IProcessOperationAdaptor
         String procInstId = bpmBusinessProcess.ProcInstId;
         List<BpmAfTask> tasks = _afTaskService
             .baseRepo
-            .Where(a => a.ProcInstId == procInstId && a.TaskDefKey == taskDefKey)
+            .Where(a => a.ProcInstId == procInstId)
             .ToList();
         if (tasks.IsEmpty())
         {

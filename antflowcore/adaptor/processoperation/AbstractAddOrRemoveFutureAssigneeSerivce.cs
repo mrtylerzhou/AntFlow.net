@@ -17,7 +17,7 @@ public abstract class AbstractAddOrRemoveFutureAssigneeSerivce
     protected readonly TaskService _taskService;
     protected readonly AfTaskInstService _afTaskInstService;
     protected readonly BpmFlowrunEntrustService _bpmFlowrunEntrustService;
-    private readonly AFDeploymentService _afDeploymentService;
+    protected readonly AFDeploymentService _afDeploymentService;
     protected readonly BpmvariableBizService _bpmvariableBizService;
 
 
