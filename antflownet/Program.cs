@@ -1,4 +1,4 @@
-﻿using antflowcore.aop;
+using antflowcore.aop;
 using antflowcore.conf.di;
 using antflowcore.conf.freesql;
 using antflowcore.conf.json;
@@ -7,9 +7,9 @@ using antflowcore.conf.serviceregistration;
 using antflowcore.constant.enus;
 using antflowcore.util;
 using FreeSql;
-using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Text.Json;
+using Microsoft.OpenApi;
 
 namespace antflownet;
 
