@@ -1,12 +1,13 @@
 ﻿
 
+using AntFlowCore.Abstraction.util;
 using AntFlowCore.Common.constant.enus;
 using AntFlowCore.Common.util;
 using AntFlowCore.Core.adaptor;
 using AntFlowCore.Core.vo;
 using AntFlowCore.Vo;
 
-namespace AntFlowCore.Extensions.Extensions.adaptor.personnel;
+namespace AntFlowCore.Abstraction.adaptor;
 
 public abstract class AbstractOrderedSignNodeAdp : IAdaptorService
     {

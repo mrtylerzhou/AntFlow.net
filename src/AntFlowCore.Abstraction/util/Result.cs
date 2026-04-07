@@ -2,7 +2,7 @@
 using AntFlowCore.Util;
 using Microsoft.Extensions.Logging;
 
-namespace AntFlowCore.Abstraction;
+namespace AntFlowCore.Abstraction.util;
 
 /// <summary>
 /// 通用结果类

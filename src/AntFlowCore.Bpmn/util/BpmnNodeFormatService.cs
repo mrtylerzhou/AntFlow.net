@@ -1,16 +1,15 @@
-﻿using AntFlowCore.Bpmn.adaptor;
+﻿using AntFlowCore.Abstraction.service.processor;
+using AntFlowCore.Bpmn.adaptor;
 using AntFlowCore.Common.constant.enus;
 using AntFlowCore.Common.exception;
 using AntFlowCore.Common.util;
 using AntFlowCore.Common.util.Extension;
 using AntFlowCore.Core;
-using AntFlowCore.Core.factory;
 using AntFlowCore.Core.vo;
-using AntFlowCore.Extensions.Extensions.adaptor.bpmnelementadp;
+using AntFlowCore.Extensions;
 using AntFlowCore.Vo;
 
-
-namespace AntFlowCore.Extensions.Extensions.service.processor;
+namespace AntFlowCore.Bpmn.util;
 
 public class BpmnNodeFormatService : IBpmnNodeFormatService
 {

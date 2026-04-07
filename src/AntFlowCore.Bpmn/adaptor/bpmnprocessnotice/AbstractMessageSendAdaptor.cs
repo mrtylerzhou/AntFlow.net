@@ -1,11 +1,10 @@
-﻿using AntFlowCore.Abstraction.service.biz;
-using AntFlowCore.Bpmn.adaptor.bpmnprocessnotice;
+﻿using AntFlowCore.Abstraction.adaptor;
+using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Common.util.Extension;
-using AntFlowCore.Engine.Engine.service.biz;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
 
-namespace AntFlowCore.Extensions.Extensions.adaptor.bpmnprocessnotice;
+namespace AntFlowCore.Bpmn.adaptor.bpmnprocessnotice;
 
 public abstract class AbstractMessageSendAdaptor<T>:  IProcessNoticeAdaptor
 {

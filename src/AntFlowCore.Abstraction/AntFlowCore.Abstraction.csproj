@@ -10,11 +10,13 @@
     </PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\AntFlowCore.Persist.api\AntFlowCore.Persist.api.csproj" />
+		<ProjectReference Include="..\AntFlowCore.Persist.api\AntFlowCore.Persist.api.csproj" />
 		<ProjectReference Include="..\AntFlowCore.Base\AntFlowCore.Base.csproj" />
 	</ItemGroup>
 
-	
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
 
     <ItemGroup>
 	  <PackageReference Include="MailKit" Version="4.14.1" />

@@ -1,10 +1,11 @@
 ﻿using AntFlowCore.Abstraction;
+using AntFlowCore.Abstraction.service;
 using AntFlowCore.Common.exception;
 using AntFlowCore.Core.vo;
 using AntFlowCore.Engine.Engine.service;
 using Microsoft.Extensions.Logging;
 
-namespace AntFlowCore.Extensions;
+namespace AntFlowCore.Abstraction.util;
 
 public class AssigneeVoBuildUtils
 {

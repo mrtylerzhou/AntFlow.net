@@ -2,7 +2,7 @@
 
 using Microsoft.AspNetCore.Http;
 
-namespace AntFlowCore.Extensions.Extensions.aop;
+namespace AntFlowCore.Abstraction.aop;
 
 public class TransactionalMiddleware
 {

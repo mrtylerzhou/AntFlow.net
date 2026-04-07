@@ -1,7 +1,7 @@
 ﻿
 using AntFlowCore.Vo;
 
-namespace AntFlowCore.Bpmn.adaptor.bpmnprocessnotice;
+namespace AntFlowCore.Abstraction.adaptor;
 
 public interface IProcessNoticeAdaptor
 {

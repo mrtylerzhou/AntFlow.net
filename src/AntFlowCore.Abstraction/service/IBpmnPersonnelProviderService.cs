@@ -1,7 +1,7 @@
 ﻿using AntFlowCore.Core.vo;
 using AntFlowCore.Vo;
 
-namespace AntFlowCore.Abstraction;
+namespace AntFlowCore.Abstraction.service;
 
 public interface IBpmnPersonnelProviderService
 {

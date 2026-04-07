@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.Http;
 
-namespace AntFlowCore.Extensions.http;
+namespace AntFlowCore.Abstraction.http;
 
 public static class HttpContextExtensions
 {

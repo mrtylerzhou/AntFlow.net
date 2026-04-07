@@ -1,9 +1,9 @@
-﻿using AntFlowCore.Common.constant.enus;
+﻿using AntFlowCore.Abstraction.adaptor;
+using AntFlowCore.Common.constant.enus;
 using AntFlowCore.Common.exception;
 using AntFlowCore.Common.util;
 using AntFlowCore.Core.adaptor;
 using AntFlowCore.Core.vo;
-using AntFlowCore.Extensions.Extensions.adaptor.personnel;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
 

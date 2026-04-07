@@ -1,7 +1,7 @@
 ﻿
 using AntFlowCore.Core.entity;
 
-namespace AntFlowCore.Abstraction;
+namespace AntFlowCore.Abstraction.service;
 
 public interface IBpmnEmployeeInfoProviderService
 {

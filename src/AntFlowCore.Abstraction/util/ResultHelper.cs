@@ -1,7 +1,7 @@
 using AntFlowCore.Util;
 using Microsoft.Extensions.Logging;
 
-namespace AntFlowCore.Abstraction;
+namespace AntFlowCore.Abstraction.util;
 
 public static class ResultHelper
 {

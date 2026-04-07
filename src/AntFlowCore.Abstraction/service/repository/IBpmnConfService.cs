@@ -3,7 +3,7 @@ using AntFlowCore.Core.vo;
 using AntFlowCore.Entity;
 using FreeSql;
 
-namespace AntFlowCore.Persist.repository;
+namespace AntFlowCore.Abstraction.service.repository;
 
 public interface IBpmnConfService
 {

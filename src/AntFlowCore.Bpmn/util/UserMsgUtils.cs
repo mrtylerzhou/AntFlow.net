@@ -1,16 +1,14 @@
-﻿
+﻿using AntFlowCore.Abstraction.adaptor;
 using AntFlowCore.Abstraction.service.biz;
-using AntFlowCore.Bpmn.adaptor.bpmnprocessnotice;
 using AntFlowCore.Common.constant.enums;
 using AntFlowCore.Common.util;
 using AntFlowCore.Core.entity;
 using AntFlowCore.Core.vo;
-using AntFlowCore.Entity;
 using AntFlowCore.Persist.api.interf.repository;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
 
-namespace AntFlowCore.Bpmn;
+namespace AntFlowCore.Bpmn.util;
 
 public static class UserMsgUtils
 {

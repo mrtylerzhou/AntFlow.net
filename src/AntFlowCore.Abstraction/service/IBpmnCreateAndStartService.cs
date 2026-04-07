@@ -1,7 +1,7 @@
 
 using AntFlowCore.Vo;
 
-namespace AntFlowCore.Extensions.service;
+namespace AntFlowCore.Abstraction.service;
 
 public interface IBpmnCreateAndStartService
 {

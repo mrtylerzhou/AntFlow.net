@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using AntFlowCore.Abstraction;
+using AntFlowCore.Abstraction.service;
 using AntFlowCore.Common.constant.enums;
 using AntFlowCore.Common.constant.enus;
 using AntFlowCore.Common.util;
@@ -9,7 +10,7 @@ using AntFlowCore.Engine.Engine.service;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AntFlowCore.Extensions.Extensions.adaptor.personnel;
+namespace AntFlowCore.Abstraction.adaptor;
 
  /// <summary>
     /// Abstract personnel adaptor to find personnel.

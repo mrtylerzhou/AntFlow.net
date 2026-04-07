@@ -1,7 +1,7 @@
 using AntFlowCore.Core.vo;
 using AntFlowCore.Vo;
 
-namespace AntFlowCore.Extensions.Extensions.service.processor;
+namespace AntFlowCore.Abstraction.service.processor;
 
 public interface IBpmnNodeFormatService
 {

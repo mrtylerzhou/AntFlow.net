@@ -3,7 +3,7 @@ using System.Data;
 using FreeSql;
 using Rougamo.Context;
 
-namespace AntFlowCore.Extensions.Extensions.aop;
+namespace AntFlowCore.Abstraction.aop;
 
 [AttributeUsage(AttributeTargets.Method)]
 public class TransactionalAttribute : Rougamo.MoAttribute

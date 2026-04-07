@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text.Json;
+using AntFlowCore.Abstraction.aop;
 using AntFlowCore.AspNetCore.AspNetCore.conf.di;
 using AntFlowCore.AspNetCore.AspNetCore.conf.serviceregistration;
 using AntFlowCore.AspNetCore.conf.di.serviceregistration;
@@ -8,9 +9,7 @@ using AntFlowCore.AspNetCore.conf.middleware;
 using AntFlowCore.Common.constant.enus;
 using AntFlowCore.Common.util;
 using AntFlowCore.Core.conf.json;
-using AntFlowCore.Extensions.Extensions.aop;
 using FreeSql;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi;
 
 public class Program

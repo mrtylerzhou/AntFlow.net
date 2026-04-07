@@ -2,7 +2,7 @@ using AntFlowCore.Core.dto;
 using AntFlowCore.Core.vo;
 using AntFlowCore.Vo;
 
-namespace AntFlowCore.Engine.service.repository;
+namespace AntFlowCore.Abstraction.service;
 
 public interface IDictService
 {
