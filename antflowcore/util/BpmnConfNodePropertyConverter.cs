@@ -188,7 +188,7 @@ public class BpmnConfNodePropertyConverter
                     else
                     {
                         Object valueOrWrapper = null;
-                        Object actualValue = null;
+                        Object actualValue = zdy1;
                         Object zdy2Value = null;
                         if (!string.IsNullOrEmpty(zdy2))
                         {
