@@ -47,7 +47,7 @@ public class JudgeOperatorEnum
 
     private static JudgeOperatorEnum[] AllValues()
     {
-        return new[] { GTE, GT, LTE, LT, EQ };
+        return new[] { GTE, GT, LTE, LT, EQ, GT1LT2, GTE1LT2, GET1LE2, GTE1LTE2 };
     }
     public static List<int> BinaryOperator()
     {
