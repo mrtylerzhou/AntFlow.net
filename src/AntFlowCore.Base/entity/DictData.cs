@@ -1,0 +1,23 @@
+﻿using AntFlowCore.Constants;
+
+namespace AntFlowCore.Core.entity
+{
+    public class DictData
+    {
+        public long Id { get; set; }
+        public int? Sort { get; set; }
+        public string Label { get; set; }
+        public string Value { get; set; }
+        public string DictType { get; set; }
+        public string CssClass { get; set; }
+        public string ListClass { get; set; }
+        public string IsDefault { get; set; }
+        public int? IsDel { get; set; }
+        public string TenantId { get; set; }
+        public DateTime? CreateTime { get; set; } = DateTime.Now;
+        public string CreateUser { get; set; }
+        public DateTime? UpdateTime { get; set; }=DateTime.Now;
+        public string UpdateUser { get; set; }
+        public string Remark { get; set; } = StringConstants.BIG_WHITE_BLANK;
+    }
+}

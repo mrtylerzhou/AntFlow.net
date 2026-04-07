@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<Import Project="../../common.props" />
+
+	<PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+		<IsPackable>true</IsPackable>
+		<OutputType>Library</OutputType>
+    </PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\AntFlowCore.Persist\AntFlowCore.Persist.csproj" />
+		<ProjectReference Include="..\AntFlowCore.Abstraction\AntFlowCore.Abstraction.csproj" />
+		<ProjectReference Include="..\AntFlowCore.Bpmn\AntFlowCore.Bpmn.csproj" />
+		<ProjectReference Include="..\AntFlowCore.Engine\AntFlowCore.Engine.csproj" />
+		<ProjectReference Include="..\AntFlowCore.Persist\AntFlowCore.Persist.csproj" />
+	</ItemGroup>
+
+    <ItemGroup>
+      <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+	  <PackageReference Include="DotNetCore.Natasha.CSharp.Compiler" Version="9.0.0.4" />
+	  <PackageReference Include="DotNetCore.Natasha.CSharp.Compiler.Domain" Version="9.0.0.1" />
+	  <PackageReference Include="DotNetCore.Natasha.CSharp.Extension.MethodCreator" Version="9.0.0.4" />
+	  <PackageReference Include="DotNetCore.Natasha.Domain" Version="9.0.0.1" />
+	  <PackageReference Include="FreeSql.Provider.MySql" Version="3.5.215" />
+    </ItemGroup>
+
+</Project>

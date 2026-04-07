@@ -1,0 +1,332 @@
+﻿using System.Linq.Expressions;
+using AntFlowCore.Common.exception;
+using AntFlowCore.Common.util;
+using AntFlowCore.Common.util.Extension;
+using AntFlowCore.Core.dto;
+using AntFlowCore.Core.entity;
+using AntFlowCore.Core.vo;
+using AntFlowCore.Persist.api.interf.repository;
+using AntFlowCore.Vo;
+using FreeSql.Internal.Model;
+
+namespace AntFlowCore.Persist.repository;
+
+public class UserService: AFBaseCurdRepositoryService<User>,IUserService
+{
+    private readonly IRoleService _roleService;
+    private readonly DepartmentService _departmentService;
+
+    public UserService(IFreeSql freeSql,
+        IRoleService roleService,
+        DepartmentService departmentService) : base(freeSql)
+    {
+        _roleService = roleService;
+        _departmentService = departmentService;
+    }
+
+    public BaseIdTranStruVo QueryUserById(string userId)
+    {
+        BaseIdTranStruVo baseIdTranStruVo = baseRepo.Where(a=>a.Id==Convert.ToInt64(userId)).First().ToBaseIdTranStruVo();
+        return baseIdTranStruVo;
+    }
+   public List<BaseIdTranStruVo> QueryUserByIds(IEnumerable<String> userIds)
+    {
+        IEnumerable<long> userIdLongList = AFCollectionUtil.StringToLongList(userIds);
+        List<BaseIdTranStruVo> baseIdTranStruVos = baseRepo.Select.Where(a => userIdLongList.Contains(a.Id))
+            .ToList().Select(a => a.ToBaseIdTranStruVo()).ToList();
+        return baseIdTranStruVos;
+    }
+   
+   
+
+    //根据发起人查找发起人的直属领导,用户实现时不用关心函数参数哪里来的(模块太多,一口吃不了胖子,先把功能实现,用户起来,然后再逐步搞清楚)
+    //这里面逻辑是:1.根据发起人Id找到发起人,t_user表里面发起人记录里面包含了发起人的直属领导的Id,然后再根据直属领导Id找到直属领导员工信息(实际上只需要Id,name两个字段)
+    //实际上,用户的组织架构系统用户的直属领导可能不是这样设计的,这里只是demo, 最终只要根据发起人id拿到他的领导信息即可
+    public List<BaseIdTranStruVo> QueryEmployeeDirectLeaderByIds(IEnumerable<string> userIds)
+    {
+        List<User> usersByIds = baseRepo.Where(a => userIds.Select(b => Convert.ToInt64(b)).Contains(a.Id)).ToList();
+        if(usersByIds.IsEmpty())
+        {
+            throw new AFBizException($"未能根据人员Id:{userIds}找到人员信息");
+        }
+
+        List<long?> leaderIdsByEmplIds = usersByIds.Select(a=>a.LeaderId).ToList();
+        
+        if (leaderIdsByEmplIds.IsEmpty())
+        {
+            throw new AFBizException("发起人没有直属领导信息,请检查人员信息");
+        }
+
+
+        List<User> leaders = baseRepo.Where(a => leaderIdsByEmplIds.Contains(a.Id)).ToList();
+        if(leaders.IsEmpty())
+        {
+            throw new AFBizException($"未能根据人员直属领导Id:{leaderIdsByEmplIds}找到人员直属领导");
+        }
+        return leaders.Select(a=>a.ToBaseIdTranStruVo()).ToList();
+    }
+
+    /// <summary>
+    /// 根据发起人查找发起人的hrbp,如果用户系统里没有这个概念,可以不用,忽略掉这个方法即可
+    /// </summary>
+    /// <param name="startUserId"></param>
+    /// <returns></returns>
+    /// <exception cref="AFBizException"></exception>
+    
+    public List<BaseIdTranStruVo> QueryEmployeeHrpbsByEmployeeIds(IEnumerable<string> userIds)
+    {
+        List<User> usersByIds = baseRepo.Where(a => userIds.Select(b => Convert.ToInt64(b)).Contains(a.Id)).ToList();
+        if(usersByIds.IsEmpty())
+        {
+            throw new AFBizException($"未能根据人员Id:{userIds}找到人员信息");
+        }
+
+        List<long?> hrbpIdsByEmplIds = usersByIds.Select(a=>a.HrbpId).ToList();
+        
+        if (hrbpIdsByEmplIds.IsEmpty())
+        {
+            throw new AFBizException("发起人没有hrbp信息,请检查人员信息");
+        }
+
+
+        List<User> hrbpList = baseRepo.Where(a => hrbpIdsByEmplIds.Contains(a.Id)).ToList();
+        if(hrbpList.IsEmpty())
+        {
+            throw new AFBizException($"未能根据人员直属领导Id:{hrbpIdsByEmplIds}找到人员直属领导");
+        }
+        return hrbpList.Select(a=>a.ToBaseIdTranStruVo()).ToList();
+    }
+
+    /// <summary>
+    /// 查找用户指定层级的领导,比如用户有直属领导,上上级领导,上上上级领导.这样就可以做成层级(grade)
+    /// </summary>
+    /// <param name="employeeId"></param>
+    /// <param name="grade"></param>
+    /// <returns></returns>
+    public  List<BaseIdTranStruVo> QueryLeadersByEmployeeIdAndGrade(String employeeId,int grade)
+    {
+       return QueryLeadersByEmployeeIdAndTier(employeeId, grade);
+    }
+    /**
+    * 层层审批,此方法根据用户Id找到用户所在组织线上的一层层的负责人,角色也是返回一个集合,不同的是层层审批是根据返回的人生成了N个节点,角色审批所有的角色人物都在一个节点上
+    * tier层级,有时候不需要用户所在组织线上所有领导都审批,可以只向上一层或者两层,实际上都是自定义的一些属性,用于控制特殊逻辑,用户也可以自定义一些其它的属性,实现原理就是在设计是增加属性,然后存表里,发起流程时读取出来
+    * 这里demo忽略tier属性,即默认组织线上所有领导都审批
+    * 作者freesql水平有限,暂无法将整个个逻辑用一条sql写出,仅作展示逻辑
+    */
+    public  List<BaseIdTranStruVo> QueryLeadersByEmployeeIdAndTier(String employeeId,int tier)
+    {
+        List<Department> departments = Frsql.Select<Department,User>()
+            .InnerJoin((a, b) => a.Id == b.DepartmentId)
+            .Where((a,b)=>b.Id==Convert.ToInt64(employeeId))
+            .ToList();
+        if(departments.Count==0)
+        {
+            throw new AFBizException($"未能根据用户Id:{employeeId}找到用户所在组织");
+        }
+        Department department = departments.First();
+        if(department==null)
+        {
+            throw new AFBizException($"未能根据用户Id:{employeeId}找到用户所在组织");
+        }
+
+        string? departmentPath = department.Path;
+        if(departmentPath==null)
+        {
+            throw new AFBizException($"未能根据用户Id:{employeeId}找到用户所在组织");
+        }
+        //path即为用户的部门路径,当然实际中用户的系统并不是这样设计的,根据实际情况查出来用户层级部门信息即可,这里和流程核心引擎逻辑没关系,纯业务
+        List<string> tiredDepartmentIds = departmentPath.Split("/").ToList();
+        IEnumerable<long> tiredDepartmentIdsLong = AFCollectionUtil.StringToLongList(tiredDepartmentIds);
+        List<Department> tiredDepartments = _departmentService.baseRepo.Where(a=>tiredDepartmentIdsLong.Contains(a.Id)).ToList();
+        if(tiredDepartments.Count==0)  //如果用户所在组织线上没有领导,则直接返回空
+        {
+            throw new AFBizException($"用户所在组织线上没有领导,请检查用户信息");
+        }
+
+        List<long?> departmentLeaderIds = departments.Select(a=>a.LeaderId).ToList();
+        //这里需要注意,用户的领导是有层级的,审批时是有顺序的,但是这里in查询并不能保证顺序,这里demo就不处理了,如果是直接使用mysql,可以加上order by field保持顺序
+        List<User> users = this.baseRepo.Where(a=>departmentLeaderIds.Contains(a.Id)).ToList();
+        return users.Select(a=>a.ToBaseIdTranStruVo()).ToList();
+    }
+    /**
+     * 查找指定层级的领导,直属领导相当于找当前层级的领导,有时候可能需要找用户所在当前组织上一级(或者两级,三级)领导
+     * 有时候会有这样情况,比如找当前用户上三级领导,但是有些部门层级很浅,向上没有三层,这时候要怎么处理就要和产品来沟通一下了,比如层数不够,就找最高的层级
+     * 总之,这里都和特定业务有关,用户要结合自己组织架构来设计和业务特点来写sql实现(当然也可以是调http接口,所有审批人规则的最终目标都是找到审批人,怎么拿到的引擎不关心,只约定返回结果的格式)
+     */
+    public BaseIdTranStruVo QueryLeaderByEmployeeIdAndLevel(string startUserId, int assignLevelGrade)
+    {
+        long startuserIdLong = Convert.ToInt64(startUserId);
+        List<Department> departments = Frsql.Select<Department,User>()
+            .InnerJoin((a, b) => a.Id == b.DepartmentId)
+            .Where((a,b)=>b.Id==startuserIdLong)
+            .ToList();
+        if(departments.Count==0)
+        {
+            throw new AFBizException($"未能根据用户Id:{startUserId}找到用户所在组织");
+        }
+        Department department = departments.First();
+        if(department==null)
+        {
+            throw new AFBizException($"未能根据用户Id:{startUserId}找到用户所在组织");
+        }
+
+        string? departmentPath = department.Path;
+        if(departmentPath==null)
+        {
+            throw new AFBizException($"未能根据用户Id:{startUserId}找到用户所在组织");
+        }
+        //path即为用户的部门路径,当然实际中用户的系统并不是这样设计的,根据实际情况查出来用户层级部门信息即可,这里和流程核心引擎逻辑没关系,纯业务
+        List<string> tiredDepartmentIds = departmentPath.Split("/").Where(a=>!string.IsNullOrWhiteSpace(a)).ToList();
+        IEnumerable<int> tiredDepartmentIdsLong = AFCollectionUtil.StringToIntList(tiredDepartmentIds);
+        List<Department> tiredDepartments = _departmentService.baseRepo.Where(a=>tiredDepartmentIdsLong.Contains(a.Id)).ToList();
+        if (tiredDepartments.Count == 0)
+        {
+            throw new AFBizException($"用户所在组织线上没有领导,请检查用户信息");
+        }
+
+        int tiredDepartmentsCount = tiredDepartments.Count;
+        int index=assignLevelGrade>tiredDepartmentsCount?tiredDepartmentsCount:assignLevelGrade;
+        long? leaderId = tiredDepartments[index-1].LeaderId;
+        if(leaderId==null)
+        {
+            throw new AFBizException($"未能根据用户Id:{startUserId}找到用户所在组织线上第{assignLevelGrade}级领导");
+        }
+
+        List<User> users = this.baseRepo.Where(a=>a.Id==leaderId).ToList();
+        if(users.Count==0)
+        {
+            throw new AFBizException($"未能根据用户Id:{startUserId}找到用户所在组织线上第{assignLevelGrade}级领导");
+        }
+        return users.First().ToBaseIdTranStruVo();
+    }
+
+    /**
+     * 根据角色Id获取用户信息,用户可以替换为自己的表,根据角色找到用户信息即可
+     */
+    public Dictionary<string,string> ProvideRoleEmployeeInfo(List<string> roleIds)
+    {
+        List<BaseIdTranStruVo> users = _roleService.QueryUserByRoleIds(roleIds);
+        if (users == null || users.Count == 0)
+        {
+            return new Dictionary<string, string>();
+        }
+
+        return users
+            .ToLookup(a => a.Id.ToString())
+            .ToDictionary(
+            a => a.Key,
+            a => a.First().Name,
+            StringComparer.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// 根据用户id查找用户信息
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    public BaseIdTranStruVo GetById(string userId)
+    {
+        User first = baseRepo.Where(a=>a.Id==Convert.ToInt64(userId)).First();
+        return new BaseIdTranStruVo{Id = first.Id.ToString(),Name = first.Name};
+    }
+
+    /// <summary>
+    /// 分页查询用户列表
+    /// </summary>
+    /// <param name="page"></param>
+    /// <param name="taskMgmtVo"></param>
+    /// <returns></returns>
+    public  ResultAndPage<BaseIdTranStruVo> SelectUserPageList(Page<BaseIdTranStruVo> page, TaskMgmtVO taskMgmtVo)
+    {
+        Expression<Func<User, bool>> expression = a => 1 == 1;
+        if (!string.IsNullOrEmpty(taskMgmtVo?.Description))
+        {
+            expression=LambadaExpressionExtensions.And(expression, a=>a.Name.Contains(taskMgmtVo.Description));
+        }
+
+        BasePagingInfo basePagingInfo = page.ToPagingInfo();
+        
+        List<User> users = baseRepo.Where(expression)
+            .Page(basePagingInfo)
+            .ToList();
+        List<BaseIdTranStruVo> baseIdTranStruVos = users.Select(a=>a.ToBaseIdTranStruVo()).ToList();
+        return PageUtils.GetResultAndPage(page.Of(baseIdTranStruVos, basePagingInfo));
+    }
+
+    public List<BaseIdTranStruVo> SelectAll()
+    {
+        List<BaseIdTranStruVo> results = baseRepo.Where(a=>1==1)
+            .ToList<BaseIdTranStruVo>(a=>new BaseIdTranStruVo(a.Id.ToString(),a.Name));
+        return results;
+    }
+   
+    
+
+    public DetailedUser GetEmployeeDetailById(string id)
+    {
+        
+        DetailedUser employee = this
+            .baseRepo
+            .Where(a=>a.Id == Convert.ToInt64(id))
+            .ToOne<DetailedUser>(a=>new DetailedUser()
+            {
+                Id = a.Id.ToString(),
+                UserName = a.Name,
+            });
+        return employee;
+    }
+
+    /// <summary>
+    /// 此方法用于流程通知,工作流流转只需要用户的id和name,通知需要的信息会多一些,比如邮件通知,就需要查出用户的邮箱地址,短信通知就要查出用户手机号,实体字段非常多,用户不必全部填充.
+    /// </summary>
+    /// <param name="ids"></param>
+    /// <returns></returns>
+    public List<DetailedUser> GetEmployeeDetailByIds(IEnumerable<string> ids)
+    {
+        List<long> longIds = ids.Select(a=>Convert.ToInt64(a)).ToList();
+        List<User> users = this.baseRepo
+            .Where(a => longIds.Contains(a.Id))
+            .ToList();
+        List<DetailedUser> employees = users.Select(a=>new DetailedUser()
+            {
+                Id = a.Id.ToString(),
+                UserName = a.Name,
+                Email = a.Email,
+                Mobile = a.Mobile,
+                MobileIsShow = a.MobileIsShow??false,
+            })
+            .ToList();
+        return employees;
+    }
+
+   
+
+    public List<BaseIdTranStruVo> GetLevelLeadersByEmployeeIdAndTier(string employeeId, int tier)
+    {
+        //todo 
+        return new List<BaseIdTranStruVo>();
+    }
+
+    /// <summary>
+    /// 查询有效的用户,如果有效则返回数量,如果用户系统里没有标识用户是否有效,直接返回大于0的数即可.
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
+    public long CheckEmployeeEffective(string userId)
+    {
+        return this.baseRepo.Where(a=>a.Id==Convert.ToInt64(userId)).Count();
+    }
+
+    public DetailedUser GetDetailedUserById(string Id)
+    {
+      return  this
+            .baseRepo
+            .Where(a=>a.Id == Convert.ToInt64(Id))
+            .ToOne<DetailedUser>(a=>new DetailedUser()
+            {
+                Id = a.Id.ToString(),
+                UserName = a.Name,
+            });
+        
+    }
+}

@@ -1,0 +1,250 @@
+﻿
+using AntFlowCore.Abstraction.service.biz;
+using AntFlowCore.Bpmn.adaptor.bpmnprocessnotice;
+using AntFlowCore.Common.constant.enums;
+using AntFlowCore.Common.util;
+using AntFlowCore.Core.entity;
+using AntFlowCore.Core.vo;
+using AntFlowCore.Entity;
+using AntFlowCore.Persist.api.interf.repository;
+using AntFlowCore.Vo;
+using Microsoft.Extensions.Logging;
+
+namespace AntFlowCore.Bpmn;
+
+public static class UserMsgUtils
+{
+    
+    public static void SendMessages(UserMsgVo vo, params MessageSendTypeEnum[] types)
+    {
+        var service = GetMessageService();
+        DoSendMessages(vo, types);
+        InsertUserMessage(vo, service);
+    }
+
+    public static void SendGeneralPurposeMessages(UserMsgVo vo, params MessageSendTypeEnum[] types)
+    {
+        DoSendMessages(vo,  types);
+    }
+
+    public static void InsertUserMessage(UserMsgVo vo)
+    {
+        InsertUserMessage(vo, GetMessageService());
+    }
+
+    private static void DoSendMessages(UserMsgVo vo, MessageSendTypeEnum[] types)
+    {
+        if (types == null || types.Length == 0 || !CheckEmployeeStatus(vo.UserId))
+        {
+            return;
+        }
+
+        foreach (MessageSendTypeEnum messageSendTypeEnum in types)
+        {
+            if(messageSendTypeEnum==null){
+                continue;
+            }
+            IEnumerable<IProcessNoticeAdaptor> processNoticeAdaptors = ServiceProviderUtils.GetServices<IProcessNoticeAdaptor>();
+            bool currentSend = false;
+            foreach (IProcessNoticeAdaptor processNoticeAdaptor in processNoticeAdaptors)
+            {
+                if (processNoticeAdaptor!=null)
+                {
+                    if (processNoticeAdaptor.GetSupportCode() == messageSendTypeEnum.Code)
+                    {
+                        currentSend = true;
+                        processNoticeAdaptor.SendMessageBatchByType(new List<UserMsgVo>{vo});
+                    }
+                }
+                else
+                {
+                    AfStaticLogUtil.Logger.LogInformation($"未实现的消息发送策略!{messageSendTypeEnum}");
+                }
+            }
+
+            if (!currentSend)
+            {
+                AfStaticLogUtil.Logger.LogInformation($"未实现的消息发送策略!{messageSendTypeEnum}");
+            }
+        }
+    }
+
+    private static void InsertUserMessage(UserMsgVo vo, IMessageService service)
+    {
+        if (!CheckEmployeeStatus(vo.UserId)) return;
+        var msg = BuildUserMessage(vo);
+        service.InsertUserMessage(msg);
+    }
+
+    public static void sendAllMsg(UserMsgVo userMsgVo) {
+        MessageSendTypeEnum[] messageSendTypeEnums= MessageSendTypeEnum._codeMap.Values.ToArray();
+        MessageSendTypeEnum[] allSendTypes =
+            messageSendTypeEnums.Where(x => x != MessageSendTypeEnum.ALL).ToArray();
+        DoSendMessages(userMsgVo, allSendTypes);
+    }
+    public static void SendMessageBatch(List<UserMsgBatchVo> list)
+    {
+        var service = GetMessageService();
+        DoSendMessageBatch(list);
+        InsertUserMessageBatch(list, service);
+    }
+
+    public static void SendGeneralPurposeMessages(List<UserMsgBatchVo> list)
+    {
+        DoSendMessageBatch(list);
+    }
+
+    public static void InsertUserMessageBatch(List<UserMsgBatchVo> list)
+    {
+        InsertUserMessageBatch(list, GetMessageService());
+    }
+    public static void SendMessageBathNoUserMessage(List<UserMsgBatchVo> userMsgBathVos) {
+
+        IMessageService messageService = GetMessageService();
+
+        //执行发送信息(批量)
+        DoSendMessageBatch(userMsgBathVos);
+
+    }
+    
+    public static void sendAppPush(UserMsgVo userMsgVo) {
+        MessageSendTypeEnum[] messageSendTypeEnums=new MessageSendTypeEnum[1];
+        messageSendTypeEnums[0]= MessageSendTypeEnum.PUSH;
+        DoSendMessages(userMsgVo, messageSendTypeEnums);
+    }
+    public static void sendSms(UserMsgVo userMsgVo) {
+        MessageSendTypeEnum[] messageSendTypeEnums=new MessageSendTypeEnum[1];
+        messageSendTypeEnums[0]=MessageSendTypeEnum.MESSAGE;
+        DoSendMessages(userMsgVo, messageSendTypeEnums);
+    }
+    private static void DoSendMessageBatch(List<UserMsgBatchVo> list)
+    {
+        Dictionary<MessageSendTypeEnum, List<UserMsgVo>> map = FormatUserMsgBatchVos(list);
+        foreach (KeyValuePair<MessageSendTypeEnum,List<UserMsgVo>> messageSendTypeEnumListEntry in map)
+        {
+            MessageSendTypeEnum messageSendTypeEnum = messageSendTypeEnumListEntry.Key;
+            if (messageSendTypeEnum == null)
+            {
+                continue;
+            }
+            List<UserMsgVo> userMsgVos = messageSendTypeEnumListEntry.Value;
+            IEnumerable<IProcessNoticeAdaptor> processNoticeAdaptors = ServiceProviderUtils.GetServices<IProcessNoticeAdaptor>();
+            bool currentSend = false;
+            foreach (IProcessNoticeAdaptor processNoticeAdaptor in processNoticeAdaptors)
+            {
+                if (processNoticeAdaptor!=null)
+                {
+                    if (processNoticeAdaptor.GetSupportCode() == messageSendTypeEnum.Code)
+                    {
+                        currentSend = true;
+                        processNoticeAdaptor.SendMessageBatchByType(userMsgVos);
+                    }
+                }
+            }
+
+            if (!currentSend)
+            {
+              AfStaticLogUtil.Logger.LogInformation($"未实现的消息发送策略!{messageSendTypeEnum}");
+            }
+        }
+    }
+
+    private static void InsertUserMessageBatch(List<UserMsgBatchVo> list, IMessageService service)
+    {
+        var messages = list
+            .Where(x => CheckEmployeeStatus(x.UserMsgVo.UserId))
+            .Select(x => BuildUserMessage(x.UserMsgVo))
+            .ToList();
+
+        service.InsertUserMessageBatch(messages);
+    }
+
+    private static Dictionary<MessageSendTypeEnum, List<UserMsgVo>> FormatUserMsgBatchVos(List<UserMsgBatchVo> list)
+    {
+        return list
+            .Distinct()
+            .Where(x => CheckEmployeeStatus(x.UserMsgVo.UserId) && x.MessageSendTypeEnums != null)
+            .SelectMany(x => x.MessageSendTypeEnums.Select(type => new { Type = type, Vo = x.UserMsgVo }))
+            .GroupBy(x => x.Type)
+            .ToDictionary(g => g.Key, g => g.Select(x => x.Vo).ToList());
+    }
+    public static void sendMail(UserMsgVo userMsgVo) {
+        MessageSendTypeEnum[] messageSendTypeEnums=new MessageSendTypeEnum[1];
+        messageSendTypeEnums[0]=MessageSendTypeEnum.MAIL;
+        DoSendMessages(userMsgVo, messageSendTypeEnums);
+    }
+
+    private static UserMessage BuildUserMessage(UserMsgVo vo)
+    {
+        return new UserMessage
+        {
+            UserId = vo.UserId ?? "-999",
+            Title = string.IsNullOrEmpty(vo.Title) ? vo.Content : vo.Title,
+            Content = vo.Content,
+            IsRead = false,
+            Url = vo.Url,
+            AppUrl = vo.AppPushUrl,
+            Node = vo.TaskId,
+            Source = vo.Source
+        };
+    }
+
+    public static BaseMsgInfo BuildBaseMsgInfo(UserMsgVo vo)
+    {
+        return new BaseMsgInfo
+        {
+            MsgTitle = vo.Title,
+            Content = vo.Content,
+            Url = vo.AppPushUrl
+        };
+    }
+
+    public static MessageInfo BuildMessageInfo(UserMsgVo vo)
+    {
+        return new MessageInfo
+        {
+            Receiver = vo.Mobile,
+            Content = vo.Content
+        };
+    }
+
+    public static MailInfo BuildMailInfo(UserMsgVo vo)
+    {
+        return new MailInfo
+        {
+            Receiver = vo.Email,
+            Cc = vo.Cc,
+            Title = vo.Title,
+            Content = JoinEmailUrl(vo.SsoSessionDomain, vo.Content, vo.EmailUrl)
+        };
+    }
+
+    private static string JoinEmailUrl(string domain, string content, string emailUrl)
+    {
+        if (!string.IsNullOrEmpty(emailUrl))
+        {
+            emailUrl = $"<a href='http://{domain}#{emailUrl}'>点击查看详情</a>";
+        }
+        return content + emailUrl;
+    }
+
+    private static bool CheckEmployeeStatus(string userId)
+    {
+        if (string.IsNullOrEmpty(userId))
+        {
+            return false;
+        }
+        var service = GetAfUserService();
+        return service.CheckEmployeeEffective(userId) > 0;
+    }
+
+    private static IUserService GetAfUserService()
+    {
+       return ServiceProviderUtils.GetService<IUserService>();
+    }
+
+    private static IMessageService GetMessageService()
+    {
+        return ServiceProviderUtils.GetService<IMessageService>();
+    }
+}

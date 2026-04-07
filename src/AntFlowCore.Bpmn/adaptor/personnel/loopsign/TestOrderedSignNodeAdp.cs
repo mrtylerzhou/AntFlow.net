@@ -1,0 +1,25 @@
+﻿using AntFlowCore.Common.constant.enus;
+using AntFlowCore.Core.adaptor;
+using AntFlowCore.Core.vo;
+using AntFlowCore.Extensions;
+using AntFlowCore.Extensions.Extensions.adaptor.personnel;
+using AntFlowCore.Vo;
+
+namespace AntFlowCore.Bpmn.adaptor.personnel.loopsign;
+
+public class TestOrderedSignNodeAdp : AbstractOrderedSignNodeAdp
+{
+    public TestOrderedSignNodeAdp(AssigneeVoBuildUtils assigneeVoBuildUtils) : base(assigneeVoBuildUtils)
+    {
+    }
+
+    public override List<string> GetAssigneeIds(BpmnNodeVo nodeVo, BpmnStartConditionsVo bpmnStartConditions)
+    {
+        return new List<string> { "1", "21", "23", "42" };
+    }
+
+    public override void SetSupportBusinessObjects()
+    {
+        ((IAdaptorService)this).AddSupportBusinessObjects(OrderNodeTypeEnum.TEST_ORDERED_SIGN);
+    }
+}

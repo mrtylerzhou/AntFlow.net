@@ -1,0 +1,12 @@
+﻿namespace AntFlowCore.Core.entity;
+
+public class AFProcess
+{
+    
+        private readonly List<object> _flowElements = new List<object>();
+
+        public void AddFlowElement(object flowElement)
+        {
+            _flowElements.Add(flowElement);
+        }
+}

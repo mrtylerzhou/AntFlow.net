@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>AntFlowCore.Persist</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\AntFlowCore.Base\AntFlowCore.Base.csproj" />
+      <ProjectReference Include="..\AntFlowCore.Persist.api\AntFlowCore.Persist.api.csproj" />
+      <ProjectReference Include="..\AntFlowCore.Abstraction\AntFlowCore.Abstraction.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -1,6 +1,5 @@
 ﻿<Project>
 	<Import Project="version.props" />
-	
 	<PropertyGroup>
 		<!-- 忽略CS8618和CS0169警告 -->
 		<NoWarn>CS8618;CS8604;;CS8601;;CS8629;CS0169</NoWarn>

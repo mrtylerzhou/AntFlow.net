@@ -1,0 +1,35 @@
+﻿using AntFlowCore.Common.util;
+using AntFlowCore.Core.entity;
+using AntFlowCore.Core.vo;
+using AntFlowCore.Entity;
+using AntFlowCore.Persist.api.interf.repository;
+
+namespace AntFlowCore.Persist.repository;
+
+public class RoleService : AFBaseCurdRepositoryService<Role>, IRoleService
+{
+    public RoleService(IFreeSql freeSql) : base(freeSql)
+    {
+    }
+
+    /// <summary>
+    /// 虽然User对象字段非常多,但是只需要Id和Name字段,如果有特殊业务可以选择出更多字段
+    /// </summary>
+    /// <param name="roleIds"></param>
+    /// <returns></returns>
+    public List<BaseIdTranStruVo> QueryUserByRoleIds(ICollection<string> roleIds)
+    {
+        IEnumerable<long> roleIdsLong = AFCollectionUtil.StringToLongList(roleIds);
+        List<BaseIdTranStruVo> users = Frsql.Select<User, UserRole>()
+            .InnerJoin((u, r) => u.Id == r.UserId)
+            .Where((u, r) => roleIdsLong.Contains(r.RoleId ?? 0L))
+            .ToList<BaseIdTranStruVo>(
+                (a,b)=>new BaseIdTranStruVo
+                {
+                    Id = a.Id.ToString(),
+                    Name = a.Name,
+                }
+                );
+        return users;
+    }
+}
