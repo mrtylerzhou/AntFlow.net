@@ -190,6 +190,7 @@ public class BpmnConfNodePropertyConverter
                         Object valueOrWrapper = null;
                         Object actualValue = zdy1;
                         Object zdy2Value = null;
+                        actualValue = JsonSerializer.Deserialize(zdy1, fieldCls);
                         if (!string.IsNullOrEmpty(zdy2))
                         {
                             zdy2Value = JsonSerializer.Deserialize(zdy2, fieldCls);
