@@ -1,5 +1,6 @@
-using AntFlowCore.Core.dto;
-using AntFlowCore.Core.entity;
+using AntFlowCore.Base.dto;
+using AntFlowCore.Base.entity;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 using FreeSql;
 

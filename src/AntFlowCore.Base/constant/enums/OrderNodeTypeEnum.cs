@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Core.constant.enums;
+﻿namespace AntFlowCore.Base.constant.enums;
 
 public enum OrderNodeTypeEnum
 {

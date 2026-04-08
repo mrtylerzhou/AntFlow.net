@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace AntFlowCore.Core.factory
+namespace AntFlowCore.Base.factory
 {
     public static class ThreadLocalContainer
     {

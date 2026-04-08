@@ -1,13 +1,11 @@
+using System.Reflection;
+using AntFlowCore.Base.util;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.adaptor.nodetypecondition;
 using AntFlowCore.Bpmn.adaptor.nodetypecondition.judge;
-using AntFlowCore.Core.util;
-using AntFlowCore.Vo;
 
-namespace AntFlowCore.Core.constant.enus;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+namespace AntFlowCore.Bpmn.constants;
+
 using static StringConstants;
 
 public class ConditionTypeAttributes

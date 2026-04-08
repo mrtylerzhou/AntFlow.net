@@ -1,6 +1,6 @@
-﻿using AntFlowCore.Core.exception;
+﻿using AntFlowCore.Base.exception;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
-using AntFlowCore.Vo;
 
 namespace AntFlowCore.Bpmn.adaptor.nodetypecondition.judge;
 

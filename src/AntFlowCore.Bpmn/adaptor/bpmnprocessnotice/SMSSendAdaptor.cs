@@ -1,16 +1,11 @@
-﻿
-
-using AntFlowCore.Abstraction.service.biz;
-using AntFlowCore.Bpmn;
-using AntFlowCore.Bpmn.adaptor.bpmnprocessnotice;
+﻿using AntFlowCore.Abstraction.service.biz;
+using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.util;
-using AntFlowCore.Common.util;
-using AntFlowCore.Core;
 using AntFlowCore.Core.constant.enums;
-using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
 
-namespace AntFlowCore.Extensions.Extensions.adaptor.bpmnprocessnotice;
+namespace AntFlowCore.Bpmn.adaptor.bpmnprocessnotice;
 
 public class SMSSendAdaptor: AbstractMessageSendAdaptor<MessageInfo>
 {

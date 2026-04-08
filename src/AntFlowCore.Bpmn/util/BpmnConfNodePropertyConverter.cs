@@ -2,16 +2,16 @@ using System.Collections;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using AntFlowCore.Common.constant.enus;
+using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.exception;
+using AntFlowCore.Base.extension;
+using AntFlowCore.Base.util;
+using AntFlowCore.Base.vo;
+using AntFlowCore.Bpmn.constants;
 using AntFlowCore.Core.constant.enums;
 using AntFlowCore.Core.vo;
-using AntFlowCore.Core.constant.enus;
-using AntFlowCore.Core.exception;
-using AntFlowCore.Core.extension;
-using AntFlowCore.Core.util;
-using AntFlowCore.Vo;
 
-namespace AntFlowCore.Common.util;
+namespace AntFlowCore.Bpmn.util;
 
 public class BpmnConfNodePropertyConverter
 {

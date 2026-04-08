@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Core.interf;
+﻿namespace AntFlowCore.Base.interf;
 
 public interface ITenantIdHolder
 {

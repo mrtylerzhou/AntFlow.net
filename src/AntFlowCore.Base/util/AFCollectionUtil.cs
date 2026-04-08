@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Core.util;
+﻿namespace AntFlowCore.Base.util;
 
 /// <summary>
 /// A convenient collection utility class mainly used to convert ID types.

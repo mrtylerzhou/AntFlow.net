@@ -1,6 +1,6 @@
 ﻿using System.Net.NetworkInformation;
 
-namespace AntFlowCore.Core.util;
+namespace AntFlowCore.Base.util;
 
 public static class StrongUuidGenerator
     {

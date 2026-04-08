@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
-using AntFlowCore.Core.util;
+using AntFlowCore.Base.util;
+using AntFlowCore.Base.vo;
 
 namespace AntFlowCore.Core.vo;
 

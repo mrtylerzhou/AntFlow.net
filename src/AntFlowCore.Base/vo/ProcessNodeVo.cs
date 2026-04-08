@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Core.vo;
+﻿namespace AntFlowCore.Base.vo;
 
 public class ProcessNodeVo
 {

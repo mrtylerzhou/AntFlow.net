@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text;
-using AntFlowCore.Core.factory;
+using AntFlowCore.Base.factory;
 
 namespace AntFlowCore.Engine.factory;
 
@@ -75,7 +75,7 @@ public class AutoParseProxyFactory
             string varNames=returnType.Name+"s";
             
             var sb = new StringBuilder();
-            sb.AppendLine($"public class {className} : AntFlowCore.Core.factory.TagParser<{returnType.FullName},{string.Join(", ", parameters.Select(p => $"{p.ParameterType.FullName}"))}> {{");
+            sb.AppendLine($"public class {className} : AntFlowCore.Base.factory.TagParser<{returnType.FullName},{string.Join(", ", parameters.Select(p => $"{p.ParameterType.FullName}"))}> {{");
 
             foreach (var method in methods)
             {
@@ -91,10 +91,10 @@ public class AutoParseProxyFactory
                 String body =
                     "    {\n" +
                     $"        if({string.Join(", ", parameters.Select(p => $" {p.Name}"))}==null){{\n" +
-                    "            throw new  AntFlowCore.Core.exception.AFBizException(\"provided data to find a bpmnNodeAdaptor method is null\");\n" +
+                    "            throw new  AntFlowCore.Base.exception.AFBizException(\"provided data to find a bpmnNodeAdaptor method is null\");\n" +
                     "        }\n" +
                     "\n" +
-                    $"        var {varNames} = AntFlowCore.Core.util.ServiceProviderUtils.GetServices<AntFlowCore.Core.adaptor.IAdaptorService>();\n" +
+                    $"        var {varNames} = AntFlowCore.Base.util.ServiceProviderUtils.GetServices<AntFlowCore.Base.adaptor.IAdaptorService>();\n" +
                     $"        foreach (var {varName} in {varNames}) {{\n" +
                     $"            if({varName}.IsSupportBusinessObject({string.Join(", ", parameters.Select(p => $" {p.Name}"))})){{\n" +
                     $"                return ({returnType.FullName}){varName};\n" +

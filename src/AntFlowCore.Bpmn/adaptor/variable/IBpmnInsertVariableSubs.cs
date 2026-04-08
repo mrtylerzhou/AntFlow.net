@@ -1,8 +1,8 @@
 ﻿
 
-using AntFlowCore.Vo;
+using AntFlowCore.Base.vo;
 
-namespace AntFlowCore.Extensions.Extensions.adaptor.variable;
+namespace AntFlowCore.Bpmn.adaptor.variable;
 
 public interface IBpmnInsertVariableSubs
 {

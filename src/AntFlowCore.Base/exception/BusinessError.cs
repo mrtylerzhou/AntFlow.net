@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Core.exception;
+﻿namespace AntFlowCore.Base.exception;
 
  public sealed class BusinessError
 

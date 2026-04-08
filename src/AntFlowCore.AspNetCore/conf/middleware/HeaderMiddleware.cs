@@ -1,7 +1,8 @@
 ﻿using System.Net;
-using AntFlowCore.Core.factory;
-using AntFlowCore.Core.interf;
-using AntFlowCore.Core.util;
+using AntFlowCore.Base.factory;
+using AntFlowCore.Base.interf;
+using AntFlowCore.Base.util;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 using AntFlowCore.Persist.api.interf.repository;
 using Microsoft.AspNetCore.Http;

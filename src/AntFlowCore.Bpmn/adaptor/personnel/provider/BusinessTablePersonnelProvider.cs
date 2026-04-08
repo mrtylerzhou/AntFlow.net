@@ -1,12 +1,12 @@
 ﻿using AntFlowCore.Abstraction;
 using AntFlowCore.Abstraction.service;
+using AntFlowCore.Base.adaptor.personnel.businesstableadp;
+using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.exception;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Common.constant.enus;
-using AntFlowCore.Core.adaptor.personnel.businesstableadp;
 using AntFlowCore.Core.constant.enums;
-using AntFlowCore.Core.exception;
-using AntFlowCore.Core.factory;
 using AntFlowCore.Core.vo;
-using AntFlowCore.Vo;
 
 namespace AntFlowCore.Bpmn.adaptor.personnel.provider;
 

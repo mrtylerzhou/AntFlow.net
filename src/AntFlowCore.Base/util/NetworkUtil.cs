@@ -2,7 +2,7 @@
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 
-namespace AntFlowCore.Core.util
+namespace AntFlowCore.Base.util
 {
     public static class NetworkUtil
     {

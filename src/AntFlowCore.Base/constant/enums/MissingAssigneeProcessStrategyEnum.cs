@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Core.constant.enums;
+﻿namespace AntFlowCore.Base.constant.enums;
 
 /// <summary>
 /// 缺失审批人处理策略

@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Core.dto;
+﻿namespace AntFlowCore.Base.dto;
 
 public class ResultAndPage<T>
 {

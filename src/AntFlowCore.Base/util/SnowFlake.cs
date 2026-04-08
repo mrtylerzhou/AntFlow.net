@@ -2,7 +2,7 @@
 using System.Net.NetworkInformation;
 using System.Text;
 
-namespace AntFlowCore.Core.util;
+namespace AntFlowCore.Base.util;
 
 public class SnowFlake
 {

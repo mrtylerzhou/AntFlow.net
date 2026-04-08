@@ -1,5 +1,4 @@
-﻿namespace AntFlowCore.Core.constant.enums;
-
+﻿namespace AntFlowCore.Base.constant.enums;
 public class AdminPersonnelTypeEnum
 {
     public int Code { get; private set; }

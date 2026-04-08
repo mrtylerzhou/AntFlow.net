@@ -1,6 +1,6 @@
 ﻿using FreeSql.DataAnnotations;
 
-namespace AntFlowCore.Core.entity;
+namespace AntFlowCore.Base.entity;
 [Table(Name = "tab_student")]
 public class Student
 {

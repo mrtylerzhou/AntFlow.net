@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace AntFlowCore.Core.extension
+namespace AntFlowCore.Base.extension
 {
     public static class LinqExtensions
     {

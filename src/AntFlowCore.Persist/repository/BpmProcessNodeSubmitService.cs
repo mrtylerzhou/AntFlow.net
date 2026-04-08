@@ -1,6 +1,6 @@
 using AntFlowCore.Abstraction.service.biz;
-using AntFlowCore.Core.entity;
-using AntFlowCore.Core.interf;
+using AntFlowCore.Base.entity;
+using AntFlowCore.Base.interf;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repository;

@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Reflection;
-using AntFlowCore.Core.adaptor.formoperation;
-using AntFlowCore.Core.util;
-using AntFlowCore.Vo;
+using AntFlowCore.Base.adaptor.formoperation;
+using AntFlowCore.Base.util;
+using AntFlowCore.Base.vo;
 
-namespace AntFlowCore.Core.factory.tagparser;
+namespace AntFlowCore.Base.factory.tagparser;
 
 public class ActivitiTagParser<T>: TagParser<IFormOperationAdaptor<T>,BusinessDataVo> where T: BusinessDataVo
 {

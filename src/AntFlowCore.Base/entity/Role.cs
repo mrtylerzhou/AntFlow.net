@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace AntFlowCore.Core.entity
+namespace AntFlowCore.Base.entity
 {
   
     public class Role

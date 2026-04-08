@@ -1,7 +1,7 @@
-﻿using AntFlowCore.Common.constant.enus;
-using AntFlowCore.Core.util;
+﻿using AntFlowCore.Base.util;
+using AntFlowCore.Common.constant.enus;
 
-namespace AntFlowCore.Core.entity;
+namespace AntFlowCore.Base.entity;
 
 /// <summary>
 /// Represents a button on the BPMN view page.

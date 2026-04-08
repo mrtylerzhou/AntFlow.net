@@ -1,9 +1,8 @@
 ﻿using AntFlowCore.Abstraction;
 using AntFlowCore.Abstraction.service;
-using AntFlowCore.Core.conf;
-using AntFlowCore.Core.util;
+using AntFlowCore.Base.conf;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
-using AntFlowCore.Vo;
 
 namespace AntFlowCore.Bpmn.adaptor.personnel.provider;
 [NamedService(nameof(OutSidePersonnelProvider))]

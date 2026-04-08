@@ -1,7 +1,8 @@
 ﻿using System.Text.Json.Serialization;
-using AntFlowCore.Core.util;
+using AntFlowCore.Base.util;
+using AntFlowCore.Core.vo;
 
-namespace AntFlowCore.Core.vo;
+namespace AntFlowCore.Base.vo;
 
    public class BpmnNodeVo
     {

@@ -1,12 +1,11 @@
 ﻿using AntFlowCore.Abstraction.util;
-using AntFlowCore.Core.conf;
-using AntFlowCore.Core.exception;
-using AntFlowCore.Core.extension;
-using AntFlowCore.Core.util;
+using AntFlowCore.Base.conf;
+using AntFlowCore.Base.exception;
+using AntFlowCore.Base.extension;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 using AntFlowCore.Extensions;
 using AntFlowCore.Persist.api.interf.repository;
-using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
 
 namespace AntFlowCore.Bpmn.adaptor.personnel.provider;

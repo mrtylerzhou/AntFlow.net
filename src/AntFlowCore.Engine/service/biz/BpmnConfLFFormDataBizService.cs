@@ -1,5 +1,5 @@
 ﻿using AntFlowCore.Abstraction.service.biz;
-using AntFlowCore.Core.entity;
+using AntFlowCore.Base.entity;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Engine.service.biz;

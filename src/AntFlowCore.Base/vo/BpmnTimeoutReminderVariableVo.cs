@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
-using AntFlowCore.Core.entity;
+﻿using System.Text.Json.Serialization;
+using AntFlowCore.Base.entity;
 
-namespace AntFlowCore.Vo
+namespace AntFlowCore.Base.vo
 {
     public class BpmnTimeoutReminderVariableVo
     {

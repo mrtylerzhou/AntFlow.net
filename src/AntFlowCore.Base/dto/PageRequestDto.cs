@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
-using AntFlowCore.Core.entity;
-using AntFlowCore.Core.util;
+using AntFlowCore.Base.entity;
+using AntFlowCore.Base.util;
 
-namespace AntFlowCore.Core.dto;
+namespace AntFlowCore.Base.dto;
 
 public class PageRequestDto<T> where T : new()
 {

@@ -1,9 +1,7 @@
-﻿using System.Diagnostics;
-using AntFlowCore.Core.entity;
-using AntFlowCore.Vo;
+﻿using AntFlowCore.Base.entity;
+using AntFlowCore.Base.vo;
 
-
-namespace AntFlowCore.Extensions.Extensions.adaptor.bpmnelementadp;
+namespace AntFlowCore.Bpmn.adaptor.bpmnelementadp;
 
 public interface IBpmnAddFlowElementAdaptor
 { 

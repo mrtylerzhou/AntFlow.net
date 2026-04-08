@@ -1,22 +1,14 @@
-﻿
-
-using AntFlowCore.Common.constant.enus;
-using AntFlowCore.Common.util;
-using AntFlowCore.Core;
-using AntFlowCore.Core.adaptor;
+﻿using AntFlowCore.Base.adaptor;
+using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.vo;
+using AntFlowCore.Bpmn.util;
 using AntFlowCore.Core.constant.enums;
 using AntFlowCore.Core.vo;
-using AntFlowCore.Vo;
-
-namespace AntFlowCore.Extensions.Extensions.adaptor.bpmnelementadp;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Extensions.Logging;
 
+namespace AntFlowCore.Bpmn.adaptor.bpmnelementadp;
 
-    public class BpmnElementCustomizeAdaptor : BpmnElementAdaptor
+public class BpmnElementCustomizeAdaptor : BpmnElementAdaptor
     {
         private readonly ILogger<BpmnElementCustomizeAdaptor> _logger;
 

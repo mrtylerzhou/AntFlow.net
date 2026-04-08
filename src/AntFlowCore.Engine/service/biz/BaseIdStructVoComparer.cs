@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 
-
-namespace AntFlowCore.Engine.Engine.service.biz;
+namespace AntFlowCore.Engine.service.biz;
 
 public class BaseIdStructVoComparer : EqualityComparer<BaseIdTranStruVo>
 {

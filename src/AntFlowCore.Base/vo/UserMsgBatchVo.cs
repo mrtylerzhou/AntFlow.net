@@ -1,7 +1,6 @@
-using AntFlowCore.Core.constant.enums;
-using AntFlowCore.Vo;
+using AntFlowCore.Base.constant.enums;
 
-namespace AntFlowCore.Core.vo;
+namespace AntFlowCore.Base.vo;
 
 public class UserMsgBatchVo
 {

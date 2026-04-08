@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Core.entity;
+﻿namespace AntFlowCore.Base.entity;
 public class Department
 {
     public int Id { get; set; }

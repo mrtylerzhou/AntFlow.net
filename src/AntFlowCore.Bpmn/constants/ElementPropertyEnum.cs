@@ -1,10 +1,8 @@
 ﻿using System.Reflection;
 using AntFlowCore.Bpmn.adaptor.bpmnelementadp;
 using AntFlowCore.Bpmn.adaptor.variable;
-using AntFlowCore.Extensions.Extensions.adaptor.bpmnelementadp;
-using AntFlowCore.Extensions.Extensions.adaptor.variable;
 
-namespace AntFlowCore.Common.constant.enus;
+namespace AntFlowCore.Bpmn.constants;
 
  public class ElementPropertyEnum
     {

@@ -1,8 +1,7 @@
-﻿namespace AntFlowCore.Core.conf.json;
-
-using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+
+namespace AntFlowCore.Base.conf.json;
 
 public class BooleanToIntJsonConverter : JsonConverter<int>
 {

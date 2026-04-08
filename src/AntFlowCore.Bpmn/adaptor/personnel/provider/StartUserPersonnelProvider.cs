@@ -1,12 +1,11 @@
 ﻿using AntFlowCore.Abstraction;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.util;
-using AntFlowCore.Core.conf;
-using AntFlowCore.Core.exception;
-using AntFlowCore.Core.util;
+using AntFlowCore.Base.conf;
+using AntFlowCore.Base.exception;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 using AntFlowCore.Extensions;
-using AntFlowCore.Vo;
 
 namespace AntFlowCore.Bpmn.adaptor.personnel.provider;
 [NamedService(nameof(StartUserPersonnelProvider))]

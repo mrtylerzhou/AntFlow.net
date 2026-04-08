@@ -1,5 +1,5 @@
-using AntFlowCore.Core.entity;
-using AntFlowCore.Core.exception;
+using AntFlowCore.Base.entity;
+using AntFlowCore.Base.exception;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repository;

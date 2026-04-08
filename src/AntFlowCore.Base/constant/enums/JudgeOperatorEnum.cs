@@ -1,8 +1,8 @@
 ﻿
 
-using AntFlowCore.Core.exception;
+using AntFlowCore.Base.exception;
 
-namespace AntFlowCore.Core.constant.enums;
+namespace AntFlowCore.Base.constant.enums;
 
 public class JudgeOperatorEnum
 {

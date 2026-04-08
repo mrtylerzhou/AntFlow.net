@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Core.conf;
+﻿namespace AntFlowCore.Base.conf;
 
 [AttributeUsage(AttributeTargets.Class,AllowMultiple = false)]
 public class NamedServiceAttribute : Attribute

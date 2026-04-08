@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
-namespace AntFlowCore.Core.vo
+namespace AntFlowCore.Base.vo
 {
     public class BpmnNodeConditionsConfBaseVo
     {

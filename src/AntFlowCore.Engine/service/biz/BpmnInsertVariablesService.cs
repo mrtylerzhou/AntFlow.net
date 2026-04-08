@@ -1,13 +1,15 @@
 ﻿using System.Text.Json;
 using AntFlowCore.Abstraction.service.biz;
+using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.entity;
+using AntFlowCore.Base.util;
+using AntFlowCore.Base.vo;
+using AntFlowCore.Bpmn;
+using AntFlowCore.Bpmn.adaptor.variable;
+using AntFlowCore.Bpmn.constants;
 using AntFlowCore.Common.constant.enus;
-using AntFlowCore.Common.util;
 using AntFlowCore.Core.constant.enums;
-using AntFlowCore.Core.entity;
-using AntFlowCore.Core.util;
-using AntFlowCore.Extensions.Extensions.adaptor.variable;
 using AntFlowCore.Persist.api.interf.repository;
-using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
 
 namespace AntFlowCore.Engine.service.biz;

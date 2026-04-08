@@ -1,9 +1,9 @@
 ﻿using System.Text.RegularExpressions;
-using AntFlowCore.Core.constant;
-using AntFlowCore.Core.exception;
-using AntFlowCore.Core.util;
+using AntFlowCore.Base.constant;
+using AntFlowCore.Base.exception;
+using AntFlowCore.Base.util;
 
-namespace AntFlowCore.Core.entity;
+namespace AntFlowCore.Base.entity;
 
 public class BpmnConf
 {

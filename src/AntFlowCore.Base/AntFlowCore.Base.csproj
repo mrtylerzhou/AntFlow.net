@@ -6,7 +6,7 @@
         <TargetFramework>net10.0</TargetFramework>
 		<IsPackable>true</IsPackable>
 		<OutputType>Library</OutputType>
-		<RootNamespace>AntFlowCore.Core</RootNamespace>
+		<RootNamespace>AntFlowCore.Base</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

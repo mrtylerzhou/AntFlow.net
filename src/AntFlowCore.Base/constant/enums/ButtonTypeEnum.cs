@@ -1,4 +1,5 @@
-﻿public enum ButtonTypeEnum
+﻿
+public enum ButtonTypeEnum
 {
     BUTTON_TYPE_PREVIEW = 0,          // 预览
     BUTTON_TYPE_SUBMIT = 1,           // 提交

@@ -1,8 +1,8 @@
 ﻿
 
-using AntFlowCore.Core.util;
+using AntFlowCore.Base.util;
 
-namespace AntFlowCore.Core.entity;
+namespace AntFlowCore.Base.entity;
 /// <summary>
 /// Represents the third party business access table.
 /// </summary>

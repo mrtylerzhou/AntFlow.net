@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Core.entity;
+﻿namespace AntFlowCore.Base.entity;
 
 /// <summary>
 /// 节点附加签核配置

@@ -1,11 +1,9 @@
 using System.Text.Json;
-using AntFlowCore.Common.constant.enus;
-using AntFlowCore.Core.adaptor;
-using AntFlowCore.Core.constant.enums;
-using AntFlowCore.Core.util;
-using AntFlowCore.Vo;
+using AntFlowCore.Base.adaptor;
+using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Core.vo;
 
-namespace AntFlowCore.Core.vo;
+namespace AntFlowCore.Base.vo;
 
 public class ProcSubmitCallbackAdp : ICallbackAdaptor<ProcSubmitCallbackReqVo, CallbackRespVo> {
 

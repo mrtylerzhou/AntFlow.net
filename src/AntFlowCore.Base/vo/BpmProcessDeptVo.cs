@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using AntFlowCore.Core.vo;
 
-namespace AntFlowCore.Vo
+namespace AntFlowCore.Base.vo
 {
     public class BpmProcessDeptVo 
     {

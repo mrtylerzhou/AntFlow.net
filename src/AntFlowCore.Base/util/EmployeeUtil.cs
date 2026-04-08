@@ -1,7 +1,8 @@
-using AntFlowCore.Core.entity;
+using AntFlowCore.Base.entity;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 
-namespace AntFlowCore.Core.util;
+namespace AntFlowCore.Base.util;
 
 public static class EmployeeUtil
 {

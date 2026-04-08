@@ -1,11 +1,7 @@
-﻿using AntFlowCore.Bpmn.Bpmn.bpmn;
-using AntFlowCore.Vo;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using AntFlowCore.Core.bpmnmodel;
+﻿using AntFlowCore.Base.bpmnmodel;
+using AntFlowCore.Base.vo;
 
-namespace AntFlowCore.Bpmn.Bpmn.bpmn.build;
+namespace AntFlowCore.Base.util;
 
 
     public static class BpmnBuildUtils

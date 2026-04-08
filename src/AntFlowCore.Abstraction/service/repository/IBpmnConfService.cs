@@ -1,4 +1,4 @@
-using AntFlowCore.Core.entity;
+using AntFlowCore.Base.entity;
 using AntFlowCore.Core.vo;
 using FreeSql;
 

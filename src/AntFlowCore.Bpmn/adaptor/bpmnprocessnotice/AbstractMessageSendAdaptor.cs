@@ -1,7 +1,7 @@
 ﻿using AntFlowCore.Abstraction.adaptor;
 using AntFlowCore.Abstraction.service.biz;
-using AntFlowCore.Core.extension;
-using AntFlowCore.Vo;
+using AntFlowCore.Base.extension;
+using AntFlowCore.Base.vo;
 using Microsoft.Extensions.Logging;
 
 namespace AntFlowCore.Bpmn.adaptor.bpmnprocessnotice;

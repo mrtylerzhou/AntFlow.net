@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Core.constant.enums;
+﻿namespace AntFlowCore.Base.constant.enums;
 
 /// <summary>
 /// 审批标准枚举（富枚举实现）

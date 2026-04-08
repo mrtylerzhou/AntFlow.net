@@ -1,6 +1,6 @@
-﻿using AntFlowCore.Core.entity;
+﻿using AntFlowCore.Base.entity;
 
-namespace AntFlowCore.Core.util;
+namespace AntFlowCore.Base.util;
 
 public class TaskDataEqualityComparer: EqualityComparer<BpmAfTask>
 {

@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Core.exception
+﻿namespace AntFlowCore.Base.exception
 {
     /// <summary>
     /// 常见错误枚举

@@ -1,8 +1,7 @@
-﻿using System;
-using System.Text.Json.Serialization;
-using AntFlowCore.Core.conf.json;
+﻿using System.Text.Json.Serialization;
+using AntFlowCore.Base.conf.json;
 
-namespace AntFlowCore.Core.vo
+namespace AntFlowCore.Base.vo
 {
     public class BaseIdTranStruVo
     {

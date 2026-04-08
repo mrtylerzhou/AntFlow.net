@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace AntFlowCore.Core.extension;
+namespace AntFlowCore.Base.extension;
 
 public static partial class Extensions
 {

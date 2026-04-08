@@ -1,8 +1,7 @@
-﻿using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace AntFlowCore.Core.conf.json;
+namespace AntFlowCore.Base.conf.json;
 
 /// <summary>
 /// 不论输入是什么类型，都强制转为字符串表示

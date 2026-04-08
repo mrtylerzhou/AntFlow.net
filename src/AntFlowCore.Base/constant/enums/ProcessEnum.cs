@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace AntFlowCore.Core.constant.enums;
+namespace AntFlowCore.Base.constant.enums;
 
  public static class ProcessEnum
     {

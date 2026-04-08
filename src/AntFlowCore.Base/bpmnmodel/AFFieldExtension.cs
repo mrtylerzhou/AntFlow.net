@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Core.bpmnmodel;
+﻿namespace AntFlowCore.Base.bpmnmodel;
 
 public class AFFieldExtension
 {

@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Core.constant;
+﻿namespace AntFlowCore.Base.constant;
 
 public interface NumberConstants
 { 

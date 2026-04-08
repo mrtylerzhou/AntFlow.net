@@ -1,7 +1,7 @@
-﻿using AntFlowCore.Core.vo;
-using AntFlowCore.Vo;
+﻿using AntFlowCore.Base.vo;
+using AntFlowCore.Core.vo;
 
-namespace AntFlowCore.Core.adaptor;
+namespace AntFlowCore.Base.adaptor;
 
 public interface ICallbackAdaptor<out TReq, out TResp>: IAdaptorService
     where TReq : CallbackReqVo

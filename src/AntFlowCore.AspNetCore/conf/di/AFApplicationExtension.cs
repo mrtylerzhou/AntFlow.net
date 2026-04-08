@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
- 
-namespace Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace AntFlowCore.AspNetCore.conf.di;
 public static class AFApplicationExtension
 {
     public static IMvcBuilder AddAFApplicationComponents(this IMvcBuilder builder)

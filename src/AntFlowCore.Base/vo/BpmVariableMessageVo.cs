@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using AntFlowCore.Core.util;
+using AntFlowCore.Base.util;
 using AntFlowCore.Enums;
-using AntFlowCore.Vo;
 
-namespace AntFlowCore.Vo
+namespace AntFlowCore.Base.vo
 {
     public class BpmVariableMessageVo
     {

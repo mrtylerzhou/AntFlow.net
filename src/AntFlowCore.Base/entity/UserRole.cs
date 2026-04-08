@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Core.entity
+﻿namespace AntFlowCore.Base.entity
 {
     /// <summary>
     /// 用户角色关联表

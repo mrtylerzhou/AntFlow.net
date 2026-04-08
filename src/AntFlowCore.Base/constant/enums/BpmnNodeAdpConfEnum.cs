@@ -1,6 +1,6 @@
-﻿using AntFlowCore.Common.constant.enus;
+﻿using AntFlowCore.Core.constant.enums;
 
-namespace AntFlowCore.Core.constant.enums;
+namespace AntFlowCore.Base.constant.enums;
 
 public enum BpmnNodeAdpConfEnum
 {

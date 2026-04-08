@@ -1,6 +1,4 @@
-﻿using AntFlowCore.Bpmn.Bpmn.bpmn;
-
-namespace AntFlowCore.Core.bpmnmodel;
+﻿namespace AntFlowCore.Base.bpmnmodel;
 
 public abstract class AbstractFlowNode: AbstractFlowElement
 {

@@ -1,7 +1,6 @@
-﻿using AntFlowCore.Core.exception;
-using AntFlowCore.Core.util;
+﻿using AntFlowCore.Base.exception;
 
-namespace AntFlowCore.Core.constant.enums;
+namespace AntFlowCore.Base.constant.enums;
 
 /// <summary>
     /// Process node static class

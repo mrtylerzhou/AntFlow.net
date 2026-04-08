@@ -1,8 +1,9 @@
 ﻿using System.Text.Json.Serialization;
-using AntFlowCore.Core.conf.json;
-using AntFlowCore.Core.util;
+using AntFlowCore.Base.conf.json;
+using AntFlowCore.Base.util;
+using AntFlowCore.Core.vo;
 
-namespace AntFlowCore.Core.vo;
+namespace AntFlowCore.Base.vo;
 
 public class BaseKeyValueStruVo
 {

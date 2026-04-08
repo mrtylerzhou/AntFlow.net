@@ -1,11 +1,12 @@
 ﻿
 
 using AntFlowCore.Abstraction.util;
-using AntFlowCore.Core.adaptor;
+using AntFlowCore.Base.adaptor;
+using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.util;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Core.constant.enums;
-using AntFlowCore.Core.util;
 using AntFlowCore.Core.vo;
-using AntFlowCore.Vo;
 
 namespace AntFlowCore.Abstraction.adaptor;
 

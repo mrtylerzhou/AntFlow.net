@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.Text.RegularExpressions;
 using hyjiacan.py4n;
 
-namespace AntFlowCore.Core.util
+namespace AntFlowCore.Base.util
 {
     /// <summary>
     /// StrUtils

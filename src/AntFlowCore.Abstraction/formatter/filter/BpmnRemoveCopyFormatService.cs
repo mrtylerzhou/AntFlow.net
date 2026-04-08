@@ -1,7 +1,8 @@
-﻿using AntFlowCore.Common.constant.enus;
+﻿using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.vo;
+using AntFlowCore.Common.constant.enus;
 using AntFlowCore.Core.constant.enums;
 using AntFlowCore.Core.vo;
-using AntFlowCore.Vo;
 
 namespace AntFlowCore.Abstraction.formatter.filter;
 

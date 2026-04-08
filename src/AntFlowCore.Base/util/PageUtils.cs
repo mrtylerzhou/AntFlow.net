@@ -1,12 +1,12 @@
 ﻿using System.Text.Json;
-using AntFlowCore.Common.constant.enus;
-using AntFlowCore.Core.constant.enums;
-using AntFlowCore.Core.dto;
-using AntFlowCore.Core.entity;
-using AntFlowCore.Core.exception;
+using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.dto;
+using AntFlowCore.Base.entity;
+using AntFlowCore.Base.exception;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 
-namespace AntFlowCore.Core.util;
+namespace AntFlowCore.Base.util;
 // Using System.Text.Json for JSON serialization
 
 

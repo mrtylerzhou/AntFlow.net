@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Core.util;
+﻿namespace AntFlowCore.Base.interf;
 
 /// <summary>
 /// 用于排序的接口。

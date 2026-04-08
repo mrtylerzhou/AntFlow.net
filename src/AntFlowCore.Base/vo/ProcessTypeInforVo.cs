@@ -1,8 +1,6 @@
-using System;
-using System.Collections.Generic;
-using AntFlowCore.Core.entity;
+using AntFlowCore.Base.entity;
 
-namespace AntFlowCore.Vo
+namespace AntFlowCore.Base.vo
 {
     public class ProcessTypeInforVo
     {

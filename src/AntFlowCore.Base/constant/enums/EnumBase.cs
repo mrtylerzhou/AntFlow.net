@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace AntFlowCore.Core.constant.enums;
+namespace AntFlowCore.Base.constant.enums;
 
 public abstract class EnumBase<T> where T : EnumBase<T>
 {

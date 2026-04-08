@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace AntFlowCore.Vo
+﻿namespace AntFlowCore.Base.vo
 {
     public class Entrust
     {

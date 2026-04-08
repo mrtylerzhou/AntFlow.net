@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Enums
+﻿namespace AntFlowCore.Base.constant.enums
 {
     public enum InformEnum
     {

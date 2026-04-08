@@ -1,5 +1,4 @@
-﻿using AntFlowCore.Common.util;
-using AntFlowCore.Core.util;
+﻿using AntFlowCore.Base.util;
 using Microsoft.Extensions.Logging;
 
 namespace AntFlowCore.Bpmn.adaptor.nodetypecondition.judge;

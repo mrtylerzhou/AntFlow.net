@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace AntFlowCore.Core.util;
+namespace AntFlowCore.Base.util;
 
 public static class DateUtil
 {

@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Core.entity;
+﻿namespace AntFlowCore.Base.entity;
 
 /// <summary>
 /// Generic employee DTO, 用于表示登录员工的通用信息

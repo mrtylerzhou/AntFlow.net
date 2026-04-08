@@ -1,6 +1,7 @@
-﻿using AntFlowCore.Core.vo;
+﻿using AntFlowCore.Base.vo;
+using AntFlowCore.Core.vo;
 
-namespace AntFlowCore.Core.util;
+namespace AntFlowCore.Base.util;
 
 /// <summary>
 /// 新版本linq有distinctby方法,为了兼容旧版本,自己实现

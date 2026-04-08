@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
-using AntFlowCore.Core.entity;
+using AntFlowCore.Base.entity;
 
-namespace AntFlowCore.Core.interf;
+namespace AntFlowCore.Base.interf;
 
 public interface ITaskService
 {

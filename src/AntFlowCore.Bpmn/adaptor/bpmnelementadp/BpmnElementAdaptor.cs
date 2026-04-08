@@ -1,11 +1,13 @@
-﻿using AntFlowCore.Common.constant.enus;
-using AntFlowCore.Common.util;
-using AntFlowCore.Core.adaptor;
+﻿using AntFlowCore.Base.adaptor;
+using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.vo;
+using AntFlowCore.Bpmn.constants;
+using AntFlowCore.Bpmn.util;
+using AntFlowCore.Common.constant.enus;
 using AntFlowCore.Core.constant.enums;
 using AntFlowCore.Core.vo;
-using AntFlowCore.Vo;
 
-namespace AntFlowCore.Core;
+namespace AntFlowCore.Bpmn.adaptor.bpmnelementadp;
 
 public abstract class BpmnElementAdaptor : IAdaptorService
     {

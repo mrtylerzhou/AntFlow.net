@@ -1,7 +1,7 @@
-﻿using AntFlowCore.Core.exception;
-using AntFlowCore.Core.util;
+﻿using AntFlowCore.Base.exception;
+using AntFlowCore.Base.util;
 
-namespace AntFlowCore.Core.entity;
+namespace AntFlowCore.Base.entity;
 
 /// <summary>
 /// Represents the external configuration for BPMN.

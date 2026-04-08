@@ -1,4 +1,4 @@
-using AntFlowCore.Core.dto;
+using AntFlowCore.Base.dto;
 using AntFlowCore.Core.vo;
 
 namespace AntFlowCore.Abstraction.service.biz;
