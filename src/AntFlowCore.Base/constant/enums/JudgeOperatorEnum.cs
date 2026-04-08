@@ -1,6 +1,6 @@
 ﻿
 
-using AntFlowCore.Common.exception;
+using AntFlowCore.Core.exception;
 
 namespace AntFlowCore.Core.constant.enums;
 

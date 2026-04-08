@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Common.exception;
+﻿using AntFlowCore.Core.exception;
 using AntFlowCore.Core.util;
 
 namespace AntFlowCore.Core.entity;

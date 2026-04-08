@@ -1,5 +1,5 @@
 ﻿
-using AntFlowCore.Common.exception;
+using AntFlowCore.Core.exception;
 
 namespace AntFlowCore.Core.conf.json;
 
