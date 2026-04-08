@@ -3,6 +3,7 @@ using AntFlowCore.Vo;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AntFlowCore.Core.bpmnmodel;
 
 namespace AntFlowCore.Bpmn.Bpmn.bpmn.build;
 

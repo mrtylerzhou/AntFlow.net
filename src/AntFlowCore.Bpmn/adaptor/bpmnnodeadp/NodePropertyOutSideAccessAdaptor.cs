@@ -1,9 +1,9 @@
 ﻿using AntFlowCore.Common.constant.enus;
 using AntFlowCore.Core.adaptor;
 using AntFlowCore.Core.adaptor.bpmnnodeadp;
+using AntFlowCore.Core.constant.enums;
 using AntFlowCore.Core.entity;
 using AntFlowCore.Core.vo;
-using AntFlowCore.Entity;
 using AntFlowCore.Persist.api.interf.repository;
 using Microsoft.Extensions.Logging;
 

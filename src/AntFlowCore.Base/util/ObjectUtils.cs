@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace AntFlowCore.Common.util;
+namespace AntFlowCore.Core.util;
 
 public static class ObjectUtils
 {

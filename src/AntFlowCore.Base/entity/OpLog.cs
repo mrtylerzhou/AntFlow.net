@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Constants;
+﻿using AntFlowCore.Core.util;
 using FreeSql.DataAnnotations;
 
 namespace AntFlowCore.Core.entity

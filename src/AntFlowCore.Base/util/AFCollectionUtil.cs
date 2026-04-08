@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace AntFlowCore.Common.util;
+﻿namespace AntFlowCore.Core.util;
 
 /// <summary>
 /// A convenient collection utility class mainly used to convert ID types.

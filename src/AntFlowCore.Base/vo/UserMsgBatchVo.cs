@@ -1,4 +1,4 @@
-using AntFlowCore.Common.constant.enums;
+using AntFlowCore.Core.constant.enums;
 using AntFlowCore.Vo;
 
 namespace AntFlowCore.Core.vo;

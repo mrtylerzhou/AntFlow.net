@@ -1,6 +1,5 @@
 using AntFlowCore.Core.entity;
 using AntFlowCore.Core.vo;
-using AntFlowCore.Entity;
 using FreeSql;
 
 namespace AntFlowCore.Abstraction.service.repository;

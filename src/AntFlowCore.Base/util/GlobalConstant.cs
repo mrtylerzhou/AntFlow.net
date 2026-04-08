@@ -1,6 +1,6 @@
 ﻿
 
-namespace AntFlowCore.Common.constant;
+namespace AntFlowCore.Core.util;
 
 public static class GlobalConstant
 {

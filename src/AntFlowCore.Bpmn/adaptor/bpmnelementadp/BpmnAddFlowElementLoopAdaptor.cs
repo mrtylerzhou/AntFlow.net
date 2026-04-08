@@ -1,5 +1,6 @@
 ﻿using AntFlowCore.Bpmn.Bpmn.bpmn.build;
 using AntFlowCore.Common.constant.enus;
+using AntFlowCore.Core.constant.enums;
 using AntFlowCore.Core.entity;
 using AntFlowCore.Extensions.Extensions.adaptor.bpmnelementadp;
 using AntFlowCore.Vo;

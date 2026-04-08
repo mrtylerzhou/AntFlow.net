@@ -1,7 +1,8 @@
-﻿using AntFlowCore.Core.interf;
+﻿
+using AntFlowCore.Core.interf;
 using Microsoft.Extensions.Configuration;
 
-namespace AntFlowCore.Common.util;
+namespace AntFlowCore.Core.util;
 
 public static class MultiTenantUtil
 {

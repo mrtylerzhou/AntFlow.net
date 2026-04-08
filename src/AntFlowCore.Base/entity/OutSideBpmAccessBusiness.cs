@@ -1,6 +1,6 @@
 ﻿
 
-using AntFlowCore.Constants;
+using AntFlowCore.Core.util;
 
 namespace AntFlowCore.Core.entity;
 /// <summary>

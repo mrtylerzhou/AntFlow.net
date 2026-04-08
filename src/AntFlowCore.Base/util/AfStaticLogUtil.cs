@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace AntFlowCore.Common.util;
+namespace AntFlowCore.Core.util;
 
 public class AfStaticLogUtil
 {

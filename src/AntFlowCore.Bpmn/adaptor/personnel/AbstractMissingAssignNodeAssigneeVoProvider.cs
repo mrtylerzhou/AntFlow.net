@@ -1,9 +1,9 @@
 ﻿using AntFlowCore.Abstraction.util;
 using AntFlowCore.Bpmn.adaptor.personnel.provider;
-using AntFlowCore.Common.constant.enums;
 using AntFlowCore.Common.constant.enus;
 using AntFlowCore.Common.exception;
-using AntFlowCore.Common.util.Extension;
+using AntFlowCore.Core.constant.enums;
+using AntFlowCore.Core.extension;
 using AntFlowCore.Core.vo;
 using AntFlowCore.Extensions;
 

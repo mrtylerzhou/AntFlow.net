@@ -1,6 +1,5 @@
 using System;
 using AntFlowCore.Core.entity;
-using AntFlowCore.Entity;
 
 namespace AntFlowCore.Vo
 {

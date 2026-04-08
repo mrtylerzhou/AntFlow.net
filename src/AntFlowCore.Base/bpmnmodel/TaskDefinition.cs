@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using AntFlowCore.Bpmn.Bpmn.bpmn;
 
-namespace AntFlowCore.Bpmn.Bpmn.bpmn;
+namespace AntFlowCore.Core.bpmnmodel;
 
 public class TaskDefinition
 {

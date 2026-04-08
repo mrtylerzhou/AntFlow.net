@@ -1,18 +1,13 @@
-﻿using System.Net.Mail;
-using AntFlowCore.Common.util.Extension;
+﻿using AntFlowCore.Core.dto;
+using AntFlowCore.Core.extension;
 using AntFlowCore.Vo;
-using AntFlowCore.Core.dto;
 using MailKit.Security;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using MimeKit;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
-namespace AntFlowCore.Common.util;
-
-using System.IO;
-using System.Linq;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-
+namespace AntFlowCore.Core.util;
 
 public class MailUtils
 {

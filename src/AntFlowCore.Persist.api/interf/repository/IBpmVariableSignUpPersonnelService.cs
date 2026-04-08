@@ -1,6 +1,6 @@
 using AntFlowCore.Core.entity;
+using AntFlowCore.Core.interf;
 using AntFlowCore.Core.vo;
-using AntFlowCore.Extensions.service;
 using FreeSql;
 
 namespace AntFlowCore.Persist.api.interf.repository;

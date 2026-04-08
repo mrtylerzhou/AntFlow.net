@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Bpmn.Bpmn.bpmn;
+﻿namespace AntFlowCore.Core.bpmnmodel;
 
 public class EndEvent: AbstractEvent
 {

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
-namespace AntFlowCore.Util
+namespace AntFlowCore.Core.util
 {
     public static class MDCLogUtil
     {

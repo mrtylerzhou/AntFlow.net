@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace AntFlowCore.Bpmn.Bpmn.bpmn;
+﻿namespace AntFlowCore.Core.bpmnmodel;
 
 public interface IAFExecutionListeners
 {

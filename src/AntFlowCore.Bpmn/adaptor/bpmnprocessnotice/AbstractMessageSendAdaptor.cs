@@ -1,6 +1,6 @@
 ﻿using AntFlowCore.Abstraction.adaptor;
 using AntFlowCore.Abstraction.service.biz;
-using AntFlowCore.Common.util.Extension;
+using AntFlowCore.Core.extension;
 using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
 

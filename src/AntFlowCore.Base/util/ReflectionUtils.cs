@@ -1,6 +1,6 @@
-﻿namespace AntFlowCore.Common.util;
+﻿using System.Reflection;
 
-using System.Reflection;
+namespace AntFlowCore.Core.util;
 
 public static class ReflectionUtils
 {

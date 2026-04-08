@@ -1,8 +1,8 @@
 using AntFlowCore.Common.constant.enus;
-using AntFlowCore.Common.util.Extension;
+using AntFlowCore.Core.constant.enums;
 using AntFlowCore.Core.entity;
+using AntFlowCore.Core.extension;
 using AntFlowCore.Core.vo;
-using AntFlowCore.Entity;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repository;

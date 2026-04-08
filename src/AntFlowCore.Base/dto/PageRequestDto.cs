@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
-using AntFlowCore.Common.util;
 using AntFlowCore.Core.entity;
+using AntFlowCore.Core.util;
 
 namespace AntFlowCore.Core.dto;
 

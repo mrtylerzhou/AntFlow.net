@@ -1,9 +1,6 @@
-﻿
+﻿using AntFlowCore.Core.vo;
 
-using System;
-using AntFlowCore.Core.vo;
-
-namespace AntFlowCore.Common.util;
+namespace AntFlowCore.Core.util;
 
 public class AfNodeUtils
 {

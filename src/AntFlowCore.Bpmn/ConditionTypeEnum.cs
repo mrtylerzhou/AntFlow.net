@@ -1,6 +1,6 @@
 using AntFlowCore.Bpmn.adaptor.nodetypecondition;
 using AntFlowCore.Bpmn.adaptor.nodetypecondition.judge;
-using AntFlowCore.Constants;
+using AntFlowCore.Core.util;
 using AntFlowCore.Vo;
 
 namespace AntFlowCore.Core.constant.enus;

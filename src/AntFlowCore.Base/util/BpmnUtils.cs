@@ -1,7 +1,6 @@
-﻿using System.Collections.ObjectModel;
-using AntFlowCore.Core.vo;
+﻿using AntFlowCore.Core.vo;
 
-namespace AntFlowCore.Common.util;
+namespace AntFlowCore.Core.util;
 
 public class BpmnUtils {
     public static BpmnNodeVo GetAggregationNode(BpmnNodeVo parallelNode, IEnumerable<BpmnNodeVo> bpmnNodeVos){

@@ -1,5 +1,4 @@
 using AntFlowCore.Core.entity;
-using AntFlowCore.Entity;
 
 namespace AntFlowCore.Persist.repository;
 

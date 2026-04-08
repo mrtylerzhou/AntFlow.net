@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Constants;
+﻿using AntFlowCore.Core.util;
 using AntFlowCore.Enums;
 
 namespace AntFlowCore.Core.entity

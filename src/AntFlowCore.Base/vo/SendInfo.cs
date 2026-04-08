@@ -1,7 +1,6 @@
 using System;
 using System.Text.Json.Serialization;
 using AntFlowCore.Core.entity;
-using AntFlowCore.Entity;
 
 namespace AntFlowCore.Vo
 {

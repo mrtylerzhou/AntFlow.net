@@ -1,9 +1,8 @@
 using AntFlowCore.Core.entity;
-using AntFlowCore.Entity;
 using AntFlowCore.Core.vo;
 using AntFlowCore.Vo;
 
-namespace AntFlowCore.Common.util;
+namespace AntFlowCore.Core.util;
 
 public static class MapperUtil
 {

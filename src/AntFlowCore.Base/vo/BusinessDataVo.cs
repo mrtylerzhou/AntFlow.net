@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using AntFlowCore.Core.conf.json;
+using AntFlowCore.Core.constant.enums;
 using AntFlowCore.Core.vo;
-using YourNamespace;
 
 namespace AntFlowCore.Vo
 {
