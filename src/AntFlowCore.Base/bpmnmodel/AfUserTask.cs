@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Bpmn.Bpmn.bpmn;
+﻿namespace AntFlowCore.Base.bpmnmodel;
 
 public class AfUserTask: AbstractTask
 {

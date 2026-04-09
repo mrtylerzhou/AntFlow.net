@@ -1,8 +1,9 @@
-﻿using AntFlowCore.Common.exception;
+﻿using AntFlowCore.Base.exception;
+using AntFlowCore.Base.factory;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
-using AntFlowCore.Util;
 
-namespace AntFlowCore.Common.util
+namespace AntFlowCore.Base.util
 {
     public class SecurityUtils
     {

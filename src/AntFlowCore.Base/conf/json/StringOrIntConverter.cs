@@ -1,11 +1,8 @@
-﻿
-using AntFlowCore.Common.exception;
-
-namespace AntFlowCore.Core.conf.json;
-
-using System;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using AntFlowCore.Base.exception;
+
+namespace AntFlowCore.Base.conf.json;
 
 public class StringOrIntConverter : JsonConverter<string>
 {

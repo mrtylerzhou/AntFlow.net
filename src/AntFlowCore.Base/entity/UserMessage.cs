@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
-using AntFlowCore.Vo;
+using AntFlowCore.Base.vo;
 
-namespace AntFlowCore.Core.entity
+namespace AntFlowCore.Base.entity
 {
     public class UserMessage
     {

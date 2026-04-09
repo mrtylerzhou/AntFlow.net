@@ -1,7 +1,7 @@
-﻿using AntFlowCore.Constants;
+﻿using AntFlowCore.Base.util;
 using FreeSql.DataAnnotations;
 
-namespace AntFlowCore.Core.entity
+namespace AntFlowCore.Base.entity
 {
     /// <summary>
     /// Represents the operation log entity.

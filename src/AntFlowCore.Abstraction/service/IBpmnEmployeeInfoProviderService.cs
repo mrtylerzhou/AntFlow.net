@@ -1,5 +1,5 @@
 ﻿
-using AntFlowCore.Core.entity;
+using AntFlowCore.Base.entity;
 
 namespace AntFlowCore.Abstraction.service;
 

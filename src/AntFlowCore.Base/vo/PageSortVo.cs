@@ -1,6 +1,6 @@
-﻿using AntFlowCore.Common.constant.enus;
+﻿using AntFlowCore.Base.constant.enums;
 
-namespace AntFlowCore.Core.vo;
+namespace AntFlowCore.Base.vo;
 
 public class PageSortVo
 {

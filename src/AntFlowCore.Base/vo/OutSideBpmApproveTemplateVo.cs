@@ -1,14 +1,8 @@
-using AntFlowCore.Core.conf.json;
-using AntFlowCore.Constants;
-
-namespace AntFlowCore.Core.vo;
-
-using System;
-using System.Collections.Generic;
-
-using System;
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using AntFlowCore.Base.conf.json;
+using AntFlowCore.Base.util;
+
+namespace AntFlowCore.Base.vo;
 
 [Serializable]
 public class OutSideBpmApproveTemplateVo

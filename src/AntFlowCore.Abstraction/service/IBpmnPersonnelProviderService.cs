@@ -1,5 +1,5 @@
-﻿using AntFlowCore.Core.vo;
-using AntFlowCore.Vo;
+﻿using AntFlowCore.Base.vo;
+using AntFlowCore.Core.vo;
 
 namespace AntFlowCore.Abstraction.service;
 

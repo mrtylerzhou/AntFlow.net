@@ -1,9 +1,9 @@
 ﻿using System.Text.Json.Serialization;
-using AntFlowCore.Common.util;
-using AntFlowCore.Core.entity;
-using AntFlowCore.Vo;
+using AntFlowCore.Base.entity;
+using AntFlowCore.Base.util;
+using AntFlowCore.Base.vo;
 
-namespace AntFlowCore.Core.dto;
+namespace AntFlowCore.Base.dto;
 
 public class DetailRequestDto
 {

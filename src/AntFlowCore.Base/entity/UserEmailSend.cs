@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Core.entity
+﻿namespace AntFlowCore.Base.entity
 {
     /// <summary>
     /// Represents a user email send record.

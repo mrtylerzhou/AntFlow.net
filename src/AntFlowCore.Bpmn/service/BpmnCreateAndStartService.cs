@@ -1,10 +1,9 @@
 ﻿using AntFlowCore.Abstraction.service;
-using AntFlowCore.Bpmn.Bpmn.bpmn;
-using AntFlowCore.Common.exception;
-using AntFlowCore.Core.entity;
-using AntFlowCore.Extensions.service;
+using AntFlowCore.Base.bpmnmodel;
+using AntFlowCore.Base.entity;
+using AntFlowCore.Base.exception;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Persist.api.interf.repository;
-using AntFlowCore.Vo;
 
 namespace AntFlowCore.Bpmn.service;
 

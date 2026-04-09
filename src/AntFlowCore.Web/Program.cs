@@ -1,14 +1,15 @@
 using System.Reflection;
 using System.Text.Json;
 using AntFlowCore.Abstraction.aop;
-using AntFlowCore.AspNetCore.AspNetCore.conf.di;
-using AntFlowCore.AspNetCore.AspNetCore.conf.serviceregistration;
+using AntFlowCore.AspNetCore.conf.conf.serviceregistration;
+using AntFlowCore.AspNetCore.conf.di;
 using AntFlowCore.AspNetCore.conf.di.serviceregistration;
 using AntFlowCore.AspNetCore.conf.freesql;
 using AntFlowCore.AspNetCore.conf.middleware;
-using AntFlowCore.Common.constant.enus;
-using AntFlowCore.Common.util;
-using AntFlowCore.Core.conf.json;
+using AntFlowCore.Base.conf.json;
+using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.util;
+using AntFlowCore.Core.constant.enums;
 using FreeSql;
 using Microsoft.OpenApi;
 

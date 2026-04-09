@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 
-namespace AntFlowCore.Util
+namespace AntFlowCore.Base.util
 {
     public static class NetworkUtil
     {

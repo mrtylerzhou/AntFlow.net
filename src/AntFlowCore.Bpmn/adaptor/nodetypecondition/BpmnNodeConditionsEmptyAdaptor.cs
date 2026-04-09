@@ -1,5 +1,6 @@
 ﻿
 
+using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 
 namespace AntFlowCore.Bpmn.adaptor.nodetypecondition;

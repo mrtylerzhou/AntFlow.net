@@ -1,9 +1,8 @@
-﻿namespace AntFlowCore.Common.util;
-
-using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.NetworkInformation;
 using System.Text;
+
+namespace AntFlowCore.Base.util;
 
 public class SnowFlake
 {

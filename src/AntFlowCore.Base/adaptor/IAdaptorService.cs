@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace AntFlowCore.Core.adaptor;
+namespace AntFlowCore.Base.adaptor;
 
  /// <summary>
     /// This interface is used to adapt to different business objects.

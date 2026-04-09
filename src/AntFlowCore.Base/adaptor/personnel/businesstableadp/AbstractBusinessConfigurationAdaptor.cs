@@ -1,8 +1,8 @@
-using AntFlowCore.Common.exception;
+using AntFlowCore.Base.exception;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
-using AntFlowCore.Vo;
 
-namespace AntFlowCore.Core.adaptor.personnel.businesstableadp;
+namespace AntFlowCore.Base.adaptor.personnel.businesstableadp;
 
 public abstract class AbstractBusinessConfigurationAdaptor
 {

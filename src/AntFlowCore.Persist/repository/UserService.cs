@@ -1,12 +1,12 @@
 ﻿using System.Linq.Expressions;
-using AntFlowCore.Common.exception;
-using AntFlowCore.Common.util;
-using AntFlowCore.Common.util.Extension;
-using AntFlowCore.Core.dto;
-using AntFlowCore.Core.entity;
+using AntFlowCore.Base.dto;
+using AntFlowCore.Base.entity;
+using AntFlowCore.Base.exception;
+using AntFlowCore.Base.extension;
+using AntFlowCore.Base.util;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 using AntFlowCore.Persist.api.interf.repository;
-using AntFlowCore.Vo;
 using FreeSql.Internal.Model;
 
 namespace AntFlowCore.Persist.repository;

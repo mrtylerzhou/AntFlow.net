@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Core.entity;
+﻿namespace AntFlowCore.Base.entity;
 
 /// <summary>
 /// 流程任务实体类

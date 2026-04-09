@@ -1,5 +1,7 @@
-﻿using AntFlowCore.Common.util;
-using AntFlowCore.Core.entity;
+﻿
+using AntFlowCore.Base.entity;
+using AntFlowCore.Base.util;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 using AntFlowCore.Persist.api.interf.repository;
 
@@ -9,10 +11,9 @@ public class AFTaskService: AFBaseCurdRepositoryService<BpmAfTask>,IAFTaskServic
 {
     public AFTaskService(IFreeSql freeSql) : base(freeSql)
     {
-        this.Frsql = freeSql;
+     
     }
-
-    public IFreeSql Frsql { get; }
+    
 
     public List<BpmAfTask> FindTaskByEmpId(String userId)
     {

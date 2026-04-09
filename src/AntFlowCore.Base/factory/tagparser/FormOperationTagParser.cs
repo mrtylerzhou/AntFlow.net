@@ -1,10 +1,10 @@
-using AntFlowCore.Common.exception;
-using AntFlowCore.Common.util;
-using AntFlowCore.Core.adaptor.processoperation;
-using AntFlowCore.Enums;
-using AntFlowCore.Vo;
+using AntFlowCore.Base.adaptor.processoperation;
+using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.exception;
+using AntFlowCore.Base.util;
+using AntFlowCore.Base.vo;
 
-namespace AntFlowCore.Core.factory.tagparser;
+namespace AntFlowCore.Base.factory.tagparser;
 
 public class FormOperationTagParser: TagParser<IProcessOperationAdaptor,BusinessDataVo>
 {

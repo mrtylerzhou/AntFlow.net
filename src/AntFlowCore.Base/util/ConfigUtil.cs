@@ -1,7 +1,6 @@
-﻿
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 
-namespace AntFlowCore.Common.util;
+namespace AntFlowCore.Base.util;
 
 public class ConfigUtil
 {

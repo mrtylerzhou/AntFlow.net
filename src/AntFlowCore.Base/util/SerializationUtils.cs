@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
-namespace AntFlowCore.Common.util;
+namespace AntFlowCore.Base.util;
 
 public class SerializationUtils
 {

@@ -1,7 +1,8 @@
-﻿using AntFlowCore.Constants;
+﻿using AntFlowCore.Base.util;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 
-namespace AntFlowCore.Core.dto;
+namespace AntFlowCore.Base.dto;
 
 public class DIYProcessInfoDTO
 {

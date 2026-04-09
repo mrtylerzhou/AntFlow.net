@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace AntFlowCore.Bpmn.Bpmn.bpmn;
+﻿namespace AntFlowCore.Base.bpmnmodel;
 
 public abstract class AfAbstractGateway: AbstractFlowNode
 {

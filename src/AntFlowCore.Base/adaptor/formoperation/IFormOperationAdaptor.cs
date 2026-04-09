@@ -1,6 +1,6 @@
-using AntFlowCore.Vo;
+using AntFlowCore.Base.vo;
 
-namespace AntFlowCore.Core.adaptor.formoperation;
+namespace AntFlowCore.Base.adaptor.formoperation;
 
 public interface IFormOperationAdaptor<in T> where T : BusinessDataVo
 {

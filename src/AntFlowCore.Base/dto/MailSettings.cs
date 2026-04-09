@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Core.dto;
+﻿namespace AntFlowCore.Base.dto;
 
 /// <summary>
 /// 邮件服务配置项

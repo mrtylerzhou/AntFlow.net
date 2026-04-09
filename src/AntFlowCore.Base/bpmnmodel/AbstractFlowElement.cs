@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace AntFlowCore.Bpmn.Bpmn.bpmn;
+﻿namespace AntFlowCore.Base.bpmnmodel;
 
 public abstract class AbstractFlowElement: AFAbstractBaseElement,IAFExecutionListeners
 {

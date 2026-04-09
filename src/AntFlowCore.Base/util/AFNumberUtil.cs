@@ -1,14 +1,10 @@
-﻿using System.Linq;
-
-namespace AntFlowCore.Common.util;
-
-using System;
+﻿using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
-using System.Numerics;
 
+namespace AntFlowCore.Base.util;
 
-    public static class AFNumberUtil
+public static class AFNumberUtil
     {
         // 62 进制字符集：0-9, A-Z, a-z
         private static readonly char[] Base62Chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".ToCharArray();

@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
-using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
 
 namespace AntFlowCore.Bpmn.adaptor.nodetypecondition.judge;

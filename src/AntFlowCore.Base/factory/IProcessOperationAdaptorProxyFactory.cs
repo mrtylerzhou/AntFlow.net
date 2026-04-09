@@ -1,6 +1,6 @@
-namespace AntFlowCore.Core.factory;
+using AntFlowCore.Base.adaptor.processoperation;
 
-using AntFlowCore.Core.adaptor.processoperation;
+namespace AntFlowCore.Base.factory;
 
 /// <summary>
 /// Factory interface for creating process operation adaptor proxies.

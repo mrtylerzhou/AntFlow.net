@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using AntFlowCore.Constants;
-using AntFlowCore.Core.vo;
+using AntFlowCore.Base.util;
 
-namespace AntFlowCore.Vo
+namespace AntFlowCore.Base.vo
 {
     public class OutSideBpmBusinessPartyVo
     {

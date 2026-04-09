@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace AntFlowCore.Common.exception;
+﻿namespace AntFlowCore.Base.exception;
 
 public class AFBizException : Exception
     {

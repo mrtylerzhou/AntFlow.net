@@ -1,6 +1,4 @@
-namespace AntFlowCore.Core.factory;
-
-using System;
+namespace AntFlowCore.Base.factory;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface)]
 public sealed class DIYFormServiceAnnoAttribute : Attribute

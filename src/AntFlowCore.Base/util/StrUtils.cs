@@ -1,14 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Text.RegularExpressions;
-using AntFlowCore.Common.util;
-using AntFlowCore.Constants;
 using hyjiacan.py4n;
 
-
-namespace AntFlowCore.Util
+namespace AntFlowCore.Base.util
 {
     /// <summary>
     /// StrUtils

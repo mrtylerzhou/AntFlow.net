@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace AntFlowCore.AspNetCore.AspNetCore.conf.di;
+namespace AntFlowCore.AspNetCore.conf.di;
 
 public static class ServiceCollectionHolder
 {

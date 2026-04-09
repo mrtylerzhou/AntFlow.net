@@ -1,5 +1,5 @@
 ﻿
-namespace AntFlowCore.Constants
+namespace AntFlowCore.Base.util
 {
     public interface StringConstants
     {

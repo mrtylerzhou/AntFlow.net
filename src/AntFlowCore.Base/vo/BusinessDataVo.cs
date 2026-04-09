@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
-using AntFlowCore.Core.conf.json;
+﻿using System.Text.Json.Serialization;
+using AntFlowCore.Base.conf.json;
+using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Core.vo;
-using YourNamespace;
 
-namespace AntFlowCore.Vo
+namespace AntFlowCore.Base.vo
 {
     public class BusinessDataVo
     {

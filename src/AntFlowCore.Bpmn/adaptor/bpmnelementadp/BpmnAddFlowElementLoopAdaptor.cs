@@ -1,8 +1,9 @@
-﻿using AntFlowCore.Bpmn.Bpmn.bpmn.build;
+﻿using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.entity;
+using AntFlowCore.Base.util;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Common.constant.enus;
-using AntFlowCore.Core.entity;
-using AntFlowCore.Extensions.Extensions.adaptor.bpmnelementadp;
-using AntFlowCore.Vo;
+using AntFlowCore.Core.constant.enums;
 using Microsoft.Extensions.Logging;
 
 namespace AntFlowCore.Bpmn.adaptor.bpmnelementadp;

@@ -1,9 +1,8 @@
-﻿using AntFlowCore.Common.constant.enums;
-using AntFlowCore.Common.constant.enus;
-using AntFlowCore.Common.exception;
-using AntFlowCore.Common.util;
+﻿using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.exception;
+using AntFlowCore.Base.util;
 
-namespace AntFlowCore.Core.entity;
+namespace AntFlowCore.Base.entity;
 
 public class LFMainField
 {

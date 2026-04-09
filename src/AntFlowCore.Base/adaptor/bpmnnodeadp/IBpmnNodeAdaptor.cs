@@ -1,6 +1,7 @@
+using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 
-namespace AntFlowCore.Core.adaptor.bpmnnodeadp;
+namespace AntFlowCore.Base.adaptor.bpmnnodeadp;
 
 public interface  IBpmnNodeAdaptor: IAdaptorService
 {

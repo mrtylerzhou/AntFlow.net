@@ -1,7 +1,6 @@
-﻿using AntFlowCore.Bpmn.Bpmn.bpmn.build;
-using AntFlowCore.Core.entity;
-using AntFlowCore.Extensions.Extensions.adaptor.bpmnelementadp;
-using AntFlowCore.Vo;
+﻿using AntFlowCore.Base.entity;
+using AntFlowCore.Base.util;
+using AntFlowCore.Base.vo;
 using Microsoft.Extensions.Logging;
 
 namespace AntFlowCore.Bpmn.adaptor.bpmnelementadp;

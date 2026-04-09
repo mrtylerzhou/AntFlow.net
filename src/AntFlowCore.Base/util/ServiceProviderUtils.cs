@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Concurrent;
-using AntFlowCore.Engine.Engine.service;
+using AntFlowCore.Base.interf;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AntFlowCore.Common.util;
+namespace AntFlowCore.Base.util;
 
 public static class ServiceProviderUtils
 {

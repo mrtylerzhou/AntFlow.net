@@ -1,9 +1,8 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace AntFlowCore.Core.conf.json;
+namespace AntFlowCore.Base.conf.json;
 
 public class DateOnlyConverter : JsonConverter<DateTime?>
 {

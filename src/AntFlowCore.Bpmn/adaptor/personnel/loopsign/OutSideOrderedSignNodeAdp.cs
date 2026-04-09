@@ -1,11 +1,13 @@
 ﻿using AntFlowCore.Abstraction.adaptor;
 using AntFlowCore.Abstraction.util;
+using AntFlowCore.Base.adaptor;
+using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.util;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Common.constant.enus;
-using AntFlowCore.Common.util;
-using AntFlowCore.Core.adaptor;
+using AntFlowCore.Core.constant.enums;
 using AntFlowCore.Core.vo;
 using AntFlowCore.Extensions;
-using AntFlowCore.Vo;
 
 namespace AntFlowCore.Bpmn.adaptor.personnel.loopsign;
 

@@ -1,7 +1,7 @@
-using AntFlowCore.Core.adaptor.formoperation;
-using AntFlowCore.Vo;
+using AntFlowCore.Base.adaptor.formoperation;
+using AntFlowCore.Base.vo;
 
-namespace AntFlowCore.Core.factory;
+namespace AntFlowCore.Base.factory;
 
 public interface IFormFactory
 {

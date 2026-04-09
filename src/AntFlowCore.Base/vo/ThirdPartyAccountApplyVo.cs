@@ -1,8 +1,7 @@
 using System.Text.Json.Serialization;
-using AntFlowCore.Constants;
-using AntFlowCore.Vo;
+using AntFlowCore.Base.util;
 
-namespace AntFlowCore.Core.vo;
+namespace AntFlowCore.Base.vo;
 
 public class ThirdPartyAccountApplyVo: BusinessDataVo
 {

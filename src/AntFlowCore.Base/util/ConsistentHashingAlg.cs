@@ -1,6 +1,4 @@
-using AntFlowCore.Constants;
-
-namespace AntFlowCore.Common.util;
+namespace AntFlowCore.Base.util;
 
 public class ConsistentHashingAlg
 {

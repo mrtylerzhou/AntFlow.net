@@ -1,6 +1,6 @@
-﻿using AntFlowCore.Constants;
+﻿using AntFlowCore.Base.util;
 
-namespace AntFlowCore.Core.entity;
+namespace AntFlowCore.Base.entity;
 
 /// <summary>
 /// 变量单一指派实体

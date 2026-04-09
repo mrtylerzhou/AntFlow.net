@@ -1,17 +1,8 @@
-﻿using System.Diagnostics;
+﻿using System.Net.NetworkInformation;
 
-namespace AntFlowCore.Common.util;
+namespace AntFlowCore.Base.util;
 
-using System;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading;
-
-    using System;
-using System.Linq;
-using System.Net.NetworkInformation;
-
- public static class StrongUuidGenerator
+public static class StrongUuidGenerator
     {
         private static readonly TimeBasedGuidGenerator Generator;
 

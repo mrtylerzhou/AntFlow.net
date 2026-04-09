@@ -1,11 +1,8 @@
-﻿
+﻿using AntFlowCore.Abstraction.service.biz;
+using AntFlowCore.Base.util;
+using AntFlowCore.Base.vo;
 
-using System.Collections.Generic;
-using AntFlowCore.Abstraction.service.biz;
-using AntFlowCore.Engine.Engine.service.biz;
-using AntFlowCore.Vo;
-
-namespace AntFlowCore.Common.util;
+namespace AntFlowCore.Bpmn.util;
 
 public class ActivitiTemplateMsgUtils
 {

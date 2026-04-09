@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Core.entity
+﻿namespace AntFlowCore.Base.entity
 {
     /// <summary>
     /// 用户消息状态实体类

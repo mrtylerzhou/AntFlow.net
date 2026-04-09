@@ -1,6 +1,4 @@
-using System;
-
-namespace AntFlowCore.Core.factory;
+namespace AntFlowCore.Base.factory;
 
 /// <summary>
 /// This is used by the AntFlow framework to build up adaptor factories.

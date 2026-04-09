@@ -1,7 +1,7 @@
-﻿using AntFlowCore.Constants;
+﻿using AntFlowCore.Base.util;
 using AntFlowCore.Enums;
 
-namespace AntFlowCore.Core.entity
+namespace AntFlowCore.Base.entity
 {
     /// <summary>
     /// Information template entity.

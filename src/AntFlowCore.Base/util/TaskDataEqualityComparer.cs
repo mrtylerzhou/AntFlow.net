@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using AntFlowCore.Core.entity;
+﻿using AntFlowCore.Base.entity;
 
-namespace AntFlowCore.Engine.Engine.service.biz;
+namespace AntFlowCore.Base.util;
 
 public class TaskDataEqualityComparer: EqualityComparer<BpmAfTask>
 {

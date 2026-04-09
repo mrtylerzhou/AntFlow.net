@@ -1,11 +1,9 @@
-﻿
-using AntFlowCore.Bpmn.Bpmn.bpmn.build;
-using AntFlowCore.Common.util;
-using AntFlowCore.Core.entity;
-using AntFlowCore.Vo;
+﻿using AntFlowCore.Base.entity;
+using AntFlowCore.Base.util;
+using AntFlowCore.Base.vo;
 using Microsoft.Extensions.Logging;
 
-namespace AntFlowCore.Extensions.Extensions.adaptor.bpmnelementadp;
+namespace AntFlowCore.Bpmn.adaptor.bpmnelementadp;
 
 public class BpmnAddFlowElementMultOrSignAaptor : IBpmnAddFlowElementAdaptor
 {

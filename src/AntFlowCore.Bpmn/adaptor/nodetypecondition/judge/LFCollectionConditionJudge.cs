@@ -1,7 +1,7 @@
 ﻿using System.Collections;
-using AntFlowCore.Common.exception;
+using AntFlowCore.Base.exception;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
-using AntFlowCore.Vo;
 using Microsoft.Extensions.Logging;
 
 namespace AntFlowCore.Bpmn.adaptor.nodetypecondition.judge;

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace AntFlowCore.Core.vo;
+namespace AntFlowCore.Base.vo;
 
 public class BaseNumIdStruVo
 {

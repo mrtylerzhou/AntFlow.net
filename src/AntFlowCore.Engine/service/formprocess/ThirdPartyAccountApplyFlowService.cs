@@ -1,11 +1,11 @@
-﻿using AntFlowCore.Bpmn.adaptor.formoperation;
-using AntFlowCore.Common.util;
-using AntFlowCore.Core.entity;
-using AntFlowCore.Core.factory;
+﻿using AntFlowCore.Base.entity;
+using AntFlowCore.Base.factory;
+using AntFlowCore.Base.util;
+using AntFlowCore.Base.vo;
+using AntFlowCore.Bpmn.adaptor.formoperation;
 using AntFlowCore.Core.vo;
 using AntFlowCore.Extensions.Extensions.adaptor;
 using AntFlowCore.Persist.api.interf.repository;
-using AntFlowCore.Vo;
 
 namespace AntFlowCore.Engine.service.formprocess;
 [DIYFormServiceAnno(SvcName = "DSFZH_WMA",Desc = "三方账号申请")]

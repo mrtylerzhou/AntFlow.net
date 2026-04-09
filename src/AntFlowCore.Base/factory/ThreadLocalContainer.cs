@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
 
-namespace AntFlowCore.Util
+namespace AntFlowCore.Base.factory
 {
     public static class ThreadLocalContainer
     {

@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace AntFlowCore.Core.conf.json;
+namespace AntFlowCore.Base.conf.json;
 
 public class IntToStringListConverter : JsonConverter<List<string>>
 {

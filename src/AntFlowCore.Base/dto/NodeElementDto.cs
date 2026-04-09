@@ -1,6 +1,7 @@
-﻿using AntFlowCore.Core.vo;
+﻿using AntFlowCore.Base.vo;
+using AntFlowCore.Core.vo;
 
-namespace AntFlowCore.Core.dto;
+namespace AntFlowCore.Base.dto;
 
 public class NodeElementDto
 {

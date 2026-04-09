@@ -1,6 +1,6 @@
-﻿using AntFlowCore.Common.util;
-using AntFlowCore.Core.entity;
-using AntFlowCore.Entity;
+﻿
+using AntFlowCore.Base.entity;
+using AntFlowCore.Base.util;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repository;

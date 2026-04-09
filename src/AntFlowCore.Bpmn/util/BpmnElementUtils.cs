@@ -1,9 +1,10 @@
-﻿using AntFlowCore.Vo;
+﻿using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.vo;
+using AntFlowCore.Bpmn.constants;
 using AntFlowCore.Common.constant.enus;
+using AntFlowCore.Core.constant.enums;
 
-namespace AntFlowCore.Common.util;
-
-using System.Collections.Generic;
+namespace AntFlowCore.Bpmn.util;
 
 public static class BpmnElementUtils
 {

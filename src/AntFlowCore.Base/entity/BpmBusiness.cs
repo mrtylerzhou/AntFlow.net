@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Core.entity;
+﻿namespace AntFlowCore.Base.entity;
 
 /// <summary>
 /// Represents the business entity in BPMN.
