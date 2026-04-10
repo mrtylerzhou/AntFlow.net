@@ -5,8 +5,6 @@ using AntFlowCore.Base.entity;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
-using AntFlowCore.Core.constant.enums;
-using AntFlowCore.Core.vo;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Bpmn.adaptor.bpmnnodeadp;

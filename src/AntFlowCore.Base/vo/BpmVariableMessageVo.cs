@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
+using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.util;
-using AntFlowCore.Enums;
 
 namespace AntFlowCore.Base.vo
 {

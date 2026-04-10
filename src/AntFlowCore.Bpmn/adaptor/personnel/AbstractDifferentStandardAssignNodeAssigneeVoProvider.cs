@@ -3,9 +3,6 @@ using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.adaptor.personnel.provider;
-using AntFlowCore.Core.constant.enums;
-using AntFlowCore.Core.vo;
-using AntFlowCore.Extensions;
 
 namespace AntFlowCore.Bpmn.adaptor.personnel;
 

@@ -3,8 +3,6 @@ using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.util;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.vo;
-using AntFlowCore.Core.vo;
-using AntFlowCore.Extensions;
 
 namespace AntFlowCore.Bpmn.adaptor.personnel.provider;
 

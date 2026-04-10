@@ -1,12 +1,12 @@
 ﻿using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.constant;
+using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
-using AntFlowCore.Core.constant;
 using AntFlowCore.Core.vo;
 using AntFlowCore.Persist.api.interf.repository;
 

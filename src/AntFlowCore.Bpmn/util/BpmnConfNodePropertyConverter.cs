@@ -8,8 +8,6 @@ using AntFlowCore.Base.extension;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.constants;
-using AntFlowCore.Core.constant.enums;
-using AntFlowCore.Core.vo;
 
 namespace AntFlowCore.Bpmn.util;
 
