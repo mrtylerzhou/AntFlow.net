@@ -10,11 +10,9 @@ using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn;
 using AntFlowCore.Bpmn.constants;
-using AntFlowCore.Core.constant.enums;
-using AntFlowCore.Core.vo;
 using Microsoft.Extensions.Logging;
 
-namespace AntFlowCore.Extensions.Extensions.service.processor.filter;
+namespace AntFlowCore.Bpmn.service;
 
 public class ConditionService : IConditionService
 {

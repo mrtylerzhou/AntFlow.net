@@ -7,9 +7,6 @@ using AntFlowCore.Base.factory;
 using AntFlowCore.Base.factory.tagparser;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.adaptor.bpmnelementadp;
-using AntFlowCore.Common.constant.enus;
-using AntFlowCore.Core;
-using AntFlowCore.Core.constant.enums;
 
 namespace AntFlowCore.Bpmn.adaptor;
 

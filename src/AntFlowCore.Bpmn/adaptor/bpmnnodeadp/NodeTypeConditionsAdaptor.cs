@@ -12,9 +12,6 @@ using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.adaptor.nodetypecondition;
 using AntFlowCore.Bpmn.constants;
 using AntFlowCore.Bpmn.util;
-using AntFlowCore.Common.constant.enus;
-using AntFlowCore.Core.constant.enums;
-using AntFlowCore.Core.vo;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Bpmn.adaptor.bpmnnodeadp;

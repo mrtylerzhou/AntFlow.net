@@ -1,8 +1,6 @@
-﻿using AntFlowCore.Base.constant.enums;
-using AntFlowCore.Base.exception;
-using AntFlowCore.Core.constant.enums;
+﻿using AntFlowCore.Base.exception;
 
-namespace AntFlowCore.Enums
+namespace AntFlowCore.Base.constant.enums
 {
     public enum EventTypeEnum
     {
