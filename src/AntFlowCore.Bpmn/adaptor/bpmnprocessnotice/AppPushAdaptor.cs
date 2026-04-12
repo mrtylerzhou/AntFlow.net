@@ -2,7 +2,6 @@
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.util;
-using AntFlowCore.Core.constant.enums;
 using Microsoft.Extensions.Logging;
 
 namespace AntFlowCore.Bpmn.adaptor.bpmnprocessnotice;

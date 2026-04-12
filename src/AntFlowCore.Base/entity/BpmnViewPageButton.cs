@@ -1,5 +1,5 @@
-﻿using AntFlowCore.Base.util;
-using AntFlowCore.Common.constant.enus;
+﻿using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.util;
 
 namespace AntFlowCore.Base.entity;
 

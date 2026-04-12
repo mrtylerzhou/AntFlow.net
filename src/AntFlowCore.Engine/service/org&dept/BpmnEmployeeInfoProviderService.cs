@@ -4,8 +4,6 @@ using AntFlowCore.Base.conf;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
-using AntFlowCore.Core.vo;
-using AntFlowCore.Engine.Engine.service;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Engine.service.org_dept;

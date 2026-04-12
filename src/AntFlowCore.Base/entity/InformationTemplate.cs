@@ -1,5 +1,4 @@
 ﻿using AntFlowCore.Base.util;
-using AntFlowCore.Enums;
 
 namespace AntFlowCore.Base.entity
 {

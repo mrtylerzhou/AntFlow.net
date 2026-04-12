@@ -6,11 +6,6 @@ using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.adaptor;
 using AntFlowCore.Bpmn.adaptor.bpmnelementadp;
-using AntFlowCore.Common.constant.enus;
-using AntFlowCore.Core;
-using AntFlowCore.Core.constant.enums;
-using AntFlowCore.Core.vo;
-using AntFlowCore.Extensions;
 
 namespace AntFlowCore.Bpmn.util;
 

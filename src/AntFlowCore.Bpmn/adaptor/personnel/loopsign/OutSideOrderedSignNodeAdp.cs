@@ -4,10 +4,6 @@ using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
-using AntFlowCore.Common.constant.enus;
-using AntFlowCore.Core.constant.enums;
-using AntFlowCore.Core.vo;
-using AntFlowCore.Extensions;
 
 namespace AntFlowCore.Bpmn.adaptor.personnel.loopsign;
 

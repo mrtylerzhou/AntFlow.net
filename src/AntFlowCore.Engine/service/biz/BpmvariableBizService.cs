@@ -13,7 +13,7 @@ using AntFlowCore.Persist.api.interf.repository;
 using FreeSql.Internal.Model;
 using Microsoft.Extensions.Logging;
 
-namespace AntFlowCore.Engine.Engine.service.biz;
+namespace AntFlowCore.Engine.service.biz;
 
 public class BpmvariableBizService: IBpmvariableBizService
 {

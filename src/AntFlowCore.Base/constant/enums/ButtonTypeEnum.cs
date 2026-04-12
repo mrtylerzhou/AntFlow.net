@@ -1,4 +1,6 @@
 ﻿
+namespace AntFlowCore.Base.constant.enums;
+
 public enum ButtonTypeEnum
 {
     BUTTON_TYPE_PREVIEW = 0,          // 预览
@@ -26,9 +28,8 @@ public enum ButtonTypeEnum
     BUTTON_TYPE_PROCESS_MOVE_AHEAD=33,//流程推进,
 }
 
-namespace AntFlowCore.Common.constant.enus
-{
-    public static class ButtonTypeEnumExtensions
+
+public static class ButtonTypeEnumExtensions
     {
         public static string GetDescByCode(int code)
         {
@@ -86,4 +87,3 @@ namespace AntFlowCore.Common.constant.enus
         }
     }
     
-}

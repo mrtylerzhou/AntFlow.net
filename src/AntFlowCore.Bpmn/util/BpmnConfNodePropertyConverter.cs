@@ -8,8 +8,6 @@ using AntFlowCore.Base.extension;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.constants;
-using AntFlowCore.Core.constant.enums;
-using AntFlowCore.Core.vo;
 
 namespace AntFlowCore.Bpmn.util;
 
@@ -189,7 +187,7 @@ public class BpmnConfNodePropertyConverter
                     else
                     {
                         Object valueOrWrapper = null;
-                        Object actualValue = null;
+                        Object actualValue = zdy1;
                         Object zdy2Value = null;
                         if (!string.IsNullOrEmpty(zdy2))
                         {
