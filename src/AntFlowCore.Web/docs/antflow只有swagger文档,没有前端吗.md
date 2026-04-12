@@ -1,0 +1,1 @@
+有些用户可能没有仔细看readme，将项目下载下来以后很快就跑起来了，跑起来发现只有一个swagger接口文档。实际上antflow.net和antflow（在不特意做对比的情况下antflow在.net语境下就是antflow.netantflow则指antflow的java版本）。用户需要到antflow [java仓库里](https://gitee.com/tylerzhou/Antflow)里把antflow-vue取出来（注意不是antflow-web,antflow-web是java项目的web出口，而非前端项目），之所以这样是因为二者共用同一套前端，即一套前端兼容java和.net两个版本。为了减少维护成本以及更新不一致问题，就没有将前端单独拉出来放到.net仓库里
