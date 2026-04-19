@@ -124,6 +124,7 @@ public static class MapperUtil
          NodeFroms = vo.NodeFroms,
          IsOutSideProcess = vo.IsOutSideProcess,
          IsLowCodeFlow = vo.IsLowCodeFlow,
+         IsParallel = vo.IsParallel,
          NoHeaderAction = vo.NoHeaderAction,
          ExtraFlags = vo.ExtraFlags
       };
