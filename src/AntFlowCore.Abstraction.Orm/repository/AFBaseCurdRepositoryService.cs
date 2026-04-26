@@ -1,7 +1,7 @@
 
 using FreeSql;
 
-namespace AntFlowCore.Persist.repository;
+namespace AntFlowCore.Abstraction.Orm.repository;
 
 public abstract class AFBaseCurdRepositoryService<T> where T : class
 {
