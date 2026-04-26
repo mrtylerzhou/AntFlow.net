@@ -15,6 +15,7 @@ using AntFlowCore.Base.factory;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
+using AntFlowCore.Persist.api.interf.repository;
 using Microsoft.Extensions.Logging;
 
 namespace AntFlowCore.Persist.repository;
@@ -33,7 +34,7 @@ public class BpmnConfCommonService : IBpmnConfCommonService
     private readonly IBpmnInsertVariablesService _bpmnInsertVariablesService;
     private readonly IBpmnCreateAndStartService _bpmnCreateAndStartService;
     private readonly IBpmVerifyInfoBizService _bpmVerifyInfoBizService;
-    private readonly BpmVariableService _bpmVariableService;
+    private readonly IBpmVariableService _bpmVariableService;
     private readonly BpmFlowrunEntrustService _flowrunEntrustService;
     private readonly IFormFactory _formFactory;
     private readonly BpmBusinessProcessService _bpmBusinessProcessService;
@@ -55,7 +56,7 @@ public class BpmnConfCommonService : IBpmnConfCommonService
         IBpmnInsertVariablesService bpmnInsertVariablesService,
         IBpmnCreateAndStartService bpmnCreateAndStartService,
         IBpmVerifyInfoBizService bpmVerifyInfoBizService,
-        BpmVariableService bpmVariableService,
+        IBpmVariableService bpmVariableService,
         BpmFlowrunEntrustService flowrunEntrustService,
         IFormFactory formFactory,
         BpmBusinessProcessService bpmBusinessProcessService,

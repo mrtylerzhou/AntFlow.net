@@ -10,7 +10,7 @@
     </PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\AntFlowCore.Abstraction.Orm\AntFlowCore.Abstraction.Orm.csproj" />
+		<ProjectReference Include="..\AntFlowCore.Persist.api\AntFlowCore.Persist.api.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -23,6 +23,10 @@
 	  <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.0" />
 	  <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.0" />
 	  <PackageReference Include="Rougamo.Fody" Version="5.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="repository\" />
     </ItemGroup>
 
 </Project>

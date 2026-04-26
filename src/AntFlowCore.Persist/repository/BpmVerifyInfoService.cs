@@ -15,8 +15,8 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>,IB
     private readonly BpmBusinessProcessService _bpmBusinessProcessService;
     private readonly AFTaskService _afTaskService;
     private readonly IProcessConstantsService _processConstantsService;
-    private readonly BpmVariableService _bpmVariableService;
-    private readonly BpmVariableSignUpService _bpmVariableSignUpService;
+    private readonly IBpmVariableService _bpmVariableService;
+    private readonly IBpmVariableSignUpService _bpmVariableSignUpService;
     private readonly IBpmnEmployeeInfoProviderService _bpmnEmployeeInfoProviderService;
     private readonly BpmnNodeService _nodeService;
 
@@ -25,8 +25,8 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>,IB
         BpmBusinessProcessService bpmBusinessProcessService,
         AFTaskService afTaskService,
         IProcessConstantsService processConstantsService,
-        BpmVariableService bpmVariableService,
-        BpmVariableSignUpService bpmVariableSignUpService,
+        IBpmVariableService bpmVariableService,
+        IBpmVariableSignUpService bpmVariableSignUpService,
         IBpmnEmployeeInfoProviderService bpmnEmployeeInfoProviderService,
         BpmnNodeService nodeService,
         IFreeSql freeSql
