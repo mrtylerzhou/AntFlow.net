@@ -1,12 +1,14 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.VirtualNode.service;
 
-public class BpmnNodeRoleOutsideEmpConfService: AFBaseCurdRepositoryService<BpmnNodeRoleOutsideEmpConf>,IBpmnNodeRoleOutsideEmpConfService
+public class BpmnNodeRoleOutsideEmpConfService : IBpmnNodeRoleOutsideEmpConfService
 {
-    public BpmnNodeRoleOutsideEmpConfService(IFreeSql freeSql) : base(freeSql)
+    public BpmnNodeRoleOutsideEmpConfService(IBpmnNodeRoleOutsideEmpConfRepository repository)
     {
+        _repository = repository;
     }
+
+    public IBpmnNodeRoleOutsideEmpConfRepository _repository { get; }
 }

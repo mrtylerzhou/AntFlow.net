@@ -73,9 +73,9 @@ public class BpmnTaskListener: ITaskListener
             _logger.LogError("流程实例不存在，流程号：{}", delegateTask.ProcessNumber);
             throw new AFBizException($"流程实例不存在，流程号：{delegateTask.ProcessNumber}");
         }
-        BpmnConf bpmnConf = _bpmnConfService.baseRepo
-            .Where(a => a.BpmnCode == bpmBusinessProcess.Version)
-            .ToOne();
+        BpmnConf bpmnConf = _bpmnConfService._repository
+            .Find(a => a.BpmnCode == bpmBusinessProcess.Version)
+            .FirstOrDefault();
         if (bpmnConf == null)
         {
             _logger.LogError("流程配置不存在，流程号：{}", delegateTask.ProcessNumber);

@@ -1,12 +1,14 @@
-﻿using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.VirtualNode.service;
 
-public class BpmVariableApproveRemindService: AFBaseCurdRepositoryService<BpmVariableApproveRemind>,IBpmVariableApproveRemindService
+public class BpmVariableApproveRemindService: IBpmVariableApproveRemindService
 {
-    public BpmVariableApproveRemindService(IFreeSql freeSql) : base(freeSql)
+    public BpmVariableApproveRemindService(IBpmVariableApproveRemindRepository repository)
     {
+        _repository = repository;
     }
+
+    public IBpmVariableApproveRemindRepository _repository { get; }
 }

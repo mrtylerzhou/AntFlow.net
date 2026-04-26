@@ -1,12 +1,12 @@
 using AntFlowCore.Base.entity;
 using AntFlowCore.Core.vo;
-using FreeSql;
+using AntFlowCore.Persist.api.interf.repository;
+using antflowcore.service.interf.repository;
 
 namespace AntFlowCore.Abstraction.service.repository;
 
-public interface IBpmnConfService
+public interface IBpmnConfService : IAntFlowRepositoryMix<BpmnConf, IBpmnConfRepository>
 {
-    IBaseRepository<BpmnConf> baseRepo { get; }
     string GetMaxBpmnCode(string bpmnCodeParts);
     string ReCheckBpmnCode(string bpmnCodeParts, string bpmnCode);
     List<BpmnConfVo> SelectPageList(Page<BpmnConfVo> page, BpmnConfVo vo);

@@ -1,39 +1,20 @@
-﻿using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.VirtualNode.service;
 
-public class BpmnNodeConditionsConfService: AFBaseCurdRepositoryService<BpmnNodeConditionsConf>,IBpmnNodeConditionsConfService
+public class BpmnNodeConditionsConfService : IBpmnNodeConditionsConfService
 {
-    public BpmnNodeConditionsConfService(IFreeSql freeSql) : base(freeSql)
+    public BpmnNodeConditionsConfService(IBpmnNodeConditionsConfRepository repository)
     {
+        _repository = repository;
     }
-    
-    public List<String> QueryConditionParamNameByProcessNumber(BusinessDataVo businessDataVo) {
-        String processNumber=businessDataVo.ProcessNumber;//流程查看页预览真使用流程编号
-        List<String> result=null;
-        if(!string.IsNullOrEmpty(processNumber))
-        {
-          result=  this.Frsql
-                .Select<BpmnConf, BpmnNode, BpmnNodeConditionsConf, BpmnNodeConditionsParamConf, BpmBusinessProcess>()
-                .InnerJoin((tbc, tbn, tbncc, tbncpc, bpb) => tbn.ConfId == tbc.Id && tbn.NodeType == 3)
-                .InnerJoin((tbc, tbn, tbncc, tbncpc, bpb) => tbncc.BpmnNodeId == tbn.Id)
-                .InnerJoin((tbc, tbn, tbncc, tbncpc, bpb) => tbncpc.BpmnNodeConditionsId == tbncc.Id)
-                .InnerJoin((tbc, tbn, tbncc, tbncpc, bpb) => bpb.Version == tbc.BpmnCode)
-                .Where((tbc, tbn, tbncc, tbncpc, bpb) => bpb.BusinessNumber == processNumber)
-                .ToList<string>(((tbc, tbn, tbncc, tbncpc, bpb) => tbncpc.ConditionParamName));
 
-        }else{//流程发起和在发起页预览时还没有流程编号，使用表单编号查询
-            result=  this.Frsql
-                .Select<BpmnConf, BpmnNode, BpmnNodeConditionsConf, BpmnNodeConditionsParamConf>()
-                .InnerJoin((tbc, tbn, tbncc, tbncpc) => tbn.ConfId == tbc.Id && tbn.NodeType == 3)
-                .InnerJoin((tbc, tbn, tbncc, tbncpc) => tbncc.BpmnNodeId == tbn.Id)
-                .InnerJoin((tbc, tbn, tbncc, tbncpc) => tbncpc.BpmnNodeConditionsId == tbncc.Id)
-                .Where((tbc, tbn, tbncc, tbncpc) => tbc.FormCode == businessDataVo.FormCode&& tbc.EffectiveStatus==1)
-                .ToList<string>(((tbc, tbn, tbncc, tbncpc) => tbncpc.ConditionParamName));
-        }
-        return result;
+    public IBpmnNodeConditionsConfRepository _repository { get; }
+
+    public List<string> QueryConditionParamNameByProcessNumber(BusinessDataVo businessDataVo)
+    {
+        return _repository.QueryConditionParamNameByProcessNumber(businessDataVo);
     }
 }

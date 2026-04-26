@@ -4,7 +4,7 @@ using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repo;
 
-internal class FsBpmnNodeConditionsParamConfRepository : RepositoryBase<BpmnNodeConditionsParamConf>, IBpmnNodeConditionsParamConfRepository
+public class FsBpmnNodeConditionsParamConfRepository : RepositoryBase<BpmnNodeConditionsParamConf>, IBpmnNodeConditionsParamConfRepository
 {
     public FsBpmnNodeConditionsParamConfRepository(AntFlowOrmContext context) : base(context)
     {

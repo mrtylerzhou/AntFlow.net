@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
@@ -55,7 +55,7 @@ namespace AntFlowCore.Engine.service.biz;
                 TenantId = MultiTenantUtil.GetCurrentTenantId(),
             };
 
-            _bpmVariableService.baseRepo.Insert(bpmVariable);
+            _bpmVariableService._repository.Add(bpmVariable);
 
             var variableId = bpmVariable.Id;
 
@@ -98,7 +98,7 @@ namespace AntFlowCore.Engine.service.biz;
                 }
                 else if (elementType == ElementTypeEnum.ELEMENT_TYPE_SEQUENCE_FLOW.Code)
                 {
-                    _bpmVariableSequenceFlowService.baseRepo.Insert(new BpmVariableSequenceFlow
+                    _bpmVariableSequenceFlowService._repository.Add(new BpmVariableSequenceFlow
                     {
                         VariableId = variableId,
                         ElementId = elementVo.ElementId,
@@ -158,7 +158,7 @@ namespace AntFlowCore.Engine.service.biz;
                     CreateTime = DateTime.Now,
                 }).ToList();
 
-                _bpmVariableButtonService.baseRepo.Insert(startPageButtons);
+                _bpmVariableButtonService._repository.AddRange(startPageButtons);
             }
 
             if (elementVo.Buttons?.ApprovalPage != null)
@@ -173,7 +173,7 @@ namespace AntFlowCore.Engine.service.biz;
                     CreateTime = DateTime.Now,
                 }).ToList();
 
-                _bpmVariableButtonService.baseRepo.Insert(approvalPageButtons);
+                _bpmVariableButtonService._repository.AddRange(approvalPageButtons);
             }
 
             if (elementVo.Buttons?.ViewPage != null)
@@ -188,7 +188,7 @@ namespace AntFlowCore.Engine.service.biz;
                     CreateTime = DateTime.Now,
                 }).ToList();
 
-                _bpmVariableButtonService.baseRepo.Insert(viewPageButtons);
+                _bpmVariableButtonService._repository.AddRange(viewPageButtons);
             }
         }
 

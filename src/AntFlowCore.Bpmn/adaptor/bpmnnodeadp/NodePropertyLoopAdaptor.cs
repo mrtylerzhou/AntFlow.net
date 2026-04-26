@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.service;
+using AntFlowCore.Abstraction.service;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
@@ -31,8 +31,7 @@ public class NodePropertyLoopAdaptor : AbstractAdditionSignNodeAdaptor
         {
             base.FormatToBpmnNodeVo(bpmnNodeVo);
             BpmnNodeLoopConf bpmnNodeLoopConf = _bpmnNodeLoopConfService
-                .baseRepo.Where(conf => conf.BpmnNodeId == bpmnNodeVo.Id)
-                .First();
+                ._repository.Find(conf => conf.BpmnNodeId == bpmnNodeVo.Id).FirstOrDefault();
 
             if (bpmnNodeLoopConf != null)
             {
@@ -99,7 +98,7 @@ public class NodePropertyLoopAdaptor : AbstractAdditionSignNodeAdaptor
                 TenantId = MultiTenantUtil.GetCurrentTenantId(),
             };
 
-            _bpmnNodeLoopConfService.baseRepo.Insert(bpmnNodeLoopConf);
+            _bpmnNodeLoopConfService._repository.Add(bpmnNodeLoopConf);
         }
 
         public override void SetSupportBusinessObjects()

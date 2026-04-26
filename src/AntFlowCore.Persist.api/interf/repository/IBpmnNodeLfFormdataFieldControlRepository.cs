@@ -1,9 +1,11 @@
-﻿using AntFlowCore.Abstraction.Orm.repository;
+using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
+using AntFlowCore.Base.vo;
+using AntFlowCore.Core.vo;
 
 namespace AntFlowCore.Persist.api.interf.repository;
 
 public interface IBpmnNodeLfFormdataFieldControlRepository: IBaseRepository<BpmnNodeLfFormdataFieldControl>
 {
-   
+    List<LFFieldControlVO> GetFieldControlByProcessNumberAndElementId(string processNumber, string taskDefKey);
 }

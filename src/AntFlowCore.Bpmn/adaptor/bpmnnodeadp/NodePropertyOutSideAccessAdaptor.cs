@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.adaptor;
+using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.adaptor.bpmnnodeadp;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
@@ -27,7 +27,7 @@ namespace AntFlowCore.Bpmn.adaptor.bpmnnodeadp;
 
         public  void FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
         {
-            var nodeOutSideAccessConf = _bpmnNodeOutSideAccessConfService.baseRepo.Where(conf => conf.BpmnNodeId == bpmnNodeVo.Id).First();
+            var nodeOutSideAccessConf = _bpmnNodeOutSideAccessConfService._repository.Find(conf => conf.BpmnNodeId == bpmnNodeVo.Id).FirstOrDefault();
 
             if (nodeOutSideAccessConf != null)
             {
@@ -53,7 +53,7 @@ namespace AntFlowCore.Bpmn.adaptor.bpmnnodeadp;
                 NodeMark = propertysVo.NodeMark
             };
 
-            _bpmnNodeOutSideAccessConfService.baseRepo.Insert(nodeOutSideAccessConf);
+            _bpmnNodeOutSideAccessConfService._repository.Add(nodeOutSideAccessConf);
         }
         
         public  void SetSupportBusinessObjects()

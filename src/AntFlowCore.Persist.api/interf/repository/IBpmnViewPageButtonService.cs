@@ -1,9 +1,9 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
-using FreeSql;
+using antflowcore.service.interf.repository;
 
 namespace AntFlowCore.Persist.api.interf.repository;
 
-public interface IBpmnViewPageButtonService : IBaseRepositoryService<BpmnViewPageButton>
+public interface IBpmnViewPageButtonService : IAntFlowRepositoryMix<BpmnViewPageButton, IBpmnViewPageButtonRepository>
 {
+    void DeleteByConfId(long confId);
 }

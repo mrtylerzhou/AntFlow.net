@@ -52,8 +52,8 @@ public class BpmnExecutionListener: IExecutionListener
         string startUser = bpmBusinessProcess.CreateUser;
         string processNumber = bpmBusinessProcess.BusinessNumber;
         string formCode = bpmBusinessProcess.ProcessinessKey;
-        List<BpmnConf> bpmnConfs = _bpmnConfService.baseRepo
-            .Where(a => a.BpmnCode == bpmBusinessProcess.Version).ToList();
+        List<BpmnConf> bpmnConfs = _bpmnConfService._repository
+            .Find(a => a.BpmnCode == bpmBusinessProcess.Version);
         if (bpmnConfs == null || bpmnConfs.Count == 0)
         {
             throw new Exception($"No bpmn confs found by bpmncode:{bpmBusinessProcess.Version}");

@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.service;
+using AntFlowCore.Abstraction.service;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
@@ -30,7 +30,7 @@ public class NodePropertyPersonnelAdaptor : AbstractAdditionSignNodeAdaptor
     public override void FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
     {
         base.FormatToBpmnNodeVo(bpmnNodeVo);
-        BpmnNodePersonnelConf bpmnNodePersonnelConf = _bpmnNodePersonnelConfService.baseRepo.Where(a => a.BpmnNodeId == bpmnNodeVo.Id).First();
+        BpmnNodePersonnelConf bpmnNodePersonnelConf = _bpmnNodePersonnelConfService._repository.Find(a => a.BpmnNodeId == bpmnNodeVo.Id).FirstOrDefault();
         if (bpmnNodePersonnelConf == null)
         {
             throw new AFBizException($"未能根据节点id: {bpmnNodeVo.Id}查到指定人员信息!");
@@ -38,8 +38,8 @@ public class NodePropertyPersonnelAdaptor : AbstractAdditionSignNodeAdaptor
         List<String> emplIds = new List<string>();
         List<String> emplNames=new List<string>();
         IEnumerable<BpmnNodePersonnelEmplConf> bpmnNodePersons = _bpmnNodePersonnelEmplConfService
-            .baseRepo
-            .Where(a => a.BpmnNodePersonneId == bpmnNodePersonnelConf.Id)
+            ._repository
+            .Find(a => a.BpmnNodePersonneId == bpmnNodePersonnelConf.Id)
             .ToList().Distinct();
         if(ObjectUtils.IsEmpty(bpmnNodePersons)){
             throw  new AFBizException("配置错误或者数据被删除,指定员人审批未获取到人员");
@@ -79,7 +79,7 @@ public class NodePropertyPersonnelAdaptor : AbstractAdditionSignNodeAdaptor
             UpdateUser = SecurityUtils.GetLogInEmpNameSafe()
         };
 
-        _bpmnNodePersonnelConfService.baseRepo.Insert(bpmnNodePersonnelConf);
+        _bpmnNodePersonnelConfService._repository.Add(bpmnNodePersonnelConf);
         int nodePersonnelId = bpmnNodePersonnelConf.Id;
 
         if (bpmnNodePropertysVo.EmplIds == null || !bpmnNodePropertysVo.EmplIds.Any())
@@ -108,7 +108,7 @@ public class NodePropertyPersonnelAdaptor : AbstractAdditionSignNodeAdaptor
             personnelEmplConfs.Add(personnelEmplConf);
         }
 
-        _bpmnNodePersonnelEmplConfService.baseRepo.Insert(personnelEmplConfs);
+        _bpmnNodePersonnelEmplConfService._repository.AddRange(personnelEmplConfs);
     }
 
     /// <summary>

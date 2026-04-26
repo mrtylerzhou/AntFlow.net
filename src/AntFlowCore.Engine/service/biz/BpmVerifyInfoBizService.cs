@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.Json;
 using AntFlowCore.Abstraction;
 using AntFlowCore.Abstraction.service;
@@ -299,14 +299,13 @@ public class BpmVerifyInfoBizService : IBpmVerifyInfoBizService
         }
 
         // 查询多人审批变量
-        List<BpmVariableMultiplayer> variableMultiplayers = _bpmVariableMultiplayerService.baseRepo.Where(a=>a.VariableId==variableId).ToList();
+        List<BpmVariableMultiplayer> variableMultiplayers = _bpmVariableMultiplayerService._repository.Find(a => a.VariableId == variableId);
         if (variableMultiplayers.Count>0)
         {
             foreach (var bpmVariableMultiplayer in variableMultiplayers)
             {
                 List<BpmVariableMultiplayerPersonnel> bpmVariableMultiplayerPersonnels = _bpmVariableMultiplayerPersonnelService
-                    .baseRepo.Where(a=>a.VariableMultiplayerId ==bpmVariableMultiplayer.VariableId)
-                    .ToList();
+                    ._repository.Find(a => a.VariableMultiplayerId == bpmVariableMultiplayer.VariableId);
                 
 
                 if (bpmVariableMultiplayerPersonnels.Any())

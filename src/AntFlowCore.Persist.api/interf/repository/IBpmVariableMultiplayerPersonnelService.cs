@@ -1,10 +1,9 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
-using FreeSql;
+using antflowcore.service.interf.repository;
 
 namespace AntFlowCore.Persist.api.interf.repository;
 
-public interface IBpmVariableMultiplayerPersonnelService : IBaseRepositoryService<BpmVariableMultiplayerPersonnel>
+public interface IBpmVariableMultiplayerPersonnelService : IAntFlowRepositoryMix<BpmVariableMultiplayerPersonnel, IBpmVariableMultiplayerPersonnelRepository>
 {
     void Undertake(string processNumber, string taskTaskDefKey);
 }

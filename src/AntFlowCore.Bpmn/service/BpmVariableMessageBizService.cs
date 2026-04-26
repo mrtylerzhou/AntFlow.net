@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Reflection;
 using System.Text.Json;
 using AntFlowCore.Abstraction;
@@ -120,7 +120,7 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
 
         BpmVariable bpmVariable = null;
         List<BpmVariable> bpmVariables =
-            _variableService.baseRepo.Where(a => a.ProcessNum.Equals(vo.ProcessNumber)).ToList();
+            _variableService._repository.Find(a => a.ProcessNum.Equals(vo.ProcessNumber));
 
         if (!ObjectUtils.IsEmpty(bpmVariables))
         {
@@ -138,7 +138,7 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
 
 
         //get bpmn conf
-        BpmnConf bpmnConf = _bpmnConfService.baseRepo.Where(a => a.BpmnCode.Equals(bpmVariable.BpmnCode)).ToOne();
+        BpmnConf bpmnConf = _bpmnConfService._repository.Find(a => a.BpmnCode.Equals(bpmVariable.BpmnCode)).FirstOrDefault();
 
         if (bpmnConf == null)
         {
@@ -276,13 +276,13 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
         // Save variable messages in batch if not empty
         if (bpmVariableMessages.Any())
         {
-            _bpmVariableMessageService.baseRepo.Insert(bpmVariableMessages);
+            _bpmVariableMessageService._repository.AddRange(bpmVariableMessages);
         }
 
         // Save approval reminds in batch if not empty
         if (bpmVariableApproveReminds.Any())
         {
-            _bpmVariableApproveRemindService.baseRepo.Insert(bpmVariableApproveReminds);
+            _bpmVariableApproveRemindService._repository.AddRange(bpmVariableApproveReminds);
         }
     }
 
@@ -327,9 +327,9 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
     public bool CheckIsSendByTemplate(BpmVariableMessageVo vo)
     {
 
-        BpmVariable bpmVariable = _variableService.baseRepo
-            .Where(a => a.ProcessNum == vo.ProcessNumber)
-            .ToOne();
+        BpmVariable bpmVariable = _variableService._repository
+            .Find(a => a.ProcessNum == vo.ProcessNumber)
+            .FirstOrDefault();
 
         if (bpmVariable == null)
         {
@@ -345,20 +345,20 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
         //如果节点存在自定义通知类型,则默认走自定义的,需要注意的是即便不设置只要开启了通知,流程仍然会通知,内部有一套默认通知机制.自定义通知主要是为了增加灵活性,慎用
         if (messageType == 2)
         {
-            long count = _bpmVariableMessageService.baseRepo
-                .Where(a=> 
+            long count = _bpmVariableMessageService._repository
+                .Count(a=> 
                              a.VariableId == bpmVariable.Id
                            //&&a.ElementId == vo.ElementId
                            && a.MessageType == messageType
-                           && a.EventType == vo.EventType).Count();
+                           && a.EventType == vo.EventType);
             return count > 0;
         }else if (messageType == 1)
         {
-            long count = _bpmVariableMessageService.baseRepo
-                .Where(a=> 
+            long count = _bpmVariableMessageService._repository
+                .Count(a=> 
                               a.VariableId == bpmVariable.Id
                            && a.MessageType == messageType
-                           && a.EventType == vo.EventType).Count();
+                           && a.EventType == vo.EventType);
             return count > 0;
         }
 
@@ -403,21 +403,20 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
         if (vo.MessageType == 1)
         {
             //out of node messages
-            bpmVariableMessages = _bpmVariableMessageService.baseRepo
-                .Where(a =>
+            bpmVariableMessages = _bpmVariableMessageService._repository
+                .Find(a =>
                     a.VariableId == vo.VariableId
                     && a.MessageType == 1
-                    && a.EventType == vo.EventType).ToList();
+                    && a.EventType == vo.EventType);
             
         }
         else if (vo.MessageType == 2)
         {
             //in node messages
-             bpmVariableMessages = _bpmVariableMessageService.baseRepo
-                .Where(a =>
+             bpmVariableMessages = _bpmVariableMessageService._repository
+                .Find(a =>
                     a.VariableId == vo.VariableId
-                    && a.EventType == vo.EventType)
-                .ToList();
+                    && a.EventType == vo.EventType);
             if (!string.IsNullOrEmpty(vo.ElementId))
             {
                 List<BpmVariableMessage> currentNodeVariableMessages = bpmVariableMessages.Where(a => a.ElementId == vo.ElementId).ToList();

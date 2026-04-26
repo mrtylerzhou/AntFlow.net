@@ -1,12 +1,14 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.VirtualNode.service;
 
-public class BpmnNodeHrbpConfService: AFBaseCurdRepositoryService<BpmnNodeHrbpConf>,IBpmnNodeHrbpConfService
+public class BpmnNodeHrbpConfService : IBpmnNodeHrbpConfService
 {
-    public BpmnNodeHrbpConfService(IFreeSql freeSql) : base(freeSql)
+    public BpmnNodeHrbpConfService(IBpmnNodeHrbpConfRepository repository)
     {
+        _repository = repository;
     }
+
+    public IBpmnNodeHrbpConfRepository _repository { get; }
 }

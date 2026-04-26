@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
@@ -33,7 +33,7 @@ public class BpmnInsertVariableSubsMultiplayerOrSignAdaptor: IBpmnInsertVariable
             SignType = (int)SignTypeEnum.SIGN_TYPE_OR_SIGN,
             TenantId = MultiTenantUtil.GetCurrentTenantId(),
         };
-        _bpmVariableMultiplayerService.baseRepo.Insert(variableMultiplayer);
+        _bpmVariableMultiplayerService._repository.Add(variableMultiplayer);
        
 
         var assigneeMap = elementVo.AssigneeMap;
@@ -49,7 +49,7 @@ public class BpmnInsertVariableSubsMultiplayerOrSignAdaptor: IBpmnInsertVariable
                 UndertakeStatus = 0
             })
             .ToList();
-        _bpmVariableMultiplayerPersonnelService.baseRepo.Insert(personnelList);
+        _bpmVariableMultiplayerPersonnelService._repository.AddRange(personnelList);
     }
 
 }

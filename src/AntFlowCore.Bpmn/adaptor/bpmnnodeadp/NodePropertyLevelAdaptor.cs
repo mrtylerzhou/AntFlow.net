@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.adaptor;
+using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.util;
@@ -29,7 +29,7 @@ namespace AntFlowCore.Bpmn.adaptor.bpmnnodeadp;
         public override void FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
         {
             base.FormatToBpmnNodeVo(bpmnNodeVo);
-            BpmnNodeAssignLevelConf bpmnNodeAssignLevelConf = _bpmnNodeAssignLevelConfService.baseRepo.Where(conf => conf.BpmnNodeId == bpmnNodeVo.Id).First();
+            BpmnNodeAssignLevelConf bpmnNodeAssignLevelConf = _bpmnNodeAssignLevelConfService._repository.Find(conf => conf.BpmnNodeId == bpmnNodeVo.Id).FirstOrDefault();
 
             if (bpmnNodeAssignLevelConf != null)
             {
@@ -60,7 +60,7 @@ namespace AntFlowCore.Bpmn.adaptor.bpmnnodeadp;
                 TenantId = MultiTenantUtil.GetCurrentTenantId(),
             };
 
-            _bpmnNodeAssignLevelConfService.baseRepo.Insert(bpmnNodeAssignLevelConf);
+            _bpmnNodeAssignLevelConfService._repository.Add(bpmnNodeAssignLevelConf);
         }
 
         public override void SetSupportBusinessObjects()

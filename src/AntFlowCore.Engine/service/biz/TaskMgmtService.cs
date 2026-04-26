@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Reflection;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Abstraction.service.repository;
@@ -97,9 +97,10 @@ public class TaskMgmtService : ITaskMgmtService
 
         List<string> formCodes = diyProcessInfoDTOS.Select(dto => dto.Key).ToList();
 
-        var bpmnConfs = _bpmnConfService.baseRepo
-            .Where(b => formCodes.Contains(b.FormCode) && b.EffectiveStatus == 1)
-            .ToList(b => new { b.FormCode, b.ExtraFlags });
+        var bpmnConfs = _bpmnConfService._repository
+            .Find(b => formCodes.Contains(b.FormCode) && b.EffectiveStatus == 1)
+            .Select(b => new { b.FormCode, b.ExtraFlags })
+            .ToList();
 
         if (bpmnConfs.Count > 0)
         {

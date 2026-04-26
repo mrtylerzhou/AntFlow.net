@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.adaptor;
+using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.util;
@@ -29,7 +29,7 @@ namespace AntFlowCore.Bpmn.adaptor.bpmnnodeadp;
         public override void FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
         {
             base.FormatToBpmnNodeVo(bpmnNodeVo);
-            var list = _bpmnNodeRoleConfService.baseRepo.Where(conf => conf.BpmnNodeId == bpmnNodeVo.Id).ToList();
+            var list = _bpmnNodeRoleConfService._repository.Find(conf => conf.BpmnNodeId == bpmnNodeVo.Id).ToList();
 
             if (list == null || !list.Any())
             {
@@ -52,7 +52,7 @@ namespace AntFlowCore.Bpmn.adaptor.bpmnnodeadp;
 
             if (bpmnNodeVo.IsOutSideProcess == 1)
             {
-                var outsideEmpConfs = _bpmnNodeRoleOutsideEmpConfService.baseRepo.Where(conf => conf.NodeId == bpmnNodeVo.Id).ToList();
+                var outsideEmpConfs = _bpmnNodeRoleOutsideEmpConfService._repository.Find(conf => conf.NodeId == bpmnNodeVo.Id).ToList();
                 if (outsideEmpConfs != null && outsideEmpConfs.Any())
                 {
                     AfNodeUtils.AddOrEditProperty(bpmnNodeVo, p =>
@@ -79,7 +79,7 @@ namespace AntFlowCore.Bpmn.adaptor.bpmnnodeadp;
             {
                 var roleList = property.RoleList;
 
-                _bpmnNodeRoleConfService.baseRepo.Insert(roleList.Select(role => new BpmnNodeRoleConf
+                _bpmnNodeRoleConfService._repository.AddRange(roleList.Select(role => new BpmnNodeRoleConf
                 {
                     BpmnNodeId = bpmnNodeVo.Id,
                     RoleId = role.Id,
@@ -107,7 +107,7 @@ namespace AntFlowCore.Bpmn.adaptor.bpmnnodeadp;
                             TenantId = MultiTenantUtil.GetCurrentTenantId(),
                         }).ToList();
 
-                        _bpmnNodeRoleOutsideEmpConfService.baseRepo.Insert(outsideEmpConfs);
+                        _bpmnNodeRoleOutsideEmpConfService._repository.AddRange(outsideEmpConfs);
                     }
                 }
             }

@@ -1,12 +1,14 @@
-﻿using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.VirtualNode.service;
 
-public class BpmVariableMessageService : AFBaseCurdRepositoryService<BpmVariableMessage>,IBpmVariableMessageService
+public class BpmVariableMessageService : IBpmVariableMessageService
 {
-    public BpmVariableMessageService(IFreeSql freeSql) : base(freeSql)
+    public BpmVariableMessageService(IBpmVariableMessageRepository repository)
     {
+        _repository = repository;
     }
+
+    public IBpmVariableMessageRepository _repository { get; }
 }

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Text.Json;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.constant.enums;
@@ -308,10 +308,10 @@ public class ConfigFlowButtonContantService : IConfigFlowButtonContantService
                     
                 if (!nodeIdsByElementIds.IsEmpty())
                 {
-                    bpmnNodeButtonConfs = _bpmnNodeButtonConfService.baseRepo.Where(a =>
+                    bpmnNodeButtonConfs = _bpmnNodeButtonConfService._repository.Find(a =>
                             nodeIdsByElementIds.Contains(a.BpmnNodeId.ToString()) &&
                             a.ButtonPageType == (int)ButtonPageTypeEnum.TOVIEW)
-                        .ToList();
+                        ;
                 }
                 //只能显示在发起人页的按钮不应显示在其它页面
                 if(isInitiate&&!bpmnNodeButtonConfs.IsEmpty()){

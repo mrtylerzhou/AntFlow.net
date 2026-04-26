@@ -97,7 +97,7 @@ public class BpmnConfBizService : IBpmnConfBizService
         bpmnConf.UpdateTime=DateTime.Now;
         bpmnConf.Remark=bpmnConfVo.Remark??"";
         bpmnConf.TenantId = MultiTenantUtil.GetCurrentTenantId();
-        _bpmnConfService.baseRepo.Insert(bpmnConf);
+        _bpmnConfService._repository.Add(bpmnConf);
         //notice template
         _bpmnConfNoticeTemplateService.Insert(bpmnCode);
         long confId = bpmnConf.Id;
@@ -291,7 +291,7 @@ public class BpmnConfBizService : IBpmnConfBizService
     }
     public BpmnConfVo Detail(long id)
     {
-        BpmnConf bpmnConf = _bpmnConfService.baseRepo.Where(a => a.Id == id).ToOne();
+        BpmnConf bpmnConf = _bpmnConfService._repository.Find(a => a.Id == id).FirstOrDefault();
         return FormatConfVo(GetBpmnConfVo(bpmnConf));
     }
 
@@ -299,7 +299,7 @@ public class BpmnConfBizService : IBpmnConfBizService
 
     public BpmnConfVo Detail(String bpmnCode)
     {
-        BpmnConf bpmnConf = _bpmnConfService.baseRepo.Where(a => a.BpmnCode.Equals(bpmnCode)).ToOne();
+        BpmnConf bpmnConf = _bpmnConfService._repository.Find(a => a.BpmnCode.Equals(bpmnCode)).FirstOrDefault();
         
         return GetBpmnConfVo(bpmnConf);
     }
@@ -420,8 +420,8 @@ public class BpmnConfBizService : IBpmnConfBizService
 
     private Dictionary<long, List<String>> GetBpmnNodeToMap(List<long> idList)
     {
-        List<BpmnNodeTo> bpmnNodeTos = _bpmnNodeToService.baseRepo
-            .Where(a => idList.Contains(a.BpmnNodeId) && a.IsDel == 0).ToList();
+        List<BpmnNodeTo> bpmnNodeTos = _bpmnNodeToService._repository
+            .Find(a => idList.Contains(a.BpmnNodeId) && a.IsDel == 0).ToList();
         Dictionary<long,List<string>> result = bpmnNodeTos
             .GroupBy(a=>a.BpmnNodeId)
             .ToDictionary(g=>g.Key,g=>g.Select(x=>x.NodeTo).ToList());
@@ -444,8 +444,8 @@ public class BpmnConfBizService : IBpmnConfBizService
 
     private  Dictionary<long, BpmnNodeSignUpConf> GetBpmnNodeSignUpConfMap(List<long> idList)
     {
-        var data = _bpmnNodeSignUpConfService.baseRepo
-            .Where(x => idList.Contains(x.BpmnNodeId) && x.IsDel==0)
+        var data = _bpmnNodeSignUpConfService._repository
+            .Find(x => idList.Contains(x.BpmnNodeId) && x.IsDel==0)
             .ToList();
 
         return data.ToDictionary(o => o.BpmnNodeId, o => o);
@@ -556,9 +556,8 @@ public class BpmnConfBizService : IBpmnConfBizService
     private  Dictionary<long, List<BpmnNodeButtonConf>> GetBpmnNodeButtonConfMap(List<long> idList)
     {
         
-        var data = _bpmnNodeButtonConfService.baseRepo
-            .Where(x => idList.Contains(x.BpmnNodeId) && x.IsDel==0)
-            .ToList();
+        var data = _bpmnNodeButtonConfService._repository
+            .Find(x => idList.Contains(x.BpmnNodeId) && x.IsDel == 0);
 
         return data
             .GroupBy(x => x.BpmnNodeId)
@@ -725,8 +724,8 @@ public class BpmnConfBizService : IBpmnConfBizService
     public BpmnConfVo DetailByFormCode(String formCode)
     {
 
-        BpmnConf bpmnConf = _bpmnConfService.baseRepo.Where(a => a.FormCode == formCode && a.EffectiveStatus == 1)
-            .First();
+        BpmnConf bpmnConf = _bpmnConfService._repository.Find(a => a.FormCode == formCode && a.EffectiveStatus == 1)
+            .FirstOrDefault();
         if(bpmnConf==null){
             throw new AFBizException("can not get a bpmnConf by provided formCode");
         }

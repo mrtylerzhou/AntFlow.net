@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -70,8 +70,8 @@ public class NodeTypeConditionsAdaptor : IBpmnNodeAdaptor
             return;
         }
 
-        List<BpmnNodeConditionsParamConf> nodeConditionsParamConfs = _bpmnNodeConditionsParamConfService.baseRepo
-            .Where(a => a.BpmnNodeConditionsId == bpmnNodeConditionsConf.Id)
+        List<BpmnNodeConditionsParamConf> nodeConditionsParamConfs = _bpmnNodeConditionsParamConfService._repository
+            .Find(a => a.BpmnNodeConditionsId == bpmnNodeConditionsConf.Id)
             .OrderBy(a => a.CondGroup)
             .ToList();
 
@@ -365,7 +365,7 @@ public class NodeTypeConditionsAdaptor : IBpmnNodeAdaptor
                         }
 
                         var numberOperator = extField.OptType;
-                        _bpmnNodeConditionsParamConfService.baseRepo.Insert(new BpmnNodeConditionsParamConf
+                        _bpmnNodeConditionsParamConfService._repository.Add(new BpmnNodeConditionsParamConf
                         {
                             BpmnNodeConditionsId = nodeConditionsId,
                             ConditionParamType = (int)conditionTypeEnum,
@@ -383,7 +383,7 @@ public class NodeTypeConditionsAdaptor : IBpmnNodeAdaptor
                         //if condition value doest not a collection and doest not a string type,it must have an operator
                         if (conditionTypeAttributes.FieldType == 2 && conditionParam is not string)
                         {
-                            _bpmnNodeConditionsParamConfService.baseRepo.Insert(new BpmnNodeConditionsParamConf
+                            _bpmnNodeConditionsParamConfService._repository.Add(new BpmnNodeConditionsParamConf
                             {
                                 BpmnNodeConditionsId = nodeConditionsId,
                                 ConditionParamType = (int)ConditionTypeEnum.CONDITION_TYPE_NUMBER_OPERATOR,

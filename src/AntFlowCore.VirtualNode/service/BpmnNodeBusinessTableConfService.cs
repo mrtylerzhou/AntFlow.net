@@ -1,22 +1,25 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
+using AntFlowCore.Persist;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.VirtualNode.service;
 
-public class BpmnNodeBusinessTableConfService : AFBaseCurdRepositoryService<BpmnNodeBusinessTableConf>, IBpmnNodeBusinessTableConfService
+public class BpmnNodeBusinessTableConfService : IBpmnNodeBusinessTableConfService
 {
-    public BpmnNodeBusinessTableConfService(IFreeSql freeSql) : base(freeSql)
+    public BpmnNodeBusinessTableConfService(IBpmnNodeBusinessTableConfRepository repository)
     {
+        _repository = repository;
     }
+
+    public IBpmnNodeBusinessTableConfRepository _repository { get; }
 
     public BpmnNodeBusinessTableConf? GetByBpmnNodeId(long bpmnNodeId)
     {
-        return baseRepo.Where(conf => conf.BpmnNodeId == bpmnNodeId).First();
+        return _repository.Find(conf => conf.BpmnNodeId == bpmnNodeId).FirstOrDefault();
     }
 
     public void Insert(BpmnNodeBusinessTableConf entity)
     {
-        baseRepo.Insert(entity);
+        _repository.Add(entity);
     }
 }

@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.adaptor;
+using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.util;
@@ -43,7 +43,7 @@ public class NodePropertyCustomizeAdaptor: AbstractAdditionSignNodeAdaptor
             SignType = bpmnNodePropertysVo.SignType,
             TenantId = MultiTenantUtil.GetCurrentTenantId(),
         };
-        _bpmnNodeCustomizeConfService.baseRepo.Insert(customizeConf);
+        _bpmnNodeCustomizeConfService._repository.Add(customizeConf);
     }
 
     public override void SetSupportBusinessObjects()

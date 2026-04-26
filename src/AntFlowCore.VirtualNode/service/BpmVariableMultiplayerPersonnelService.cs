@@ -1,40 +1,19 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
-using AntFlowCore.Base.exception;
-using AntFlowCore.Base.util;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.VirtualNode.service;
 
-public class BpmVariableMultiplayerPersonnelService: AFBaseCurdRepositoryService<BpmVariableMultiplayerPersonnel>,IBpmVariableMultiplayerPersonnelService
+public class BpmVariableMultiplayerPersonnelService : IBpmVariableMultiplayerPersonnelService
 {
-    public BpmVariableMultiplayerPersonnelService(IFreeSql freeSql) : base(freeSql)
+    public BpmVariableMultiplayerPersonnelService(IBpmVariableMultiplayerPersonnelRepository repository)
     {
+        _repository = repository;
     }
+
+    public IBpmVariableMultiplayerPersonnelRepository _repository { get; }
 
     public void Undertake(string processNumber, string taskTaskDefKey)
     {
-        List<BpmVariableMultiplayer> bpmVariableMultiplayers = Frsql.Select<BpmVariableMultiplayer>()
-            .From<BpmVariable, BpmVariableMultiplayerPersonnel>(
-                (a,b,c)=>
-                    a.LeftJoin(x=>x.VariableId==b.Id)
-                        .LeftJoin(x=>x.Id==c.VariableMultiplayerId)
-            )
-            .Where(a=>(a.t1.ElementId==taskTaskDefKey)&&(a.t2.ProcessNum==processNumber)&&(a.t3.UndertakeStatus==0))
-            .ToList();
-        if (bpmVariableMultiplayers != null && bpmVariableMultiplayers.Count > 0 &&
-            bpmVariableMultiplayers[0].SignType == 2)
-        {
-            String logInEmpId = SecurityUtils.GetLogInEmpId();
-            if (string.IsNullOrEmpty(logInEmpId)) {
-                throw new AFBizException("current user is not login");
-            }
-
-
-            this.Frsql.Update<BpmVariableMultiplayerPersonnel>()
-                .Set(a => a.UndertakeStatus, 1)
-                .Where(a => a.VariableMultiplayerId == bpmVariableMultiplayers[0].Id)
-                .ExecuteAffrows();
-        }
+        _repository.Undertake(processNumber, taskTaskDefKey);
     }
 }
