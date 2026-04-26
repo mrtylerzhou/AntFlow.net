@@ -1,3 +1,8 @@
+
+<h1 align="left">🛑  原服务器到期,临时预览地址</h1>
+
+<h1 align="left">🛑  http://150.158.106.115/admin/</h1>
+
 <p align="center">
  <img src="https://img.shields.io/badge/.net-9.0-blue" alt="Downloads">
  <img src="https://img.shields.io/badge/Vue-3.5-yellow.svg" alt="Downloads">
