@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
@@ -45,7 +45,7 @@ public class BpmProcessNodeSubmitBizService : IBpmProcessNodeSubmitBizService
             bool nextElementParallelGateway=false;
             if (processNodeSubmit.BackType == 1||processNodeSubmit.BackType == 2 || processNodeSubmit.BackType == 4)
             {
-                BpmAfDeployment bpmAfDeployment = _afDeploymentService.baseRepo.Where(a => a.Id == task.ProcDefId).First();
+                BpmAfDeployment bpmAfDeployment = _afDeploymentService._repository.FirstOrDefault(a => a.Id == task.ProcDefId);
                 if (bpmAfDeployment == null)
                 {
                     throw new AFBizException($"can not find deployment by id: {task.ProcDefId}");

@@ -12,7 +12,6 @@ using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.util;
 using AntFlowCore.Persist.api.interf.repository;
-using AntFlowCore.Persist.repository;
 
 namespace AntFlowCore.Bpmn.service;
 
@@ -32,7 +31,6 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
     private readonly IBpmVariableMessageService _bpmVariableMessageService;
 
     public BpmVariableMessageBizService(
-        IFreeSql freeSql,
         IBpmVariableService variableService,
         IBpmnConfService bpmnConfService,
         IBpmBusinessProcessService bpmBusinessProcessService,
@@ -170,8 +168,8 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
 
 
         //query bpmn business process by process number
-        BpmBusinessProcess businessProcess = _bpmBusinessProcessService.baseRepo
-            .Where(a => a.BusinessNumber.Equals(vo.ProcessNumber)).ToOne();
+        BpmBusinessProcess businessProcess = _bpmBusinessProcessService._repository
+            .FirstOrDefault(a => a.BusinessNumber.Equals(vo.ProcessNumber));
 
 
         if (businessProcess == null)
@@ -184,8 +182,7 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
         vo.ApplyDate = businessProcess.CreateTime?.ToString("yyyy-MM-dd");
         vo.ApplyTime = businessProcess.CreateTime?.ToString("yyyy-MM-dd HH:mm:ss");
 
-        List<BpmAfTaskInst> bpmAfTaskInsts = _afTaskInstService.baseRepo.Where(a => a.ProcInstId == vo.ProcessInsId)
-            .ToList();
+        List<BpmAfTaskInst> bpmAfTaskInsts = _afTaskInstService._repository.Find(a => a.ProcInstId == vo.ProcessInsId);
         vo.Approveds = bpmAfTaskInsts.Where(a => !string.IsNullOrEmpty(a.Assignee)).Select(a => a.Assignee).ToList();
         //if the current node approver is empty, then get it from login user info
         if (string.IsNullOrEmpty(vo.Assignee))
@@ -198,8 +195,8 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
         if (vo.EventTypeEnum.IsInNode())
         {
             //get current task list by process instance id
-            List<BpmAfTask> tasks = _taskService.baseRepo
-                .Where(a => a.ProcInstId == vo.ProcessInsId).ToList();
+            List<BpmAfTask> tasks = _taskService._repository
+                .Find(a => a.ProcInstId == vo.ProcessInsId);
             if (!tasks.IsEmpty())
             {
                 //if node is empty then get from task's definition
@@ -390,8 +387,8 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
         //if next node's approvers is empty then query current tasks instead
         if (vo.NextNodeApproveds.IsEmpty())
         {
-            List<BpmAfTask> tasks = _taskService.baseRepo
-                .Where(a => a.ProcInstId == vo.ProcessInsId).ToList();
+            List<BpmAfTask> tasks = _taskService._repository
+                .Find(a => a.ProcInstId == vo.ProcessInsId);
 
             if (!tasks.IsEmpty())
             {

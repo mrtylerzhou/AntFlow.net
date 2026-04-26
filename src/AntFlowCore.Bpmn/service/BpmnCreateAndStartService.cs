@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.service;
+using AntFlowCore.Abstraction.service;
 using AntFlowCore.Base.bpmnmodel;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.exception;
@@ -27,16 +27,12 @@ public class BpmnCreateAndStartService : IBpmnCreateAndStartService
         string deploymentId = _repositoryService.CreateDeployment(bpmnConfCommonVo, bpmnStartConditions);
         ExecutionEntity startProcessInstance = _runtimeService.StartProcessInstance(bpmnConfCommonVo,bpmnStartConditions, deploymentId);
         string processNum = bpmnStartConditions.ProcessNum;
-        BpmBusinessProcess bpmBusinessProcess = _bpmBusinessProcessService.baseRepo.Where(a=>a.BusinessNumber==processNum).First();
+        BpmBusinessProcess bpmBusinessProcess = _bpmBusinessProcessService._repository.FirstOrDefault(a=>a.BusinessNumber==processNum);
         if (bpmBusinessProcess == null)
         {
             throw new AFBizException($"can not find bpmn process by processNum:{processNum}");
         }
         
-        _bpmBusinessProcessService.Frsql
-            .Update<BpmBusinessProcess>()
-            .Set(a => a.ProcInstId,startProcessInstance.ProcessInstanceId)
-            .Where(a => a.Id == bpmBusinessProcess.Id)
-            .ExecuteAffrows();
+        _bpmBusinessProcessService._repository.UpdateProcInstId(bpmBusinessProcess.Id, startProcessInstance.ProcessInstanceId);
     }
 }

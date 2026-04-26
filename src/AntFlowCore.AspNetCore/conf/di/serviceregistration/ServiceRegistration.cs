@@ -497,6 +497,9 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmVariableViewPageButtonRepository, FsBpmVariableViewPageButtonRepository>();
         services.AddSingleton<IBpmVariableSignUpPersonnelRepository, FsBpmVariableSignUpPersonnelRepository>();
         services.AddSingleton<IBpmAfExecutionRepository, FsBpmAfExecutionRepository>();
+        services.AddSingleton<IBpmnConfNoticeTemplateDetailService, BpmnConfNoticeTemplateDetailService>();
+        services.AddSingleton<IDepartmentRepository, FsDepartmentRepository > ();
+        services.AddSingleton<IThirdPartyAccountApplyRepository, FsThirdPartyAccountApplyRepository>();
         //=================================不可越过的三八线==============================
         IAdaptorFactory adaptorFactory = AdaptorFactoryProxy.GetProxyInstance();
         services.AddSingleton(adaptorFactory);

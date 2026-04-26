@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.adaptor;
+using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.adaptor.processoperation;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
@@ -50,8 +50,8 @@ public class FastForwardProcessService: IProcessOperationAdaptor
         }
         String procInstId=bpmBusinessProcess.ProcInstId;
         
-        List<BpmAfTask> taskList =_afTaskInstService.baseRepo
-            .Where(a => a.ProcInstId == procInstId).ToList();
+        List<BpmAfTask> taskList =_afTaskInstService._repository
+            .Find(a => a.ProcInstId == procInstId);
         if (taskList.IsEmpty()) {
             throw new AFBizException(BusinessError.STATUS_ERROR,"未获取到当前流程信息!,流程编号:" + bpmBusinessProcess.ProcessinessKey);
         }
@@ -100,8 +100,8 @@ public class FastForwardProcessService: IProcessOperationAdaptor
                 processInstanceId,processKey,nodeId,1);
         }
         
-        List<BpmAfTask> tasks =_afTaskInstService.baseRepo
-            .Where(a => a.ProcInstId == processInstanceId).ToList();
+        List<BpmAfTask> tasks =_afTaskInstService._repository
+            .Find(a => a.ProcInstId == processInstanceId);
         CompleteTaskRecursively(tasks,processInstanceId,forwardToNodeElementId,processNumber,verifyComment,processKey);
     }
     public void SetSupportBusinessObjects()

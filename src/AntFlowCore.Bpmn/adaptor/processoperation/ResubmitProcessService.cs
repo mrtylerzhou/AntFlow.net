@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.service.biz;
+using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.adaptor.processoperation;
 using AntFlowCore.Base.constant.enums;
@@ -100,11 +100,7 @@ public class ResubmitProcessService: IProcessOperationAdaptor
           
             if (vo != null && !string.IsNullOrEmpty(vo.ProcessDigest))
             {
-                _bpmBusinessProcessService.Frsql
-                    .Update<BpmBusinessProcess>()
-                    .Set(a => a.ProcessDigest, vo.ProcessDigest)
-                    .Where(a => a.BusinessNumber.Equals(vo.ProcessNumber))
-                    .ExecuteAffrows();
+                _bpmBusinessProcessService._repository.UpdateProcessDigest(vo.ProcessNumber, vo.ProcessDigest);
             }
 
             if (vo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_JP)

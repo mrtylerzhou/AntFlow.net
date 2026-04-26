@@ -65,9 +65,9 @@ public class BpmnTaskListener: ITaskListener
            _taskService.Complete(delegateTask);
            return;
         }
-        BpmBusinessProcess bpmBusinessProcess = _bpmBusinessProcessService.baseRepo
-            .Where(a=>a.BusinessNumber==delegateTask.ProcessNumber)
-            .ToOne();
+        BpmBusinessProcess bpmBusinessProcess = _bpmBusinessProcessService._repository
+            .Find(a=>a.BusinessNumber==delegateTask.ProcessNumber)
+            .First();
         if (bpmBusinessProcess == null)
         {
             _logger.LogError("流程实例不存在，流程号：{}", delegateTask.ProcessNumber);

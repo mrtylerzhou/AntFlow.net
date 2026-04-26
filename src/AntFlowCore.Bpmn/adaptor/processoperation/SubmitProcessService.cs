@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.service;
+using AntFlowCore.Abstraction.service;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.adaptor.formoperation;
 using AntFlowCore.Base.adaptor.processoperation;
@@ -73,7 +73,7 @@ public class SubmitProcessService: IProcessOperationAdaptor
             Version = businessDataVo.BpmnCode,
             TenantId = MultiTenantUtil.GetCurrentTenantId(),
         };
-        _bpmBusinessProcessService.baseRepo.Insert(bpmBusinessProcess);
+        _bpmBusinessProcessService._repository.Add(bpmBusinessProcess);
         businessDataVo.ProcessNumber = processNumber;
         _bpmnConfCommonService.StartProcess(businessDataVo.BpmnCode, bpmnStartConditionsVo);
     }

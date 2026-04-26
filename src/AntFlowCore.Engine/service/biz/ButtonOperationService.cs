@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.service.biz;
+using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.adaptor.processoperation;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
@@ -6,23 +6,24 @@ using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.adaptor;
 using AntFlowCore.Bpmn.listener;
+using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Engine.service.biz;
 
 public class ButtonOperationService : IButtonOperationService
 {
-    private readonly IFreeSql _freeSql;
+    private readonly IAFTaskService _taskService;
     private readonly ITaskListener _taskListener;
     private readonly IThirdPartyCallBackService _thirdPartyCallBackService;
     private readonly IAdaptorFactory _adaptorFactory;
 
     public ButtonOperationService(
-        IFreeSql freeSql,
+        IAFTaskService taskService,
         ITaskListener taskListener,
         ThirdPartyCallBackService thirdPartyCallBackService,
         IAdaptorFactory adaptorFactory)
     {
-        _freeSql = freeSql;
+        _taskService = taskService;
         _taskListener = taskListener;
         _thirdPartyCallBackService = thirdPartyCallBackService;
         _adaptorFactory = adaptorFactory;
@@ -56,13 +57,8 @@ public class ButtonOperationService : IButtonOperationService
             }
             else
             {
-                List<BpmAfTask> bpmAfTasks = _freeSql
-                    .Select<BpmAfTask>()
-                    .From<BpmBusinessProcess>((a, b) =>
-                        a.InnerJoin(x => x.ProcInstId == b.ProcInstId)
-                    )
-                    .Where((a, b) => b.BusinessNumber == vo.ProcessNumber)
-                    .ToList();
+                List<BpmAfTask> bpmAfTasks = _taskService._repository
+                    .FindTasksByProcessNumber(vo.ProcessNumber);
                 string eventName = "";
                 if (vo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_AGREE)
                 {

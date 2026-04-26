@@ -23,10 +23,8 @@ public class BpmnViewPageButtonBizService : IBpmnViewPageButtonBizService
         }
 
         _bpmnViewPageButtonService
-            .Frsql
-            .Delete<BpmnViewPageButton>()
-            .Where(x => x.ConfId == confId)
-            .ExecuteAffrows();
+            ._repository
+            .DeleteByConfId(confId);
 
         List<int> viewPageStarts = viewPageButtons.ViewPageStart;
         if (!viewPageStarts.IsEmpty())

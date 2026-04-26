@@ -44,16 +44,10 @@ public class TaskMgmtService : ITaskMgmtService
     /// <returns></returns>
     public int UpdateTaskInst(TaskMgmtVO taskMgmtVO)
     {
-        int affrows = _taskInstService
-            .Frsql
-            .Update<BpmAfTaskInst>()
-            .Set(a => a.Assignee, taskMgmtVO.ApplyUser)
-            .Set(a => a.AssigneeName, taskMgmtVO.ApplyUserName)
-            .Set(a=>a.Description,"变更处理人")
-            .Set(a=>a.UpdateUser,SecurityUtils.GetLogInEmpId())
-            .Where(a => a.Id == taskMgmtVO.TaskId)
-            .ExecuteAffrows();
-        return affrows;
+        int count = _taskInstService
+            ._repository
+            .UpdateTaskInstAssignee(taskMgmtVO.TaskId, taskMgmtVO.ApplyUser, taskMgmtVO.ApplyUserName, "变更处理人", SecurityUtils.GetLogInEmpId());
+        return count;
     }
 
     /// <summary>
@@ -63,28 +57,24 @@ public class TaskMgmtService : ITaskMgmtService
     /// <returns></returns>
     public int UpdateTask(TaskMgmtVO taskMgmtVO)
     {
-        int affrows = _taskService
-            .Frsql
-            .Update<BpmAfTask>()
-            .Set(a => a.Assignee, taskMgmtVO.ApplyUser)
-            .Set(a => a.AssigneeName, taskMgmtVO.ApplyUserName)
-            .Where(a => a.Id == taskMgmtVO.TaskId)
-            .ExecuteAffrows();
-       
-        return affrows;
+        int updateAssignee = _taskService
+            ._repository
+            .UpdateAssignee(taskMgmtVO.TaskId, taskMgmtVO.ApplyUser, taskMgmtVO.ApplyUserName);
+
+        return updateAssignee;
     }
 
     public List<BpmAfTask> GetAgencyList(string taskId, int code, string taskProcInstId)
     {
-        IEnumerable<string> taskDefKeys = _taskService.baseRepo.Where(a=>a.Id==taskId).ToList().Select(a=>a.TaskDefKey);
-        List<BpmAfTask> bpmAfTasks = _taskService.baseRepo.Where(a=>taskDefKeys.Contains(a.TaskDefKey)&&a.ProcInstId==taskProcInstId).ToList();
+        IEnumerable<string> taskDefKeys = _taskService._repository.Find(a=>a.Id==taskId).Select(a=>a.TaskDefKey);
+        List<BpmAfTask> bpmAfTasks = _taskService._repository.Find(a=>taskDefKeys.Contains(a.TaskDefKey)&&a.ProcInstId==taskProcInstId);
         List<BpmAfTask> afTasks = bpmAfTasks.Where(a=>a.Id!=taskId).ToList();
         return afTasks;
     }
 
     public void DeleteTask(string taskId)
     {
-       _taskService.baseRepo.Delete(a=>a.Id==taskId);
+       _taskService._repository.DeleteByExpression(a=>a.Id==taskId);
     }
 
     public List<DIYProcessInfoDTO> ViewProcessInfo(string desc = "")
@@ -183,10 +173,7 @@ public class TaskMgmtService : ITaskMgmtService
         {
             throw new AFBizException("executionId不存在!");
         }
-        _executionService.Frsql
-            .Delete<BpmAfExecution>()
-            .Where(a => a.Id == executionId)
-            .ExecuteAffrows();
+        _executionService._repository.DeleteByExpression(a => a.Id == executionId);
     }
 
     public void DeletTask(String taskId)
@@ -196,9 +183,6 @@ public class TaskMgmtService : ITaskMgmtService
             throw new AFBizException("taskId不存在!");
         }
 
-        _taskService.Frsql
-            .Delete<BpmAfTask>()
-            .Where(a => a.Id == taskId)
-            .ExecuteAffrows();
+        _taskService._repository.DeleteByExpression(a => a.Id == taskId);
     }
 }

@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction;
+using AntFlowCore.Abstraction;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.constant.enums;
@@ -58,9 +58,8 @@ public class ProcessConstantsService : IProcessConstantsService
             throw new ArgumentNullException(nameof(procInstId));
         }
 
-        List<BpmAfTaskInst> bpmAfTaskInsts = _afTaskInstService.baseRepo
-            .Where(a => a.ProcInstId == procInstId && a.TaskDefKey == taskDefKey&&a.EndTime!=null)
-            .OrderByDescending(a => a.StartTime).ToList();
+        List<BpmAfTaskInst> bpmAfTaskInsts = _afTaskInstService._repository
+            .Find(a => a.ProcInstId == procInstId && a.TaskDefKey == taskDefKey&&a.EndTime!=null);
         BpmAfTaskInst? bpmAfTaskInst = bpmAfTaskInsts.Where(a => a.TaskDefKey != taskDefKey).FirstOrDefault();
         return bpmAfTaskInst;
     }
@@ -113,9 +112,8 @@ public class ProcessConstantsService : IProcessConstantsService
 
         // 查询当前用户的任务
         var tasks = _afTaskService
-            .baseRepo
-            .Where(a=>a.ProcInstId== processInstanceId)
-            .ToList();
+            ._repository
+            .Find(a=>a.ProcInstId== processInstanceId);
         string taskDefKey = "";
         List<String> viewNodeIds=null;
         if (tasks.Any())
@@ -138,10 +136,8 @@ public class ProcessConstantsService : IProcessConstantsService
         else if (bpmBusinessProcess.IsLowCodeFlow == 1)
         {
             List<BpmAfTaskInst> historicTasks = _afTaskInstService
-                .baseRepo
-                .Where(a => a.ProcInstId == processInstanceId && a.Assignee == SecurityUtils.GetLogInEmpId())
-                .OrderByDescending(a => a.EndTime)
-                .ToList();
+                ._repository
+                .Find(a => a.ProcInstId == processInstanceId && a.Assignee == SecurityUtils.GetLogInEmpId());
 
             if (historicTasks.Any())
             {
@@ -167,9 +163,8 @@ public class ProcessConstantsService : IProcessConstantsService
         if (bpmBusinessProcess != null)
         {
             List<BpmAfTaskInst> taskInstanceList = _afTaskInstService
-                .baseRepo
-                .Where(a => a.ProcInstId == bpmBusinessProcess.ProcInstId)
-                .ToList();
+                ._repository
+                .Find(a => a.ProcInstId == bpmBusinessProcess.ProcInstId);
                 
             
 

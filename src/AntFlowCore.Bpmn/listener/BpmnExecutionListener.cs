@@ -35,9 +35,8 @@ public class BpmnExecutionListener: IExecutionListener
     {
         string procInstId = execution.ProcInstId;
         List<BpmBusinessProcess> bpmBusinessProcesses = _bpmBusinessProcessService
-            .baseRepo
-            .Where(a => a.ProcInstId == procInstId)
-            .ToList();
+            ._repository
+            .Find(a => a.ProcInstId == procInstId);
         if (bpmBusinessProcesses==null||bpmBusinessProcesses.Count == 0)
         {
             throw new AFBizException($"Can not get bpm business process by procInstId:{procInstId}");
@@ -87,11 +86,8 @@ public class BpmnExecutionListener: IExecutionListener
         }
 
         _bpmBusinessProcessService
-            .Frsql
-            .Update<BpmBusinessProcess>()
-            .Set(a => a.ProcessState, (int)ProcessStateEnum.HANDLE_STATE)
-            .Where(a => a.Id == bpmBusinessProcess.Id)
-            .ExecuteAffrows();
+            ._repository
+            .UpdateProcessState(bpmBusinessProcess.Id, (int)ProcessStateEnum.HANDLE_STATE);
         //todo notification
     }
 }

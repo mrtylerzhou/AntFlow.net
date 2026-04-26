@@ -89,7 +89,7 @@ namespace AntFlowCore.Bpmn.adaptor.processoperation;
             var taskData = taskList.First();
             bpmBusinessProcess.ProcessState=processState;
             // Update process state
-            _bpmBusinessProcessService.baseRepo
+            _bpmBusinessProcessService._repository
                 .Update(bpmBusinessProcess);
 
             // Save verify info

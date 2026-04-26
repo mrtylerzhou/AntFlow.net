@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.repository;
 using AntFlowCore.Base.constant.enums;
@@ -56,7 +56,7 @@ public class DictService : IDictService
         /// </summary>
         public int AddFormCode(BaseKeyValueStruVo dto)
         {
-            List<DictData> dictDatas = _dicDataSerivce.baseRepo.Where(a=>a.Value==dto.Key).ToList();
+            List<DictData> dictDatas = _dicDataSerivce._repository.Find(a=>a.Value==dto.Key);
             if (!dictDatas.Any())
             {
                 var entity = new DictData()
@@ -70,7 +70,7 @@ public class DictService : IDictService
                     CreateUser = SecurityUtils.GetLogInEmpName(),
                     CreateTime = DateTime.UtcNow
                 };
-                _dicDataSerivce.baseRepo.Insert(entity);
+                _dicDataSerivce._repository.Add(entity);
             }
            
             return 0;
@@ -79,9 +79,8 @@ public class DictService : IDictService
     
         private List<DictData> GetDictItemsByType(String dictType){
             List<DictData> dictDatas = _dicDataSerivce
-                .baseRepo
-                .Where(a=>a.DictType==dictType)
-                .OrderByDescending(a=>a.CreateTime).ToList();
+                ._repository
+                .Find(a=>a.DictType==dictType);
             
             return dictDatas;
         }

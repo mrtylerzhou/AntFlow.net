@@ -66,7 +66,7 @@ public class BpmVerifyInfoBizService : IBpmVerifyInfoBizService
 
         // 查询业务流程信息
         BpmBusinessProcess bpmBusinessProcess =
-            _bpmBusinessProcessService.baseRepo.Where(a => a.BusinessNumber == processNumber).First();
+            _bpmBusinessProcessService._repository.FirstOrDefault(a => a.BusinessNumber == processNumber);
 
         finishFlag = (int)ProcessStateEnum.HANDLE_STATE == bpmBusinessProcess.ProcessState;
         if (bpmBusinessProcess == null)
@@ -93,17 +93,16 @@ public class BpmVerifyInfoBizService : IBpmVerifyInfoBizService
 
         // 查询流程的历史实例
         BpmAfTaskInst historicProcessInstance = _afTaskInstService
-            .baseRepo
-            .Where(a => a.ProcInstId == bpmBusinessProcess.ProcInstId)
-            .First();
+            ._repository
+            .FirstOrDefault(a => a.ProcInstId == bpmBusinessProcess.ProcInstId);
 
 
         // 获取最后一个审批记录
         BpmAfTaskInst lastHistoricTaskInstance = _afTaskInstService
-            .baseRepo
-            .Where(a => a.ProcInstId == bpmBusinessProcess.ProcInstId)
+            ._repository
+            .Find(a => a.ProcInstId == bpmBusinessProcess.ProcInstId)
             .OrderByDescending(a => a.EndTime)
-            .First();
+            .FirstOrDefault();
 
 
         int sort = 0;
@@ -244,9 +243,8 @@ public class BpmVerifyInfoBizService : IBpmVerifyInfoBizService
 
         // Query process variable info
         BpmVariable bpmVariable = _bpmVariableService
-            .baseRepo
-            .Where(a => a.ProcessNum == processNumber)
-            .First();
+            ._repository
+            .FirstOrDefault(a => a.ProcessNum == processNumber);
 
         if (bpmVariable == null)
         {
@@ -423,9 +421,8 @@ public class BpmVerifyInfoBizService : IBpmVerifyInfoBizService
         var signUpNodeCollectionNameMap = new Dictionary<string, string>();
 
         List<BpmVariableSignUp> bpmVariableSignUps = _bpmVariableSignUpService
-            .baseRepo
-            .Where(a=>a.VariableId==variableId)
-            .ToList();
+            ._repository
+            .Find(a=>a.VariableId==variableId);
             
         
 

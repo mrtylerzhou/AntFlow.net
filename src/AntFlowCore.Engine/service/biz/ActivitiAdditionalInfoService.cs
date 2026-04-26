@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.vo;
@@ -30,7 +30,7 @@ public class ActivitiAdditionalInfoService : IActivitiAdditionalInfoService
 
     }
     public List<BpmnConfCommonElementVo> GetActivitiList(String procDefId){
-        BpmAfDeployment bpmAfDeployment = _afDeploymentService.baseRepo.Where(a=>a.Id==procDefId).First();
+        BpmAfDeployment bpmAfDeployment = _afDeploymentService._repository.FirstOrDefault(a=>a.Id==procDefId);
         if (bpmAfDeployment == null)
         {
             throw new ApplicationException($"deployment with id {procDefId} not found");
@@ -41,7 +41,7 @@ public class ActivitiAdditionalInfoService : IActivitiAdditionalInfoService
     }
     public Dictionary<string, List<BpmAfTaskInst>> GetVariableInstanceMap(string procInstId)
     {
-        List<BpmAfTaskInst> bpmAfTaskInsts = _afTaskInstService.baseRepo.Where(a => a.ProcInstId == procInstId).ToList();
+        List<BpmAfTaskInst> bpmAfTaskInsts = _afTaskInstService._repository.Find(a => a.ProcInstId == procInstId);
         
 
         var variableInstanceMap = new Dictionary<string, List<BpmAfTaskInst>>();

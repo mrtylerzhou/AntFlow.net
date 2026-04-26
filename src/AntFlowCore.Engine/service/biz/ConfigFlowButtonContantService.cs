@@ -176,8 +176,8 @@ public class ConfigFlowButtonContantService : IConfigFlowButtonContantService
         {
             return false;
         }
-        BpmAfTaskInst bpmAfTaskInst = _afTaskInstService.baseRepo.Where(a=>a.ProcInstId==procInstId).First();
-        BpmAfDeployment bpmAfDeployment = _afDeploymentService.baseRepo.Where(a=>a.Id==bpmAfTaskInst.ProcDefId).First();
+        BpmAfTaskInst bpmAfTaskInst = _afTaskInstService._repository.FirstOrDefault(a=>a.ProcInstId==procInstId);
+        BpmAfDeployment bpmAfDeployment = _afDeploymentService._repository.FirstOrDefault(a=>a.Id==bpmAfTaskInst.ProcDefId);
         if (bpmAfDeployment == null)
         {
             throw new ApplicationException($"deployment with id {procInstId} not found");
@@ -294,9 +294,8 @@ public class ConfigFlowButtonContantService : IConfigFlowButtonContantService
         }else
         {
             List<BpmAfTaskInst> bpmAfTaskInsts = _afTaskInstService
-                .baseRepo
-                .Where(a=>a.ProcInstId==bpmBusinessProcess.ProcInstId)
-                .OrderBy(a=>a.EndTime).ToList();
+                ._repository
+                .Find(a=>a.ProcInstId==bpmBusinessProcess.ProcInstId);
 
             List<String> hisTaskDefKeys = bpmAfTaskInsts
                 .Where(a => a.EndTime.HasValue && SecurityUtils.GetLogInEmpIdSafe() == a.Assignee)

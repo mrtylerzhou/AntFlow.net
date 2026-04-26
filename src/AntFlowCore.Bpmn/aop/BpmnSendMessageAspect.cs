@@ -45,7 +45,7 @@ public class BpmnSendMessageAspect<T> : DispatchProxy
         OutSideBpmBusinessParty outSideBpmBusinessParty=null;
         if(businessPartyId!=null&&businessPartyId>0){
             IOutSideBpmBusinessPartyService outSideBpmBusinessPartyService = ServiceProviderUtils.GetService<IOutSideBpmBusinessPartyService>();
-            outSideBpmBusinessParty=outSideBpmBusinessPartyService.baseRepo.Where(a=>a.Id==businessPartyId).First();
+            outSideBpmBusinessParty=outSideBpmBusinessPartyService._repository.Find(a=>a.Id==businessPartyId).First();
             //set outside type
             businessDataVo.OutSideType=(outSideBpmBusinessParty.Type);
         }

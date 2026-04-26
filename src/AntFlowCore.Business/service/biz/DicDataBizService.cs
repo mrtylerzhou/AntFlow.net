@@ -107,9 +107,8 @@ public class DicDataBizService :  IDicDataBizSerivce
                 IBpmnConfService bpmnConfService = ServiceProviderUtils.GetService<IBpmnConfService>();
 
                 List<BpmnConf> bpmnConfs = bpmnConfService
-                    .baseRepo
-                    .Where(a => formCodes.Contains(a.FormCode) && a.EffectiveStatus == 1)
-                    .ToList();
+                    ._repository
+                    .Find(a => formCodes.Contains(a.FormCode) && a.EffectiveStatus == 1);
                 if (bpmnConfs != null && bpmnConfs.Any())
                 {
                     var formCode2Flags = bpmnConfs.ToDictionary(

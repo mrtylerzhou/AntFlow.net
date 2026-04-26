@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.service.biz;
+using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.adaptor.processoperation;
 using AntFlowCore.Base.constant.enums;
@@ -39,9 +39,8 @@ public class TransferAssigneeProcessService : IProcessOperationAdaptor
     {
         BpmBusinessProcess bpmBusinessProcess = _bpmBusinessProcessService.GetBpmBusinessProcess(vo.ProcessNumber);
         List<BpmAfTask> tasks = _taskService
-            .baseRepo
-            .Where(a => a.ProcInstId == bpmBusinessProcess.ProcInstId)
-            .ToList();
+            ._repository
+            .Find(a => a.ProcInstId == bpmBusinessProcess.ProcInstId);
 
         var userInfos = vo.UserInfos;
         if (userInfos.Count != 2)

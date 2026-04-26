@@ -68,9 +68,8 @@ public class RemoveFutureNodeProcessService : IProcessOperationAdaptor
         bool isSingle = nodeElementDto.IsSingle;
 
         // 检查节点是否已经执行过或正在执行
-        List<BpmAfTaskInst> bpmAfTaskInsts = _afTaskInstService.baseRepo
-            .Where(a => a.ProcInstId == procInstId && a.TaskDefKey == elementId)
-            .ToList();
+        List<BpmAfTaskInst> bpmAfTaskInsts = _afTaskInstService._repository
+            .Find(a => a.ProcInstId == procInstId && a.TaskDefKey == elementId);
         if (bpmAfTaskInsts.Count > 0)
         {
             throw new AFBizException("当前节点已经执行或正在执行,无法删除!");

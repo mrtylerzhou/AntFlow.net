@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using AntFlowCore.Base.bpmnmodel;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
@@ -78,7 +78,7 @@ public class RuntimeService
                     SignType = signType
                };
                executions.Add(execution);
-               _executionService.baseRepo.Insert(execution);
+               _executionService._repository.Add(execution);
                List<BpmAfTask> tasks = new List<BpmAfTask>();
                List<BpmAfTaskInst> historyTaskInsts = new List<BpmAfTaskInst>();
                if (i == 0)
@@ -131,7 +131,7 @@ public class RuntimeService
                     historyTaskInsts.Add(bpmAfTask.ToInst());
                }
 
-               _taskInstService.baseRepo.Insert(historyTaskInsts);
+               _taskInstService._repository.AddRange(historyTaskInsts);
           }
 
           ExecutionEntity executionEntity = new ExecutionEntity()
@@ -148,8 +148,8 @@ public class RuntimeService
           string businessKey = bpmBusinessProcess.ProcessinessKey;
           DateTime nowTime = DateTime.Now;
 
-          List<BpmAfTaskInst> bpmAfTaskInsts = _afTaskInstService.baseRepo
-               .Where(a=>a.ProcInstId==procInstId&&a.TaskDefKey==taskDefKey).ToList();
+          List<BpmAfTaskInst> bpmAfTaskInsts = _afTaskInstService._repository
+               .Find(a=>a.ProcInstId==procInstId&&a.TaskDefKey==taskDefKey);
 
           if (bpmAfTaskInsts.IsEmpty())
           {
@@ -157,7 +157,7 @@ public class RuntimeService
           }
 
           string procDefId = bpmAfTaskInsts[0].ProcDefId;
-          BpmAfDeployment bpmAfDeployment = _afDeploymentService.baseRepo.Where(a=>a.Id==procDefId).First();
+          BpmAfDeployment bpmAfDeployment = _afDeploymentService._repository.FirstOrDefault(a=>a.Id==procDefId);
           if (bpmAfDeployment == null)
           {
                throw new ApplicationException($"deployment with id {procDefId} not found");
@@ -220,7 +220,7 @@ public class RuntimeService
                historyTaskInsts.Add(bpmAfTaskInst);
           }
           
-          _afTaskInstService.baseRepo.Insert(historyTaskInsts);
+          _afTaskInstService._repository.AddRange(historyTaskInsts);
         
      }
 }

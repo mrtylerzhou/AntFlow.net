@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
@@ -50,7 +50,7 @@ public class ProcessNodeJumpService : IProcessNodeJumpService
     }
     public void TurnTransition(String taskId, String taskToTurnToNodeKey, Dictionary<String, Object> variables)
     {
-        BpmAfTask bpmAfTask = _afTaskService.baseRepo.Where(a => a.Id == taskId).First();
+        BpmAfTask bpmAfTask = _afTaskService._repository.FirstOrDefault(a => a.Id == taskId);
         if (bpmAfTask == null)
         {
             throw new AFBizException($"can not find task by id: {taskId}");
@@ -61,15 +61,8 @@ public class ProcessNodeJumpService : IProcessNodeJumpService
     {
         string verifyComment = variables.ContainsKey(StringConstants.VERIFY_COMMENT) ? variables[StringConstants.VERIFY_COMMENT]?.ToString() : "";
         DateTime nowTime = DateTime.Now;
-        _afTaskInstService.Frsql
-            .Update<BpmAfTaskInst>()
-            .Set(a => a.DeleteReason, StringConstants.DEFAULT_TASK_DELETE_REASON)
-            .Set(a => a.VerifyStatus, (int)ProcessSubmitStateEnum.PROCESS_UPDATE_TYPE)
-            .Set(a => a.VerifyDesc, verifyComment)
-            .Set(a => a.EndTime, nowTime)
-            .Set(a => a.Duration, (nowTime - bpmAfTask.CreateTime).Seconds)
-            .Where(a => a.Id == bpmAfTask.Id)
-            .ExecuteAffrows();
+        _afTaskInstService._repository
+            .UpdateTaskInstByTaskId(bpmAfTask.Id, StringConstants.DEFAULT_TASK_DELETE_REASON, (int)ProcessSubmitStateEnum.PROCESS_UPDATE_TYPE, verifyComment, nowTime, (nowTime - bpmAfTask.CreateTime).Seconds);
 
         string procInstId = bpmAfTask.ProcInstId;
         string procDefId = bpmAfTask.ProcDefId;
@@ -77,7 +70,7 @@ public class ProcessNodeJumpService : IProcessNodeJumpService
 
         if (bpmAfDeployment == null)
         {
-            bpmAfDeployment = _afDeploymentService.baseRepo.Where(a => a.Id == procDefId).First();
+            bpmAfDeployment = _afDeploymentService._repository.FirstOrDefault(a => a.Id == procDefId);
         }
 
         if (bpmAfDeployment == null)
@@ -92,10 +85,7 @@ public class ProcessNodeJumpService : IProcessNodeJumpService
         IDictionary<string, string> assigneeMap = turnToElement.AssigneeMap;
         string executionId = StrongUuidGenerator.GetNextId();
 
-        _executionService.Frsql
-            .Delete<BpmAfExecution>()
-            .Where(a => a.Id == bpmAfTask.ExecutionId)
-            .ExecuteAffrows();
+        _executionService._repository.DeleteByExpression(a => a.Id == bpmAfTask.ExecutionId);
 
         List<BpmAfTaskInst> historyTaskInsts = new List<BpmAfTaskInst>();
         List<BpmAfTask> tasks = new List<BpmAfTask>();
@@ -141,9 +131,9 @@ public class ProcessNodeJumpService : IProcessNodeJumpService
             StartUserId = SecurityUtils.GetLogInEmpId(),
             TaskCount = signType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode() ? 1 : assigneeMap.Count,
         };
-        _executionService.baseRepo.Insert(execution);
-        _afTaskService.baseRepo.Delete(bpmAfTask);
-        _afTaskService.baseRepo.Insert(tasks);
+        _executionService._repository.Add(execution);
+        _afTaskService._repository.DeleteByExpression(a => a.Id == bpmAfTask.Id);
+        _afTaskService.InsertTasks(tasks);
         //_afTaskInstService.baseRepo.Insert(historyTaskInsts);
 
     }

@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
@@ -31,15 +31,9 @@ public class ProcessBusinessContansService : IProcessBusinessContansService
 
     public void DeleteProcessInstance(string processInstanceId)
     {
-        _executionService.baseRepo.Delete(a=>a.ProcInstId==processInstanceId);
-        _taskService.baseRepo.Delete(a=>a.ProcInstId==processInstanceId);
-        _taskInstService.Frsql
-            .Update<BpmAfTaskInst>()
-            .Set(a => a.EndTime, DateTime.Now)
-            .Set(a => a.DeleteReason, "process ending")
-            .Where(a => a.ProcInstId == processInstanceId && a.EndTime == null &&
-                        a.Assignee == SecurityUtils.GetLogInEmpId())
-            .ExecuteAffrows();
+        _executionService._repository.DeleteByExpression(a=>a.ProcInstId==processInstanceId);
+        _taskService._repository.DeleteByExpression(a=>a.ProcInstId==processInstanceId);
+        _taskInstService._repository.UpdateEndTimeByProcInstId(processInstanceId, DateTime.Now, "process ending", SecurityUtils.GetLogInEmpId());
     }
     public BpmAfTaskInst GetPrevTask(String taskDefKey,String procInstId){
         if(string.IsNullOrEmpty(taskDefKey)){
@@ -50,10 +44,8 @@ public class ProcessBusinessContansService : IProcessBusinessContansService
         }
 
         List<BpmAfTaskInst> bpmAfTaskInsts = _taskInstService
-            .baseRepo
-            .Where(a=>a.ProcInstId==procInstId)
-            .OrderByDescending(a=>a.StartTime)
-            .ToList();
+            ._repository
+            .Find(a=>a.ProcInstId==procInstId);
         BpmAfTaskInst bpmAfTaskInst = bpmAfTaskInsts.First(a => a.EndTime!=null&&a.TaskDefKey!=taskDefKey);
         return bpmAfTaskInst;
     }

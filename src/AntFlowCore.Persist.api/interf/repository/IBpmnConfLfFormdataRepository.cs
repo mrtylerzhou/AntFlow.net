@@ -5,4 +5,5 @@ namespace AntFlowCore.Persist.api.interf.repository;
 
 public interface IBpmnConfLfFormdataRepository : IBaseRepository<BpmnConfLfFormdata>
 {
+    BpmnConfLfFormdata GetLFFormDataByFormCode(string formCode);
 }

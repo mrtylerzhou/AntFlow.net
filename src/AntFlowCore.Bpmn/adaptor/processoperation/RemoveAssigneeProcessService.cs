@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.service.biz;
+using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.adaptor.processoperation;
 using AntFlowCore.Base.constant.enums;
@@ -54,9 +54,8 @@ public class RemoveAssigneeProcessService: IProcessOperationAdaptor
             throw new AFBizException("未能根据流程编号找到流程信息!");
         }
         String processInstanceId = bpmBusinessProcess.ProcInstId;
-        List<BpmAfTask> bpmAfTasks = _aFtaskService.baseRepo
-            .Where(a=>a.ProcInstId==processInstanceId&&a.TaskDefKey==taskDefKey)
-            .ToList<BpmAfTask>();
+        List<BpmAfTask> bpmAfTasks = _aFtaskService._repository
+            .Find(a=>a.ProcInstId==processInstanceId&&a.TaskDefKey==taskDefKey);
         if (bpmAfTasks.IsEmpty())
         {
             throw new AFBizException($"未能根据当前taskdefkey:{taskDefKey}找到任务");

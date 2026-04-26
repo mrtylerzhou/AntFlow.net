@@ -21,7 +21,6 @@ namespace AntFlowCore.Bpmn.adaptor.processoperation;
 public class InsertNodeAfterCurrentOrFutureService : AbstractAddOrRemoveFutureAssigneeSerivce, IProcessOperationAdaptor
 {
     private readonly IAFTaskService _afTaskService;
-    private readonly IFreeSql _freeSql;
 
     public InsertNodeAfterCurrentOrFutureService(
         IBpmBusinessProcessService bpmBusinessProcessService,
@@ -30,11 +29,9 @@ public class InsertNodeAfterCurrentOrFutureService : AbstractAddOrRemoveFutureAs
         IBpmFlowrunEntrustService bpmFlowrunEntrustService,
         IAFDeploymentService afDeploymentService,
         IBpmvariableBizService bpmvariableBizService,
-        IAFTaskService afTaskService,
-        IFreeSql freeSql) : base(bpmBusinessProcessService, taskService, afTaskInstService, bpmFlowrunEntrustService, afDeploymentService, bpmvariableBizService)
+        IAFTaskService afTaskService) : base(bpmBusinessProcessService, taskService, afTaskInstService, bpmFlowrunEntrustService, afDeploymentService, bpmvariableBizService)
     {
         _afTaskService = afTaskService;
-        _freeSql = freeSql;
     }
 
     public void DoProcessButton(BusinessDataVo vo)
@@ -72,7 +69,7 @@ public class InsertNodeAfterCurrentOrFutureService : AbstractAddOrRemoveFutureAs
             throw new AFBizException("当前节点不是多实例节点，不支持插入节点");
         }
 
-        List<BpmAfTask> currTasks = _afTaskService.baseRepo.Where(a => a.ProcInstId == bpmBusinessProcess.ProcInstId).ToList();
+        List<BpmAfTask> currTasks = _afTaskService._repository.Find(a => a.ProcInstId == bpmBusinessProcess.ProcInstId);
         if(currTasks.IsEmpty()){
             throw new AFBizException("未能根据流程实例id找到任务信息");
         }
@@ -98,7 +95,7 @@ public class InsertNodeAfterCurrentOrFutureService : AbstractAddOrRemoveFutureAs
     /// </summary>
     private void UpdateDeploymentSignType(string procDefId, List<BpmnConfCommonElementVo> elements)
     {
-        BpmAfDeployment bpmAfDeployment = _afDeploymentService.baseRepo.Where(a=>a.Id==procDefId).First();
+        BpmAfDeployment bpmAfDeployment = _afDeploymentService._repository.FirstOrDefault(a=>a.Id==procDefId);
 
         if (bpmAfDeployment == null)
         {
@@ -109,7 +106,7 @@ public class InsertNodeAfterCurrentOrFutureService : AbstractAddOrRemoveFutureAs
         bpmAfDeployment.Rev += 1;
         bpmAfDeployment.UpdateTime = DateTime.Now;
         bpmAfDeployment.UpdateUser = SecurityUtils.GetLogInEmpId();
-        _freeSql.Update<BpmAfDeployment>().SetSource(bpmAfDeployment).ExecuteAffrows();
+        _afDeploymentService._repository.UpdateDeployment(bpmAfDeployment);
     }
 
     public void SetSupportBusinessObjects()

@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.service.biz;
+using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.adaptor.processoperation;
 using AntFlowCore.Base.constant.enums;
@@ -62,9 +62,8 @@ public class RemoveCurrentNodeProcessService: IProcessOperationAdaptor
         string processInstanceId = bpmBusinessProcess.ProcInstId;
 
         // 获取当前流程实例的所有任务
-        List<BpmAfTask> bpmAfTasks = _afTaskService.baseRepo
-            .Where(a => a.ProcInstId == processInstanceId)
-            .ToList();
+        List<BpmAfTask> bpmAfTasks = _afTaskService._repository
+            .Find(a => a.ProcInstId == processInstanceId);
 
         if (bpmAfTasks.Count == 0)
         {

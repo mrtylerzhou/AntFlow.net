@@ -159,7 +159,7 @@ public static class BpmnFlowUtil
             return vosByDeployId;
         }
         IAFDeploymentService afDeploymentService = ServiceProviderUtils.GetService<IAFDeploymentService>();
-        BpmAfDeployment bpmAfDeployment = afDeploymentService.baseRepo.Where(a => a.Id == deployId).First();
+        BpmAfDeployment bpmAfDeployment = afDeploymentService._repository.Find(a => a.Id == deployId).First();
         if (bpmAfDeployment == null)
         {
             throw new AFBizException($"can not find deployment by id: {deployId}");

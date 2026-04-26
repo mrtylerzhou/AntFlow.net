@@ -386,7 +386,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
                 field.FieldValue = fValue;
             }
         }
-        _lfMainFieldService._repository.Update(lfMainFields);
+        _lfMainFieldService._repository.UpdateRange(lfMainFields);
         IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
         foreach (ILFFormOperationAdaptor o in lfFormOperationAdaptors)
         {

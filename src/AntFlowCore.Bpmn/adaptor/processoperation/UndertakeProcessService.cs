@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.service.biz;
+using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.adaptor.processoperation;
 using AntFlowCore.Base.constant.enums;
@@ -37,7 +37,7 @@ public class UndertakeProcessService : IProcessOperationAdaptor
                 throw new AFBizException("当前流程节点等于空！");
             }
 
-            BpmAfTask task = _taskService.baseRepo.Where(a=>a.Id==vo.TaskId).First();
+            BpmAfTask task = _taskService._repository.FirstOrDefault(a=>a.Id==vo.TaskId);
            
             if (task == null)
             {
@@ -56,10 +56,7 @@ public class UndertakeProcessService : IProcessOperationAdaptor
 
             _bpmVariableMultiplayerPersonnelService.Undertake(vo.ProcessNumber, task.TaskDefKey);
             
-            _afExecutionService.Frsql.Update<BpmAfExecution>()
-                .Set(a => a.TaskCount == 1)
-                .Where(a => a.Id == task.ExecutionId)
-                .ExecuteAffrows();
+            _afExecutionService._repository.UpdateTaskCount(task.ExecutionId, 1);
         }
 
         public void SetSupportBusinessObjects()

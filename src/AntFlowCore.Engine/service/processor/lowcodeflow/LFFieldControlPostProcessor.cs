@@ -57,11 +57,8 @@ public class LFFieldControlPostProcessor : IAntFlowOrderPostProcessor<BpmnConfVo
                 }
             }
 
-            int affrows = _lfFormdataFieldControlService.Frsql.Insert(fieldControls).ExecuteAffrows();
-            if (affrows < 0)
-            {
-                throw new AFBizException("数据插入失败!");
-            }
+            _lfFormdataFieldControlService._repository.AddRange(fieldControls);
+            
         }
     }
 

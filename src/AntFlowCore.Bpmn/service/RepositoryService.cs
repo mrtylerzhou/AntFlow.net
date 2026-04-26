@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
@@ -42,7 +42,7 @@ public class RepositoryService
             UpdateTime = DateTime.Now,
             TenantId = MultiTenantUtil.GetCurrentTenantId(),
         };
-        _deploymentService.baseRepo.Insert(deployment);
+        _deploymentService._repository.Add(deployment);
         return deployment.Id;
     }
 }

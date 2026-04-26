@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.Orm.repository;
+using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Persist.api.interf.repository;
 
@@ -20,5 +20,10 @@ public class FsBpmAfDeploymentRepository: RepositoryBase<BpmAfDeployment>, IBpmA
             .ToList<BpmAfDeployment>((a,b,c)=>c)
             .First();
         return bpmAfDeployment;
+    }
+
+    public void UpdateDeployment(BpmAfDeployment deployment)
+    {
+        _ormContext.FreeSql.Update<BpmAfDeployment>().SetSource(deployment).ExecuteAffrows();
     }
 }

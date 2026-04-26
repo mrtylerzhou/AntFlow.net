@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.service.biz;
+using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Persist.api.interf.repository;
 
@@ -15,11 +15,8 @@ public class BpmnConfLFFormDataBizService : IBpmnConfLFFormDataBizService
     public BpmnConfLfFormdata GetLFFormDataByFormCode(String formCode)
     {
         BpmnConfLfFormdata bpmnConfLfFormdata = _bpmnConfLfFormdataService
-            .Frsql
-            .Select<BpmnConfLfFormdata,BpmnConf>()
-            .InnerJoin((a,b)=>a.BpmnConfId ==b.Id&&b.EffectiveStatus==1)
-            .Where(m => m.t2.FormCode == formCode)
-            .First();
+            ._repository
+            .GetLFFormDataByFormCode(formCode);
         return bpmnConfLfFormdata;
     }
     

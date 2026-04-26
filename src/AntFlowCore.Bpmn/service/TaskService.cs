@@ -10,7 +10,6 @@ using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.listener;
 using AntFlowCore.Bpmn.util;
 using AntFlowCore.Persist.api.interf.repository;
-using FreeSql;
 
 namespace AntFlowCore.Bpmn.service;
 
@@ -40,7 +39,7 @@ public class TaskService : ITaskService
     }
     public List<BpmAfTask> CreateTaskQuery(Expression<Func<BpmAfTask,bool>> filter)
     {
-        List<BpmAfTask> bpmAfTasks = _afTaskService.baseRepo.Where(filter).ToList();
+        List<BpmAfTask> bpmAfTasks = _afTaskService._repository.Find(filter);
         return bpmAfTasks;
     }
 
@@ -54,14 +53,14 @@ public class TaskService : ITaskService
         string procDefId = task.ProcDefId;
         string taskDefKey = task.TaskDefKey;
         string procInstId = task.ProcInstId;
-        List<BpmAfTask> afTasks = _afTaskService.baseRepo.Where(a => a.ProcInstId == procInstId).ToList();
+        List<BpmAfTask> afTasks = _afTaskService._repository.Find(a => a.ProcInstId == procInstId);
         BpmAfTask bpmAfTask = afTasks.First(a => a.Id == taskId);
       
         if (bpmAfTask == null)
         {
             throw new ApplicationException($"Task with id {taskId} not found");
         }
-        BpmAfExecution currentExecution = _afExecutionService.baseRepo.Where(a=>a.Id==bpmAfTask.ExecutionId&&a.ActId==task.TaskDefKey).First();
+        BpmAfExecution currentExecution = _afExecutionService._repository.FirstOrDefault(a=>a.Id==bpmAfTask.ExecutionId&&a.ActId==task.TaskDefKey);
         if (currentExecution == null)
         {
             throw new AFBizException("未能找到当前流程执行实例!");
@@ -71,30 +70,19 @@ public class TaskService : ITaskService
        
         if (currentSignType == 2||task.IsNextNodeSignUp)
         {
-            _afTaskService.Frsql.Delete<BpmAfTask>()
-                .Where(a => a.TaskDefKey == taskDefKey&&a.ProcInstId==procInstId)
-                .ExecuteAffrows();
+            _afTaskService._repository.DeleteByExpression(a => a.TaskDefKey == taskDefKey&&a.ProcInstId==procInstId);
         }
         else
         {
-            _afTaskService.Frsql.Delete<BpmAfTask>().Where(a=>a.Id==taskId).ExecuteAffrows();
+            _afTaskService._repository.DeleteByExpression(a=>a.Id==taskId);
         }
         TimeSpan taskDuration = nowTime - bpmAfTask.CreateTime;
         int durationMinutes = taskDuration.Minutes;
-        IUpdate<BpmAfTaskInst> update = _afTaskInstService.Frsql
-            .Update<BpmAfTaskInst>()
-            .Set(a => a.Duration, durationMinutes)
-            .Set(a => a.EndTime, nowTime)
-            .Set(a => a.DeleteReason, deleteReason);
-        if(bpmAfTask.NodeType==(int)NodeTypeEnum.NODE_TYPE_COPY)
-        {
-            update.Set(a => a.Assignee, task.Assignee);
-            update.Set(a => a.AssigneeName, task.AssigneeName);
-        }
-        update
-            .Where(a => a.Id == taskId)
-            .ExecuteAffrows();
-        BpmAfDeployment bpmAfDeployment = _afDeploymentService.baseRepo.Where(a=>a.Id==procDefId).First();
+        bool isCopyNode = bpmAfTask.NodeType==(int)NodeTypeEnum.NODE_TYPE_COPY;
+        _afTaskInstService._repository.UpdateTaskDurationAndEndTime(
+            taskId, durationMinutes, nowTime, deleteReason, isCopyNode,
+            isCopyNode ? task.Assignee : null, isCopyNode ? task.AssigneeName : null);
+        BpmAfDeployment bpmAfDeployment = _afDeploymentService._repository.FirstOrDefault(a=>a.Id==procDefId);
         if (bpmAfDeployment == null)
         {
             throw new ApplicationException($"deployment with id {procDefId} not found");
@@ -103,10 +91,7 @@ public class TaskService : ITaskService
         if (currentExecution.TaskCount!.Value >= 2)
         {
             int currentCount = currentExecution.TaskCount - 1 ?? 0;
-            _afExecutionService.Frsql.Update<BpmAfExecution>()
-                .Set(a => a.TaskCount, currentCount)
-                .Where(a => a.Id == currentExecution.Id)
-                .ExecuteAffrows();
+            _afExecutionService._repository.UpdateTaskCount(currentExecution.Id, currentCount);
             return;
         }
         string content = bpmAfDeployment.Content;
@@ -186,7 +171,7 @@ public class TaskService : ITaskService
                     var (nextUserElement, nextFlowElement) = GetNextAssigneeNodeRecursively(elements, elementToDeal);
                     if (nextUserElement == null)
                     {
-                        long count = _afTaskService.baseRepo.Where(a=>a.ProcInstId==procInstId).Count();
+                        long count = _afTaskService._repository.Count(a=>a.ProcInstId==procInstId);
                         if (count > 0)
                         {
                             return;
@@ -239,7 +224,7 @@ public class TaskService : ITaskService
                 TenantId = MultiTenantUtil.GetCurrentTenantId(),
             };
 
-            _afExecutionService.baseRepo.Insert(execution);
+            _afExecutionService._repository.Add(execution);
             if (elementToDeal.ElementType == ElementTypeEnum.ELEMENT_TYPE_END_EVENT.Code)
             {
                 deleteReason = StringConstants.TASK_FINISH_REASON;
@@ -293,10 +278,8 @@ public class TaskService : ITaskService
                 historyTaskInsts.Add(bpmAfTaskInst);
             }
 
-            _afTaskService.Frsql.Delete<BpmAfExecution>()
-                .Where(a => a.Id == currentExecution.Id)
-                .ExecuteAffrows();
-            _afTaskInstService.baseRepo.Insert(historyTaskInsts);
+            _afExecutionService._repository.DeleteByExpression(a => a.Id == currentExecution.Id);
+            _afTaskInstService._repository.AddRange(historyTaskInsts);
         }
        
     }
