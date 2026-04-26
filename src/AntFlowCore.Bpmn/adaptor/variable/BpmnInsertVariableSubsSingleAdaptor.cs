@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.entity;
+using AntFlowCore.Base.entity;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Persist.api.interf.repository;
@@ -32,7 +32,7 @@ public class BpmnInsertVariableSubsSingleAdaptor: IBpmnInsertVariableSubs
             TenantId = MultiTenantUtil.GetCurrentTenantId(),
         };
 
-        _bpmVariableSingleService.baseRepo.Insert(variableSingle);
+        _bpmVariableSingleService._repository.Add(variableSingle);
     }
 
 }

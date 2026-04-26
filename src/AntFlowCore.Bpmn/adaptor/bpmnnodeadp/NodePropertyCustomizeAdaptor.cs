@@ -24,10 +24,9 @@ public class NodePropertyCustomizeAdaptor: AbstractAdditionSignNodeAdaptor
     public override void FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
     {
         base.FormatToBpmnNodeVo(bpmnNodeVo);
-       List<BpmnNodeCustomizeConf> list=_bpmnNodeCustomizeConfService
-           .baseRepo
-           .Where(a=>a.BpmnNodeId == bpmnNodeVo.Id)
-           .ToList();
+        List<BpmnNodeCustomizeConf> list = _bpmnNodeCustomizeConfService
+            ._repository
+            .Find(a => a.BpmnNodeId == bpmnNodeVo.Id);
        BpmnNodeCustomizeConf customizeConf = list[0];
        AfNodeUtils.AddOrEditProperty(bpmnNodeVo, a=>a.SignType= customizeConf.SignType);
       

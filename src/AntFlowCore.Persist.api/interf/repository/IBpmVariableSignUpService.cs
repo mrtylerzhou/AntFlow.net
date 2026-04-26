@@ -1,10 +1,9 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
-using FreeSql;
+using antflowcore.service.interf.repository;
 
 namespace AntFlowCore.Persist.api.interf.repository;
 
-public interface IBpmVariableSignUpService : IBaseRepositoryService<BpmVariableSignUp>
+public interface IBpmVariableSignUpService : IAntFlowRepositoryMix<BpmVariableSignUp, IBpmVariableSignUpRepository>
 {
     List<string>? GetSignUpPrevNodeIdsByeElementId(string processNumber, string taskDefinitionKey);
     bool CheckNodeIsSignUp(string processNumber, string nodeId);

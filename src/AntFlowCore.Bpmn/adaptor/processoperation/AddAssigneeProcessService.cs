@@ -53,9 +53,8 @@ public class AddAssigneeProcessService: IProcessOperationAdaptor
         }
         String procInstId = bpmBusinessProcess.ProcInstId;
         List<BpmAfTask> tasks = _afTaskService
-            .baseRepo
-            .Where(a => a.ProcInstId == procInstId)
-            .ToList();
+            ._repository
+            .Find(a => a.ProcInstId == procInstId);
         if (tasks.IsEmpty())
         {
             throw new AFBizException($"未能根据流程实例id:{procInstId}和任务节点key:{taskDefKey}找到当前审批任务");
@@ -81,7 +80,7 @@ public class AddAssigneeProcessService: IProcessOperationAdaptor
             return;
         }
         List<string> currentList = tasks.Select(a=>a.Assignee).ToList();
-        BpmAfExecution afExecution = _executionService.baseRepo.Where(a=>a.Id==tasks[0].ExecutionId).First();
+        BpmAfExecution afExecution = _executionService._repository.Find(a=>a.Id==tasks[0].ExecutionId).First();
         if (afExecution == null)
         {
             throw new AFBizException(BusinessError.STATUS_ERROR,$"未能根据流程实例id:{procInstId}和任务节点key:{taskDefKey}找到当前审批任务的执行实例");
@@ -95,14 +94,14 @@ public class AddAssigneeProcessService: IProcessOperationAdaptor
 
             
             BpmAfTask bpmAfTask = BuildTask(bpmBusinessProcess,tasks[0],afExecution,userinfo);
-            _afTaskService.baseRepo.Insert(bpmAfTask);
+            _afTaskService._repository.Add(bpmAfTask);
             _flowrunEntrustService.AddFlowrunEntrust(userinfo.Id,userinfo.Name,"0","管理员加签",taskDefKey,0,
                 bpmBusinessProcess.ProcInstId,bpmBusinessProcess.ProcessinessKey,vo.NodeId,2);
             _bpmvariableBizService.AddNodeAssignees(processNumber,taskDefKey,userInfos);
         }
        
         afExecution.TaskCount += userInfos.Count;
-        _executionService.baseRepo.Update(afExecution);
+        _executionService._repository.Update(afExecution);
         
     }
 

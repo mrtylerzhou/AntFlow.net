@@ -62,7 +62,7 @@ public class BackToModifyService : IProcessOperationAdaptor
             string procInstId = bpmBusinessProcess.ProcInstId;
 
             // 获取当前流程任务列表
-            List<BpmAfTask> taskList = _taskService.baseRepo.Where(t => t.ProcInstId == procInstId).ToList();
+            List<BpmAfTask> taskList = _taskService._repository.Find(t => t.ProcInstId == procInstId);
             if (!taskList.Any())
                 throw new AFBizException($"未获取到当前流程信息!, 流程编号: {bpmBusinessProcess.ProcessinessKey}");
 
@@ -231,7 +231,7 @@ public class BackToModifyService : IProcessOperationAdaptor
                 }
             }
             //退回以后的任务
-            List<BpmAfTask> currentTasks = _taskService.baseRepo.Where(t => t.ProcInstId == procInstId).OrderByDescending(a=>a.CreateTime).ToList();
+            List<BpmAfTask> currentTasks = _taskService._repository.Find(t => t.ProcInstId == procInstId).OrderByDescending(a=>a.CreateTime).ToList();
             if (currentTasks.Count > 0)
             {
                 BpmAfTask firstStartNode = currentTasks.First();
@@ -251,13 +251,9 @@ public class BackToModifyService : IProcessOperationAdaptor
                         otherNewTaskIds.Add(otherNewTask.Id);
                         otherNewExecutionIds.Add(otherNewTask.ExecutionId);
                     }
-
-                    _taskService.Frsql.Delete<BpmAfTask>()
-                        .Where(a => otherNewTaskIds.Contains(a.Id))
-                        .ExecuteAffrows();
-                    _afExecutionService.Frsql.Delete<BpmAfExecution>()
-                        .Where(a => otherNewExecutionIds.Contains(a.Id))
-                        .ExecuteAffrows();
+                    _taskService._repository.DeleteByExpression(a => otherNewTaskIds.Contains(a.Id));
+                    _afExecutionService._repository.DeleteByExpression(a => otherNewExecutionIds.Contains(a.Id));
+                   
 
                 }
                
@@ -274,7 +270,7 @@ public class BackToModifyService : IProcessOperationAdaptor
             if (!string.IsNullOrEmpty(vo.BackToEmployeeId))
             {
                 bpmBusinessProcess.BackUserId = vo.BackToEmployeeId;
-                _bpmBusinessProcessService.baseRepo.Update(bpmBusinessProcess);
+                _bpmBusinessProcessService._repository.Update(bpmBusinessProcess);
 
                 TaskMgmtVO taskMgmtVo = new TaskMgmtVO
                 {

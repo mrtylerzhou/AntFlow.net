@@ -59,9 +59,8 @@ public abstract class AbstractAddOrRemoveFutureAssigneeSerivce
         string nodeId = nodeElementDto.NodeId;
         string elementId = nodeElementDto.ElementId;
         bool isSingle = nodeElementDto.IsSingle;
-        List<BpmAfTaskInst> bpmAfTaskInsts = _afTaskInstService.baseRepo
-            .Where(a=>a.ProcInstId==procInstId&&a.TaskDefKey==nodeElementDto.ElementId)
-            .ToList();
+        List<BpmAfTaskInst> bpmAfTaskInsts = _afTaskInstService._repository
+            .Find(a => a.ProcInstId == procInstId && a.TaskDefKey == nodeElementDto.ElementId);
         if (bpmAfTaskInsts.Count > 0)
         {
             if (actionType == 1)

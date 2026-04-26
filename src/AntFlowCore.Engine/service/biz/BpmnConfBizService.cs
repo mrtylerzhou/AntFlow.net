@@ -322,8 +322,7 @@ public class BpmnConfBizService : IBpmnConfBizService
                 bpmnConfVo.BpmFlowCallbackUrl=outSideBpmCallbackUrlConf.BpmFlowCallbackUrl;//process flow call back url
             }
             //query business party's info
-            OutSideBpmBusinessParty outSideBpmBusinessParty = _outSideBpmBusinessPartyService.baseRepo
-                .Where(a => a.Id.Equals(bpmnConf.BusinessPartyId)).ToOne();
+            OutSideBpmBusinessParty outSideBpmBusinessParty = _outSideBpmBusinessPartyService._repository.Find(a => a.Id.Equals(bpmnConf.BusinessPartyId)).First();
             //format outside form code and reset value
             String formCode = FormatOutSideFormCode(bpmnConfVo);
             bpmnConfVo.FormCode=formCode;
@@ -431,8 +430,7 @@ public class BpmnConfBizService : IBpmnConfBizService
     private Dictionary<long, List<BpmnNodeLfFormdataFieldControl>> GetBpmnNodeFieldControlConfMap(List<long> idList)
     {
         var bpmnNodeLfFormdataFieldControls = _lfFormdataFieldControlService
-            .baseRepo.
-            Where(a=>idList.Contains(a.Id)).ToList();
+          ._repository.Find(a=>idList.Contains(a.Id)).ToList();
 
         return bpmnNodeLfFormdataFieldControls
             .GroupBy(x => x.NodeId)
@@ -687,8 +685,7 @@ public class BpmnConfBizService : IBpmnConfBizService
     }
     private void SetViewPageButton(BpmnConfVo bpmnConfVo)
     {
-        List<BpmnViewPageButton> bpmnViewPageButtons = _viewPageButtonService.baseRepo
-            .Where(a => a.ConfId == bpmnConfVo.Id && a.IsDel == 0).ToList();
+        List<BpmnViewPageButton> bpmnViewPageButtons = _viewPageButtonService._repository.Find(a => a.ConfId == bpmnConfVo.Id && a.IsDel == 0).ToList();
         
 
         BpmnViewPageButtonBaseVo bpmnViewPageButtonBaseVo = new BpmnViewPageButtonBaseVo();

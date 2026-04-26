@@ -106,9 +106,9 @@ namespace AntFlowCore.Api.controller;
         public Result<BpmProcessAppApplication> ApplicationDetail(int id)
         {
             BpmProcessAppApplication bpmProcessAppApplication = _bpmProcessAppApplicationService
-                .baseRepo
-                .Where(a=>a.Id == id)
-                .ToOne();
+                ._repository
+                .Find(a => a.Id == id)
+                .First();
             return ResultHelper.Success(bpmProcessAppApplication);
         }
 

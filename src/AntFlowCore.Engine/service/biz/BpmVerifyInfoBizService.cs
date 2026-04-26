@@ -281,7 +281,7 @@ public class BpmVerifyInfoBizService : IBpmVerifyInfoBizService
         var nodeApprovedsMap = new Dictionary<string, List<BaseIdTranStruVo>>();
 
         // 查询单人审批变量
-        List<BpmVariableSingle> variableSingles = _bpmVariableSingleService.baseRepo.Where(a=>a.VariableId == variableId).ToList();
+        List<BpmVariableSingle> variableSingles = _bpmVariableSingleService._repository.Find(a=>a.VariableId == variableId);
         if (variableSingles.Count >0)
         {
             

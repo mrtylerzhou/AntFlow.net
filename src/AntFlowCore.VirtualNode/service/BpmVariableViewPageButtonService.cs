@@ -1,21 +1,19 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.VirtualNode.service;
 
-public class BpmVariableViewPageButtonService: AFBaseCurdRepositoryService<BpmVariableViewPageButton>,IBpmVariableViewPageButtonService
+public class BpmVariableViewPageButtonService : IBpmVariableViewPageButtonService
 {
-    public BpmVariableViewPageButtonService(IFreeSql freeSql) : base(freeSql)
+    public BpmVariableViewPageButtonService(IBpmVariableViewPageButtonRepository repository)
     {
+        _repository = repository;
     }
+
+    public IBpmVariableViewPageButtonRepository _repository { get; }
 
     public List<BpmVariableViewPageButton> GetButtonsByProcessNumber(string processNum)
     {
-        List<BpmVariableViewPageButton> bpmVariableViewPageButtons = Frsql.Select<BpmVariableViewPageButton, BpmVariable>()
-            .LeftJoin((a, b) => a.VariableId == b.Id)
-            .Where((a, b) => b.ProcessNum == processNum)
-            .ToList();
-        return bpmVariableViewPageButtons;
+        return _repository.GetButtonsByProcessNumber(processNum);
     }
 }

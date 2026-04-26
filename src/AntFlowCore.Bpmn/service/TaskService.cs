@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Text.Json;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
@@ -179,13 +179,8 @@ public class TaskService : ITaskService
             if (elementToDeal.IsSignUpSubElement == 1)
             {
                 
-                List<KeyValuePair<string, string>> signupNodeAssigneeMap = this._signUpPersonnelService.Frsql
-                    .Select<BpmBusinessProcess, BpmVariable, BpmVariableSignUpPersonnel>()
-                    .InnerJoin((a, b, c) => a.BusinessNumber == b.ProcessNum)
-                    .InnerJoin((a, b, c) => b.Id == c.VariableId)
-                    .Where((a, b, c) => a.ProcInstId == procInstId&&c.ElementId==elementToDeal.ElementId)
-                    .ToList<KeyValuePair<string, string>>((a, b, c) =>
-                        new KeyValuePair<string, string>(c.Assignee, c.AssigneeName));
+                List<KeyValuePair<string, string>> signupNodeAssigneeMap = this._signUpPersonnelService._repository
+                    .GetSignUpNodeAssigneeMap(procInstId, elementToDeal.ElementId);
                 if (signupNodeAssigneeMap.Count <= 0&& elementToDeal.IsBackSignUp!=1)
                 {
                     var (nextUserElement, nextFlowElement) = GetNextAssigneeNodeRecursively(elements, elementToDeal);

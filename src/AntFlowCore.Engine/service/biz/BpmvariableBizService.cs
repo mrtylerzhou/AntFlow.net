@@ -106,13 +106,7 @@ public class BpmvariableBizService: IBpmvariableBizService
         {
             if (isSingle)
             {
-                _bpmVariableSingleService.Frsql
-                    .Update<BpmVariableSingle>()
-                    .Set(a => a.Assignee, changed.Id)
-                    .Set(a => a.AssigneeName, changed.Name)
-                    .Set(a=>a.Remark,$"管理员变更{old.Id}:{old.Name}=>{changed.Id}:{changed.Name}")
-                    .Where(a => a.Id == long.Parse(old.VariableId))
-                    .ExecuteAffrows();
+                _bpmVariableSingleService._repository.UpdateAssignee(long.Parse(old.VariableId), changed.Id, changed.Name, $"管理员变更{old.Id}:{old.Name}=>{changed.Id}:{changed.Name}");
             }
             else
             {

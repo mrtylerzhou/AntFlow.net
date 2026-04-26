@@ -34,7 +34,7 @@ public class NodeTypeConditionsAdaptor : IBpmnNodeAdaptor
     public  void FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
     {
         BpmnNodeConditionsConf bpmnNodeConditionsConf =
-            _bpmnNodeConditionsConfService.baseRepo.Where(a => a.BpmnNodeId == bpmnNodeVo.Id).First();
+            _bpmnNodeConditionsConfService._repository.Find(a => a.BpmnNodeId == bpmnNodeVo.Id).First();
 
 
         if (bpmnNodeConditionsConf == null)
@@ -291,7 +291,7 @@ public class NodeTypeConditionsAdaptor : IBpmnNodeAdaptor
             TenantId = MultiTenantUtil.GetCurrentTenantId(),
         };
 
-        _bpmnNodeConditionsConfService.baseRepo.Insert(bpmnNodeConditionsConf);
+        _bpmnNodeConditionsConfService._repository.Add(bpmnNodeConditionsConf);
 
         // if it is default condition return
         if (bpmnNodeConditionsConfBaseVo.IsDefault == 1)

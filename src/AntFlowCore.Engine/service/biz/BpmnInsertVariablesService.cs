@@ -141,7 +141,7 @@ namespace AntFlowCore.Engine.service.biz;
                 });
             }
 
-            _bpmVariableSignUpService.baseRepo.Insert(bpmVariableSignUps);
+            _bpmVariableSignUpService._repository.AddRange(bpmVariableSignUps);
         }
 
         private void InsertElementButton(long variableId, BpmnConfCommonElementVo elementVo, string elementId)
@@ -206,7 +206,7 @@ namespace AntFlowCore.Engine.service.biz;
                     CreateTime = DateTime.Now,
                 }).ToList();
 
-                _bpmVariableViewPageButtonService.baseRepo.Insert(startPageButtons);
+                _bpmVariableViewPageButtonService._repository.AddRange(startPageButtons);
             }
 
             if (bpmnConfCommonVo.ViewPageButtons?.ViewPageOther != null)
@@ -221,7 +221,7 @@ namespace AntFlowCore.Engine.service.biz;
                     CreateTime = DateTime.Now,
                 }).ToList();
 
-                _bpmVariableViewPageButtonService.baseRepo.Insert(otherPageButtons);
+                _bpmVariableViewPageButtonService._repository.AddRange(otherPageButtons);
             }
         }
     }

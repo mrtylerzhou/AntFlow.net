@@ -30,9 +30,8 @@ public class ChangeAssigneeProcessService: IProcessOperationAdaptor
     public void DoProcessButton(BusinessDataVo vo)
     {
         BpmBusinessProcess bpmBusinessProcess =_bpmBusinessProcessService.GetBpmBusinessProcess(vo.ProcessNumber);
-        List<BpmAfTask> taskList = _taskService.baseRepo
-            .Where(t => t.ProcInstId == bpmBusinessProcess.ProcInstId)
-            .ToList();
+        List<BpmAfTask> taskList = _taskService._repository
+            .Find(t => t.ProcInstId == bpmBusinessProcess.ProcInstId);
 
         List<BaseIdTranStruVo> userInfos = vo.UserInfos;
         List<string> userIds = userInfos.Select(ui => ui.Id).ToList();

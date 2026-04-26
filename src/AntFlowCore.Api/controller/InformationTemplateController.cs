@@ -53,7 +53,7 @@ public class InformationTemplateController
     [HttpPost("deleteById")]
     public Result<string> DeleteById([FromQuery] long id)
     {
-        _informationTemplateService.baseRepo.Update(new InformationTemplate
+        _informationTemplateService._repository.Update(new InformationTemplate
         {
             Id = id,
             UpdateUser = SecurityUtils.GetLogInEmpNameSafe(),
@@ -73,9 +73,7 @@ public class InformationTemplateController
         }
 
         List<InformationTemplate> results = _informationTemplateService
-            .baseRepo
-            .Where(expression)
-            .ToList();
+            ._repository.Find(expression);
         return ResultHelper.Success(results);
     }
 
