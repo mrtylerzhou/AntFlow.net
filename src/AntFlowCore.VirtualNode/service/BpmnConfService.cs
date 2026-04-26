@@ -1,12 +1,14 @@
-﻿using AntFlowCore.Abstraction.service.repository;
+﻿using AntFlowCore.Abstraction.Orm.ext;
+using AntFlowCore.Abstraction.service.repository;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.extension;
 using AntFlowCore.Base.util;
 using AntFlowCore.Core.vo;
+using AntFlowCore.Persist.api.interf.repository;
 using FreeSql;
 using FreeSql.Internal.Model;
 
-namespace AntFlowCore.Persist.repository;
+namespace AntFlowCore.VirtualNode.service;
 
 public class BpmnConfService : IBpmnConfService
 {
@@ -60,7 +62,7 @@ public class BpmnConfService : IBpmnConfService
         expression = expression.WhereIf(!string.IsNullOrEmpty(vo.FormCode), (a, b, c) => a.FormCode.Trim() == vo.FormCode.Trim());
         expression = expression.WhereIf(!string.IsNullOrEmpty(vo.BusinessPartyMark), (a, b, c) => b.BusinessPartyMark.Trim() == vo.BusinessPartyMark.Trim());
    
-        BasePagingInfo basePagingInfo = page.ToPagingInfo();
+        BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
         List<BpmnConfVo> bpmnConfVos = select.Where(expression)
             .OrderByDescending(a=>a.t1.CreateTime)
             .Page(basePagingInfo)
@@ -119,7 +121,7 @@ public class BpmnConfService : IBpmnConfService
             .Set(a => a.EffectiveStatus, 1)
             .Where(a=>a.Id==id)
             .ExecuteAffrows();
-        BpmProcessNameService bpmProcessNameService = ServiceProviderUtils.GetService<BpmProcessNameService>();
+        IBpmProcessNameService bpmProcessNameService = ServiceProviderUtils.GetService<IBpmProcessNameService>();
         bpmProcessNameService.EditProcessName(bpmnConf);
     }
     private int GetIsAll(BpmnConf bpmnConf, BpmnConf prevBpmnConf) {

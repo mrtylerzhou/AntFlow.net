@@ -6,6 +6,7 @@ using AntFlowCore.Abstraction.formatter.filter;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Abstraction.service.processor;
+using AntFlowCore.Abstraction.service.repository;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
@@ -23,7 +24,7 @@ namespace AntFlowCore.Persist.repository;
 public class BpmnConfCommonService : IBpmnConfCommonService
 {
     private readonly IBpmnConfBizService _bpmnConfBizService;
-    private readonly BpmnConfService _bpmnConfService;
+    private readonly IBpmnConfService _bpmnConfService;
     private readonly BpmnNodeService _nodeService;
     private readonly IBpmnStartFormatFactory _bpmnStartFormatFactory;
     private readonly IBpmnPersonnelFormat _personnelFormat;
@@ -45,7 +46,7 @@ public class BpmnConfCommonService : IBpmnConfCommonService
 
     public BpmnConfCommonService(
         IBpmnConfBizService bpmnConfBizService,
-        BpmnConfService bpmnConfService,
+        IBpmnConfService bpmnConfService,
         BpmnNodeService nodeService,
         IBpmnStartFormatFactory bpmnStartFormatFactory,
         IBpmnPersonnelFormat personnelFormat,

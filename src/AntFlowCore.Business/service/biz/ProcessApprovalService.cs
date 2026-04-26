@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using AntFlowCore.Abstraction.Orm.ext;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.constant.enums;
@@ -9,18 +10,17 @@ using AntFlowCore.Base.extension;
 using AntFlowCore.Base.factory;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
-using AntFlowCore.Engine.factory;
 using AntFlowCore.Persist.api.interf.repository;
 using FreeSql;
 using FreeSql.Internal.Model;
 using Microsoft.Extensions.Logging;
 
-namespace AntFlowCore.Engine.service.biz;
+namespace AntFlowCore.Business.service.biz;
 
 public class ProcessApprovalService : IProcessApprovalService
 {
-    private readonly FormFactory _formFactory;
-    private readonly ButtonOperationService _buttonOperationService;
+    private readonly IFormFactory _formFactory;
+    private readonly IButtonOperationService _buttonOperationService;
     private readonly IBpmBusinessProcessService _bpmBusinessProcessService;
     private readonly IBpmVariableSignUpService _bpmVariableSignUpService;
     private readonly IProcessConstantsService _processConstantsService;
@@ -36,8 +36,8 @@ public class ProcessApprovalService : IProcessApprovalService
     private readonly ILogger _logger;
 
     public ProcessApprovalService(
-        FormFactory formFactory,
-        ButtonOperationService buttonOperationService,
+        IFormFactory formFactory,
+        IButtonOperationService buttonOperationService,
         IBpmBusinessProcessService bpmBusinessProcessService,
         IBpmVariableSignUpService bpmVariableSignUpService,
         IProcessConstantsService processConstantsService,
@@ -370,7 +370,7 @@ private bool IsOperatable(TaskMgmtVO taskMgmtVo)
 
 List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
     {
-        BasePagingInfo basePagingInfo = page.ToPagingInfo();
+        BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
         List<TaskMgmtVO> taskMgmtVos = _freeSql
             .Select<BpmAfTaskInst, BpmBusinessProcess>()
             .LeftJoin((h, b) => h.ProcInstId == b.ProcInstId)
@@ -394,7 +394,7 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
     }
     
     List<TaskMgmtVO> ViewPcpNewlyBuildList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO){
-        BasePagingInfo basePagingInfo = page.ToPagingInfo();
+        BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
         List<TaskMgmtVO> taskMgmtVos = _freeSql
             .Select<BpmBusinessProcess,BpmAfTaskInst>()
             .LeftJoin((b,h) => h.ProcInstId == b.ProcInstId&&h.TaskDefKey=="task1418018332271"&&h.Priority==0)
@@ -423,7 +423,7 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
         return taskMgmtVos;
     }
     List<TaskMgmtVO> ViewPcAlreadyDoneList(Page<TaskMgmtVO> page,  TaskMgmtVO taskMgmtVO){
-        BasePagingInfo basePagingInfo = page.ToPagingInfo();
+        BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
         List<TaskMgmtVO> taskMgmtVos = _freeSql
             .Select<BpmAfTaskInst, BpmBusinessProcess>()
             .LeftJoin((h, b) => h.ProcInstId == b.ProcInstId)
@@ -450,7 +450,7 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
     }
     List<TaskMgmtVO> ViewPcToDoList(Page<TaskMgmtVO> page,TaskMgmtVO taskMgmtVO)
     {
-        BasePagingInfo basePagingInfo = page.ToPagingInfo();
+        BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
         List<TaskMgmtVO> taskMgmtVos = _freeSql
             .Select<BpmAfTask, BpmBusinessProcess>()
             .LeftJoin((a, b) => a.ProcInstId == b.ProcInstId)
@@ -478,7 +478,7 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
         return taskMgmtVos;
     }
     List<TaskMgmtVO> AllProcessList(Page<TaskMgmtVO> page,TaskMgmtVO taskMgmtVO){
-        BasePagingInfo basePagingInfo = page.ToPagingInfo();
+        BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
         ISelect<BpmAfTask,BpmBusinessProcess> select = _freeSql
             .Select<BpmAfTask, BpmBusinessProcess>();
         if (taskMgmtVO.IncludeAllFlag == 1)
@@ -517,7 +517,7 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
         return taskMgmtVos;
     }
     List<TaskMgmtVO> ViewPcForwardList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO){
-        BasePagingInfo basePagingInfo = page.ToPagingInfo();
+        BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
         List<TaskMgmtVO> taskMgmtVos = _freeSql
             .Select<BpmBusinessProcess,BpmProcessForward>()
             .LeftJoin((a,b)=>a.ProcInstId==b.ProcessInstanceId)
@@ -545,7 +545,7 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
         return taskMgmtVos;
     }
     List<TaskMgmtVO> BackToModifyList(Page<TaskMgmtVO> page,  TaskMgmtVO taskMgmtVO){
-        BasePagingInfo basePagingInfo = page.ToPagingInfo();
+        BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
         List<TaskMgmtVO> taskMgmtVos = _freeSql
             .Select<BpmAfTask, BpmVerifyInfo, BpmBusinessProcess>()
             .InnerJoin((t, c, b) => c.RunInfoId == t.ProcInstId)

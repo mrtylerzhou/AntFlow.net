@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using AntFlowCore.Abstraction.Orm.ext;
 using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
@@ -245,7 +246,7 @@ public class UserService: AFBaseCurdRepositoryService<User>,IUserService
             expression=LambadaExpressionExtensions.And(expression, a=>a.Name.Contains(taskMgmtVo.Description));
         }
 
-        BasePagingInfo basePagingInfo = page.ToPagingInfo();
+        BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
         
         List<User> users = baseRepo.Where(expression)
             .Page(basePagingInfo)

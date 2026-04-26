@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using AntFlowCore.Abstraction.Orm.ext;
 using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.dto;
@@ -13,13 +14,13 @@ namespace AntFlowCore.Persist.repository;
 
 public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSideBpmBusinessParty>,IOutSideBpmBusinessPartyService
 {
-    private readonly OutSideBpmAdminPersonnelService _outSideBpmAdminPersonnelService;
-    private readonly OutSideBpmCallbackUrlConfService _outSideBpmCallbackUrlConfService;
+    private readonly IOutSideBpmAdminPersonnelService _outSideBpmAdminPersonnelService;
+    private readonly IOutSideBpmCallbackUrlConfService _outSideBpmCallbackUrlConfService;
     private readonly IUserService _employeeService;
 
     public OutSideBpmBusinessPartyService(
-        OutSideBpmAdminPersonnelService outSideBpmAdminPersonnelService,
-        OutSideBpmCallbackUrlConfService outSideBpmCallbackUrlConfService,
+        IOutSideBpmAdminPersonnelService outSideBpmAdminPersonnelService,
+        IOutSideBpmCallbackUrlConfService outSideBpmCallbackUrlConfService,
         IUserService employeeService,
         IFreeSql freeSql) : base(freeSql)
     {
@@ -70,7 +71,7 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
 
     public List<OutSideBpmBusinessPartyVo> SelectPageList(Page<OutSideBpmBusinessPartyVo> page)
     {
-        BasePagingInfo basePagingInfo = page.ToPagingInfo();
+        BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
         List<OutSideBpmBusinessPartyVo> result = this.baseRepo
             .Where(a => a.IsDel == 0)
             .OrderByDescending(a => a.CreateTime)

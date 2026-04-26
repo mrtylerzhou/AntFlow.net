@@ -1,4 +1,5 @@
 ﻿
+using AntFlowCore.Abstraction.Orm.ext;
 using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
@@ -25,7 +26,7 @@ public class OutSideBpmApproveTemplateService : AFBaseCurdRepositoryService<OutS
    public ResultAndPage<OutSideBpmApproveTemplateVo> ListPage(PageDto pageDto, OutSideBpmApproveTemplateVo vo)
    {
       Page<OutSideBpmApproveTemplateVo> page = PageUtils.GetPageByPageDto<OutSideBpmApproveTemplateVo>(pageDto);
-      BasePagingInfo basePagingInfo = page.ToPagingInfo();
+      BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
       List<OutSideBpmApproveTemplateVo> outSideBpmApproveTemplateVos = Frsql
           .Select<OutSideBpmApproveTemplate>()
           .Where(a => a.IsDel == 0)

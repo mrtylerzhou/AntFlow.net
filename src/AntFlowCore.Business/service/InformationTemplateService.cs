@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using AntFlowCore.Abstraction.Orm.ext;
 using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.dto;
@@ -35,7 +36,7 @@ namespace AntFlowCore.Business.service
                 expression.And(a => a.Name.Contains(informationTemplateVo.Name));
             }
 
-            BasePagingInfo basePagingInfo = page.ToPagingInfo();
+            BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
             List<InformationTemplate> informationTemplates = this.baseRepo
                 .Where(expression)
                 .Page(basePagingInfo)

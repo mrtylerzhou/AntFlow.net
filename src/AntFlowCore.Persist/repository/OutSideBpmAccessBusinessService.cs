@@ -1,6 +1,7 @@
 ﻿using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
+using AntFlowCore.Abstraction.service.repository;
 using AntFlowCore.Base.constant;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.dto;
@@ -40,7 +41,7 @@ public class OutSideBpmAccessBusinessService : AFBaseCurdRepositoryService<OutSi
         else
         {
             var formCode = vo.FormCode;
-            BpmnConfService bpmnConfService = ServiceProviderUtils.GetService<BpmnConfService>();
+            IBpmnConfService bpmnConfService = ServiceProviderUtils.GetService<IBpmnConfService>();
             BpmnConf effectiveConfByFormCode = bpmnConfService
                 .baseRepo
                 .Where(a => a.FormCode == formCode && a.EffectiveStatus == 1 && a.IsDel == 0)
@@ -140,7 +141,7 @@ public class OutSideBpmAccessBusinessService : AFBaseCurdRepositoryService<OutSi
     }
     public ResultAndPage<BpmnConfVo> SelectOutSideFormCodePageList(PageDto pageDto, BpmnConfVo vo) {
         Page<BpmnConfVo> page = PageUtils.GetPageByPageDto<BpmnConfVo>(pageDto);
-        BpmnConfService bpmnConfService = ServiceProviderUtils.GetService<BpmnConfService>();
+        IBpmnConfService bpmnConfService = ServiceProviderUtils.GetService<IBpmnConfService>();
         List<BpmnConfVo> bpmnConfVos = this.Frsql
             .Select<BpmnConf, BpmProcessAppApplication>()
             .InnerJoin((a, b) => a.FormCode == b.ProcessKey)

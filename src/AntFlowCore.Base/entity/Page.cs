@@ -100,9 +100,9 @@ public class Page<T>
             return current <= 1L ? 0L : Math.Max((current - 1L) * Size, 0L);
         }
 
-        public BasePagingInfo ToPagingInfo()
+        public PagingInfo ToPagingInfo()
         {
-            BasePagingInfo info = new BasePagingInfo()
+            PagingInfo info = new PagingInfo()
             {
                 PageSize = (int)this.Size,
                 PageNumber = (int)this.Current,
@@ -116,6 +116,14 @@ public class Page<T>
             this.Total = (int)pagingInfo.Count;
             return this;
         }
+        
     }
+
+public class PagingInfo
+{
+    public int PageSize { get; set; }
+    public int PageNumber { get; set; }
+    public long Count { get; set; }
+}
 
 

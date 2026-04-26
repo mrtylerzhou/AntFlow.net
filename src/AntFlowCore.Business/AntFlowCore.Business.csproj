@@ -13,4 +13,8 @@
     <ProjectReference Include="..\AntFlowCore.Abstraction\AntFlowCore.Abstraction.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="service\biz\ProcessApprovalBizService.cs" />
+  </ItemGroup>
+
 </Project>

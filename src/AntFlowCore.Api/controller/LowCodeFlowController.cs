@@ -6,6 +6,8 @@ using AntFlowCore.Base.entity;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
+using AntFlowCore.Persist.api.interf.biz;
+using AntFlowCore.Persist.api.interf.repository;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AntFlowCore.Api.controller;
@@ -14,12 +16,15 @@ namespace AntFlowCore.Api.controller;
 public class LowCodeFlowController
 {
     private readonly IBpmnConfLFFormDataBizService _lfformDataBizService;
+    private readonly IDicDataBizSerivce _dicDataBizSerivce;
+    private readonly IDicDataSerivce _dicDataSerivce;
     private readonly IDictService _dictService;
 
-    public LowCodeFlowController(IBpmnConfLFFormDataBizService lfformDataBizService,IDictService dictService)
+    public LowCodeFlowController(IBpmnConfLFFormDataBizService lfformDataBizService,IDicDataBizSerivce dicDataBizSerivce,IDicDataSerivce dicDataSerivce)
     {
         _lfformDataBizService = lfformDataBizService;
-        _dictService = dictService;
+        _dicDataBizSerivce = dicDataBizSerivce;
+        _dicDataSerivce = dicDataSerivce;
     }
     [HttpPost("createLowCodeFormCode")]
     public Result<int> CreateLowCodeFormCode([FromBody] BaseKeyValueStruVo vo){
@@ -36,14 +41,14 @@ public class LowCodeFlowController
     public ResultAndPage<BaseKeyValueStruVo> GetLFFormCodePageList([FromBody] DetailRequestDto requestDto) {
         PageDto pageDto = requestDto.PageDto;
         TaskMgmtVO taskMgmtVO = requestDto.TaskMgmtVO;
-        return _dictService.SelectLFFormCodePageList(pageDto, taskMgmtVO);
+        return _dicDataBizSerivce.SelectLFFormCodePageList(pageDto, taskMgmtVO);
     }
     [HttpPost("getLFActiveFormCodePageList")]
     public ResultAndPage<BaseKeyValueStruVo> GetLFActiveFormCodePageList([FromBody] DetailRequestDto requestDto)
     {
         var pageDto = requestDto.PageDto;
         var taskMgmtVO = requestDto.TaskMgmtVO;
-        ResultAndPage<BaseKeyValueStruVo> resultAndPage = _dictService.SelectLFActiveFormCodePageList(pageDto, taskMgmtVO);
+        ResultAndPage<BaseKeyValueStruVo> resultAndPage = _dicDataBizSerivce.SelectLFActiveFormCodePageList(pageDto, taskMgmtVO);
         return resultAndPage;
     }
     [HttpGet("getformDataByFormCode")]

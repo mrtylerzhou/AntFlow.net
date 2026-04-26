@@ -53,7 +53,7 @@ public class OutSideBpmCallbackUrlConfService : AFBaseCurdRepositoryService<OutS
 
         OutSideBpmCallbackUrlConfVo vo = outSideBpmCallbackUrlConf.MapToVo();
 
-        OutSideBpmBusinessPartyService outSideBpmBusinessPartyService = ServiceProviderUtils.GetService<OutSideBpmBusinessPartyService>();
+        IOutSideBpmBusinessPartyService outSideBpmBusinessPartyService = ServiceProviderUtils.GetService<IOutSideBpmBusinessPartyService>();
         //query business party's info,for assemble the result
         OutSideBpmBusinessParty outSideBpmBusinessParty = outSideBpmBusinessPartyService
             .baseRepo

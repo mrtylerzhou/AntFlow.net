@@ -1,4 +1,5 @@
 ﻿using System.Web;
+using AntFlowCore.Abstraction.Orm.ext;
 using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.dto;
@@ -135,7 +136,7 @@ public class BpmProcessAppApplicationService : AFBaseCurdRepositoryService<BpmPr
    private List<BpmProcessAppApplicationVo> NewListPage(Page<BpmProcessAppApplicationVo> page,
        BpmProcessAppApplicationVo vo)
    {
-      BasePagingInfo basePagingInfo = page.ToPagingInfo();
+      BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
       List<BpmProcessAppApplicationVo> list = this.Frsql.Select<BpmProcessAppApplication, OutSideBpmBusinessParty>()
           .LeftJoin((app, party) => app.BusinessCode == party.BusinessPartyMark)
           .Where((app, party) => app.IsDel == 0)
