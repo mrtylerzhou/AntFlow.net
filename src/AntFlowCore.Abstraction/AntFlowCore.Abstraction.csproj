@@ -10,8 +10,7 @@
     </PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\AntFlowCore.Persist.api\AntFlowCore.Persist.api.csproj" />
-		<ProjectReference Include="..\AntFlowCore.Base\AntFlowCore.Base.csproj" />
+		<ProjectReference Include="..\AntFlowCore.Abstraction.Orm\AntFlowCore.Abstraction.Orm.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

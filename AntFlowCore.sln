@@ -17,7 +17,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AntFlowCore.Api", "src\AntF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntFlowCore.Persist.api", "src\AntFlowCore.Persist.api\AntFlowCore.Persist.api.csproj", "{6A9E4495-EB6D-4633-A557-E9348B8FAFE4}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AntFlowCore.Abstraction.Orm", "src\AntFlowCore.Abstraction.Orm\AntFlowCore.Abstraction.Orm.csproj", "{A1B2C3D4-E5F6-7890-ABCD-EF0123456789}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntFlowCore.Persist", "src\AntFlowCore.Persist\AntFlowCore.Persist.csproj", "{B802DF11-E3B4-4B9C-8751-EFFC122ED0B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntFlowCore.Engine.Orm", "src\AntFlowCore.Engine.Orm\AntFlowCore.Engine.Orm.csproj", "{D5E6F7A8-B9C0-1234-DEAB-CDEF01234567}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntFlowCore.Web", "src\AntFlowCore.Web\AntFlowCore.Web.csproj", "{C1D2E3F4-A5B6-7890-CDEF-123456789012}"
 EndProject
@@ -63,5 +67,13 @@ Global
 		{C1D2E3F4-A5B6-7890-CDEF-123456789012}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1D2E3F4-A5B6-7890-CDEF-123456789012}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C1D2E3F4-A5B6-7890-CDEF-123456789012}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF0123456789}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF0123456789}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF0123456789}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-E5F6-7890-ABCD-EF0123456789}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5E6F7A8-B9C0-1234-DEAB-CDEF01234567}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5E6F7A8-B9C0-1234-DEAB-CDEF01234567}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5E6F7A8-B9C0-1234-DEAB-CDEF01234567}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5E6F7A8-B9C0-1234-DEAB-CDEF01234567}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

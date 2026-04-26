@@ -9,11 +9,7 @@
     </PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\AntFlowCore.Persist\AntFlowCore.Persist.csproj" />
-		<ProjectReference Include="..\AntFlowCore.Abstraction\AntFlowCore.Abstraction.csproj" />
-		<ProjectReference Include="..\AntFlowCore.Bpmn\AntFlowCore.Bpmn.csproj" />
-		<ProjectReference Include="..\AntFlowCore.Engine\AntFlowCore.Engine.csproj" />
-		<ProjectReference Include="..\AntFlowCore.Persist\AntFlowCore.Persist.csproj" />
+		<ProjectReference Include="..\AntFlowCore.Engine.Orm\AntFlowCore.Engine.Orm.csproj" />
 	</ItemGroup>
 
     <ItemGroup>
