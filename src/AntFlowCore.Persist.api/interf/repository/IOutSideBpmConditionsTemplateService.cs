@@ -1,12 +1,11 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.vo;
-using FreeSql;
+using antflowcore.service.interf.repository;
 
 namespace AntFlowCore.Persist.api.interf.repository;
 
-public interface IOutSideBpmConditionsTemplateService : IBaseRepositoryService<OutSideBpmConditionsTemplate>
+public interface IOutSideBpmConditionsTemplateService : IAntFlowRepositoryMix<OutSideBpmConditionsTemplate, IOutSideBpmConditionsTemplateRepository>
 {
     ResultAndPage<OutSideBpmConditionsTemplateVo> ListPage(PageDto pageDto, OutSideBpmConditionsTemplateVo vo);
     List<OutSideBpmConditionsTemplateVo> SelectConditionListByAppId(int appId);

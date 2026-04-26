@@ -1,13 +1,12 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
-using FreeSql;
+using antflowcore.service.interf.repository;
 
 namespace AntFlowCore.Persist.api.interf.repository;
 
-public interface IUserService : IBaseRepositoryService<User>
+public interface IUserService : IAntFlowRepositoryMix<User, IUserRepository>
 {
     List<BaseIdTranStruVo> QueryUserByIds(IEnumerable<String> userIds);
     BaseIdTranStruVo QueryUserById(string userId);

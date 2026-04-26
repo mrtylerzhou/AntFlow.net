@@ -1,9 +1,10 @@
-﻿using AntFlowCore.Abstraction.repository;
+﻿using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
 
 namespace AntFlowCore.Persist.api.interf.repository;
 
-public interface IBpmProcessNodeSubmitRepository: IBaseRepository<BpmProcessNodeSubmit>
+public interface IBpmProcessNodeSubmitRepository : IBaseRepository<BpmProcessNodeSubmit>
 {
-   
+    BpmProcessNodeSubmit? FindLatestByProcessInstanceId(string processInstanceId);
+    void DeleteByProcessInstanceId(string processInstanceId);
 }

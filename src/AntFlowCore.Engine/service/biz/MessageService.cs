@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction;
+using AntFlowCore.Abstraction;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.entity;
@@ -131,7 +131,7 @@ public class MessageService : IMessageService
 
     private UserMessageStatus GetUserMessageStatus(string userId)
     {
-        return _userMessageStatusService.baseRepo.Where(x => x.UserId == userId).ToOne();
+        return _userMessageStatusService._repository.Find(x => x.UserId == userId).FirstOrDefault();
     }
 
     private string GetUsernameByUserId(string userId)

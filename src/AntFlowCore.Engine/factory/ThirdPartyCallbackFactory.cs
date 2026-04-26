@@ -26,7 +26,7 @@ public class ThirdPartyCallbackFactory
     private readonly IConfiguration _configuration;
     private readonly ILogger<ThirdPartyCallbackFactory> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IOutSideBpmBusinessPartyService _outSideBpmBusinessPartyService;
+    private readonly IOutSideBpmBusinessPartyRepository _outSideBpmBusinessPartyRepository;
     private readonly BpmVerifyInfoBizService _bpmVerifyInfoBizService;
     private readonly IOutSideBpmCallbackUrlConfService _outSideBpmCallbackUrlConfService;
 
@@ -42,7 +42,7 @@ public class ThirdPartyCallbackFactory
         IHttpClientFactory httpClientFactory,
         IConfiguration configuration,
         IHttpContextAccessor httpContextAccessor,
-        IOutSideBpmBusinessPartyService outSideBpmBusinessPartyService,
+        IOutSideBpmBusinessPartyRepository outSideBpmBusinessPartyRepository,
         BpmVerifyInfoBizService bpmVerifyInfoBizService,
         IOutSideBpmCallbackUrlConfService outSideBpmCallbackUrlConfService,
         ILogger<ThirdPartyCallbackFactory> logger)
@@ -51,7 +51,7 @@ public class ThirdPartyCallbackFactory
         _configuration = configuration;
         _logger = logger;
          _httpContextAccessor= httpContextAccessor;
-         _outSideBpmBusinessPartyService = outSideBpmBusinessPartyService;
+         _outSideBpmBusinessPartyRepository = outSideBpmBusinessPartyRepository;
          _bpmVerifyInfoBizService = bpmVerifyInfoBizService;
          _outSideBpmCallbackUrlConfService = outSideBpmCallbackUrlConfService;
     }
@@ -94,9 +94,9 @@ public class ThirdPartyCallbackFactory
                 return newRespObj as T;
             }
 
-            String businessPartyMarkById = _outSideBpmBusinessPartyService.baseRepo
-                .Where(a => a.Id == bpmnConfVo.BusinessPartyId.Value && a.IsDel == 0)
-                .First(a => a.BusinessPartyMark);
+            OutSideBpmBusinessParty businessParty = _outSideBpmBusinessPartyRepository
+                .FirstOrDefault(a => a.Id == bpmnConfVo.BusinessPartyId.Value && a.IsDel == 0);
+            String businessPartyMarkById = businessParty?.BusinessPartyMark ?? string.Empty;
             callbackReqVo = adaptor.FormatRequest(bpmnConfVo);
             callbackReqVo.BusinessPartyMark = businessPartyMarkById;
             callbackReqVo.EventType = callbackTypeEnum.GetMark();
@@ -125,10 +125,9 @@ public class ThirdPartyCallbackFactory
             var loginUser = new BaseIdTranStruVo()
                 { Id = SecurityUtils.GetLogInEmpId(), Name = SecurityUtils.GetLogInEmpName() };
 
-            OutSideBpmCallbackUrlConf outSideBpmCallbackUrlConf = _outSideBpmCallbackUrlConfService.baseRepo
-                .Where(a => a.BusinessPartyId == bpmnConfVo.BusinessPartyId && a.Status == 1 &&
-                            a.FormCode == bpmnConfVo.FormCode)
-                .First();
+            OutSideBpmCallbackUrlConf outSideBpmCallbackUrlConf = _outSideBpmCallbackUrlConfService._repository
+                .FirstOrDefault(a => a.BusinessPartyId == bpmnConfVo.BusinessPartyId && a.Status == 1 &&
+                            a.FormCode == bpmnConfVo.FormCode);
 
             string url = string.Empty;
 

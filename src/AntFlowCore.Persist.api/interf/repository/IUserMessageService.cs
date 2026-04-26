@@ -1,10 +1,9 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
-using FreeSql;
+using antflowcore.service.interf.repository;
 
 namespace AntFlowCore.Persist.api.interf.repository;
 
-public interface IUserMessageService : IBaseRepositoryService<UserMessage>
+public interface IUserMessageService : IAntFlowRepositoryMix<UserMessage, IUserMessageRepository>
 {
     void ReadNode(string node);
     void InsertMessage(UserMessage message);

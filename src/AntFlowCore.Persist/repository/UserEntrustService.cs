@@ -1,6 +1,4 @@
-﻿using System.Linq.Expressions;
-using AntFlowCore.Abstraction.Orm.repository;
-using AntFlowCore.Base.dto;
+﻿using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.extension;
@@ -11,18 +9,21 @@ using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repository;
 
-public class UserEntrustService :AFBaseCurdRepositoryService<UserEntrust>,IUserEntrustService
+public class UserEntrustService : IUserEntrustService
 {
-    public UserEntrustService(IFreeSql freeSql) : base(freeSql)
+    public UserEntrustService(IUserEntrustRepository repository)
     {
-        
+        _repository = repository;
     }
+
+    public IUserEntrustRepository _repository { get; }
+
     public ResultAndPage<Entrust> GetEntrustPageList(PageDto pageDto, Entrust vo, int type) {
         if (type == 1){
             vo.ReceiverId=SecurityUtils.GetLogInEmpIdSafe();
         }
         Page<Entrust> page = PageUtils.GetPageByPageDto<Entrust>(pageDto);
-        List<Entrust> resultData = this.QueryEntrustPageList(page, vo.ReceiverId);
+        List<Entrust> resultData = _repository.QueryEntrustPageList(vo.ReceiverId);
         if (resultData==null||!resultData.Any()) {
             return PageUtils.GetResultAndPage(page);
         }
@@ -46,14 +47,14 @@ public class UserEntrustService :AFBaseCurdRepositoryService<UserEntrust>,IUserE
 
             if (idsVo.Id > 0)
             {
-                var existing = this.baseRepo.Where(a => a.Id == idsVo.Id).ToOne();
+                var existing = _repository.FirstOrDefault(a => a.Id == idsVo.Id);
                 if (existing == null)
                     throw new AFBizException("300001", "更新的记录不存在");
 
                 userEntrust.Id = idsVo.Id??0;
                 userEntrust.PowerId = existing.PowerId;
                 userEntrust.CreateUser = SecurityUtils.GetLogInEmpNameSafe();
-                this.baseRepo.Update(existing);
+                _repository.Update(existing);
             }
             else if (!string.IsNullOrEmpty(idsVo.PowerId))
             {
@@ -63,16 +64,16 @@ public class UserEntrustService :AFBaseCurdRepositoryService<UserEntrust>,IUserE
                 userEntrust.PowerId = idsVo.PowerId;
                 userEntrust.CreateUser = SecurityUtils.GetLogInEmpNameSafe();
                 userEntrust.TenantId = MultiTenantUtil.GetCurrentTenantId();
-                List<UserEntrust> userEntrusts = this.baseRepo
-                    .Where(a=>a.Sender==userEntrust.Sender
+                List<UserEntrust> userEntrusts = _repository
+                    .Find(a=>a.Sender==userEntrust.Sender
                               &&a.ReceiverId==userEntrust.ReceiverId
-                              &&a.PowerId==userEntrust.PowerId).ToList();
+                              &&a.PowerId==userEntrust.PowerId);
                 if (!userEntrusts.IsEmpty())
                 {
                     throw new AFBizException(BusinessError.DATA_ALREADY_EXISTED, "委托记录已存在,请确认!");
                 }
-                this.baseRepo.Insert(userEntrust);
-                
+                _repository.Add(userEntrust);
+
             }
         }
     }
@@ -93,7 +94,7 @@ public class UserEntrustService :AFBaseCurdRepositoryService<UserEntrust>,IUserE
         }
 
         DateTime now = DateTime.Now;
-        List<UserEntrust> list = this.baseRepo.Where(x => x.PowerId == powerId && x.Sender == employeeId).ToList();
+        List<UserEntrust> list = _repository.Find(x => x.PowerId == powerId && x.Sender == employeeId);
         if (string.IsNullOrEmpty(MultiTenantUtil.GetCurrentTenantId()))
         {
             List<UserEntrust> currentOnes =
@@ -109,7 +110,7 @@ public class UserEntrustService :AFBaseCurdRepositoryService<UserEntrust>,IUserE
         }
         foreach (UserEntrust u in list)
         {
-            if (u.BeginTime.HasValue && u.EndTime.HasValue && 
+            if (u.BeginTime.HasValue && u.EndTime.HasValue &&
                 now >= u.BeginTime.Value.Date && now <= u.EndTime.Value.Date.AddDays(1).AddTicks(-1))
             {
                 return new BaseIdTranStruVo { Id = u.ReceiverId, Name = u.ReceiverName };
@@ -130,36 +131,10 @@ public class UserEntrustService :AFBaseCurdRepositoryService<UserEntrust>,IUserE
 
         return new BaseIdTranStruVo { Id = employeeId, Name = employeeName };
     }
-    private List<Entrust> QueryEntrustPageList(Page<Entrust> page, string userId)
-    {
-        Expression<Func<UserEntrust,User, bool>> expression = (a,b) => 1 == 1;
-        if (!string.IsNullOrEmpty(userId))
-        {
-            LambadaExpressionExtensions.And(expression, (a,b) => a.Sender==userId||a.ReceiverId==userId);
-        }
-
-        List<Entrust> entrusts = this.Frsql
-            .Select<UserEntrust,User>()
-            .LeftJoin((a,b)=>a.Sender==b.Id.ToString())
-            .Where(expression)
-            .ToList<Entrust>(a => new Entrust()
-            {
-                Id=a.t1.Id,
-                Name = a.t2.Name,
-                Sender = a.t1.Sender,
-                ReceiverId = a.t1.ReceiverId,
-                ReceiverName = a.t1.ReceiverName,
-                PowerId = a.t1.PowerId,
-                BeginTime = a.t1.BeginTime,
-                EndTime = a.t1.EndTime,
-                CreateTime = a.t1.CreateTime,
-            });
-        return entrusts;
-    }
 
     public UserEntrust GetEntrustDetail(int id)
     {
-        UserEntrust userEntrust = this.baseRepo.Where(a=>a.Id == id).ToOne();
+        UserEntrust userEntrust = _repository.FirstOrDefault(a=>a.Id == id);
         return userEntrust;
     }
 }

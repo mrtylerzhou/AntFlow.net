@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
@@ -7,39 +6,45 @@ using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repository;
 
-public class BpmProcessNameService: AFBaseCurdRepositoryService<BpmProcessName>,IBpmProcessNameService
+public class BpmProcessNameService : IBpmProcessNameService
 {
-    private readonly BpmProcessNameRelevancyService _bpmProcessNameRelevancyService;
+    private readonly IBpmProcessNameRelevancyService _bpmProcessNameRelevancyService;
 
     public BpmProcessNameService(
-        IFreeSql freeSql,
-        BpmProcessNameRelevancyService bpmProcessNameRelevancyService
-        ) : base(freeSql)
+        IBpmProcessNameRepository repository,
+        IBpmProcessNameRelevancyService bpmProcessNameRelevancyService
+        )
     {
+        _repository = repository;
         _bpmProcessNameRelevancyService = bpmProcessNameRelevancyService;
     }
+
+    public IBpmProcessNameRepository _repository { get; }
+
     private static IDictionary<String, BpmProcessVo> processVoMap = new ConcurrentDictionary<string, BpmProcessVo>();
-    public BpmProcessName GetBpmProcessName(String processKey) {
+
+    public BpmProcessName GetBpmProcessName(String processKey)
+    {
         BpmProcessNameRelevancy processNameRelevancy = _bpmProcessNameRelevancyService.FindProcessNameRelevancy(processKey);
-        if (processNameRelevancy==null) {
+        if (processNameRelevancy == null)
+        {
             return new BpmProcessName();
         }
 
-        BpmProcessName bpmProcessName = baseRepo.Where(a=>a.Id.Equals(processNameRelevancy.ProcessNameId)).ToOne();
+        BpmProcessName bpmProcessName = _repository.FirstOrDefault(a => a.Id.Equals(processNameRelevancy.ProcessNameId));
         return bpmProcessName;
     }
 
     public void EditProcessName(BpmnConf bpmnConfByCode)
     {
         BpmProcessName processName = FindProcessName(bpmnConfByCode.BpmnName);
-        BpmProcessNameRelevancyService bpmProcessNameRelevancyService = ServiceProviderUtils.GetService<BpmProcessNameRelevancyService>();
-        bool flag = bpmProcessNameRelevancyService.SelectCount(bpmnConfByCode.FormCode);
-    
-        if (processName?.Id!=0)
+        bool flag = _bpmProcessNameRelevancyService.SelectCount(bpmnConfByCode.FormCode);
+
+        if (processName?.Id != 0)
         {
             if (!flag)
             {
-                bpmProcessNameRelevancyService.Add(new BpmProcessNameRelevancy
+                _bpmProcessNameRelevancyService.Add(new BpmProcessNameRelevancy
                 {
                     ProcessKey = bpmnConfByCode.FormCode,
                     ProcessNameId = processName.Id,
@@ -51,18 +56,18 @@ public class BpmProcessNameService: AFBaseCurdRepositoryService<BpmProcessName>,
         {
             if (flag)
             {
-                BpmProcessNameRelevancy processNameRelevancy = bpmProcessNameRelevancyService.FindProcessNameRelevancy(bpmnConfByCode.FormCode);
-                BpmProcessName bpmProcessName = this.baseRepo.Where(p => p.Id == processNameRelevancy.ProcessNameId).First();
+                BpmProcessNameRelevancy processNameRelevancy = _bpmProcessNameRelevancyService.FindProcessNameRelevancy(bpmnConfByCode.FormCode);
+                BpmProcessName bpmProcessName = _repository.FirstOrDefault(p => p.Id == processNameRelevancy.ProcessNameId);
                 bpmProcessName.ProcessName = bpmnConfByCode.BpmnName;
-                this.baseRepo.Update(bpmProcessName);
+                _repository.Update(bpmProcessName);
             }
             else
             {
-                BpmProcessName process = new BpmProcessName { ProcessName = bpmnConfByCode.BpmnName,CreateTime = DateTime.Now};
-                this.baseRepo.Insert(process);
+                BpmProcessName process = new BpmProcessName { ProcessName = bpmnConfByCode.BpmnName, CreateTime = DateTime.Now };
+                _repository.Add(process);
 
                 long id = process.Id;
-                bpmProcessNameRelevancyService.Add(new BpmProcessNameRelevancy
+                _bpmProcessNameRelevancyService.Add(new BpmProcessNameRelevancy
                 {
                     ProcessKey = bpmnConfByCode.FormCode,
                     ProcessNameId = id,
@@ -74,9 +79,8 @@ public class BpmProcessNameService: AFBaseCurdRepositoryService<BpmProcessName>,
 
     private BpmProcessName FindProcessName(string processName)
     {
-        List<BpmProcessName> bpmProcessNames = this.baseRepo
-            .Where(a=>a.ProcessName==processName&&a.IsDel==0)
-            .ToList();
+        List<BpmProcessName> bpmProcessNames = _repository
+            .Find(a => a.ProcessName == processName && a.IsDel == 0);
         if (bpmProcessNames.Count > 0)
         {
             return bpmProcessNames[0];
@@ -86,7 +90,7 @@ public class BpmProcessNameService: AFBaseCurdRepositoryService<BpmProcessName>,
 
     public BpmProcessVo Get(string processKey)
     {
-        processVoMap.TryGetValue(processKey,out  BpmProcessVo? bpmProcessVo);
+        processVoMap.TryGetValue(processKey, out BpmProcessVo? bpmProcessVo);
         if (bpmProcessVo != null)
         {
             return bpmProcessVo;
@@ -99,32 +103,16 @@ public class BpmProcessNameService: AFBaseCurdRepositoryService<BpmProcessName>,
 
     private void LoadProcessName()
     {
-        Dictionary<String, BpmProcessVo> map = new Dictionary<String, BpmProcessVo>();
-        List<BpmProcessVo> list = this.AllProcess();
+        List<BpmProcessVo> list = _repository.GetAllProcessVo();
         foreach (BpmProcessVo next in list)
         {
-            
             if (!string.IsNullOrEmpty(next.ProcessKey))
             {
-              
                 if (!processVoMap.ContainsKey(next.ProcessKey))
                 {
-                    processVoMap.Add(next.ProcessKey,next);
+                    processVoMap.Add(next.ProcessKey, next);
                 }
             }
         }
-    }
-
-    private List<BpmProcessVo> AllProcess()
-    {
-        List<BpmProcessVo> bpmProcessVos = this.Frsql
-            .Select<BpmProcessName,BpmProcessNameRelevancy>()
-            .LeftJoin((a,b)=>b.ProcessNameId==a.Id)
-            .ToList<BpmProcessVo>((b,s)=>new BpmProcessVo()
-            {
-                ProcessName = b.ProcessName,
-                ProcessKey = s.ProcessKey
-            });
-        return bpmProcessVos;
     }
 }

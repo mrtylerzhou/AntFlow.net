@@ -15,4 +15,14 @@ public static class BasePagingInfoExtensions
     };
     return basePagingInfo;
   }
+  public static PagingInfo ToPagingInfo(this BasePagingInfo basePagingInfo)
+  {
+    PagingInfo pagingInfo = new PagingInfo()
+    {
+      PageNumber = basePagingInfo.PageNumber,
+      PageSize = basePagingInfo.PageSize,
+      Count = basePagingInfo.Count
+    };
+    return pagingInfo;
+  }
 }

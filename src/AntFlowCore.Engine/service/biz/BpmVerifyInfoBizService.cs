@@ -170,8 +170,8 @@ public class BpmVerifyInfoBizService : IBpmVerifyInfoBizService
             bpmVerifyInfoVos.Add(taskVo);
 
             List<BpmFlowrunEntrust> flowrunEntrustList = _bpmFlowrunEntrustService
-                .baseRepo
-                .Where(a => a.RunInfoId == bpmBusinessProcess.ProcInstId && a.Actual == taskVo.VerifyUserId).ToList();
+                ._repository
+                .Find(a => a.RunInfoId == bpmBusinessProcess.ProcInstId && a.Actual == taskVo.VerifyUserId);
 
 
             if (flowrunEntrustList.Any())
@@ -450,8 +450,8 @@ public class BpmVerifyInfoBizService : IBpmVerifyInfoBizService
 
     public BpmVerifyInfo GetLastProcessNodeByAssignee(String processNumber, String assignee)
     {
-        BpmVerifyInfo bpmVerifyInfo = _bpmVerifyInfoService.baseRepo
-            .Where(a=>a.ProcessCode==processNumber&&a.VerifyUserId==assignee).First();
+        BpmVerifyInfo bpmVerifyInfo = _bpmVerifyInfoService._repository
+            .FindByProcessCodeAndVerifyUserId(processNumber, assignee);
         return bpmVerifyInfo;
     }
 }

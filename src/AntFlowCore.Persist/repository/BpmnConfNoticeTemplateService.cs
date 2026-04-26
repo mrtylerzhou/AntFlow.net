@@ -1,4 +1,3 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.extension;
@@ -7,21 +6,26 @@ using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repository;
 
-public class BpmnConfNoticeTemplateService : AFBaseCurdRepositoryService<BpmnConfNoticeTemplate>,
-    IBpmnConfNoticeTemplateService
+public class BpmnConfNoticeTemplateService : IBpmnConfNoticeTemplateService
 {
-    public BpmnConfNoticeTemplateService(IFreeSql freeSql) : base(freeSql)
+    private readonly IBpmnConfNoticeTemplateDetailService _bpmnConfNoticeTemplateDetailService;
+
+    public BpmnConfNoticeTemplateService(IBpmnConfNoticeTemplateRepository repository, IBpmnConfNoticeTemplateDetailService bpmnConfNoticeTemplateDetailService)
     {
+        _repository = repository;
+        _bpmnConfNoticeTemplateDetailService = bpmnConfNoticeTemplateDetailService;
     }
 
-    public long Insert(String bpmnCode)
+    public IBpmnConfNoticeTemplateRepository _repository { get; }
+
+    public long Insert(string bpmnCode)
     {
         BpmnConfNoticeTemplate bpmnConfNoticeTemplate = new BpmnConfNoticeTemplate()
         {
             BpmnCode = bpmnCode,
             CreateTime = DateTime.Now,
         };
-        this.baseRepo.Insert(bpmnConfNoticeTemplate);
+        _repository.Add(bpmnConfNoticeTemplate);
         long id = bpmnConfNoticeTemplate.Id;
 
         List<BpmnConfNoticeTemplateDetail> list = new List<BpmnConfNoticeTemplateDetail>();
@@ -39,16 +43,15 @@ public class BpmnConfNoticeTemplateService : AFBaseCurdRepositoryService<BpmnCon
             list.Add(detail);
         }
 
-        int affrows = Frsql.Insert(list).ExecuteAffrows();
+        _bpmnConfNoticeTemplateDetailService._repository.AddRange(list);
         return id;
     }
 
     public BpmnConfNoticeTemplateDetail? GetDetailByCodeAndType(string bpmnCode, int msgNoticeType)
     {
-        BpmnConfNoticeTemplateDetailService bpmnConfNoticeTemplateDetailService = ServiceProviderUtils.GetService<BpmnConfNoticeTemplateDetailService>();
-        List<BpmnConfNoticeTemplateDetail> bpmnConfNoticeTemplateDetails = bpmnConfNoticeTemplateDetailService
-            .baseRepo
-            .Where(a => a.BpmnCode == bpmnCode && a.NoticeTemplateType == msgNoticeType)
+        List<BpmnConfNoticeTemplateDetail> bpmnConfNoticeTemplateDetails = _bpmnConfNoticeTemplateDetailService
+            ._repository
+            .Find(a => a.BpmnCode == bpmnCode && a.NoticeTemplateType == msgNoticeType)
             .OrderByDescending(a => a.Id)
             .ToList();
         return bpmnConfNoticeTemplateDetails.IsEmpty() ? null : bpmnConfNoticeTemplateDetails[0];

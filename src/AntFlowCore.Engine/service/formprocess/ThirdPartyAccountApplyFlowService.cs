@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.factory;
 using AntFlowCore.Base.util;
@@ -39,7 +39,7 @@ public class ThirdPartyAccountApplyFlowService : AbstractLowFlowSpyFormOperation
 
     public override void OnQueryData(ThirdPartyAccountApplyVo vo)
     {
-        ThirdPartyAccountApply accountApply=_thirdPartyAccountApplyService.baseRepo.Where(a=>a.Id==Convert.ToInt32(vo.BusinessId)).First();
+        ThirdPartyAccountApply accountApply = _thirdPartyAccountApplyService._repository.Find(a => a.Id == Convert.ToInt32(vo.BusinessId)).FirstOrDefault();
         vo.AccountType = accountApply.AccountType;
         vo.AccountOwnerName = accountApply.AccountOwnerName;
         vo.Remark = accountApply.Remark;
@@ -49,7 +49,7 @@ public class ThirdPartyAccountApplyFlowService : AbstractLowFlowSpyFormOperation
     {
         ThirdPartyAccountApply thirdPartyAccountApply = vo.MapToEntity();
         
-        _thirdPartyAccountApplyService.baseRepo.Insert(thirdPartyAccountApply);
+        _thirdPartyAccountApplyService._repository.Add(thirdPartyAccountApply);
         vo.BusinessId=(thirdPartyAccountApply.Id.ToString());
         vo.ProcessTitle="第三方账号申请";
         vo.ProcessDigest=vo.Remark;
@@ -63,7 +63,7 @@ public class ThirdPartyAccountApplyFlowService : AbstractLowFlowSpyFormOperation
             ThirdPartyAccountApply thirdPartyAccountApply = vo.MapToEntity();
             int id = Convert.ToInt32(vo.BusinessId);
             thirdPartyAccountApply.Id=id;
-            _thirdPartyAccountApplyService.baseRepo.Update(thirdPartyAccountApply);
+            _thirdPartyAccountApplyService._repository.Update(thirdPartyAccountApply);
         }
     }
 

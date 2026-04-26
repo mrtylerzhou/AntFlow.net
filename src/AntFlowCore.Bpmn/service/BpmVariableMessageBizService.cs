@@ -502,8 +502,8 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
 
         //forwarded
         List<String> forwardUsers = null;
-        List<BpmProcessForward> bpmProcessForwards = _bpmProcessForwardService.baseRepo
-            .Where(a=>a.ProcessInstanceId==vo.ProcessInsId).ToList();
+        List<BpmProcessForward> bpmProcessForwards = _bpmProcessForwardService._repository
+            .Find(a=>a.ProcessInstanceId==vo.ProcessInsId);
             
         if (!vo.ForwardUsers.IsEmpty() && !bpmProcessForwards.IsEmpty()) {
             forwardUsers =new List<String>();

@@ -1,13 +1,11 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.vo;
-using AntFlowCore.Core.vo;
-using FreeSql;
+using antflowcore.service.interf.repository;
 
 namespace AntFlowCore.Persist.api.interf.repository;
 
-public interface IOutSideBpmApproveTemplateService : IBaseRepositoryService<OutSideBpmApproveTemplate>
+public interface IOutSideBpmApproveTemplateService : IAntFlowRepositoryMix<OutSideBpmApproveTemplate, IOutSideBpmApproveTemplateRepository>
 {
     ResultAndPage<OutSideBpmApproveTemplateVo> ListPage(PageDto pageDto, OutSideBpmApproveTemplateVo vo);
     List<OutSideBpmApproveTemplateVo> SelectListByTemp(int applicationId);

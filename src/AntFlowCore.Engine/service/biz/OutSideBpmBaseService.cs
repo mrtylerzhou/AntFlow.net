@@ -9,14 +9,14 @@ namespace AntFlowCore.Engine.service.biz;
 public class OutSideBpmBaseService : IOutSideBpmBaseService
 {
     private readonly IOutSideBpmAdminPersonnelService _outSideBpmAdminPersonnelService;
-    private readonly IOutSideBpmBusinessPartyService _outSideBpmBusinessPartyService;
+    private readonly IOutSideBpmBusinessPartyRepository _outSideBpmBusinessPartyRepository;
 
     public OutSideBpmBaseService(
         IOutSideBpmAdminPersonnelService outSideBpmAdminPersonnelService,
-        IOutSideBpmBusinessPartyService outSideBpmBusinessPartyService)
+        IOutSideBpmBusinessPartyRepository outSideBpmBusinessPartyRepository)
     {
         _outSideBpmAdminPersonnelService = outSideBpmAdminPersonnelService;
-        _outSideBpmBusinessPartyService = outSideBpmBusinessPartyService;
+        _outSideBpmBusinessPartyRepository = outSideBpmBusinessPartyRepository;
     }
     public List<OutSideBpmBusinessPartyVo> GetEmplBusinessPartys(string name, params string[] permCodes)
     {
@@ -34,7 +34,7 @@ public class OutSideBpmBaseService : IOutSideBpmBaseService
         {
            
             // 有全部权限，查询全部业务方
-            outSideBpmBusinessPartys = _outSideBpmBusinessPartyService.baseRepo.Where(a => 1 == 1).ToList();
+            outSideBpmBusinessPartys = _outSideBpmBusinessPartyRepository.GetAll();
         }
         else
         {
@@ -42,8 +42,8 @@ public class OutSideBpmBaseService : IOutSideBpmBaseService
             var businessPartyIds = _outSideBpmAdminPersonnelService.GetBusinessPartyIdByEmployeeId(loginEmployee.UserId, permCodes);
             if (businessPartyIds != null && businessPartyIds.Any())
             {
-                outSideBpmBusinessPartys = _outSideBpmBusinessPartyService.baseRepo
-                    .Where(p => businessPartyIds.Contains(p.Id)).ToList();
+                outSideBpmBusinessPartys = _outSideBpmBusinessPartyRepository
+                    .Find(p => businessPartyIds.Contains(p.Id));
             }
             else
             {

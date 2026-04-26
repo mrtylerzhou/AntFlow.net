@@ -8,26 +8,30 @@ using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repository;
 
-public class OutSideBpmCallbackUrlConfService : AFBaseCurdRepositoryService<OutSideBpmCallbackUrlConf>,IOutSideBpmCallbackUrlConfService
+public class OutSideBpmCallbackUrlConfService : IOutSideBpmCallbackUrlConfService
 {
-   
-    private readonly OutSideBpmAdminPersonnelService _outSideBpmAdminPersonnelService;
     private readonly IUserService _employeeService;
+    private readonly IOutSideBpmBusinessPartyRepository _outSideBpmBusinessPartyRepository;
+    private readonly IOutSideBpmAdminPersonnelRepository _outSideBpmAdminPersonnelRepository;
 
     public OutSideBpmCallbackUrlConfService(
-       
-        OutSideBpmAdminPersonnelService outSideBpmAdminPersonnelService,
+        IOutSideBpmCallbackUrlConfRepository repository,
         IUserService employeeService,
-        IFreeSql freeSql) : base(freeSql)
+        IOutSideBpmBusinessPartyRepository outSideBpmBusinessPartyRepository,
+        IOutSideBpmAdminPersonnelRepository outSideBpmAdminPersonnelRepository)
     {
-        _outSideBpmAdminPersonnelService = outSideBpmAdminPersonnelService;
+        _repository = repository;
         _employeeService = employeeService;
+        _outSideBpmBusinessPartyRepository = outSideBpmBusinessPartyRepository;
+        _outSideBpmAdminPersonnelRepository = outSideBpmAdminPersonnelRepository;
     }
+
+    public IOutSideBpmCallbackUrlConfRepository _repository { get; }
 
     public OutSideBpmCallbackUrlConf GetOutSideBpmCallbackUrlConf(long businessPartyId)
     {
         OutSideBpmCallbackUrlConf outSideBpmCallbackUrlConf =
-            baseRepo.Where(a => a.BusinessPartyId == businessPartyId && a.Status == 1).First();
+            _repository.FirstOrDefault(a => a.BusinessPartyId == businessPartyId && a.Status == 1);
 
         if (outSideBpmCallbackUrlConf == null)
         {
@@ -39,28 +43,21 @@ public class OutSideBpmCallbackUrlConfService : AFBaseCurdRepositoryService<OutS
 
     public List<OutSideBpmCallbackUrlConf> SelectListByFormCode(String formCode)
     {
-        List<OutSideBpmCallbackUrlConf> confList = this.baseRepo
-            .Where(a => a.FormCode == formCode && a.Status == 1)
-            .ToList();
+        List<OutSideBpmCallbackUrlConf> confList = _repository
+            .Find(a => a.FormCode == formCode && a.Status == 1);
         return confList;
     }
 
     public OutSideBpmCallbackUrlConfVo Detail(int id)
     {
-        OutSideBpmCallbackUrlConf outSideBpmCallbackUrlConf = this.baseRepo
-            .Where(a => a.Id == id)
-            .ToOne();
+        OutSideBpmCallbackUrlConf outSideBpmCallbackUrlConf = _repository
+            .FirstOrDefault(a => a.Id == id);
 
         OutSideBpmCallbackUrlConfVo vo = outSideBpmCallbackUrlConf.MapToVo();
 
-        IOutSideBpmBusinessPartyService outSideBpmBusinessPartyService = ServiceProviderUtils.GetService<IOutSideBpmBusinessPartyService>();
-        //query business party's info,for assemble the result
-        OutSideBpmBusinessParty outSideBpmBusinessParty = outSideBpmBusinessPartyService
-            .baseRepo
-            .Where(a => a.Id == vo.BusinessPartyId)
-            .ToOne();
+        OutSideBpmBusinessParty outSideBpmBusinessParty = _outSideBpmBusinessPartyRepository
+            .FirstOrDefault(a => a.Id == vo.BusinessPartyId);
 
-        //rebuild the vo to give it detailed information for representing
         return RebuildVo(vo, outSideBpmBusinessParty);
     }
 
@@ -68,7 +65,6 @@ public class OutSideBpmCallbackUrlConfService : AFBaseCurdRepositoryService<OutS
         OutSideBpmCallbackUrlConfVo vo,
         OutSideBpmBusinessParty businessParty)
     {
-        // 映射状态名称
         if (vo.Status != null)
         {
             if (vo.Status == 1)
@@ -81,18 +77,15 @@ public class OutSideBpmCallbackUrlConfService : AFBaseCurdRepositoryService<OutS
             }
         }
 
-        // 映射业务方信息
         if (businessParty != null)
         {
             vo.BusinessPartyName = businessParty.Name;
             vo.AccessType = businessParty.Type;
             vo.AccessTypeName = BusinessPartyTypeEnum.GetDescByCode(businessParty.Type);
 
-            List<OutSideBpmAdminPersonnel> outSideBpmAdminPersonnels = _outSideBpmAdminPersonnelService
-                .baseRepo
-                .Where(p => p.BusinessPartyId == businessParty.Id &&
-                            p.Type == AdminPersonnelTypeEnum.ADMIN_PERSONNEL_TYPE_INTERFACE.Code)
-                .ToList();
+            List<OutSideBpmAdminPersonnel> outSideBpmAdminPersonnels = _outSideBpmAdminPersonnelRepository
+                .Find(p => p.BusinessPartyId == businessParty.Id &&
+                            p.Type == AdminPersonnelTypeEnum.ADMIN_PERSONNEL_TYPE_INTERFACE.Code);
 
             if (outSideBpmAdminPersonnels != null && outSideBpmAdminPersonnels.Any())
             {
@@ -115,12 +108,10 @@ public class OutSideBpmCallbackUrlConfService : AFBaseCurdRepositoryService<OutS
 
     public void Edit(OutSideBpmCallbackUrlConfVo vo)
     {
-        // 如果是新增，判断该业务方是否已存在记录（一个业务方只能有一条配置）
         if (vo.Id is null or 0)
         {
-            var count = this.baseRepo
-                .Where(x => x.BusinessPartyId == vo.BusinessPartyId&&x.ApplicationId == vo.ApplicationId)
-                .Count();
+            var count = _repository
+                .Count(x => x.BusinessPartyId == vo.BusinessPartyId && x.ApplicationId == vo.ApplicationId);
 
             if (count > 0)
             {
@@ -132,29 +123,27 @@ public class OutSideBpmCallbackUrlConfService : AFBaseCurdRepositoryService<OutS
         var loginUser = SecurityUtils.GetLogInEmpName();
 
         OutSideBpmCallbackUrlConf? entity = vo.Id != null
-            ? this.baseRepo.Where(a => a.Id == vo.Id).ToOne()
+            ? _repository.FirstOrDefault(a => a.Id == vo.Id)
             : null;
 
         if (entity != null)
         {
-            // 更新
             vo.CopyToEntity(entity);
             entity.UpdateTime = now;
             entity.UpdateUser = loginUser;
-            this.baseRepo.Update(entity);
+            _repository.Update(entity);
         }
         else
         {
-            // 新增
             entity = new OutSideBpmCallbackUrlConf();
             vo.CopyToEntity(entity);
-            entity.Status = 1; // 默认启用
+            entity.Status = 1;
             entity.CreateTime = now;
             entity.CreateUser = loginUser;
             entity.UpdateTime = now;
             entity.UpdateUser = loginUser;
 
-            this.baseRepo.Insert(entity);
+            _repository.Add(entity);
         }
     }
 }

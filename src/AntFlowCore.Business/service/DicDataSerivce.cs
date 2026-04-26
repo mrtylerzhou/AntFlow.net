@@ -4,9 +4,11 @@ using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Business.service;
 
-public class DicDataSerivce: AFBaseCurdRepositoryService<DictData>,IDicDataSerivce
+public class DicDataSerivce: IDicDataSerivce
 {
-    public DicDataSerivce(IFreeSql freeSql) : base(freeSql)
+    public DicDataSerivce(IDicDataSerivce dicDataSerivce)
     {
+        _repository = dicDataSerivce._repository;
     }
+    public IDictDataRepository _repository { get; }
 }

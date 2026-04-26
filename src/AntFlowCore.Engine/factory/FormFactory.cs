@@ -62,8 +62,8 @@ public class FormFactory : IFormFactory
 
             if (vo.IsOutSideAccessProc!=null&&vo.IsOutSideAccessProc==true)
             {
-                var bpmAccessBusinesses = _outSideBpmAccessBusinessService.baseRepo
-                    .Where(a => a.ProcessNumber == vo.ProcessNumber).ToList();
+                var bpmAccessBusinesses = _outSideBpmAccessBusinessService._repository
+                    .Find(a => a.ProcessNumber == vo.ProcessNumber);
 
                 if (bpmAccessBusinesses.Any())
                 {

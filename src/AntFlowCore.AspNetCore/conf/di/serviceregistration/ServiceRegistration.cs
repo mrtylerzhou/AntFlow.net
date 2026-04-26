@@ -3,6 +3,7 @@ using AntFlowCore.Abstraction.factory;
 using AntFlowCore.Abstraction.formatter;
 using AntFlowCore.Abstraction.formatter.filter;
 using AntFlowCore.Abstraction.formatter.personnel;
+using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Abstraction.service.processor;
@@ -35,6 +36,7 @@ using AntFlowCore.Bpmn.service;
 using AntFlowCore.Bpmn.util;
 using AntFlowCore.Business.service;
 using AntFlowCore.Business.service.biz;
+using antflowcore.conf.ef;
 using AntFlowCore.Core.vo;
 using AntFlowCore.Engine.factory;
 using AntFlowCore.Engine.service;
@@ -45,6 +47,7 @@ using AntFlowCore.Engine.service.processor;
 using AntFlowCore.Engine.service.processor.lowcodeflow;
 using AntFlowCore.Persist.api.interf.biz;
 using AntFlowCore.Persist.api.interf.repository;
+using AntFlowCore.Persist.repo;
 using AntFlowCore.Persist.repository;
 using AntFlowCore.VirtualNode.service;
 using Microsoft.Extensions.Configuration;
@@ -261,8 +264,8 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmnPersonnelProviderService, BusinessTablePersonnelProvider>();
         services.AddSingleton<IBpmnProcessAdminProvider, ProcessAddminProvider>();
         #endregion
-        
-        
+
+        services.AddSingleton<AntFlowOrmContext>();
         
         services.AddSingleton<AbstractBpmnPersonnelAdaptor, CustomizablePersonnelAdaptor>();
         services.AddSingleton<AbstractBpmnPersonnelAdaptor, DirectLeaderPersonnelAdaptor>();
@@ -424,6 +427,48 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmvariableBizService, BpmvariableBizService>();
         services.AddSingleton<ThirdPartyAccountApplyService>();
         services.AddSingleton<IThirdPartyAccountApplyService, ThirdPartyAccountApplyService>();
+        
+        services.AddSingleton<IDictDataRepository, DictDataRepository>();
+        services.AddSingleton<IBpmAfDeploymentRepository, FsBpmAfDeploymentRepository>();
+        services.AddSingleton<IBpmAfTaskInstRepository, FsBpmAfTaskInstRepository>();
+        services.AddSingleton<IBpmBusinessProcessRepository, FsBpmBusinessProcessRepository>();
+        services.AddSingleton<IBpmFlowrunEntrustRepository, FsBpmFlowrunEntrustRepository>();
+        services.AddSingleton<IAFTaskRepository, FsAFTaskRepository>();
+        services.AddSingleton<IBpmnConfLfFormdataFieldRepository, FsBpmnConfLfFormdataFieldRepository>();
+        services.AddSingleton<IBpmnConfLfFormdataRepository, FsBpmnConfLfFormdataRepository>();
+        services.AddSingleton<IBpmnConfNoticeTemplateDetailRepository, FsBpmnConfNoticeTemplateDetailRepository>();
+        services.AddSingleton<IBpmnConfNoticeTemplateRepository, FsBpmnConfNoticeTemplateRepository>();
+        services.AddSingleton<IBpmnNodeAdditionalSignConfRepository, FsBpmnNodeAdditionalSignConfRepository>();
+        services.AddSingleton<IBpmnNodeRepository, FsBpmnNodeRepository>();
+        services.AddSingleton<IBpmProcessForwardRepository, FsBpmProcessForwardRepository>();
+        services.AddSingleton<IBpmProcessNameRelevancyRepository, FsBpmProcessNameRelevancyRepository>();
+        services.AddSingleton<IBpmProcessNameRepository, FsBpmProcessNameRepository>();
+        services.AddSingleton<IBpmProcessNodeSubmitRepository, FsBpmProcessNodeSubmitRepository>();
+        services.AddSingleton<IBpmVerifyInfoRepository, FsBpmVerifyInfoRepository>();
+        services.AddSingleton<ILFMainFieldRepository, FsLFMainFieldRepository>();
+        services.AddSingleton<ILFMainRepository, FsLFMainRepository>();
+        services.AddSingleton<IBpmnConfRepository, FsBpmnConfRepository>();
+        services.AddSingleton<IBpmVariableRepository, FsBpmVariableRepository>();
+        services.AddSingleton<IOutSideBpmAccessBusinessRepository, FsOutSideBpmAccessBusinessRepository>();
+        services.AddSingleton<IOutSideBpmCallbackUrlConfRepository, FsOutSideBpmCallbackUrlConfRepository>();
+        services.AddSingleton<IOutSideBpmBusinessPartyRepository, FsOutSideBpmBusinessPartyRepository>();
+        services.AddSingleton<IOutSideBpmAdminPersonnelRepository, FsOutSideBpmAdminPersonnelRepository>();
+        services.AddSingleton<IOutSideBpmConditionsTemplateRepository, FsOutSideBpmConditionsTemplateRepository>();
+        services.AddSingleton<IBpmProcessAppApplicationRepository, FsBpmProcessAppApplicationRepository>();
+        services.AddSingleton<IBpmnNodeConditionsConfRepository, FsBpmnNodeConditionsConfRepository>();
+        services.AddSingleton<IBpmnNodeConditionsParamConfRepository, FsBpmnNodeConditionsParamConfRepository>();
+        services.AddSingleton<IUserEntrustRepository, FsUserEntrustRepository>();
+        services.AddSingleton<IBpmnApproveRemindRepository, FsBpmnApproveRemindRepository>();
+        services.AddSingleton<IBpmnTemplateRepository, FsBpmnTemplateRepository>();
+        services.AddSingleton<IBpmProcessNoticeRepository, FsBpmProcessNoticeRepository>();
+        services.AddSingleton<IDefaultTemplateRepository, FsDefaultTemplateRepository>();
+        services.AddSingleton<IDicMainRepository, FsDicMainRepository>();
+        services.AddSingleton<IInformationTemplateRepository, FsInformationTemplateRepository>();
+        services.AddSingleton<IOutSideBpmApproveTemplateRepository, FsOutSideBpmApproveTemplateRepository>();
+        services.AddSingleton<IRoleRepository, FsRoleRepository>();
+        services.AddSingleton<IUserMessageRepository, FsUserMessageRepository>();
+        services.AddSingleton<IUserMessageStatusRepository, FsUserMessageStatusRepository>();
+        services.AddSingleton<IUserRepository, FsUserRepository>();
         //=================================不可越过的三八线==============================
         IAdaptorFactory adaptorFactory = AdaptorFactoryProxy.GetProxyInstance();
         services.AddSingleton(adaptorFactory);

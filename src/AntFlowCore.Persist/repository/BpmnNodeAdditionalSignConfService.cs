@@ -1,22 +1,24 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repository;
 
-public class BpmnNodeAdditionalSignConfService : AFBaseCurdRepositoryService<BpmnNodeAdditionalSignConf>, IBpmnNodeAdditionalSignConfService
+public class BpmnNodeAdditionalSignConfService : IBpmnNodeAdditionalSignConfService
 {
-    public BpmnNodeAdditionalSignConfService(IFreeSql freeSql) : base(freeSql)
+    public BpmnNodeAdditionalSignConfService(IBpmnNodeAdditionalSignConfRepository repository)
     {
+        _repository = repository;
     }
+
+    public IBpmnNodeAdditionalSignConfRepository _repository { get; }
 
     public List<BpmnNodeAdditionalSignConf> GetByBpmnNodeId(long? bpmnNodeId)
     {
-        return baseRepo.Where(conf => conf.BpmnNodeId == bpmnNodeId).ToList();
+        return _repository.Find(conf => conf.BpmnNodeId == bpmnNodeId);
     }
 
     public void Insert(List<BpmnNodeAdditionalSignConf> entities)
     {
-        baseRepo.Insert(entities);
+        _repository.AddRange(entities);
     }
 }

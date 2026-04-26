@@ -110,7 +110,7 @@ public class Page<T>
             return info;
         }
 
-        public Page<T> Of(ICollection<T> records, BasePagingInfo pagingInfo)
+        public Page<T> Of(ICollection<T> records, PagingInfo pagingInfo)
         {
             this.Records.AddRange(records);
             this.Total = (int)pagingInfo.Count;

@@ -22,7 +22,7 @@ public class BpmnTemplateMarkAdaptor: IBpmnNodeConditionsAdaptor
         if (!ObjectUtils.IsEmpty(templateMarks))
         {
             List<OutSideBpmConditionsTemplate> outSideBpmConditionsTemplates = _outSideBpmConditionsTemplateService
-                .baseRepo.Where(a => longTemplateMarks.Contains(a.Id)).ToList();
+                ._repository.Find(a => longTemplateMarks.Contains(a.Id));
             
             if (!ObjectUtils.IsEmpty(outSideBpmConditionsTemplates))
             {

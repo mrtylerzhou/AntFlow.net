@@ -1,12 +1,11 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.vo;
-using FreeSql;
+using antflowcore.service.interf.repository;
 
 namespace AntFlowCore.Persist.api.interf.repository;
 
-public interface IInformationTemplateService : IBaseRepositoryService<InformationTemplate>
+public interface IInformationTemplateService : IAntFlowRepositoryMix<InformationTemplate, IInformationTemplateRepository>
 {
     ResultAndPage<InformationTemplateVo> List(PageDto pageDto, InformationTemplateVo informationTemplateVo);
     long Edit(InformationTemplateVo informationTemplateVo);

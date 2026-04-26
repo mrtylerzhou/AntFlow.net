@@ -64,8 +64,8 @@ public class OutSideAccessSubmitProcessService : IProcessOperationAdaptor
         }
        
         // Query outside access business info
-        OutSideBpmAccessBusiness outSideBpmAccessBusiness = _outSideBpmAccessBusinessService.baseRepo
-            .Where(a => a.Id == Convert.ToInt64(originalBusinessId)).First();
+        OutSideBpmAccessBusiness outSideBpmAccessBusiness = _outSideBpmAccessBusinessService._repository
+            .FirstOrDefault(a => a.Id == Convert.ToInt64(originalBusinessId));
 
         // New start conditions vo
         var bpmnStartConditionsVo = new BpmnStartConditionsVo();
@@ -74,10 +74,10 @@ public class OutSideAccessSubmitProcessService : IProcessOperationAdaptor
         if (!string.IsNullOrEmpty(templateMark))
         {
             // Query template mark
-            OutSideBpmConditionsTemplate outSideBpmConditionsTemplate = _outSideBpmConditionsTemplateService.baseRepo.Where(x =>
+            OutSideBpmConditionsTemplate outSideBpmConditionsTemplate = _outSideBpmConditionsTemplateService._repository.FirstOrDefault(x =>
                 x.IsDel == 0 &&
                 x.BusinessPartyId == outSideBpmAccessBusiness.BusinessPartyId &&
-                x.TemplateMark == templateMark).First();
+                x.TemplateMark == templateMark);
 
             if (outSideBpmConditionsTemplate == null)
             {

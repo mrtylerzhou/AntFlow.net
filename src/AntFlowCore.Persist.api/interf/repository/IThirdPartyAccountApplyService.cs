@@ -1,10 +1,8 @@
-
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
-using FreeSql;
+using antflowcore.service.interf.repository;
 
 namespace AntFlowCore.Persist.api.interf.repository;
 
-public interface IThirdPartyAccountApplyService : IBaseRepositoryService<ThirdPartyAccountApply>
+public interface IThirdPartyAccountApplyService : IAntFlowRepositoryMix<ThirdPartyAccountApply, IThirdPartyAccountApplyRepository>
 {
 }

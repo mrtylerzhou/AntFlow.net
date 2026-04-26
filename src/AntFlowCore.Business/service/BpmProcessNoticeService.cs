@@ -1,70 +1,64 @@
-﻿using AntFlowCore.Abstraction.Orm.repository;
-using AntFlowCore.Base.entity;
+﻿using AntFlowCore.Base.entity;
 using AntFlowCore.Base.extension;
-using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Business.service;
 
-public class BpmProcessNoticeService: AFBaseCurdRepositoryService<BpmProcessNotice>,IBpmProcessNoticeService
+public class BpmProcessNoticeService : IBpmProcessNoticeService
 {
-    public BpmProcessNoticeService(IFreeSql freeSql) : base(freeSql)
+    private readonly IBpmnTemplateService _bpmnTemplateService;
+
+    public BpmProcessNoticeService(IBpmProcessNoticeRepository repository, IBpmnTemplateService bpmnTemplateService)
     {
+        _repository = repository;
+        _bpmnTemplateService = bpmnTemplateService;
     }
+
+    public IBpmProcessNoticeRepository _repository { get; }
 
     public List<BpmProcessNotice> ProcessNoticeList(string processKey)
     {
-        List<BpmProcessNotice> bpmProcessNotices = this.baseRepo.Where(a => a.ProcessKey == processKey).ToList();
-        return bpmProcessNotices;
+        return _repository.Find(a => a.ProcessKey == processKey);
     }
-    public void SaveProcessNotice(BpmProcessDeptVo vo) {
-        String processKey=vo.ProcessKey; 
-        List<int> notifyTypeIds=vo.NotifyTypeIds;
-       
+
+    public void SaveProcessNotice(BpmProcessDeptVo vo)
+    {
+        String processKey = vo.ProcessKey;
+        List<int> notifyTypeIds = vo.NotifyTypeIds;
+
         List<BpmnTemplateVo> templateVos = vo.TemplateVos;
-        if(!templateVos.IsEmpty())
+        if (!templateVos.IsEmpty())
         {
-            if(notifyTypeIds.IsEmpty())
+            if (notifyTypeIds.IsEmpty())
             {
-                List<int> list = templateVos.SelectMany(a=>a.MessageSendTypeList).Select(a=>Convert.ToInt32(a.Id)).Distinct().ToList();
-                notifyTypeIds=list;
+                List<int> list = templateVos.SelectMany(a => a.MessageSendTypeList).Select(a => Convert.ToInt32(a.Id)).Distinct().ToList();
+                notifyTypeIds = list;
             }
-          
-            Frsql.Delete<BpmnTemplate>()
-                .Where(a => a.FormCode == processKey && a.NodeId != null)
-                .ExecuteAffrows();
-            
-            BpmnConfVo confVo=new BpmnConfVo();
-            confVo.FormCode=processKey;
-            confVo.TemplateVos=templateVos;
-            
-            BpmnTemplateService bpmnTemplateService = ServiceProviderUtils.GetService<BpmnTemplateService>();
-            bpmnTemplateService.EditBpmnTemplate(confVo,0);
+
+            BpmnConfVo confVo = new BpmnConfVo();
+            confVo.FormCode = processKey;
+            confVo.TemplateVos = templateVos;
+
+            _bpmnTemplateService.EditBpmnTemplate(confVo, 0);
         }
         if (!notifyTypeIds.IsEmpty())
         {
-            this.Frsql.Delete<BpmProcessNotice>()
-                .Where(a=>a.ProcessKey == processKey)
-                .ExecuteAffrows();
-            foreach (int notifyTypeId in notifyTypeIds)
+            _repository.DeleteByProcessKey(processKey);
+            List<BpmProcessNotice> notices = notifyTypeIds.Select(notifyTypeId => new BpmProcessNotice()
             {
-                this.baseRepo.Insert(new BpmProcessNotice()
-                {
-                    ProcessKey = processKey,
-                    Type = notifyTypeId
-                });
-            }
+                ProcessKey = processKey,
+                Type = notifyTypeId
+            }).ToList();
+            _repository.AddRange(notices);
         }
     }
 
-    public IDictionary<String,List<BpmProcessNotice>> ProcessNoticeMap(List<string> formCodes)
+    public IDictionary<String, List<BpmProcessNotice>> ProcessNoticeMap(List<string> formCodes)
     {
-        List<BpmProcessNotice> bpmProcessNotices = this.baseRepo
-            .Where(a => formCodes.Contains(a.ProcessKey))
-            .ToList();
-        Dictionary<string,List<BpmProcessNotice>> grouped = bpmProcessNotices
+        List<BpmProcessNotice> bpmProcessNotices = _repository.Find(a => formCodes.Contains(a.ProcessKey));
+        Dictionary<string, List<BpmProcessNotice>> grouped = bpmProcessNotices
             .GroupBy(x => x.ProcessKey)
             .ToDictionary(g => g.Key, g => g.ToList());
 

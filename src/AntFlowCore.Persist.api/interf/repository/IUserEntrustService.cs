@@ -1,13 +1,12 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
-using FreeSql;
+using antflowcore.service.interf.repository;
 
 namespace AntFlowCore.Persist.api.interf.repository;
 
-public interface IUserEntrustService : IBaseRepositoryService<UserEntrust>
+public interface IUserEntrustService : IAntFlowRepositoryMix<UserEntrust, IUserEntrustRepository>
 {
     ResultAndPage<Entrust> GetEntrustPageList(PageDto pageDto, Entrust vo, int type);
     void UpdateEntrustList(DataVo dataVo);

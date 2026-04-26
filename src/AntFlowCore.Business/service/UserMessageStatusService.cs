@@ -1,12 +1,14 @@
-﻿using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Business.service;
 
-public class UserMessageStatusService: AFBaseCurdRepositoryService<UserMessageStatus>,IUserMessageStatusService
+public class UserMessageStatusService : IUserMessageStatusService
 {
-    public UserMessageStatusService(IFreeSql freeSql) : base(freeSql)
+    public UserMessageStatusService(IUserMessageStatusRepository repository)
     {
+        _repository = repository;
     }
+
+    public IUserMessageStatusRepository _repository { get; }
 }

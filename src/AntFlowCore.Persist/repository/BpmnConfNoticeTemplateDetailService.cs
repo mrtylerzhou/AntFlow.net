@@ -1,12 +1,14 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
+using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repository;
 
-public class BpmnConfNoticeTemplateDetailService: AFBaseCurdRepositoryService<BpmnConfNoticeTemplateDetail>
+public class BpmnConfNoticeTemplateDetailService : IBpmnConfNoticeTemplateDetailService
 {
-    public BpmnConfNoticeTemplateDetailService(IFreeSql freeSql) : base(freeSql)
+    public BpmnConfNoticeTemplateDetailService(IBpmnConfNoticeTemplateDetailRepository repository)
     {
+        _repository = repository;
     }
-    
+
+    public IBpmnConfNoticeTemplateDetailRepository _repository { get; }
 }

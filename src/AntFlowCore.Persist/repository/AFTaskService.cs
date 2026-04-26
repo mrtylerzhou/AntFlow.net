@@ -8,19 +8,17 @@ using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repository;
 
-public class AFTaskService: AFBaseCurdRepositoryService<BpmAfTask>,IAFTaskService
+public class AFTaskService: IAFTaskService
 {
-    public AFTaskService(IFreeSql freeSql) : base(freeSql)
+    public AFTaskService(IAFTaskRepository repository) 
     {
-     
+        _repository = repository;
     }
     
 
     public List<BpmAfTask> FindTaskByEmpId(String userId)
     {
-        List<BpmAfTask> bpmAfTasks = this.baseRepo
-            .Where(a=>a.Assignee==userId)
-            .ToList();
+        List<BpmAfTask> bpmAfTasks = this._repository.Find(a => a.Assignee == userId);
         return bpmAfTasks;
     }
 
@@ -52,10 +50,12 @@ public class AFTaskService: AFBaseCurdRepositoryService<BpmAfTask>,IAFTaskServic
                     RunInfoId = bpmAfTask.ProcInstId,
                 };
                 BpmFlowrunEntrustService bpmFlowrunEntrustService = ServiceProviderUtils.GetService<BpmFlowrunEntrustService>();
-                bpmFlowrunEntrustService.baseRepo.Insert(entrust);
+                bpmFlowrunEntrustService._repository.Add(entrust);
             }
         }
 
-        this.baseRepo.Insert(tasks);
+        this._repository.AddRange(tasks);
     }
+
+    public IAFTaskRepository _repository { get; }
 }

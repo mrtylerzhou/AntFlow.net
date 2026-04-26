@@ -1,5 +1,4 @@
-﻿using AntFlowCore.Abstraction.Orm.repository;
-using AntFlowCore.Base.entity;
+﻿using AntFlowCore.Base.entity;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
@@ -8,10 +7,13 @@ using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Business.service;
 
-public class BpmnTemplateService : AFBaseCurdRepositoryService<BpmnTemplate>, IBpmnTemplateService
+public class BpmnTemplateService : IBpmnTemplateService
 {
-    public BpmnTemplateService(IFreeSql freeSql) : base(freeSql)
+    public IBpmnTemplateRepository _repository { get; }
+
+    public BpmnTemplateService(IBpmnTemplateRepository repository)
     {
+        _repository = repository;
     }
 
     public void EditBpmnTemplate(BpmnConfVo bpmnConfVo, long confId)
@@ -23,11 +25,7 @@ public class BpmnTemplateService : AFBaseCurdRepositoryService<BpmnTemplate>, IB
         }
 
         List<BpmnTemplate> bpmnTemplateList = MapVos(templateVos, confId, bpmnConfVo.FormCode);
-        int executeAffrows = Frsql.Insert(bpmnTemplateList).ExecuteAffrows();
-        if (executeAffrows <= 0)
-        {
-            throw new AFBizException("t_bpmn_template插入失败");
-        }
+        _repository.AddRange(bpmnTemplateList);
     }
 
     public void EditBpmnTemplate(BpmnNodeVo bpmnNodeVo)
@@ -39,11 +37,7 @@ public class BpmnTemplateService : AFBaseCurdRepositoryService<BpmnTemplate>, IB
         }
 
         List<BpmnTemplate> bpmnTemplates = MapVos(templateVos, bpmnNodeVo.ConfId, bpmnNodeVo.FormCode);
-        int executeAffrows = Frsql.Insert(bpmnTemplates).ExecuteAffrows();
-        if (executeAffrows <= 0)
-        {
-            throw new AFBizException("t_bpmn_template插入失败");
-        }
+        _repository.AddRange(bpmnTemplates);
     }
 
     private List<BpmnTemplate> MapVos(List<BpmnTemplateVo> templateVos, long confId, string formCode)

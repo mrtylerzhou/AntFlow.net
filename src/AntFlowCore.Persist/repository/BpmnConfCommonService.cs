@@ -25,7 +25,7 @@ public class BpmnConfCommonService : IBpmnConfCommonService
 {
     private readonly IBpmnConfBizService _bpmnConfBizService;
     private readonly IBpmnConfService _bpmnConfService;
-    private readonly BpmnNodeService _nodeService;
+    private readonly IBpmnNodeService _nodeService;
     private readonly IBpmnStartFormatFactory _bpmnStartFormatFactory;
     private readonly IBpmnPersonnelFormat _personnelFormat;
     private readonly IBpmnDeduplicationFormat _deduplicationFormat;
@@ -36,18 +36,21 @@ public class BpmnConfCommonService : IBpmnConfCommonService
     private readonly IBpmnCreateAndStartService _bpmnCreateAndStartService;
     private readonly IBpmVerifyInfoBizService _bpmVerifyInfoBizService;
     private readonly IBpmVariableService _bpmVariableService;
-    private readonly BpmFlowrunEntrustService _flowrunEntrustService;
+    private readonly IBpmFlowrunEntrustService _flowrunEntrustService;
     private readonly IFormFactory _formFactory;
-    private readonly BpmBusinessProcessService _bpmBusinessProcessService;
+    private readonly IBpmBusinessProcessService _bpmBusinessProcessService;
     private readonly IBpmvariableBizService _bpmvariableBizService;
-    private readonly AFTaskService _afTaskService;
-    private readonly IFreeSql _freeSql;
+    private readonly IAFTaskService _afTaskService;
+    private readonly IBpmnConfRepository _bpmnConfRepository;
+    private readonly IBpmVariableRepository _bpmVariableRepository;
+    private readonly IBpmnNodeRepository _bpmnNodeRepository;
+    private readonly IAFTaskRepository _afTaskRepository;
     private readonly ILogger<BpmnConfCommonService> _logger;
 
     public BpmnConfCommonService(
         IBpmnConfBizService bpmnConfBizService,
         IBpmnConfService bpmnConfService,
-        BpmnNodeService nodeService,
+        IBpmnNodeService nodeService,
         IBpmnStartFormatFactory bpmnStartFormatFactory,
         IBpmnPersonnelFormat personnelFormat,
         IBpmnDeduplicationFormat deduplicationFormat,
@@ -58,12 +61,15 @@ public class BpmnConfCommonService : IBpmnConfCommonService
         IBpmnCreateAndStartService bpmnCreateAndStartService,
         IBpmVerifyInfoBizService bpmVerifyInfoBizService,
         IBpmVariableService bpmVariableService,
-        BpmFlowrunEntrustService flowrunEntrustService,
+        IBpmFlowrunEntrustService flowrunEntrustService,
         IFormFactory formFactory,
-        BpmBusinessProcessService bpmBusinessProcessService,
+        IBpmBusinessProcessService bpmBusinessProcessService,
         IBpmvariableBizService bpmvariableBizService,
-        AFTaskService afTaskService,
-        IFreeSql freeSql,
+        IAFTaskService afTaskService,
+        IBpmnConfRepository bpmnConfRepository,
+        IBpmVariableRepository bpmVariableRepository,
+        IBpmnNodeRepository bpmnNodeRepository,
+        IAFTaskRepository afTaskRepository,
         ILogger<BpmnConfCommonService> logger)
     {
         _bpmnConfBizService = bpmnConfBizService;
@@ -84,17 +90,16 @@ public class BpmnConfCommonService : IBpmnConfCommonService
         _bpmBusinessProcessService = bpmBusinessProcessService;
         _bpmvariableBizService = bpmvariableBizService;
         _afTaskService = afTaskService;
-        _freeSql = freeSql;
+        _bpmnConfRepository = bpmnConfRepository;
+        _bpmVariableRepository = bpmVariableRepository;
+        _bpmnNodeRepository = bpmnNodeRepository;
+        _afTaskRepository = afTaskRepository;
         _logger = logger;
     }
 
     public BpmnConf GetBpmnConfByFormCode(String formCode)
     {
-        BpmnConf bpmnConf = _freeSql
-            .Select<BpmnConf>()
-            .Where(a => a.FormCode == formCode && a.EffectiveStatus == 1)
-            .ToOne() ?? new BpmnConf();
-        return bpmnConf;
+        return _bpmnConfRepository.GetBpmnConfByFormCode(formCode);
     }
 
     public void StartProcess(String bpmnCode, BpmnStartConditionsVo bpmnStartConditions)
@@ -479,7 +484,7 @@ public class BpmnConfCommonService : IBpmnConfCommonService
         }
 
      
-        BpmVariable? bpmnVariable = _bpmVariableService.baseRepo.Where(a => a.ProcessNum == processNumber).First();
+        BpmVariable? bpmnVariable = _bpmVariableRepository.FindByProcessNum(processNumber);
            
 
         if (bpmnVariable == null || string.IsNullOrEmpty(bpmnVariable.ProcessStartConditions))
@@ -499,11 +504,7 @@ public class BpmnConfCommonService : IBpmnConfCommonService
 
     public List<BpmnConf> GetBpmnConfByFormCodeBatch(List<string> formCodes)
     {
-        List<BpmnConf> bpmnConfs = _bpmnConfService
-            .baseRepo
-            .Where(a=>formCodes.Contains(a.FormCode)&&a.EffectiveStatus==1)
-            .ToList();
-        return bpmnConfs;
+        return _bpmnConfRepository.GetBpmnConfByFormCodeBatch(formCodes);
     }
 
     private void ReTreatNodeAssignee(List<BpmnNodeVo> nodeVos,string processNumber)
@@ -514,11 +515,8 @@ public class BpmnConfCommonService : IBpmnConfCommonService
         }
 
         List<BpmFlowrunEntrust> bpmFlowrunEntrusts = _flowrunEntrustService
-            .Frsql
-            .Select<BpmFlowrunEntrust, BpmBusinessProcess>()
-            .InnerJoin((a, b) => a.RunInfoId == b.ProcInstId)
-            .Where((a, b) => b.BusinessNumber == processNumber)
-            .ToList<BpmFlowrunEntrust>();
+            ._repository
+            .GetEntrustsByProcessNumber(processNumber);
          
          Dictionary<string, List<BpmFlowrunEntrust>> nodeId2entrustDict= bpmFlowrunEntrusts
              .Where(a=>!string.IsNullOrEmpty(a.NodeId))
@@ -623,12 +621,12 @@ public class BpmnConfCommonService : IBpmnConfCommonService
         String processNumber = jsonObject["processNumber"]?.GetValue<string>();
         var nodeId = jsonObject["nodeId"]?.GetValue <long>();
         List<BaseIdTranStruVo> userList = new List<BaseIdTranStruVo>();
-        BpmnNode bpmnNode = _nodeService.baseRepo.Where(a => a.Id == nodeId).ToOne();
+        BpmnNode bpmnNode = _bpmnNodeRepository.FirstOrDefault(a => a.Id == nodeId);
         if (bpmnNode == null)
         {
             return userList;
         }
-        BpmVariable bpmnVariable=_bpmVariableService.baseRepo.Where(a=>a.ProcessNum==processNumber).ToOne();
+        BpmVariable bpmnVariable = _bpmVariableRepository.FindByProcessNum(processNumber);
         BpmnConfVo detail = _bpmnConfBizService.Detail(bpmnVariable.BpmnCode);
         //当前节点
         String currentNodeIdStr = _bpmVerifyInfoBizService.FindCurrentNodeIds(processNumber);
@@ -652,8 +650,8 @@ public class BpmnConfCommonService : IBpmnConfCommonService
                 return userList;
             }
 
-            List<BpmAfTask> list = _afTaskService.baseRepo
-                .Where(a => a.ProcInstId == bpmBusinessProcess.ProcInstId && a.TaskDefKey == elementList[0]).ToList();
+            List<BpmAfTask> list = _afTaskRepository
+                .Find(a => a.ProcInstId == bpmBusinessProcess.ProcInstId && a.TaskDefKey == elementList[0]);
 
            foreach (BpmAfTask bpmAfTask in list)
            {

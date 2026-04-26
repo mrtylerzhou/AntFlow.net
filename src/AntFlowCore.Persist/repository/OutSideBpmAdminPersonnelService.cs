@@ -1,20 +1,21 @@
 using System.Linq.Expressions;
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repository;
 
-public class OutSideBpmAdminPersonnelService: AFBaseCurdRepositoryService<OutSideBpmAdminPersonnel>,IOutSideBpmAdminPersonnelService
+public class OutSideBpmAdminPersonnelService : IOutSideBpmAdminPersonnelService
 {
-    public OutSideBpmAdminPersonnelService(IFreeSql freeSql) : base(freeSql)
+    public OutSideBpmAdminPersonnelService(IOutSideBpmAdminPersonnelRepository repository)
     {
+        _repository = repository;
     }
+
+    public IOutSideBpmAdminPersonnelRepository _repository { get; }
 
     public List<long> GetBusinessPartyIdByEmployeeId(String employeeId, params string[] permCodes)
     {
-
         List<int> types = new List<int>();
         if(permCodes.Length>0){
             foreach (string permCode in permCodes)
@@ -35,11 +36,11 @@ public class OutSideBpmAdminPersonnelService: AFBaseCurdRepositoryService<OutSid
             expression = expression.And(x=>types.Contains(x.Type));
         }
 
-        List<long> businessPartyIds = this
-            .baseRepo
-            .Where(expression)
+        List<long> businessPartyIds = _repository
+            .Find(expression)
+            .Select(x => x.BusinessPartyId)
             .Distinct()
-            .ToList(x => x.BusinessPartyId);
+            .ToList();
         
         return businessPartyIds;
     }

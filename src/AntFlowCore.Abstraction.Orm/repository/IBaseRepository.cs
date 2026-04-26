@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace AntFlowCore.Abstraction.repository;
+namespace AntFlowCore.Abstraction.Orm.repository;
 
 /// <summary>
 /// 基础仓储接口

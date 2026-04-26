@@ -1,6 +1,4 @@
-﻿using System.Linq.Expressions;
-using AntFlowCore.Abstraction.Orm.repository;
-using AntFlowCore.Abstraction.service;
+﻿using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.util;
@@ -9,28 +7,28 @@ using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repository;
 
-public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>,IBpmVerifyInfoService
+public class BpmVerifyInfoService : IBpmVerifyInfoService
 {
-    private readonly BpmFlowrunEntrustService _bpmFlowrunEntrustService;
-    private readonly BpmBusinessProcessService _bpmBusinessProcessService;
+    private readonly IBpmFlowrunEntrustService _bpmFlowrunEntrustService;
+    private readonly IBpmBusinessProcessService _bpmBusinessProcessService;
     private readonly AFTaskService _afTaskService;
     private readonly IProcessConstantsService _processConstantsService;
     private readonly IBpmVariableService _bpmVariableService;
     private readonly IBpmVariableSignUpService _bpmVariableSignUpService;
     private readonly IBpmnEmployeeInfoProviderService _bpmnEmployeeInfoProviderService;
-    private readonly BpmnNodeService _nodeService;
+    private readonly IBpmnNodeService _nodeService;
 
     public BpmVerifyInfoService(
-        BpmFlowrunEntrustService bpmFlowrunEntrustService,
-        BpmBusinessProcessService bpmBusinessProcessService,
+        IBpmFlowrunEntrustService bpmFlowrunEntrustService,
+        IBpmBusinessProcessService bpmBusinessProcessService,
         AFTaskService afTaskService,
         IProcessConstantsService processConstantsService,
         IBpmVariableService bpmVariableService,
         IBpmVariableSignUpService bpmVariableSignUpService,
         IBpmnEmployeeInfoProviderService bpmnEmployeeInfoProviderService,
-        BpmnNodeService nodeService,
-        IFreeSql freeSql
-    ) : base(freeSql)
+        IBpmnNodeService nodeService,
+        IBpmVerifyInfoRepository repository
+    )
     {
         _bpmFlowrunEntrustService = bpmFlowrunEntrustService;
         _bpmBusinessProcessService = bpmBusinessProcessService;
@@ -40,7 +38,10 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>,IB
         _bpmVariableSignUpService = bpmVariableSignUpService;
         _bpmnEmployeeInfoProviderService = bpmnEmployeeInfoProviderService;
         _nodeService = nodeService;
+        _repository = repository;
     }
+
+    public IBpmVerifyInfoRepository _repository { get; }
 
     public void AddVerifyInfo(BpmVerifyInfo verifyInfo)
     {
@@ -49,15 +50,15 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>,IB
         {
             verifyInfo.OriginalId = entrustByTaskId.Original;
         }
-        this.baseRepo.Insert(verifyInfo);
+        _repository.Add(verifyInfo);
     }
 
     public string FindCurrentNodeIds(string processNumber)
     {
         // 查询业务流程信息
         BpmBusinessProcess bpmBusinessProcess =
-            _bpmBusinessProcessService.baseRepo.Where(a => a.BusinessNumber == processNumber).First();
-        
+            _bpmBusinessProcessService._repository.FirstOrDefault(a => a.BusinessNumber == processNumber);
+
         if (bpmBusinessProcess == null)
         {
             return string.Empty;
@@ -91,8 +92,7 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>,IB
             return string.Empty;
         }
 
-
-        List<BpmnNode> bpmnNodes = _nodeService.baseRepo.Where(a => bpmnNodeIds.Contains(a.Id.ToString())).ToList();
+        List<BpmnNode> bpmnNodes = _nodeService._repository.Find(a => bpmnNodeIds.Contains(a.Id.ToString()));
         if (bpmnNodes == null || bpmnNodes.Count == 0)
         {
             return string.Empty;
@@ -105,16 +105,15 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>,IB
     public List<BpmVerifyInfoVo> FindTaskInfo(String procInstId)
     {
         List<BpmVerifyInfoVo> currentTasks = _afTaskService
-            .baseRepo.Where(a => a.ProcInstId == procInstId)
-            .OrderByDescending(a=>a.CreateTime)
-            .ToList()
+            ._repository.Find(a => a.ProcInstId == procInstId)
+            .OrderByDescending(a => a.CreateTime)
             .Select(t => new BpmVerifyInfoVo()
             {
                 Id = t.Id,
                 TaskName = t.Name,
                 VerifyUserId = t.Assignee,
                 VerifyUserName = t.AssigneeName,
-                VerifyStatusName = "处理中" ,
+                VerifyStatusName = "处理中",
                 ElementId = t.TaskDefKey,
                 VerifyDesc = "",
                 VerifyDate = null,
@@ -122,6 +121,7 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>,IB
         ).ToList();
         return currentTasks;
     }
+
     public List<BpmVerifyInfoVo> FindTaskInfo(BpmBusinessProcess bpmBusinessProcess)
     {
         string procInstId = bpmBusinessProcess.ProcInstId;
@@ -138,7 +138,7 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>,IB
 
         if (isOutSideProcess == 1)
         {
-            stringStringMap = tasks.ToDictionary(t => t.VerifyUserId, t => t.VerifyUserName,StringComparer.Ordinal);
+            stringStringMap = tasks.ToDictionary(t => t.VerifyUserId, t => t.VerifyUserName, StringComparer.Ordinal);
         }
         else
         {
@@ -161,7 +161,7 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>,IB
             string taskName = string.Empty;
             List<string> strs = tasks.Select(t => t.TaskName).Where(t => t != null).Distinct().ToList();
 
-            if (strs.Count>1)
+            if (strs.Count > 1)
             {
                 taskName = string.Join("||", strs);
             }
@@ -170,18 +170,16 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>,IB
                 taskName = strs.FirstOrDefault();
             }
 
-            string elementId=string.Empty;
+            string elementId = string.Empty;
             List<string> elementIdList = tasks.Select(t => t.ElementId).Distinct().ToList();
             if (elementIdList.Count > 1)
             {
-                elementId= string.Join(",",elementIdList );
+                elementId = string.Join(",", elementIdList);
             }
             else
             {
-                //本段代码包在(tasks.Count > 1,至少有一个元素
-                elementId = elementIdList.FirstOrDefault()??string.Empty;
+                elementId = elementIdList.FirstOrDefault() ?? string.Empty;
             }
-          
 
             taskInfors.Add(new BpmVerifyInfoVo
             {
@@ -201,65 +199,16 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>,IB
         return taskInfors;
     }
 
-    public List<BpmVerifyInfoVo> VerifyInfoList(String processNumber,String procInstId)
+    public List<BpmVerifyInfoVo> VerifyInfoList(String processNumber, String procInstId)
     {
         BpmVerifyInfoVo vo = new BpmVerifyInfoVo()
         {
             ProcessCode = processNumber
         };
-        List<BpmVerifyInfoVo> bpmVerifyInfoVos = GetVerifyInfo(vo);
+        List<BpmVerifyInfoVo> bpmVerifyInfoVos = _repository.GetVerifyInfo(vo);
         return GetBpmVerifyInfoVoList(bpmVerifyInfoVos, procInstId);
     }
 
-    private List<BpmVerifyInfoVo> GetVerifyInfo(BpmVerifyInfoVo vo)
-    {
-       
-        Expression<Func<BpmVerifyInfo, bool>> expression = a => 1==1;
-        if (!string.IsNullOrEmpty(vo.ProcessCode))
-        {
-            expression = expression.And(a => a.ProcessCode == vo.ProcessCode);
-        }
-
-        if (vo.ProcessCodeList != null && vo.ProcessCodeList.Count > 0)
-        {
-            expression.And(a => vo.ProcessCodeList.Contains(a.ProcessCode));
-        }
-
-        if (!string.IsNullOrEmpty(vo.BusinessId))
-        {
-            expression = expression.And(a => a.BusinessId == vo.BusinessId);
-        }
-
-
-        List<BpmVerifyInfoVo> bpmVerifyInfoVos = baseRepo
-            .Where(expression)
-            .ToList<BpmVerifyInfoVo>(w => new BpmVerifyInfoVo
-            {
-                Id = w.Id.ToString(),
-                VerifyUserId = w.VerifyUserId,
-                VerifyUserName = w.VerifyUserName,
-                TaskName = w.TaskName,
-                VerifyStatus = w.VerifyStatus,
-                VerifyStatusName = 
-                    w.VerifyStatus == 1 ? "提交" :
-                    w.VerifyStatus == 2 ? "同意" :
-                    w.VerifyStatus == 3 ? "不同意" :
-                    w.VerifyStatus == 4 ? "撤回" :
-                    w.VerifyStatus == 5 ? "作废" :
-                    w.VerifyStatus == 6 ? "终止" :
-                    w.VerifyStatus == 8 ? "退回修改" :
-                    w.VerifyStatus == 9 ? "加批" :
-                    w.VerifyStatus == 10 ? "转交" :
-                    "",
-                VerifyDate = w.VerifyDate,
-                VerifyDesc = w.VerifyDesc,
-                OriginalId = w.OriginalId,
-                ElementId = w.TaskDefKey
-            }).OrderByDescending(a => a.VerifyDate)
-            .ToList();
-        return bpmVerifyInfoVos;
-    }
-    
     public List<BpmVerifyInfoVo> GetBpmVerifyInfoVoList(List<BpmVerifyInfoVo> list, string procInstId)
     {
         var infoVoList = new List<BpmVerifyInfoVo>();
@@ -271,9 +220,8 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>,IB
                 if (!string.IsNullOrEmpty(procInstId))
                 {
                     List<BpmFlowrunEntrust> bpmFlowrunEntrusts = _bpmFlowrunEntrustService
-                        .baseRepo
-                        .Where(a=>a.Original==o.OriginalId&&a.RunInfoId==o.RunInfoId)
-                        .ToList();
+                        ._repository
+                        .Find(a => a.Original == o.OriginalId && a.RunInfoId == o.RunInfoId);
 
                     if (bpmFlowrunEntrusts != null && bpmFlowrunEntrusts.Any())
                     {
@@ -296,5 +244,4 @@ public class BpmVerifyInfoService: AFBaseCurdRepositoryService<BpmVerifyInfo>,IB
 
         return infoVoList;
     }
-
 }

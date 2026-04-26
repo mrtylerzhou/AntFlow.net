@@ -1,26 +1,27 @@
-﻿
-using AntFlowCore.Abstraction.Orm.repository;
-using AntFlowCore.Base.entity;
+﻿using AntFlowCore.Base.entity;
 using AntFlowCore.Base.util;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repository;
 
-public class BpmFlowrunEntrustService : AFBaseCurdRepositoryService<BpmFlowrunEntrust>,IBpmFlowrunEntrustService
+public class BpmFlowrunEntrustService : IBpmFlowrunEntrustService
 {
-    public BpmFlowrunEntrustService(IFreeSql freeSql) : base(freeSql)
+    public BpmFlowrunEntrustService(IBpmFlowrunEntrustRepository repository)
     {
+        _repository = repository;
     }
+
+    public IBpmFlowrunEntrustRepository _repository { get; }
 
     public BpmFlowrunEntrust GetEntrustByTaskId(string actual, string procDefId, string taskId)
     {
-        BpmFlowrunEntrust bpmFlowrunEntrust = this.baseRepo.Where(a =>
-            a.Actual.Equals(actual) && a.RunInfoId.Equals(procDefId) && a.RunTaskId.Equals(taskId)).First();
+        BpmFlowrunEntrust bpmFlowrunEntrust = _repository.FirstOrDefault(a =>
+            a.Actual.Equals(actual) && a.RunInfoId.Equals(procDefId) && a.RunTaskId.Equals(taskId));
         return bpmFlowrunEntrust;
     }
 
     public void AddFlowrunEntrust(String actual, String actualName, String original, String originalName,
-        String runtaskid, int type, String processInstanceId, String processKey,string nodeId,int actionType)
+        String runtaskid, int type, String processInstanceId, String processKey, string nodeId, int actionType)
     {
         var entrust = new BpmFlowrunEntrust
         {
@@ -37,6 +38,6 @@ public class BpmFlowrunEntrustService : AFBaseCurdRepositoryService<BpmFlowrunEn
             NodeId = nodeId,
             ActionType = actionType,
         };
-        this.baseRepo.Insert(entrust);
+        _repository.Add(entrust);
     }
 }

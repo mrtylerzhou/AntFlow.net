@@ -1,10 +1,9 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
-using FreeSql;
+using antflowcore.service.interf.repository;
 
 namespace AntFlowCore.Persist.api.interf.repository;
 
-public interface IBpmProcessNameRelevancyService : IBaseRepositoryService<BpmProcessNameRelevancy>
+public interface IBpmProcessNameRelevancyService : IAntFlowRepositoryMix<BpmProcessNameRelevancy, IBpmProcessNameRelevancyRepository>
 {
     BpmProcessNameRelevancy? FindProcessNameRelevancy(string formCode);
     bool SelectCount(string formCode);

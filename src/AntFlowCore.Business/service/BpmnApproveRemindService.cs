@@ -1,4 +1,3 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
@@ -6,10 +5,13 @@ using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Business.service;
 
-public class BpmnApproveRemindService: AFBaseCurdRepositoryService<BpmnApproveRemind>,IBpmnApproveRemindService
+public class BpmnApproveRemindService: IBpmnApproveRemindService
 {
-    public BpmnApproveRemindService(IFreeSql freeSql) : base(freeSql)
+    public IBpmnApproveRemindRepository _repository { get; }
+
+    public BpmnApproveRemindService(IBpmnApproveRemindRepository repository)
     {
+        _repository = repository;
     }
     public void EditBpmnApproveRemind(BpmnNodeVo bpmnNodeVo) {
         BpmnApproveRemindVo o = bpmnNodeVo.ApproveRemindVo;
@@ -26,6 +28,6 @@ public class BpmnApproveRemindService: AFBaseCurdRepositoryService<BpmnApproveRe
             bpmnApproveRemind.TemplateId=null;
         }
         bpmnApproveRemind.CreateUser=(SecurityUtils.GetLogInEmpNameSafe());
-        baseRepo.Update(bpmnApproveRemind);
+        _repository.Update(bpmnApproveRemind);
     }
 }

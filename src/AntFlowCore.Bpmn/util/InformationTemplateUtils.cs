@@ -19,8 +19,8 @@ public class InformationTemplateUtils
         public static InformationTemplateVo TranslateInformationTemplate(InformationTemplateVo informationTemplateVo)
         {
             IInformationTemplateService informationTemplateService = ServiceProviderUtils.GetService<IInformationTemplateService>();
-            InformationTemplate informationTemplate = informationTemplateService.baseRepo
-                .Where(a => a.Id == informationTemplateVo.Id).ToOne() ?? new InformationTemplate();
+            InformationTemplate informationTemplate = informationTemplateService._repository.GetQueryable()
+                .Where(a => a.Id == informationTemplateVo.Id).FirstOrDefault() ?? new InformationTemplate();
 
             return new InformationTemplateVo
             {

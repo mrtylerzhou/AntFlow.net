@@ -643,9 +643,7 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
     public TaskMgmtVO ProcessStatistics()
     {
         string logInEmpIdStr = SecurityUtils.GetLogInEmpIdStr();
-        List<BpmAfTask> taskList = _taskService.baseRepo
-            .Where(a=>a.Assignee==logInEmpIdStr)
-            .ToList();
+        List<BpmAfTask> taskList = _taskService._repository.Find(a => a.Assignee == logInEmpIdStr);
         int doneTodayProcess = _afTaskInstService.DoneTodayProcess(logInEmpIdStr);
         int doneCreateProcess = _afTaskInstService.DoneCreateProcess(logInEmpIdStr);
         TaskMgmtVO taskMgmtVo = new TaskMgmtVO()

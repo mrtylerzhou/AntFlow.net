@@ -106,7 +106,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
 
     public void OnQueryData(UDLFApplyVo vo)
     {
-        LFMain lfMain = _mainService.baseRepo.Where(a => a.Id == long.Parse(vo.BusinessId)).First();
+        LFMain lfMain = _mainService._repository.FirstOrDefault(a => a.Id == long.Parse(vo.BusinessId));
         if (lfMain == null)
         {
             _logger.LogError("can not get lowcode from data by specified Id:{0}", vo.BusinessId);
@@ -123,7 +123,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
             allFieldConfMap[confId] = lfFormdataFieldMap;
         }
 
-        List<LFMainField> lfMainFields = _lfMainFieldService.baseRepo.Where(x => x.MainId == mainId).ToList();
+        List<LFMainField> lfMainFields = _lfMainFieldService._repository.Find(x => x.MainId == mainId);
         if (lfMainFields == null || !lfMainFields.Any())
         {
             throw new AFBizException($"lowcode form with formcode:{formCode}, confid:{confId} has no formdata");
@@ -240,7 +240,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         vo.LfFields = fieldVoMap;
 
         List<BpmnConfLfFormdata> bpmnConfLfFormdataList =
-            _lfformdataService.baseRepo.Where(x => x.BpmnConfId == confId).ToList();
+            _lfformdataService._repository.Find(x => x.BpmnConfId == confId);
         if (bpmnConfLfFormdataList == null || !bpmnConfLfFormdataList.Any())
         {
             throw new AFBizException($"can not get lowcode flow formdata by confId:{confId}");
@@ -279,7 +279,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
             CreateUser = SecurityUtils.GetLogInEmpName(),
             TenantId = MultiTenantUtil.GetCurrentTenantId(),
         };
-        _mainService.baseRepo.Insert(main);
+        _mainService._repository.Add(main);
         long mainId = main.Id;
 
         if (!allFieldConfMap.TryGetValue(confId, out var lfFormdataFieldMap) || lfFormdataFieldMap == null || lfFormdataFieldMap.Count == 0)
@@ -294,7 +294,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         }
 
         var mainFields = LFMainField.ParseFromMap(lfFields, fieldConfMap, mainId,formCode);
-        _lfMainFieldService.baseRepo.Insert(mainFields);
+        _lfMainFieldService._repository.AddRange(mainFields);
 
         vo.BusinessId = mainId.ToString();
         vo.ProcessDigest = vo.Remark;
@@ -324,7 +324,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
             throw new AFBizException("form data does not contain any field");
         }
 
-        var lfMain = _mainService.baseRepo.Where(a => a.Id == long.Parse(vo.BusinessId)).First();
+        var lfMain = _mainService._repository.FirstOrDefault(a => a.Id == long.Parse(vo.BusinessId));
         if (lfMain == null)
         {
             _logger.LogError($"can not get lowcode from data by specified Id:{vo.BusinessId}");
@@ -335,7 +335,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         string formCode = vo.FormCode;
         long confId = vo.BpmnConfVo.Id;
 
-        List<LFMainField> lfMainFields = _lfMainFieldService.baseRepo.Where(a=>a.MainId==mainId).ToList();
+        List<LFMainField> lfMainFields = _lfMainFieldService._repository.Find(a=>a.MainId==mainId);
         if (lfMainFields == null || lfMainFields.Count == 0)
         {
             throw new AFBizException($"lowcode form with formcode:{formCode}, confId:{confId} has no formdata");
@@ -361,7 +361,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
                     mainFields.RemoveAll(mainField=>lfMainFields.Any(a=>a.FieldId==mainField.FieldId));
                     if(mainFields.Any())
                     {
-                        _lfMainFieldService.baseRepo.Insert(mainFields);
+                        _lfMainFieldService._repository.AddRange(mainFields);
                     }
                 }
             }
@@ -386,7 +386,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
                 field.FieldValue = fValue;
             }
         }
-        _lfMainFieldService.baseRepo.Update(lfMainFields);
+        _lfMainFieldService._repository.Update(lfMainFields);
         IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
         foreach (ILFFormOperationAdaptor o in lfFormOperationAdaptors)
         {

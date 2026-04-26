@@ -1,39 +1,36 @@
-﻿using AntFlowCore.Abstraction.Orm.repository;
-using AntFlowCore.Base.entity;
+﻿using AntFlowCore.Base.entity;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repository;
 
-public class BpmProcessNameRelevancyService: AFBaseCurdRepositoryService<BpmProcessNameRelevancy>,IBpmProcessNameRelevancyService
+public class BpmProcessNameRelevancyService : IBpmProcessNameRelevancyService
 {
-    public BpmProcessNameRelevancyService(IFreeSql freeSql) : base(freeSql)
+    public BpmProcessNameRelevancyService(IBpmProcessNameRelevancyRepository repository)
     {
+        _repository = repository;
     }
-    public BpmProcessNameRelevancy FindProcessNameRelevancy(String formCode) {
-        BpmProcessNameRelevancy bpmProcessNameRelevancy = baseRepo.Where(a=>a.ProcessKey.Equals(formCode)&&a.IsDel==0).ToOne();
+
+    public IBpmProcessNameRelevancyRepository _repository { get; }
+
+    public BpmProcessNameRelevancy FindProcessNameRelevancy(string formCode)
+    {
+        BpmProcessNameRelevancy bpmProcessNameRelevancy = _repository.FirstOrDefault(a => a.ProcessKey.Equals(formCode) && a.IsDel == 0);
         return bpmProcessNameRelevancy;
     }
 
     public bool SelectCount(string formCode)
     {
-        long count = this
-            .baseRepo.
-            Where(a=>a.ProcessKey==formCode&&a.IsDel==0)
-            .Count();
+        long count = _repository.Count(a => a.ProcessKey == formCode && a.IsDel == 0);
         return count > 0;
     }
 
     public void Add(BpmProcessNameRelevancy processNameRelevancy)
     {
-        this.baseRepo.Insert(processNameRelevancy);
+        _repository.Add(processNameRelevancy);
     }
 
     public List<string> ProcessKeyList(long id)
     {
-        List<string> processK = this
-            .baseRepo
-            .Where(a=>a.ProcessNameId==id&&a.IsDel==0)
-            .ToList(a=>a.ProcessKey);
-        return processK;
+        return _repository.GetProcessKeysByProcessNameId(id);
     }
 }

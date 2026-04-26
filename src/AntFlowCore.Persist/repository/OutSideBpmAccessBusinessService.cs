@@ -1,5 +1,4 @@
-﻿using AntFlowCore.Abstraction.Orm.repository;
-using AntFlowCore.Abstraction.service;
+﻿using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Abstraction.service.repository;
 using AntFlowCore.Base.constant;
@@ -14,21 +13,38 @@ using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repository;
 
-public class OutSideBpmAccessBusinessService : AFBaseCurdRepositoryService<OutSideBpmAccessBusiness>,IOutSideBpmAccessBusinessService
+public class OutSideBpmAccessBusinessService : IOutSideBpmAccessBusinessService
 {
-    public OutSideBpmAccessBusinessService(IFreeSql freeSql) : base(freeSql)
+    private readonly IBpmnConfRepository _bpmnConfRepository;
+    private readonly IButtonOperationService _buttonOperationService;
+    private readonly IBpmVerifyInfoBizService _bpmVerifyInfoBizService;
+    private readonly IBpmnEmployeeInfoProviderService _bpmnEmployeeInfoProviderService;
+
+    public OutSideBpmAccessBusinessService(
+        IOutSideBpmAccessBusinessRepository repository,
+        IBpmnConfRepository bpmnConfRepository,
+        IButtonOperationService buttonOperationService,
+        IBpmVerifyInfoBizService bpmVerifyInfoBizService,
+        IBpmnEmployeeInfoProviderService bpmnEmployeeInfoProviderService)
     {
+        _repository = repository;
+        _bpmnConfRepository = bpmnConfRepository;
+        _buttonOperationService = buttonOperationService;
+        _bpmVerifyInfoBizService = bpmVerifyInfoBizService;
+        _bpmnEmployeeInfoProviderService = bpmnEmployeeInfoProviderService;
     }
+
+    public IOutSideBpmAccessBusinessRepository _repository { get; }
 
     public void UpdateById(OutSideBpmAccessBusiness outSideBpmAccessBusiness)
     {
-        this.baseRepo.Update(outSideBpmAccessBusiness);
+        _repository.Update(outSideBpmAccessBusiness);
     }
 
     public OutSideBpmAccessRespVo AccessBusinessStart(OutSideBpmAccessBusinessVo vo)
     {
-        OutSideBpmAccessBusiness outSideBpmAccessBusiness = this.baseRepo
-            .Where(a => a.Id == vo.Id).ToOne();
+        OutSideBpmAccessBusiness outSideBpmAccessBusiness = _repository
+            .FirstOrDefault(a => a.Id == vo.Id);
 
         if (outSideBpmAccessBusiness != null)
         {
@@ -41,12 +57,8 @@ public class OutSideBpmAccessBusinessService : AFBaseCurdRepositoryService<OutSi
         else
         {
             var formCode = vo.FormCode;
-            IBpmnConfService bpmnConfService = ServiceProviderUtils.GetService<IBpmnConfService>();
-            BpmnConf effectiveConfByFormCode = bpmnConfService
-                .baseRepo
-                .Where(a => a.FormCode == formCode && a.EffectiveStatus == 1 && a.IsDel == 0)
-                .ToOne();
-
+            BpmnConf effectiveConfByFormCode = _bpmnConfRepository
+                .FirstOrDefault(a => a.FormCode == formCode && a.EffectiveStatus == 1 && a.IsDel == 0);
 
             if (effectiveConfByFormCode == null)
             {
@@ -72,7 +84,7 @@ public class OutSideBpmAccessBusinessService : AFBaseCurdRepositoryService<OutSi
             outSideBpmAccessBusiness.UpdateUser = empId;
             outSideBpmAccessBusiness.UpdateTime = now;
 
-            this.baseRepo.Insert(outSideBpmAccessBusiness);
+            _repository.Add(outSideBpmAccessBusiness);
         }
 
         // 组装业务数据对象
@@ -100,11 +112,10 @@ public class OutSideBpmAccessBusinessService : AFBaseCurdRepositoryService<OutSi
         businessDataVo.EmpId = SecurityUtils.GetLogInEmpIdSafe();
         businessDataVo.SubmitUser = SecurityUtils.GetLogInEmpNameSafe();
         businessDataVo.EmbedNodes = vo.EmbedNodes;
-        IButtonOperationService ButtonOperationService = ServiceProviderUtils.GetService<IButtonOperationService>();
-        ButtonOperationService.ButtonsOperationTransactional(businessDataVo);
+        _buttonOperationService.ButtonsOperationTransactional(businessDataVo);
 
-        OutSideBpmAccessBusiness result = this.baseRepo
-            .Where(a => a.Id == outSideBpmAccessBusiness.Id).ToOne();
+        OutSideBpmAccessBusiness result = _repository
+            .FirstOrDefault(a => a.Id == outSideBpmAccessBusiness.Id);
 
         return new OutSideBpmAccessRespVo
         {
@@ -116,8 +127,7 @@ public class OutSideBpmAccessBusinessService : AFBaseCurdRepositoryService<OutSi
 
     private List<OutSideBpmAccessProcessRecordVo> GetProcessRecord(string processNumber)
     {
-        IBpmVerifyInfoBizService bpmVerifyInfoBizService = ServiceProviderUtils.GetService<IBpmVerifyInfoBizService>();
-        var bpmVerifyInfoVos = bpmVerifyInfoBizService.GetBpmVerifyInfoVos(processNumber, false);
+        var bpmVerifyInfoVos = _bpmVerifyInfoBizService.GetBpmVerifyInfoVos(processNumber, false);
 
         var result = bpmVerifyInfoVos
             .Select(o => new OutSideBpmAccessProcessRecordVo
@@ -141,24 +151,7 @@ public class OutSideBpmAccessBusinessService : AFBaseCurdRepositoryService<OutSi
     }
     public ResultAndPage<BpmnConfVo> SelectOutSideFormCodePageList(PageDto pageDto, BpmnConfVo vo) {
         Page<BpmnConfVo> page = PageUtils.GetPageByPageDto<BpmnConfVo>(pageDto);
-        IBpmnConfService bpmnConfService = ServiceProviderUtils.GetService<IBpmnConfService>();
-        List<BpmnConfVo> bpmnConfVos = this.Frsql
-            .Select<BpmnConf, BpmProcessAppApplication>()
-            .InnerJoin((a, b) => a.FormCode == b.ProcessKey)
-            .Where((a, b) => a.EffectiveStatus == 1 && a.IsOutSideProcess == 1)
-            .OrderByDescending((a, b) => a.CreateTime)
-            .ToList<BpmnConfVo>((a, b) => new BpmnConfVo()
-            {
-                BpmnCode = a.BpmnCode,
-                FormCode = a.FormCode,
-                BpmnName = a.BpmnName,
-                DeduplicationType = a.DeduplicationType,
-                EffectiveStatus = a.EffectiveStatus,
-                BusinessPartyId = a.BusinessPartyId,
-                ApplicationId = b.Id,
-                UpdateTime = a.UpdateTime,
-                Remark = a.Remark
-            });
+        List<BpmnConfVo> bpmnConfVos = _repository.SelectOutSideFormCodePageList();
             
         if (bpmnConfVos==null||!bpmnConfVos.Any()) {
             return PageUtils.GetResultAndPage(page);
@@ -204,12 +197,10 @@ public class OutSideBpmAccessBusinessService : AFBaseCurdRepositoryService<OutSi
             }
         }
 
-        IButtonOperationService buttonOperationService = ServiceProviderUtils.GetService<IButtonOperationService>();
-        buttonOperationService.ButtonsOperationTransactional(businessDataVo);
+        _buttonOperationService.ButtonsOperationTransactional(businessDataVo);
     }
     private Employee GetEmployeeByUserId(String userName) {
-        IBpmnEmployeeInfoProviderService bpmnEmployeeInfoProviderService = ServiceProviderUtils.GetService<IBpmnEmployeeInfoProviderService>();
-        Dictionary<String, String> stringStringMap = bpmnEmployeeInfoProviderService.ProvideEmployeeInfo(new List<string>(){userName});
+        Dictionary<String, String> stringStringMap = _bpmnEmployeeInfoProviderService.ProvideEmployeeInfo(new List<string>(){userName});
         if(!stringStringMap.Any()){
             return null;
         }

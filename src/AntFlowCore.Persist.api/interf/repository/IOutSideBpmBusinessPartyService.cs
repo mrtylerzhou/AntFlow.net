@@ -1,13 +1,12 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
-using FreeSql;
+using antflowcore.service.interf.repository;
 
 namespace AntFlowCore.Persist.api.interf.repository;
 
-public interface IOutSideBpmBusinessPartyService : IBaseRepositoryService<OutSideBpmBusinessParty>
+public interface IOutSideBpmBusinessPartyService : IAntFlowRepositoryMix<OutSideBpmBusinessParty, IOutSideBpmBusinessPartyRepository>
 {
     ResultAndPage<OutSideBpmBusinessPartyVo> ListPage(PageDto pageDto, OutSideBpmBusinessPartyVo vo);
     List<OutSideBpmBusinessPartyVo> SelectPageList(Page<OutSideBpmBusinessPartyVo> page);

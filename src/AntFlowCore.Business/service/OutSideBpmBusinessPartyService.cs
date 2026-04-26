@@ -1,6 +1,5 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using AntFlowCore.Abstraction.Orm.ext;
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
@@ -10,58 +9,53 @@ using AntFlowCore.Base.vo;
 using AntFlowCore.Persist.api.interf.repository;
 using FreeSql.Internal.Model;
 
-namespace AntFlowCore.Persist.repository;
+namespace AntFlowCore.Business.service;
 
-public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSideBpmBusinessParty>,IOutSideBpmBusinessPartyService
+public class OutSideBpmBusinessPartyService : IOutSideBpmBusinessPartyService
 {
     private readonly IOutSideBpmAdminPersonnelService _outSideBpmAdminPersonnelService;
     private readonly IOutSideBpmCallbackUrlConfService _outSideBpmCallbackUrlConfService;
     private readonly IUserService _employeeService;
 
     public OutSideBpmBusinessPartyService(
+        IOutSideBpmBusinessPartyRepository repository,
         IOutSideBpmAdminPersonnelService outSideBpmAdminPersonnelService,
         IOutSideBpmCallbackUrlConfService outSideBpmCallbackUrlConfService,
-        IUserService employeeService,
-        IFreeSql freeSql) : base(freeSql)
+        IUserService employeeService
+    )
     {
+        _repository = repository;
         _outSideBpmAdminPersonnelService = outSideBpmAdminPersonnelService;
         _outSideBpmCallbackUrlConfService = outSideBpmCallbackUrlConfService;
         _employeeService = employeeService;
     }
 
+    public IOutSideBpmBusinessPartyRepository _repository { get; }
+
     public ResultAndPage<OutSideBpmBusinessPartyVo> ListPage(PageDto pageDto, OutSideBpmBusinessPartyVo vo)
     {
-        // 获取分页对象
         Page<OutSideBpmBusinessPartyVo> page = PageUtils.GetPageByPageDto<OutSideBpmBusinessPartyVo>(pageDto);
-
-        // 查询结果
         List<OutSideBpmBusinessPartyVo> records = this.SelectPageList(page);
 
-        // 如果结果为空，返回空的分页列表
         if (records == null || !records.Any())
         {
             return PageUtils.GetResultAndPage(page);
         }
 
-        // 查询所有相关的业务方管理员
         List<long?> businessPartyIds = records
             .Select(r => r.Id)
             .Distinct()
             .ToList();
 
-        List<OutSideBpmAdminPersonnel> outSideBpmAdminPersonnels = _outSideBpmAdminPersonnelService.baseRepo
-            .Where(a => businessPartyIds.Contains(a.Id))
-            .ToList();
+        List<OutSideBpmAdminPersonnel> outSideBpmAdminPersonnels = _outSideBpmAdminPersonnelService._repository
+            .Find(a => businessPartyIds.Contains(a.Id));
 
-
-        // 如果没有找到管理员人员，直接返回结果
         if (outSideBpmAdminPersonnels == null || !outSideBpmAdminPersonnels.Any())
         {
             page.Records = records;
             return PageUtils.GetResultAndPage(page);
         }
 
-        // 设置结果
         page.Records = (records
             .Select(record => ReBuildVo(record, outSideBpmAdminPersonnels, false))
             .ToList());
@@ -71,12 +65,11 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
 
     public List<OutSideBpmBusinessPartyVo> SelectPageList(Page<OutSideBpmBusinessPartyVo> page)
     {
-        BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
-        List<OutSideBpmBusinessPartyVo> result = this.baseRepo
-            .Where(a => a.IsDel == 0)
-            .OrderByDescending(a => a.CreateTime)
-            .Page(basePagingInfo)
-            .ToList<OutSideBpmBusinessPartyVo>(a => new OutSideBpmBusinessPartyVo
+        PagingInfo pagingInfo = page.ToPagingInfo();
+        
+
+        List<OutSideBpmBusinessPartyVo> result = _repository.ListPage(a => a.IsDel == 0, pagingInfo)
+            .Select(a => new OutSideBpmBusinessPartyVo
             {
                 Id = a.Id,
                 BusinessPartyMark = a.BusinessPartyMark,
@@ -86,8 +79,9 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
                 IsDel = a.IsDel,
                 Remark = a.Remark,
                 CreateTime = a.CreateTime
-            });
-        page.Total = (int)basePagingInfo.Count;
+            }).ToList();
+
+        page.Total = (int)pagingInfo.Count;
         return result;
     }
 
@@ -96,14 +90,12 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
         List<OutSideBpmAdminPersonnel> outSideBpmAdminPersonnels,
         bool isDetail)
     {
-        // 设置 typeName
         if (outSideBpmBusinessPartyVo.Type != null)
         {
             outSideBpmBusinessPartyVo.TypeName =
                 BusinessPartyTypeEnum.GetDescByCode(outSideBpmBusinessPartyVo.Type.Value);
         }
 
-        // 获取员工详情
         var employeeIds = outSideBpmAdminPersonnels
             .Select(p => p.EmployeeId)
             .Distinct()
@@ -112,7 +104,6 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
         var employeeMap = _employeeService.GetEmployeeDetailByIds(employeeIds)
             .ToDictionary(e => e.Id, e => e);
 
-        // 当前业务方的人员
         List<OutSideBpmAdminPersonnel> adminPersonnels = outSideBpmAdminPersonnels
             .Where(p => p.BusinessPartyId == outSideBpmBusinessPartyVo.Id)
             .ToList();
@@ -129,7 +120,6 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
 
             if (isDetail)
             {
-                // 列表数据
                 var list = bpmAdminPersonnels.Select(p => new BaseIdTranStruVo
                 {
                     Id = p.EmployeeId,
@@ -138,16 +128,13 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
                         : (employeeMap.TryGetValue(p.EmployeeId, out var emp) ? emp.UserName : string.Empty)
                 }).ToList();
 
-                // 设置到对应属性上（如 AdminList、AuditorList 等）
                 SetProperty(outSideBpmBusinessPartyVo, typeEnum.ListField, list);
 
-                // 设置ID列表
                 var idList = bpmAdminPersonnels.Select(p => p.EmployeeId).Distinct().ToList();
                 SetProperty(outSideBpmBusinessPartyVo, typeEnum.IdsField, idList);
             }
             else
             {
-                // 拼接用户名
                 var nameStr = string.Join(",", bpmAdminPersonnels
                     .Select(p => employeeMap.TryGetValue(p.EmployeeId, out var emp) ? emp.UserName : string.Empty));
 
@@ -160,19 +147,13 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
 
     public OutSideBpmBusinessPartyVo Detail(int id)
     {
-        OutSideBpmBusinessParty outSideBpmBusinessParty = this.baseRepo.Where(a => a.Id == id).ToOne();
+        OutSideBpmBusinessParty outSideBpmBusinessParty = _repository.Find(a => a.Id == id).FirstOrDefault() ?? new OutSideBpmBusinessParty();
 
         OutSideBpmBusinessPartyVo vo = outSideBpmBusinessParty.MapToVo();
 
+        List<OutSideBpmAdminPersonnel> outSideBpmAdminPersonnels = _outSideBpmAdminPersonnelService._repository
+            .Find(a => a.BusinessPartyId == outSideBpmBusinessParty.Id);
 
-        //querying all associated business party admin
-        List<OutSideBpmAdminPersonnel> outSideBpmAdminPersonnels = _outSideBpmAdminPersonnelService
-            .baseRepo
-            .Where(a => a.BusinessPartyId == outSideBpmBusinessParty.Id)
-            .ToList();
-
-
-        //if the result is empty then return
         if (outSideBpmAdminPersonnels == null || !outSideBpmAdminPersonnels.Any())
         {
             return vo;
@@ -183,22 +164,18 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
 
     public void Edit(OutSideBpmBusinessPartyVo vo)
     {
-        // 检查数据是否重复
         if (this.CheckData(vo) > 0)
         {
-            //throw new AFBizException("业务方标识或业务方名称重复");
-
         }
 
-        OutSideBpmBusinessParty outSideBpmBusinessParty = this.baseRepo
-            .Where(a => a.Id == vo.Id).ToOne();
+        OutSideBpmBusinessParty? outSideBpmBusinessParty = _repository.Find(a => a.Id == vo.Id).FirstOrDefault();
 
         if (outSideBpmBusinessParty != null)
         {
             vo.CopyTo(outSideBpmBusinessParty);
             outSideBpmBusinessParty.UpdateTime = DateTime.Now;
             outSideBpmBusinessParty.UpdateUser = SecurityUtils.GetLogInEmpName();
-            this.baseRepo.Update(outSideBpmBusinessParty);
+            _repository.Update(outSideBpmBusinessParty);
         }
         else
         {
@@ -208,17 +185,16 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
             outSideBpmBusinessParty.CreateUser = SecurityUtils.GetLogInEmpName();
             outSideBpmBusinessParty.UpdateTime = DateTime.Now;
             outSideBpmBusinessParty.UpdateUser = SecurityUtils.GetLogInEmpName();
-            this.baseRepo.Insert(outSideBpmBusinessParty);
+            _repository.Add(outSideBpmBusinessParty);
         }
 
         var id = outSideBpmBusinessParty.Id;
 
         if (id != null && id > 0)
         {
-            // 删除旧的管理员信息
-            _outSideBpmAdminPersonnelService.baseRepo.Delete(a => a.BusinessPartyId == id);
+            _outSideBpmAdminPersonnelService._repository.RemoveRange(
+                _outSideBpmAdminPersonnelService._repository.Find(a => a.BusinessPartyId == id));
 
-            // 添加管理员
             foreach (AdminPersonnelTypeEnum typeEnum in AdminPersonnelTypeEnum.Values())
             {
                 var property = this.GetProperty(vo, typeEnum.IdsField);
@@ -235,15 +211,13 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
                         UpdateUser = SecurityUtils.GetLogInEmpName()
                     }).ToList();
 
-                    _outSideBpmAdminPersonnelService.baseRepo.Insert(personnels);
+                    _outSideBpmAdminPersonnelService._repository.AddRange(personnels);
                 }
             }
 
-            // 添加回调配置（如果没有）
             var count = _outSideBpmCallbackUrlConfService
-                .baseRepo
-                .Where(a => a.BusinessPartyId == id)
-                .Count();
+                ._repository
+                .Count(a => a.BusinessPartyId == id);
 
             if (count == 0)
             {
@@ -251,12 +225,12 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
                 {
                     BusinessPartyId = id
                 };
-                _outSideBpmCallbackUrlConfService.baseRepo.Insert(conf);
+                _outSideBpmCallbackUrlConfService._repository.Add(conf);
             }
         }
     }
 
-   public long CheckData(OutSideBpmBusinessPartyVo vo)
+    public long CheckData(OutSideBpmBusinessPartyVo vo)
     {
         Expression<Func<OutSideBpmBusinessParty, bool>> expression = a =>
             a.BusinessPartyMark == vo.BusinessPartyMark || a.Name == vo.Name;
@@ -265,11 +239,9 @@ public class OutSideBpmBusinessPartyService : AFBaseCurdRepositoryService<OutSid
             expression = expression.And(a => a.Id == vo.Id);
         }
 
-        long count = this.baseRepo.Where(expression).Count();
-        return count;
+        return _repository.Count(expression);
     }
 
-    // 工具方法：动态设置属性
     private void SetProperty(object obj, string propertyName, object value)
     {
         var prop = obj.GetType().GetProperty(propertyName);

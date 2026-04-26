@@ -1,11 +1,10 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.vo;
-using FreeSql;
+using antflowcore.service.interf.repository;
 
 namespace AntFlowCore.Persist.api.interf.repository;
 
-public interface IBpmProcessNoticeService : IBaseRepositoryService<BpmProcessNotice>
+public interface IBpmProcessNoticeService : IAntFlowRepositoryMix<BpmProcessNotice, IBpmProcessNoticeRepository>
 {
     List<BpmProcessNotice> ProcessNoticeList(string processKey);
     void SaveProcessNotice(BpmProcessDeptVo vo);

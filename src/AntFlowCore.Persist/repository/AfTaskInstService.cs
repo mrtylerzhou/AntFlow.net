@@ -6,16 +6,17 @@ using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repository;
 
-public class AfTaskInstService: AFBaseCurdRepositoryService<BpmAfTaskInst>,IAfTaskInstService
+public class AfTaskInstService: IAfTaskInstService
 {
-    public AfTaskInstService(IFreeSql freeSql) : base(freeSql)
+    public AfTaskInstService(IBpmAfTaskInstRepository repository)
     {
+        _repository = repository;
     }
     
 
     public int DoneTodayProcess(String createUserId)
     {
-        long count = this.baseRepo
+        long count = this._repository.GetQueryable()
             .Where(a=>a.TaskDefKey!=ProcessEnum.StartTaskKey.Desc&&a.Assignee==createUserId 
                        &&a.EndTime!=null &&a.EndTime.Value.Date>=DateTime.Now.Date)
             .Count();
@@ -26,9 +27,9 @@ public class AfTaskInstService: AFBaseCurdRepositoryService<BpmAfTaskInst>,IAfTa
     {
         BpmBusinessProcessService bpmBusinessProcessService = ServiceProviderUtils.GetService<BpmBusinessProcessService>();
         long count = bpmBusinessProcessService
-            .baseRepo
-            .Where(a => a.CreateUser == createUserId && a.CreateTime.Value.Date == DateTime.Now.Date)
-            .Count();
+            ._repository.Count((a => a.CreateUser == createUserId && a.CreateTime.Value.Date == DateTime.Now.Date));
         return Convert.ToInt32(count);
     }
+
+    public IBpmAfTaskInstRepository _repository { get; }
 }

@@ -143,7 +143,7 @@ public class BpmnConfBizService : IBpmnConfBizService
             bpmnNode.CreateUser=SecurityUtils.GetLogInEmpNameSafe();
             bpmnNode.Remark ??= "";
             bpmnNode.TenantId = MultiTenantUtil.GetCurrentTenantId();
-            _bpmnNodeService.baseRepo.Insert(bpmnNode);
+            _bpmnNodeService._repository.Add(bpmnNode);
             long bpmnNodeId = bpmnNode.Id;
             if(bpmnNodeId.IsNullOrZero()){
                 throw new AFBizException("can not get bpmn node id!");
@@ -185,11 +185,7 @@ public class BpmnConfBizService : IBpmnConfBizService
             bpmnConfVo.ExtraFlags=binariedOr;
         }
         if (bpmnConfVo.ExtraFlags!=null) {
-            this._bpmnNodeService.Frsql
-                .Update<BpmnConf>()
-                .Set(a => a.ExtraFlags, bpmnConfVo.ExtraFlags)
-                .Where(a => a.Id == confId)
-                .ExecuteAffrows();
+            _bpmnNodeService.UpdateConfExtraFlags(confId, bpmnConfVo.ExtraFlags);
             
         }
         ProcessorFactory.ExecutePostProcessors(bpmnConfVo);
@@ -355,7 +351,7 @@ public class BpmnConfBizService : IBpmnConfBizService
         }
       
         ProcessorFactory.ExecutePreReadProcessors(bpmnConfVo);
-        List<BpmnNode> bpmnNodes = _bpmnNodeService.baseRepo.Where(a=>a.ConfId.Equals(bpmnConf.Id)&&a.IsDel==0).ToList();
+        List<BpmnNode> bpmnNodes = _bpmnNodeService._repository.Find(a=>a.ConfId.Equals(bpmnConf.Id)&&a.IsDel==0);
         bool isOutSideProcess=bpmnConf.IsOutSideProcess!=null&&bpmnConf.IsOutSideProcess==1;
         bool isLowCodeFlow=bpmnConf.IsLowCodeFlow!=null&&bpmnConf.IsLowCodeFlow==1;
         if(isOutSideProcess||isLowCodeFlow||bpmnConfVo.ExtraFlags!=null){
@@ -393,8 +389,8 @@ public class BpmnConfBizService : IBpmnConfBizService
     private void SetBpmnTemplateVos(BpmnConfVo bpmnConfVo)
     {
        
-        List<BpmnTemplate> bpmnTemplates = _bpmnTemplateService.baseRepo
-            .Where(a => a.ConfId == bpmnConfVo.Id && a.IsDel == 0 && a.NodeId == null).ToList();
+        List<BpmnTemplate> bpmnTemplates = _bpmnTemplateService._repository
+            .Find(a => a.ConfId == bpmnConfVo.Id && a.IsDel == 0 && a.NodeId == null);
         bpmnConfVo.TemplateVos  = bpmnTemplates.Select(o =>
         {
             BpmnTemplateVo vo = BuildBpmnTemplateVo(o);
@@ -461,8 +457,8 @@ public class BpmnConfBizService : IBpmnConfBizService
             return new Dictionary<long, BpmnApproveRemindVo>();
         }
 
-        var bpmnApproveRemindList = _approveRemindService.baseRepo
-            .Where(a=>ids.Contains(a.Id)&&a.IsDel==0);
+        var bpmnApproveRemindList = _approveRemindService._repository
+            .Find(a=>ids.Contains(a.Id)&&a.IsDel==0);
             
 
         return bpmnApproveRemindList
@@ -473,8 +469,8 @@ public class BpmnConfBizService : IBpmnConfBizService
                     BpmnApproveRemindVo vo = o.MapToVo();
                     vo.IsInuse = false;
                     
-                    var template = _informationTemplateService.baseRepo.Where(a => a.Id == o.TemplateId).ToOne();
-                    vo.TemplateName = template.Name;
+                    var template = _informationTemplateService._repository.GetQueryable().Where(a => a.Id == o.TemplateId).FirstOrDefault();
+                    vo.TemplateName = template?.Name ?? string.Empty;
                     
                     if (!string.IsNullOrEmpty(vo.Days))
                     {
@@ -499,9 +495,8 @@ public class BpmnConfBizService : IBpmnConfBizService
             return new Dictionary<long, List<BpmnTemplateVo>>();
         }
 
-        return _bpmnTemplateService.baseRepo
-            .Where(x => x.NodeId!=null&&ids.Contains(x.NodeId.Value) && x.IsDel==0)
-            .ToList()
+        return _bpmnTemplateService._repository
+            .Find(x => x.NodeId!=null&&ids.Contains(x.NodeId.Value) && x.IsDel==0)
             .GroupBy(x => x.NodeId.Value)
             .ToDictionary(
                 g => g.Key,
@@ -552,9 +547,9 @@ public class BpmnConfBizService : IBpmnConfBizService
             }).ToList();
             vo.MessageSendTypeList = baseNumIdStruVos;
         }
-        vo.TemplateName = _informationTemplateService.baseRepo
-            .Where(a=>a.Id==vo.TemplateId).ToOne()?
-            .Name ?? string.Empty;
+        vo.TemplateName = _informationTemplateService._repository.GetQueryable()
+            .Where(a=>a.Id==vo.TemplateId).FirstOrDefault()
+            ?.Name ?? string.Empty;
         return vo;
     }
 
@@ -740,13 +735,7 @@ public class BpmnConfBizService : IBpmnConfBizService
 
     public int? GetCustomizeNodeSignType(long nodeId)
     {
-        int? signType = _bpmnNodeService.Frsql
-            .Select<BpmnNode,BpmnNodeCustomizeConf>()
-            .InnerJoin((a,b)=>a.Id==b.BpmnNodeId)
-            .Where((a,b)=>a.Id==nodeId)
-            .ToList<int?>((a,b)=>b.SignType)
-            .FirstOrDefault();
-        return signType;
+        return _bpmnNodeService.GetCustomizeNodeSignType(nodeId);
     }
     private BpmnConfVo FormatConfVo(BpmnConfVo confVo)
     {

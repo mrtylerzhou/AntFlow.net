@@ -1,19 +1,21 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repository;
 
-public class BpmnConfLfFormdataFieldService: AFBaseCurdRepositoryService<BpmnConfLfFormdataField>,IBpmnConfLfFormdataFieldService
+public class BpmnConfLfFormdataFieldService : IBpmnConfLfFormdataFieldService
 {
-    public BpmnConfLfFormdataFieldService(IFreeSql freeSql) : base(freeSql)
+    public BpmnConfLfFormdataFieldService(IBpmnConfLfFormdataFieldRepository repository)
     {
+        _repository = repository;
     }
 
-    public Dictionary<string,BpmnConfLfFormdataField> QryFormDataFieldMap(long confId)
+    public IBpmnConfLfFormdataFieldRepository _repository { get; }
+
+    public Dictionary<string, BpmnConfLfFormdataField> QryFormDataFieldMap(long confId)
     {
-        List<BpmnConfLfFormdataField> allFields = baseRepo.Where(x => x.BpmnConfId == confId).ToList();
+        List<BpmnConfLfFormdataField> allFields = _repository.Find(x => x.BpmnConfId == confId);
         if (allFields == null || !allFields.Any())
         {
             throw new AFBizException("lowcode form data has no fields");
@@ -27,5 +29,4 @@ public class BpmnConfLfFormdataFieldService: AFBaseCurdRepositoryService<BpmnCon
 
         return id2SelfMap;
     }
-    
 }

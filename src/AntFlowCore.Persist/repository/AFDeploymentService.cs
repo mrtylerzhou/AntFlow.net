@@ -9,10 +9,11 @@ using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repository;
 
-public class AFDeploymentService: AFBaseCurdRepositoryService<BpmAfDeployment>,IAFDeploymentService
+public class AFDeploymentService: IAFDeploymentService
 {
-    public AFDeploymentService(IFreeSql freeSql) : base(freeSql)
+    public AFDeploymentService(IBpmAfDeploymentRepository bpmAfDeploymentRepository)
     {
+        _repository = bpmAfDeploymentRepository;
     }
 
     /// <summary>
@@ -30,13 +31,7 @@ public class AFDeploymentService: AFBaseCurdRepositoryService<BpmAfDeployment>,I
         {
             throw new AFBizException("请传入流程编号");
         }
-        BpmAfDeployment bpmAfDeployment = this.Frsql
-            .Select<BpmBusinessProcess,BpmAfTask,BpmAfDeployment>()
-            .InnerJoin((a,b,c)=>a.ProcInstId==b.ProcInstId)
-            .InnerJoin((a,b,c)=>b.ProcDefId==c.Id)
-            .Where((a,b,c)=>a.BusinessNumber==processNumber)
-            .ToList<BpmAfDeployment>((a,b,c)=>c)
-            .First();
+        BpmAfDeployment bpmAfDeployment = _repository.QueryDeploymentbyprocessNumber(processNumber);
         if (bpmAfDeployment == null)
         {
             throw new AFBizException($"未能根据流程编号:{processNumber}找到流程定义!");
@@ -106,7 +101,7 @@ public class AFDeploymentService: AFBaseCurdRepositoryService<BpmAfDeployment>,I
         bpmAfDeployment.Rev += 1;
         bpmAfDeployment.UpdateTime=DateTime.Now;
         bpmAfDeployment.UpdateUser = SecurityUtils.GetLogInEmpId();
-        baseRepo.Update(bpmAfDeployment);
+        _repository.Update(bpmAfDeployment);
     }
 
     public List<BpmnConfCommonElementVo> GetDeploymentByProcessNumber(string processNumber)
@@ -115,13 +110,7 @@ public class AFDeploymentService: AFBaseCurdRepositoryService<BpmAfDeployment>,I
         {
             return null;
         }
-        BpmAfDeployment bpmAfDeployment = this.Frsql
-            .Select<BpmBusinessProcess,BpmAfTask,BpmAfDeployment>()
-            .InnerJoin((a,b,c)=>a.ProcInstId==b.ProcInstId)
-            .InnerJoin((a,b,c)=>b.ProcDefId==c.Id)
-            .Where((a,b,c)=>a.BusinessNumber==processNumber)
-            .ToList<BpmAfDeployment>((a,b,c)=>c)
-            .First();
+        BpmAfDeployment bpmAfDeployment = _repository.QueryDeploymentbyprocessNumber(processNumber);
         if (bpmAfDeployment == null)
         {
             throw new AFBizException($"未能根据流程编号:{processNumber}找到流程定义!");
@@ -135,4 +124,6 @@ public class AFDeploymentService: AFBaseCurdRepositoryService<BpmAfDeployment>,I
         List<BpmnConfCommonElementVo> elements = JsonSerializer.Deserialize<List<BpmnConfCommonElementVo>>(content);
         return elements;
     }
+
+    public IBpmAfDeploymentRepository _repository { get; }
 }

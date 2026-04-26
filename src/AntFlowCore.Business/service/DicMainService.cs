@@ -1,12 +1,14 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Business.service;
 
-public class DicMainService : AFBaseCurdRepositoryService<DictMain>,IDicMainService
+public class DicMainService : IDicMainService
 {
-    public DicMainService(IFreeSql freeSql) : base(freeSql)
+    public DicMainService(IDicMainRepository repository)
     {
+        _repository = repository;
     }
+
+    public IDicMainRepository _repository { get; }
 }

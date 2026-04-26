@@ -123,9 +123,8 @@ public class TaskService : ITaskService
             }
 
             IBpmVerifyInfoService bpmVerifyInfoService = ServiceProviderUtils.GetService<IBpmVerifyInfoService>();
-            List<BpmVerifyInfo> bpmVerifyInfos = bpmVerifyInfoService.baseRepo
-                .Where(a=>a.RunInfoId==procInstId&&a.TaskDefKey==taskDefKey)
-                .ToList();
+            List<BpmVerifyInfo> bpmVerifyInfos = bpmVerifyInfoService._repository
+                .FindByRunInfoIdAndTaskDefKey(procInstId, taskDefKey);
             verifyUserIds= bpmVerifyInfos.Select(a=>a.VerifyUserId).ToList();
             int currentNodeAssigneesCount = currentElement.AssigneeMap.Count;
             if (verifyUserIds.Count != currentNodeAssigneesCount)

@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using AntFlowCore.Abstraction.Orm.ext;
+using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Abstraction.service.repository;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.dto;
@@ -13,12 +14,13 @@ using FreeSql.Internal.Model;
 
 namespace AntFlowCore.Business.service.biz;
 
-public class DicDataBizService : IDicDataBizSerivce
+public class DicDataBizService :  IDicDataBizSerivce
 {
     private readonly IDicDataSerivce _dicDataSerivce;
     private readonly IBpmProcessNoticeService _bpmProcessNoticeService;
 
-    public DicDataBizService(IDicDataSerivce dicDataSerivce,IBpmProcessNoticeService bpmProcessNoticeService)
+
+    public DicDataBizService(IFreeSql freeSql, IDicDataSerivce dicDataSerivce, IBpmProcessNoticeService bpmProcessNoticeService)
     {
         _dicDataSerivce = dicDataSerivce;
         _bpmProcessNoticeService = bpmProcessNoticeService;
@@ -46,16 +48,9 @@ public class DicDataBizService : IDicDataBizSerivce
                 a.DictType.Contains(taskMgmtVO.Description) || a.Value.Contains(taskMgmtVO.Description));
         }
 
-        var basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
-        List<DictData> dictDataList = _dicDataSerivce
-            .Frsql
-            .Select<DictData, BpmnConf>()
-            .InnerJoin((a, b) => a.Value == b.FormCode && b.IsLowCodeFlow == 1)
-            .Where(expression)
-            .OrderByDescending((a, b) => a.CreateTime)
-            .Page(basePagingInfo)
-            .ToList<DictData>((a, b) => a);
-        page.Total = (int)basePagingInfo.Count;
+        var pagingInfo = page.ToPagingInfo();
+        List<DictData> dictDataList = _dicDataSerivce._repository.QueryDictDataListByExpression(expression, pagingInfo);
+        page.Total = (int)pagingInfo.Count;
         return dictDataList;
     }
     
@@ -78,14 +73,10 @@ public class DicDataBizService : IDicDataBizSerivce
                     a.Label.Contains(taskMgmtVO.Description) || a.Value.Contains(taskMgmtVO.Description));
             }
 
-            BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
+            PagingInfo pagingInfo = page.ToPagingInfo();
             List<DictData> dictDatas = this._dicDataSerivce
-                .baseRepo
-                .Where(expression)
-                .OrderByDescending(c=>c.CreateTime)
-                .Page(basePagingInfo)
-                .ToList();
-            page.Total = (int)basePagingInfo.Count;
+                ._repository.QueryDictDataListByExpression(expression, pagingInfo);
+            page.Total = (int)pagingInfo.Count;
             return dictDatas;
         }
         private ResultAndPage<BaseKeyValueStruVo> HandleLFFormCodePageList(Page<BaseKeyValueStruVo> page, List<DictData> dictlist)

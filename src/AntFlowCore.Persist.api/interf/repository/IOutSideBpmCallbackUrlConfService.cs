@@ -1,11 +1,10 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.vo;
-using FreeSql;
+using antflowcore.service.interf.repository;
 
 namespace AntFlowCore.Persist.api.interf.repository;
 
-public interface IOutSideBpmCallbackUrlConfService : IBaseRepositoryService<OutSideBpmCallbackUrlConf>
+public interface IOutSideBpmCallbackUrlConfService : IAntFlowRepositoryMix<OutSideBpmCallbackUrlConf, IOutSideBpmCallbackUrlConfRepository>
 {
     OutSideBpmCallbackUrlConf GetOutSideBpmCallbackUrlConf(long businessPartyId);
     List<OutSideBpmCallbackUrlConf> SelectListByFormCode(string formCode);

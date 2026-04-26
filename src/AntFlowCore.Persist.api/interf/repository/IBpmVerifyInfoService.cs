@@ -1,11 +1,10 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.vo;
-using FreeSql;
+using antflowcore.service.interf.repository;
 
 namespace AntFlowCore.Persist.api.interf.repository;
 
-public interface IBpmVerifyInfoService : IBaseRepositoryService<BpmVerifyInfo>
+public interface IBpmVerifyInfoService : IAntFlowRepositoryMix<BpmVerifyInfo, IBpmVerifyInfoRepository>
 {
     void AddVerifyInfo(BpmVerifyInfo verifyInfo);
     string FindCurrentNodeIds(string processNumber);

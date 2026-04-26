@@ -1,32 +1,34 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Business.service;
 
-public class UserMessageService :AFBaseCurdRepositoryService<UserMessage>,IUserMessageService
+public class UserMessageService : IUserMessageService
 {
-    public UserMessageService(IFreeSql freeSql) : base(freeSql)
+    public UserMessageService(IUserMessageRepository repository)
     {
+        _repository = repository;
     }
-    
+
+    public IUserMessageRepository _repository { get; }
+
     public void ReadNode(string node)
     {
-        List<UserMessage> userMessages = this.baseRepo.Where(a=>a.Node==node).ToList();
+        List<UserMessage> userMessages = _repository.Find(a => a.Node == node);
         foreach (UserMessage userMessage in userMessages)
         {
-            userMessage.IsRead=true;
-            this.baseRepo.Update(userMessage);
+            userMessage.IsRead = true;
+            _repository.Update(userMessage);
         }
     }
 
     public void InsertMessage(UserMessage message)
     {
-        this.baseRepo.Insert(message);
+        _repository.Add(message);
     }
 
     public void SaveBatch(List<UserMessage> list)
     {
-        this.baseRepo.Insert(list);
+        _repository.AddRange(list);
     }
 }

@@ -1,11 +1,9 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
-using FreeSql;
+using antflowcore.service.interf.repository;
 
 namespace AntFlowCore.Persist.api.interf.repository;
 
-public interface IDefaultTemplateService : IBaseRepositoryService<DefaultTemplate>
+public interface IDefaultTemplateService : IAntFlowRepositoryMix<DefaultTemplate, IDefaultTemplateRepository>
 {
-
-    
+    void InsertOrUpdateAllColumnBatch(List<DefaultTemplate> list);
 }

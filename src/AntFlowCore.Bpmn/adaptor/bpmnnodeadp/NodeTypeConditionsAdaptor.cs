@@ -398,11 +398,7 @@ public class NodeTypeConditionsAdaptor : IBpmnNodeAdaptor
                         }
 
                         long confId = bpmnNodeVo.ConfId;
-                        _lfFormdataFieldService.Frsql
-                            .Update<BpmnConfLfFormdataField>()
-                            .Set(a => a.IsConditionField, 1)
-                            .Where(a => a.BpmnConfId == confId && a.FieldId == columnDbname)
-                            .ExecuteAffrows();
+                        _lfFormdataFieldService._repository.UpdateIsConditionField(confId, columnDbname, 1);
                     }
                 }
             }

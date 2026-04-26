@@ -4,10 +4,11 @@ using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repository;
 
-public class AFExecutionService: AFBaseCurdRepositoryService<BpmAfExecution>,IAFExecutionService
+public class AFExecutionService:IAFExecutionService
 {
-    public AFExecutionService(IFreeSql freeSql) : base(freeSql)
+    public AFExecutionService(IBpmAfExecutionRepository repository)
     {
+        _repository = repository;
     }
-    
+    public IBpmAfExecutionRepository _repository { get; }
 }

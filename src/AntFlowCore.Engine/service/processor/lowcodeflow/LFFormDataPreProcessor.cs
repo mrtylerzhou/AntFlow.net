@@ -36,7 +36,7 @@ public class LFFormDataPreProcessor : IAntFlowOrderPreProcessor<BpmnConfVo>
                 Formdata = lfForm,
                 CreateUser = SecurityUtils.GetLogInEmpName()
             };
-            _lfFormdataService.baseRepo.Insert(lfFormdata);
+            _lfFormdataService._repository.Add(lfFormdata);
             confVo.LfFormDataId = lfFormdata.Id;
 
             FormConfigWrapper formConfigWrapper = JsonSerializer.Deserialize<FormConfigWrapper>(lfForm);
@@ -55,11 +55,7 @@ public class LFFormDataPreProcessor : IAntFlowOrderPreProcessor<BpmnConfVo>
                 throw new AFBizException($"Low-code form fields cannot be empty, confId: {confId}, formCode: {confVo.FormCode}");
             }
 
-            int affrows = _lfFormdataFieldService.Frsql.Insert(formdataFields).ExecuteAffrows();
-            if (affrows <= 0)
-            {
-                throw new AFBizException("数据插入失败!");
-            }
+            _lfFormdataFieldService._repository.AddRange(formdataFields);
            
         }
 

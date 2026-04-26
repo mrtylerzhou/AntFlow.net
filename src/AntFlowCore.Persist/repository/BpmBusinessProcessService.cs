@@ -5,15 +5,15 @@ using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repository;
 
-public class BpmBusinessProcessService: AFBaseCurdRepositoryService<BpmBusinessProcess>,IBpmBusinessProcessService
+public class BpmBusinessProcessService: IBpmBusinessProcessService
 {
-    public BpmBusinessProcessService(IFreeSql freeSql) : base(freeSql)
+    public BpmBusinessProcessService(IBpmBusinessProcessRepository repository)
     {
-        this.Frsql = freeSql;
+        _repository = repository;
     }
     public bool CheckProcessData(String entryId)
     {
-        long number = baseRepo.Where(a => a.EntryId.Equals(entryId)).Count();
+        long number = _repository.GetQueryable().Where(a => a.EntryId.Equals(entryId)).Count();
         
         return number <= 0;
     }
@@ -22,7 +22,7 @@ public class BpmBusinessProcessService: AFBaseCurdRepositoryService<BpmBusinessP
 
     public BpmBusinessProcess GetBpmBusinessProcess(string processNumber)
     {
-        List<BpmBusinessProcess> bpmBusinessProcesses = this.baseRepo.Where(a => a.BusinessNumber.Equals(processNumber)).ToList();
+        List<BpmBusinessProcess> bpmBusinessProcesses = this._repository.Find(a => a.BusinessNumber.Equals(processNumber)).ToList();
         if (bpmBusinessProcesses.Count > 1)
         {
             throw new AFBizException($"get more than one bpm business process by processNumber:{processNumber}");
@@ -35,7 +35,7 @@ public class BpmBusinessProcessService: AFBaseCurdRepositoryService<BpmBusinessP
 
     public BpmBusinessProcess GetBpmBusinessProcessByProcInstId(string procinstId)
     {
-        List<BpmBusinessProcess> processes = this.baseRepo.Where(a => a.ProcInstId==procinstId).ToList();
+        List<BpmBusinessProcess> processes = this._repository.Find(a => a.ProcInstId==procinstId).ToList();
         if (processes.Count > 1)
         {
             throw new AFBizException($"根据流程实例ID:{procinstId}查询到多个BPM业务流程");
@@ -59,7 +59,8 @@ public class BpmBusinessProcessService: AFBaseCurdRepositoryService<BpmBusinessP
 
     public void AddBusinessProcess(BpmBusinessProcess bpmBusinessProcess)
     {
-        baseRepo.Insert(bpmBusinessProcess);
+        _repository.Add(bpmBusinessProcess);
     }
-    
+
+    public IBpmBusinessProcessRepository _repository { get; }
 }

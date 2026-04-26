@@ -1,4 +1,3 @@
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.interf;
@@ -6,9 +5,8 @@ using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Persist.repository;
 
-public class BpmProcessNodeSubmitService: AFBaseCurdRepositoryService<BpmProcessNodeSubmit>,IBpmProcessNodeSubmitService
+public class BpmProcessNodeSubmitService : IBpmProcessNodeSubmitService
 {
-   
     private readonly ITaskService _taskService;
     private readonly IProcessNodeJumpService _processNodeJumpService;
     private readonly AFDeploymentService _afDeploymentService;
@@ -17,27 +15,25 @@ public class BpmProcessNodeSubmitService: AFBaseCurdRepositoryService<BpmProcess
         ITaskService taskService,
         IProcessNodeJumpService processNodeJumpService,
         AFDeploymentService afDeploymentService,
-        IFreeSql freeSql) : base(freeSql)
+        IBpmProcessNodeSubmitRepository repository)
     {
         _taskService = taskService;
         _processNodeJumpService = processNodeJumpService;
         _afDeploymentService = afDeploymentService;
+        _repository = repository;
     }
 
-   
+    public IBpmProcessNodeSubmitRepository _repository { get; }
 
     public BpmProcessNodeSubmit FindBpmProcessNodeSubmit(String processInstanceId)
     {
-        BpmProcessNodeSubmit bpmProcessNodeSubmit = this
-            .baseRepo
-            .Where(a=>a.ProcessInstanceId.Equals(processInstanceId))
-            .OrderByDescending(a=>a.CreateTime)
-            .First();
-        return bpmProcessNodeSubmit;
+        return _repository.FindLatestByProcessInstanceId(processInstanceId);
     }
-    public bool AddProcessNode(BpmProcessNodeSubmit processNodeSubmit) {
-        this.baseRepo.Delete(a => a.ProcessInstanceId == processNodeSubmit.ProcessInstanceId);
-        this.baseRepo.Insert(processNodeSubmit);
+
+    public bool AddProcessNode(BpmProcessNodeSubmit processNodeSubmit)
+    {
+        _repository.DeleteByProcessInstanceId(processNodeSubmit.ProcessInstanceId);
+        _repository.Add(processNodeSubmit);
         return true;
     }
 }
