@@ -6,9 +6,9 @@ namespace AntFlowCore.Business.service;
 
 public class DicDataSerivce: IDicDataSerivce
 {
-    public DicDataSerivce(IDicDataSerivce dicDataSerivce)
+    public DicDataSerivce(IDictDataRepository repository)
     {
-        _repository = dicDataSerivce._repository;
+        _repository = repository;
     }
     public IDictDataRepository _repository { get; }
 }

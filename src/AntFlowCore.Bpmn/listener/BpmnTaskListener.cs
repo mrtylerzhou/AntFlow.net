@@ -9,7 +9,6 @@ using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.service;
 using AntFlowCore.Bpmn.util;
 using AntFlowCore.Persist.api.interf.repository;
-using AntFlowCore.Persist.repository;
 using Microsoft.Extensions.Logging;
 
 namespace AntFlowCore.Bpmn.listener;
@@ -19,7 +18,6 @@ public class BpmnTaskListener: ITaskListener
     private readonly IBpmnConfService _bpmnConfService;
     private readonly IBpmBusinessProcessService _bpmBusinessProcessService;
     private readonly IBpmProcessForwardService _bpmProcessForwardService;
-    private readonly ITaskService _taskService;
     private readonly IUserEntrustService _userEntrustService;
     private readonly IBpmVariableMessageListenerService _bpmVariableMessageListenerService;
     private readonly IProcessBusinessContansService _processBusinessContansService;
@@ -29,7 +27,6 @@ public class BpmnTaskListener: ITaskListener
         IBpmnConfService bpmnConfService,
        IBpmBusinessProcessService bpmBusinessProcessService,
        IBpmProcessForwardService bpmProcessForwardService,
-       ITaskService taskService,
        IUserEntrustService userEntrustService,
        IBpmVariableMessageListenerService bpmVariableMessageListenerService,
        IProcessBusinessContansService processBusinessContansService,
@@ -38,13 +35,12 @@ public class BpmnTaskListener: ITaskListener
         _bpmnConfService = bpmnConfService;
         _bpmBusinessProcessService = bpmBusinessProcessService;
         _bpmProcessForwardService = bpmProcessForwardService;
-        _taskService = taskService;
         _userEntrustService = userEntrustService;
         _bpmVariableMessageListenerService = bpmVariableMessageListenerService;
         _processBusinessContansService = processBusinessContansService;
         _logger = logger;
     }
-  
+   
     public void Notify(BpmAfTask delegateTask,string eventName)
     {
         if(delegateTask.NodeType==(int)NodeTypeEnum.NODE_TYPE_COPY)
@@ -62,7 +58,8 @@ public class BpmnTaskListener: ITaskListener
             _bpmProcessForwardService.AddProcessForward(bpmProcessForward);
             delegateTask.Assignee = AFSpecialAssigneeEnum.COPY_NODE.Id;
             delegateTask.AssigneeName = AFSpecialAssigneeEnum.COPY_NODE.Desc;
-           _taskService.Complete(delegateTask);
+           var taskService = ServiceProviderUtils.GetService<ITaskService>();
+           taskService.Complete(delegateTask);
            return;
         }
         BpmBusinessProcess bpmBusinessProcess = _bpmBusinessProcessService._repository
