@@ -25,7 +25,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntFlowCore.VirtualNode", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntFlowCore.Business", "src\AntFlowCore.Business\AntFlowCore.Business.csproj", "{00000000-0000-0000-0000-000000000000}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntFlowCore.Engine.Orm", "src\AntFlowCore.Engine.Orm\AntFlowCore.Engine.Orm.csproj", "{D5E6F7A8-B9C0-1234-DEAB-CDEF01234567}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntFlowCore.Engine.Abstraction", "src\AntFlowCore.Engine.Abstraction\AntFlowCore.Engine.Abstraction.csproj", "{D5E6F7A8-B9C0-1234-DEAB-CDEF01234567}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AntFlowCore.Web", "src\AntFlowCore.Web\AntFlowCore.Web.csproj", "{C1D2E3F4-A5B6-7890-CDEF-123456789012}"
 EndProject

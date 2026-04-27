@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.adaptor.processoperation;
@@ -9,9 +10,10 @@ using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.adaptor;
 using AntFlowCore.Core.vo;
+using AntFlowCore.Engine.factory;
 using AntFlowCore.Persist.api.interf.repository;
 
-namespace AntFlowCore.Bpmn.aop;
+namespace AntFlowCore.Engine.Abstraction.aop;
 
 /// <summary>
 /// 这里非通用的创建代理的方法,仅用于实现特定业务

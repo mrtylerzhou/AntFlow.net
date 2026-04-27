@@ -1,3 +1,4 @@
+using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
@@ -31,7 +32,7 @@ public class BpmnViewPageButtonBizService : IBpmnViewPageButtonBizService
         {
             List<BpmnViewPageButton> viewPageButtonList = viewPageStarts
                 .Select(start =>
-                    BpmnViewPageButton.BuildViewPageButton(confId, start, (int)ViewPageTypeEnum.VIEW_PAGE_TYPE_START))
+                    BpmnViewPageButton.BuildViewPageButton(confId, start, (int)ViewPageTypeEnum.VIEW_PAGE_TYPE_START,MultiTenantUtil.GetCurrentTenantId()))
                 .ToList();
             _bpmnViewPageButtonService._repository.AddRange(viewPageButtonList);
         }
@@ -40,7 +41,7 @@ public class BpmnViewPageButtonBizService : IBpmnViewPageButtonBizService
 
         if (!viewPageOthers.IsEmpty()) {
             List<BpmnViewPageButton> viewPageButtonList = viewPageOthers
-                .Select(other => BpmnViewPageButton.BuildViewPageButton(confId, other,(int)ViewPageTypeEnum.VIEW_PAGE_TYPE_OTHER))
+                .Select(other => BpmnViewPageButton.BuildViewPageButton(confId, other,(int)ViewPageTypeEnum.VIEW_PAGE_TYPE_OTHER,MultiTenantUtil.GetCurrentTenantId()))
                 .ToList();
             _bpmnViewPageButtonService._repository.AddRange(viewPageButtonList);
         }

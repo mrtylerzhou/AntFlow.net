@@ -38,7 +38,7 @@ public class BpmnViewPageButton
 
     public DateTime? UpdateTime { get; set; }=DateTime.Now;
 
-    public static BpmnViewPageButton BuildViewPageButton(long confId, int buttonTypeCode, int viewPageTypeCode)
+    public static BpmnViewPageButton BuildViewPageButton(long confId, int buttonTypeCode, int viewPageTypeCode,string tenantId)
     {
         return new BpmnViewPageButton
         {
@@ -50,7 +50,7 @@ public class BpmnViewPageButton
             CreateTime = DateTime.Now,
             UpdateUser = SecurityUtils.GetLogInEmpNameSafe(),
             UpdateTime = DateTime.Now,
-            TenantId = MultiTenantUtil.GetCurrentTenantId(),
+            TenantId =tenantId,
             Remark = StringConstants.BIG_WHITE_BLANK,
         };
     }

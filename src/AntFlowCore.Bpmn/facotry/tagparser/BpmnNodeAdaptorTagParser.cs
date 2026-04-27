@@ -1,10 +1,11 @@
+using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.adaptor.bpmnnodeadp;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.exception;
-using AntFlowCore.Base.util;
+using AntFlowCore.Base.factory;
 
-namespace AntFlowCore.Base.factory.tagparser;
+namespace AntFlowCore.Engine.factory.tagparser;
 
 public class BpmnNodeAdaptorTagParser:TagParser<IBpmnNodeAdaptor, BpmnNodeAdpConfEnum>
 {

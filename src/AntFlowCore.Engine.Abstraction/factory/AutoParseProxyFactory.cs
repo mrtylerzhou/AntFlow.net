@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Text;
 using AntFlowCore.Base.factory;
 
-namespace AntFlowCore.Engine.factory;
+namespace AntFlowCore.Engine.Abstraction.factory;
 
 public class AutoParseProxyFactory
     {
@@ -94,7 +94,7 @@ public class AutoParseProxyFactory
                     "            throw new  AntFlowCore.Base.exception.AFBizException(\"provided data to find a bpmnNodeAdaptor method is null\");\n" +
                     "        }\n" +
                     "\n" +
-                    $"        var {varNames} = AntFlowCore.Base.util.ServiceProviderUtils.GetServices<AntFlowCore.Base.adaptor.IAdaptorService>();\n" +
+                    $"        var {varNames} = AntFlowCore.Abstraction.Orm.util.ServiceProviderUtils.GetServices<AntFlowCore.Base.adaptor.IAdaptorService>();\n" +
                     $"        foreach (var {varName} in {varNames}) {{\n" +
                     $"            if({varName}.IsSupportBusinessObject({string.Join(", ", parameters.Select(p => $" {p.Name}"))})){{\n" +
                     $"                return ({returnType.FullName}){varName};\n" +

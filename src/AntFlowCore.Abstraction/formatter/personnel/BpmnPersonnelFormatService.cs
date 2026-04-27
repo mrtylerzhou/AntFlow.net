@@ -1,4 +1,5 @@
 ﻿using AntFlowCore.Abstraction.adaptor;
+using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.exception;

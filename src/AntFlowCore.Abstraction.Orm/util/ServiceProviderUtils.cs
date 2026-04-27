@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using AntFlowCore.Base.interf;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AntFlowCore.Base.util;
+namespace AntFlowCore.Abstraction.Orm.util;
 
 public static class ServiceProviderUtils
 {

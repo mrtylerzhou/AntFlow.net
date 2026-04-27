@@ -1,11 +1,11 @@
-﻿using AntFlowCore.Abstraction;
-using AntFlowCore.Abstraction.service;
+﻿using AntFlowCore.Abstraction.service;
 using AntFlowCore.Base.adaptor.personnel.businesstableadp;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.vo;
+using AntFlowCore.Bpmn.adaptor;
 
-namespace AntFlowCore.Bpmn.adaptor.personnel.provider;
+namespace AntFlowCore.Engine.factory.provider;
 
 public class BusinessTablePersonnelProvider: IBpmnPersonnelProviderService
 {

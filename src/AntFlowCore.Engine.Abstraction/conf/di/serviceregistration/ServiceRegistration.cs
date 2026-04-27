@@ -26,10 +26,8 @@ using AntFlowCore.Bpmn.adaptor.nodetypecondition.judge;
 using AntFlowCore.Bpmn.adaptor.personnel.loopsign;
 using AntFlowCore.Bpmn.adaptor.personnel.provider;
 using AntFlowCore.Bpmn.adaptor.personnel.provideradp;
-using AntFlowCore.Bpmn.adaptor.personnel.provideradp.businesstableadp;
 using AntFlowCore.Bpmn.adaptor.processoperation;
 using AntFlowCore.Bpmn.adaptor.variable;
-using AntFlowCore.Bpmn.aop;
 using AntFlowCore.Bpmn.evt;
 using AntFlowCore.Bpmn.listener;
 using AntFlowCore.Bpmn.service;
@@ -38,7 +36,11 @@ using AntFlowCore.Business.service;
 using AntFlowCore.Business.service.biz;
 using antflowcore.conf.ef;
 using AntFlowCore.Core.vo;
+using AntFlowCore.Engine.Abstraction.aop;
+using AntFlowCore.Engine.Abstraction.factory;
 using AntFlowCore.Engine.factory;
+using AntFlowCore.Engine.factory.provider;
+using AntFlowCore.Engine.provideradaptor.businesstableadp;
 using AntFlowCore.Engine.service;
 using AntFlowCore.Engine.service.biz;
 using AntFlowCore.Engine.service.formprocess;
@@ -53,7 +55,7 @@ using AntFlowCore.VirtualNode.service;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AntFlowCore.AspNetCore.conf.di.serviceregistration;
+namespace AntFlowCore.Engine.Abstraction.conf.di.serviceregistration;
 
 public static class ServiceRegistration
 {

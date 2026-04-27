@@ -1,7 +1,7 @@
 ﻿using AntFlowCore.Base.interf;
 using Microsoft.Extensions.Configuration;
 
-namespace AntFlowCore.Base.util;
+namespace AntFlowCore.Abstraction.Orm.util;
 
 public static class MultiTenantUtil
 {

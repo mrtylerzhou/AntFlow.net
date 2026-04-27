@@ -1,7 +1,7 @@
 using AntFlowCore.Base.adaptor.processoperation;
 using AntFlowCore.Base.factory;
 
-namespace AntFlowCore.Bpmn.aop;
+namespace AntFlowCore.Engine.Abstraction.aop;
 
 /// <summary>
 /// Implementation of proxy factory that uses BpmnSendMessageAspect for cross-cutting concerns.

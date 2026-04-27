@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 
-namespace AntFlowCore.Base.util;
+namespace AntFlowCore.Abstraction.Orm.util;
 
 public class ConfigUtil
 {

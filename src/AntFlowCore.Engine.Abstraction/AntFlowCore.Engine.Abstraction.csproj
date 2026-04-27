@@ -6,11 +6,15 @@
     <TargetFramework>net10.0</TargetFramework>
     <IsPackable>true</IsPackable>
     <OutputType>Library</OutputType>
-    <RootNamespace>AntFlowCore.Engine.Orm</RootNamespace>
+    <RootNamespace>AntFlowCore.Engine.Abstraction</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AntFlowCore.Engine\AntFlowCore.Engine.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="conf\di\" />
   </ItemGroup>
 
 </Project>

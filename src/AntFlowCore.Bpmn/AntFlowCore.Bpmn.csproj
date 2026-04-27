@@ -15,4 +15,8 @@
 		<ProjectReference Include="..\AntFlowCore.Business\AntFlowCore.Business.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="facotry\" />
+	</ItemGroup>
+
 </Project>

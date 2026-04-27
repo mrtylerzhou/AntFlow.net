@@ -3,8 +3,9 @@ using System.Text;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.factory;
 using AntFlowCore.Bpmn.adaptor;
+using AntFlowCore.Engine.factory;
 
-namespace AntFlowCore.Engine.factory;
+namespace AntFlowCore.Engine.Abstraction.factory;
 
 public class AdaptorFactoryProxy
     {

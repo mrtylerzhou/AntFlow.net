@@ -9,7 +9,7 @@
     </PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\AntFlowCore.Engine.Orm\AntFlowCore.Engine.Orm.csproj" />
+		<ProjectReference Include="..\AntFlowCore.Engine.Abstraction\AntFlowCore.Engine.Abstraction.csproj" />
 	</ItemGroup>
 
     <ItemGroup>

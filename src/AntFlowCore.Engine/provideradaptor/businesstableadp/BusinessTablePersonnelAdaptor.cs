@@ -2,9 +2,9 @@
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.constant.enums;
-using AntFlowCore.Bpmn.adaptor.personnel.provider;
+using AntFlowCore.Engine.factory.provider;
 
-namespace AntFlowCore.Bpmn.adaptor.personnel.provideradp.businesstableadp;
+namespace AntFlowCore.Engine.provideradaptor.businesstableadp;
 
 public class BusinessTablePersonnelAdaptor : AbstractBpmnPersonnelAdaptor {
         public BusinessTablePersonnelAdaptor(BusinessTablePersonnelProvider bpmnPersonnelProviderService, IBpmnEmployeeInfoProviderService bpmnEmployeeInfoProviderService) : base(bpmnPersonnelProviderService, bpmnEmployeeInfoProviderService)
