@@ -1,6 +1,4 @@
-﻿using FreeSql.Internal.Model;
-
-namespace AntFlowCore.Base.entity;
+﻿namespace AntFlowCore.Base.entity;
 
 public class Page<T>
     {

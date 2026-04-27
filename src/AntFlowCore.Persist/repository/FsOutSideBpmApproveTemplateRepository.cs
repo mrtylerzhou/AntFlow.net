@@ -13,17 +13,17 @@ public class FsOutSideBpmApproveTemplateRepository : RepositoryBase<OutSideBpmAp
     {
     }
 
-    public (List<OutSideBpmApproveTemplate>, PagingInfo) ListPage(Expression<Func<OutSideBpmApproveTemplate, bool>> expression, BasePagingInfo basePagingInfo)
+    public List<OutSideBpmApproveTemplate> ListPage(Expression<Func<OutSideBpmApproveTemplate, bool>> expression, PagingInfo pagingInfo)
     {
+        BasePagingInfo basePagingInfo = pagingInfo.ToBasePagingInfo();
         List<OutSideBpmApproveTemplate> list = _ormContext.FreeSql
             .Select<OutSideBpmApproveTemplate>()
             .Where(expression)
             .OrderByDescending(a => a.CreateTime)
             .Page(basePagingInfo)
             .ToList();
-
-        PagingInfo pagingInfo = basePagingInfo.ToPagingInfo();
-        return (list, pagingInfo);
+        pagingInfo.Count = basePagingInfo.Count;
+        return list;
     }
 
     public void DeleteById(long id)

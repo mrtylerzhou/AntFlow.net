@@ -5,7 +5,7 @@ using AntFlowCore.Base.adaptor.formoperation;
 using AntFlowCore.Base.factory;
 using AntFlowCore.Base.vo;
 
-namespace AntFlowCore.Engine.factory.tagparser;
+namespace AntFlowCore.Bpmn.facotry.tagparser;
 
 public class ActivitiTagParser<T>: TagParser<IFormOperationAdaptor<T>,BusinessDataVo> where T: BusinessDataVo
 {

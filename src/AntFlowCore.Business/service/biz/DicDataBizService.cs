@@ -1,6 +1,4 @@
 ﻿using System.Linq.Expressions;
-using AntFlowCore.Abstraction.Orm.ext;
-using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.service.repository;
 using AntFlowCore.Base.constant.enums;
@@ -11,7 +9,6 @@ using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Persist.api.interf.biz;
 using AntFlowCore.Persist.api.interf.repository;
-using FreeSql.Internal.Model;
 
 namespace AntFlowCore.Business.service.biz;
 
@@ -21,7 +18,7 @@ public class DicDataBizService :  IDicDataBizSerivce
     private readonly IBpmProcessNoticeService _bpmProcessNoticeService;
 
 
-    public DicDataBizService(IFreeSql freeSql, IDicDataSerivce dicDataSerivce, IBpmProcessNoticeService bpmProcessNoticeService)
+    public DicDataBizService(IDicDataSerivce dicDataSerivce, IBpmProcessNoticeService bpmProcessNoticeService)
     {
         _dicDataSerivce = dicDataSerivce;
         _bpmProcessNoticeService = bpmProcessNoticeService;

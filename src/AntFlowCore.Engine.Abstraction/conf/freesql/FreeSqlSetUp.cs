@@ -1,8 +1,7 @@
-﻿using FreeSql.MySql;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AntFlowCore.AspNetCore.conf.freesql;
+namespace AntFlowCore.Engine.Abstraction.conf.freesql;
 
 public static class FreeSqlSetUp
 {

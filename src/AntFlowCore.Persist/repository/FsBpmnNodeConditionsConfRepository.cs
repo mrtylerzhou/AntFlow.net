@@ -3,7 +3,7 @@ using AntFlowCore.Base.entity;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Persist.api.interf.repository;
 
-namespace antflowcore.conf.ef;
+namespace AntFlowCore.Persist.repository;
 
 public class FsBpmnNodeConditionsConfRepository : RepositoryBase<BpmnNodeConditionsConf>, IBpmnNodeConditionsConfRepository
 {

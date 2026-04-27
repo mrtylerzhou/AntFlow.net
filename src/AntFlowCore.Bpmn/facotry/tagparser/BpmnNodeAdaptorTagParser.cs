@@ -5,7 +5,7 @@ using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.factory;
 
-namespace AntFlowCore.Engine.factory.tagparser;
+namespace AntFlowCore.Bpmn.facotry.tagparser;
 
 public class BpmnNodeAdaptorTagParser:TagParser<IBpmnNodeAdaptor, BpmnNodeAdpConfEnum>
 {

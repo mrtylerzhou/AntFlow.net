@@ -15,7 +15,7 @@ using FreeSql;
 using FreeSql.Internal.Model;
 using Microsoft.Extensions.Logging;
 
-namespace AntFlowCore.Business.service.biz;
+namespace AntFlowCore.Persist.repository;
 
 public class ProcessApprovalService : IProcessApprovalService
 {

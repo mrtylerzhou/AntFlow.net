@@ -1,6 +1,6 @@
 ﻿using AntFlowCore.Abstraction.Orm.repository;
 
-namespace antflowcore.service.interf.repository;
+namespace AntFlowCore.Persist.api.interf.repository;
 
 public interface IAntFlowRepositoryMix<T, TRepo> where T : class where TRepo : IBaseRepository<T>
 {

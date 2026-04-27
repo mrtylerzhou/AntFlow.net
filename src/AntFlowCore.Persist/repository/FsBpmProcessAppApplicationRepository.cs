@@ -1,13 +1,11 @@
 using AntFlowCore.Abstraction.Orm.ext;
 using AntFlowCore.Abstraction.Orm.repository;
-using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.vo;
-using AntFlowCore.Core.vo;
 using AntFlowCore.Persist.api.interf.repository;
 using FreeSql.Internal.Model;
 
-namespace antflowcore.conf.ef;
+namespace AntFlowCore.Persist.repository;
 
 public class FsBpmProcessAppApplicationRepository : RepositoryBase<BpmProcessAppApplication>, IBpmProcessAppApplicationRepository
 {

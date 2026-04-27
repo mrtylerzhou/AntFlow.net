@@ -8,7 +8,6 @@ using AntFlowCore.Base.exception;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Persist.api.interf.repository;
-using FreeSql.Internal.Model;
 
 namespace AntFlowCore.Business.service
 {
@@ -42,8 +41,8 @@ namespace AntFlowCore.Business.service
                 expression = expression.And(a => a.Name.Contains(informationTemplateVo.Name));
             }
 
-            BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
-            var (list, pagingInfo) = this._repository.GetInformationTemplateByExpression(expression, basePagingInfo);
+            PagingInfo  pagingInfo = page.ToPagingInfo();
+            var list= this._repository.GetInformationTemplateByExpression(expression,  pagingInfo);
             List<InformationTemplate> informationTemplates = list;
               
             List<InformationTemplateVo> results = new List<InformationTemplateVo>();

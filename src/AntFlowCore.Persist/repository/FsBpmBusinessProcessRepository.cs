@@ -33,4 +33,12 @@ public class FsBpmBusinessProcessRepository: RepositoryBase<BpmBusinessProcess>,
             .Where(a => a.Id == id)
             .ExecuteAffrows();
     }
+
+    public void UpdateDto(BpmBusinessProcess bpmBusinessProcess)
+    {
+        _ormContext.FreeSql.Update<BpmBusinessProcess>()
+            .SetDto(bpmBusinessProcess)
+            .Where(a => a.BusinessNumber.Equals(bpmBusinessProcess.BusinessNumber))
+            .ExecuteAffrows();
+    }
 }

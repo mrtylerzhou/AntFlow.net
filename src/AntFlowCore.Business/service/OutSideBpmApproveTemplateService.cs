@@ -4,7 +4,6 @@ using AntFlowCore.Base.entity;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Persist.api.interf.repository;
-using FreeSql.Internal.Model;
 
 namespace AntFlowCore.Business.service;
 
@@ -26,9 +25,9 @@ public class OutSideBpmApproveTemplateService : IOutSideBpmApproveTemplateServic
     public ResultAndPage<OutSideBpmApproveTemplateVo> ListPage(PageDto pageDto, OutSideBpmApproveTemplateVo vo)
     {
         Page<OutSideBpmApproveTemplateVo> page = PageUtils.GetPageByPageDto<OutSideBpmApproveTemplateVo>(pageDto);
-        BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
+        PagingInfo pagingInfo = page.ToPagingInfo();
 
-        var (templates, pagingInfo) = _repository.ListPage(a => a.IsDel == 0, basePagingInfo);
+        var templates = _repository.ListPage(a => a.IsDel == 0, pagingInfo);
 
         List<OutSideBpmApproveTemplateVo> outSideBpmApproveTemplateVos = templates
             .Where(a => string.IsNullOrWhiteSpace(vo.ApproveTypeName) || a.ApproveTypeName.Contains(vo.ApproveTypeName))

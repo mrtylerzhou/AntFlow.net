@@ -2,7 +2,7 @@
 using AntFlowCore.Base.entity;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AntFlowCore.AspNetCore.conf.freesql;
+namespace AntFlowCore.Engine.Abstraction.conf.freesql;
 public static class FreesqlFluentConfiguration
 {
     public static void AddFreeSqlFluentConfig(this IServiceProvider service)

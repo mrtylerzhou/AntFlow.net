@@ -1,7 +1,6 @@
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.interf;
 using AntFlowCore.Base.vo;
-using antflowcore.service.interf.repository;
 
 namespace AntFlowCore.Persist.api.interf.repository;
 

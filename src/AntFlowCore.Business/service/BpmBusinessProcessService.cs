@@ -16,8 +16,7 @@ public class BpmBusinessProcessService: IBpmBusinessProcessService
         
         return number <= 0;
     }
-
-    public IFreeSql Frsql { get; }
+    
 
     public BpmBusinessProcess GetBpmBusinessProcess(string processNumber)
     {
@@ -49,10 +48,7 @@ public class BpmBusinessProcessService: IBpmBusinessProcessService
     {
         
         //todo 看这里更新正常么
-        this.Frsql.Update<BpmBusinessProcess>()
-            .SetDto(bpmBusinessProcess)
-            .Where(a => a.BusinessNumber.Equals(bpmBusinessProcess.BusinessNumber))
-            .ExecuteAffrows();
+        this._repository.UpdateDto(bpmBusinessProcess);
         
     }
 

@@ -1,5 +1,4 @@
 ﻿using AntFlowCore.Base.util;
-using FreeSql.DataAnnotations;
 
 namespace AntFlowCore.Base.entity
 {

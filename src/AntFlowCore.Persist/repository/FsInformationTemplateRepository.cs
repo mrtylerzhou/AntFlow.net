@@ -16,15 +16,16 @@ public class FsInformationTemplateRepository : RepositoryBase<InformationTemplat
        
     }
     
-    public (List<InformationTemplate>,PagingInfo pagingInfo) GetInformationTemplateByExpression(  Expression<Func<InformationTemplate, bool>> expression, BasePagingInfo basePagingInfo)
+    public List<InformationTemplate> GetInformationTemplateByExpression(  Expression<Func<InformationTemplate, bool>> expression, PagingInfo pagingInfo)
     {
+        BasePagingInfo basePagingInfo = pagingInfo.ToBasePagingInfo();
         List<InformationTemplate> informationTemplates = _ormContext.FreeSql.GetRepository<InformationTemplate>()
             .Where(expression)
             .Page(basePagingInfo)
             .ToList();
 
-        PagingInfo pagingInfo = basePagingInfo.ToPagingInfo();
+      pagingInfo.Count=informationTemplates.Count;
        
-        return (informationTemplates, pagingInfo);
+        return informationTemplates;
     }
 }
