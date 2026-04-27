@@ -1,8 +1,9 @@
-﻿using System.Security.Cryptography;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using AntFlowCore.Abstraction.Orm.util;
+using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
@@ -28,7 +29,7 @@ public class ThirdPartyCallbackFactory
     private readonly ILogger<ThirdPartyCallbackFactory> _logger;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IOutSideBpmBusinessPartyRepository _outSideBpmBusinessPartyRepository;
-    private readonly BpmVerifyInfoBizService _bpmVerifyInfoBizService;
+    private readonly IBpmVerifyInfoBizService _bpmVerifyInfoBizService;
     private readonly IOutSideBpmCallbackUrlConfService _outSideBpmCallbackUrlConfService;
 
 
@@ -44,7 +45,7 @@ public class ThirdPartyCallbackFactory
         IConfiguration configuration,
         IHttpContextAccessor httpContextAccessor,
         IOutSideBpmBusinessPartyRepository outSideBpmBusinessPartyRepository,
-        BpmVerifyInfoBizService bpmVerifyInfoBizService,
+        IBpmVerifyInfoBizService bpmVerifyInfoBizService,
         IOutSideBpmCallbackUrlConfService outSideBpmCallbackUrlConfService,
         ILogger<ThirdPartyCallbackFactory> logger)
     {

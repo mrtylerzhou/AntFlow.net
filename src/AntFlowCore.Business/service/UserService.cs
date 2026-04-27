@@ -210,7 +210,7 @@ public class UserService : IUserService
         Expression<Func<User, bool>> expression = a => 1 == 1;
         if (!string.IsNullOrEmpty(taskMgmtVo?.Description))
         {
-            expression = LambadaExpressionExtensions.And(expression, a => a.Name.Contains(taskMgmtVo.Description));
+            expression =LinqExtensions.And(expression, a => a.Name.Contains(taskMgmtVo.Description));
         }
 
         PagingInfo pagingInfo = page.ToPagingInfo();

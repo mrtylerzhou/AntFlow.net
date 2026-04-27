@@ -36,8 +36,8 @@ public class BpmnConfBizService : IBpmnConfBizService
     private readonly IInformationTemplateService _informationTemplateService;
     private readonly IBpmnNodeLfFormdataFieldControlService _lfFormdataFieldControlService;
     private readonly IBpmnViewPageButtonService _viewPageButtonService;
-    private readonly BpmnViewPageButtonBizService _viewPageButtonBizService;
-    private readonly TaskMgmtService _taskMgmtService;
+    private readonly IBpmnViewPageButtonBizService _viewPageButtonBizService;
+    private readonly ITaskMgmtService _taskMgmtService;
   
 
     public BpmnConfBizService(
@@ -57,8 +57,8 @@ public class BpmnConfBizService : IBpmnConfBizService
         IInformationTemplateService informationTemplateService,
         IBpmnNodeLfFormdataFieldControlService lfFormdataFieldControlService,
         IBpmnViewPageButtonService viewPageButtonService,
-        BpmnViewPageButtonBizService viewPageButtonBizService,
-        TaskMgmtService taskMgmtService
+        IBpmnViewPageButtonBizService viewPageButtonBizService,
+        ITaskMgmtService taskMgmtService
         )
     {
         _bpmnConfService = bpmnConfService;
