@@ -234,7 +234,7 @@ public class UserService : IUserService
     {
         var user = _repository.GetQueryable()
             .Where(a => a.Id == Convert.ToInt64(id))
-            .FirstOrDefault();
+            .First();
         return new DetailedUser()
         {
             Id = user.Id.ToString(),
@@ -275,9 +275,7 @@ public class UserService : IUserService
 
     public DetailedUser GetDetailedUserById(string Id)
     {
-        User? firstOrDefault = _repository
-            .GetQueryable()
-            .FirstOrDefault(a => a.Id == Convert.ToInt64(Id));
+        User? firstOrDefault = _repository.FirstOrDefault(a => a.Id == Convert.ToInt64(Id));
         DetailedUser employee = new DetailedUser()
         {
             Id = firstOrDefault.Id.ToString(),

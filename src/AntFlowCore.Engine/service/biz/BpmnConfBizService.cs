@@ -469,7 +469,7 @@ public class BpmnConfBizService : IBpmnConfBizService
                     BpmnApproveRemindVo vo = o.MapToVo();
                     vo.IsInuse = false;
                     
-                    var template = _informationTemplateService._repository.GetQueryable().Where(a => a.Id == o.TemplateId).FirstOrDefault();
+                    var template = _informationTemplateService._repository.Find(a => a.Id == o.TemplateId).FirstOrDefault();
                     vo.TemplateName = template?.Name ?? string.Empty;
                     
                     if (!string.IsNullOrEmpty(vo.Days))
@@ -547,8 +547,7 @@ public class BpmnConfBizService : IBpmnConfBizService
             }).ToList();
             vo.MessageSendTypeList = baseNumIdStruVos;
         }
-        vo.TemplateName = _informationTemplateService._repository.GetQueryable()
-            .Where(a=>a.Id==vo.TemplateId).FirstOrDefault()
+        vo.TemplateName = _informationTemplateService._repository.Find(a=>a.Id==vo.TemplateId).FirstOrDefault()
             ?.Name ?? string.Empty;
         return vo;
     }

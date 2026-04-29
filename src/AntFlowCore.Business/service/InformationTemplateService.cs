@@ -1,10 +1,11 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using AntFlowCore.Abstraction.Orm.ext;
 using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.exception;
+using AntFlowCore.Base.extension;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Persist.api.interf.repository;
@@ -38,7 +39,8 @@ namespace AntFlowCore.Business.service
             Expression<Func<InformationTemplate, bool>> expression = a => a.IsDel == 0;
             if (!string.IsNullOrEmpty(informationTemplateVo.Name))
             {
-                expression = expression.And(a => a.Name.Contains(informationTemplateVo.Name));
+                expression.And(
+                expression = expression.And(a => a.Name.Contains(informationTemplateVo.Name)));
             }
 
             PagingInfo  pagingInfo = page.ToPagingInfo();
@@ -132,6 +134,7 @@ namespace AntFlowCore.Business.service
             Dictionary<long, string> templateMap = map.Any()
                 ? _repository.GetQueryable()
                     .Where(t => map.Values.Contains(t.Id))
+                    .ToList()
                     .ToDictionary(t => t.Id, t => t.Name)
                 : new Dictionary<long, string>();
 
@@ -167,7 +170,7 @@ namespace AntFlowCore.Business.service
         {
             InformationTemplate informationTemplate = _repository.GetQueryable()
                 .Where(a => a.Id == id)
-                .FirstOrDefault() ?? new InformationTemplate();
+                .First() ?? new InformationTemplate();
             if (informationTemplate == null)
             {
                 throw new AFBizException("模板消息通知模板不存在");

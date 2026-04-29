@@ -1,5 +1,4 @@
 ﻿using System.Linq.Expressions;
-using AntFlowCore.Abstraction.Orm.ext;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.constant.enums;
@@ -11,13 +10,12 @@ using AntFlowCore.Base.factory;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Persist.api.interf.repository;
-using FreeSql;
-using FreeSql.Internal.Model;
 using Microsoft.Extensions.Logging;
+using SqlSugar;
 
 namespace AntFlowCore.Persist.repository;
 
-public class ProcessApprovalService : IProcessApprovalService
+public class ProcessApprovalService: IProcessApprovalService
 {
     private readonly IFormFactory _formFactory;
     private readonly IButtonOperationService _buttonOperationService;
@@ -28,7 +26,7 @@ public class ProcessApprovalService : IProcessApprovalService
     private readonly IBpmVariableMultiplayerService _bpmVariableMultiplayerService;
     private readonly IBpmProcessNameRelevancyService _processNameRelevancyService;
     private readonly IBpmProcessForwardService _bpmProcessForwardService;
-    private readonly IFreeSql _freeSql;
+    private readonly ISqlSugarClient _sqlSugar;
     private readonly IBpmProcessNameService _bpmProcessNameService;
     private readonly IBpmnConfCommonService _bpmnConfCommonService;
     private readonly IAFTaskService _taskService;
@@ -45,7 +43,7 @@ public class ProcessApprovalService : IProcessApprovalService
         IBpmVariableMultiplayerService bpmVariableMultiplayerService,
         IBpmProcessNameRelevancyService processNameRelevancyService,
         IBpmProcessForwardService bpmProcessForwardService,
-        IFreeSql freeSql,
+        ISqlSugarClient sqlSugar,
         IBpmProcessNameService bpmProcessNameService,
         IBpmnConfCommonService bpmnConfCommonService,
         IAFTaskService taskService,
@@ -62,7 +60,7 @@ public class ProcessApprovalService : IProcessApprovalService
         _bpmVariableMultiplayerService = bpmVariableMultiplayerService;
         _processNameRelevancyService = processNameRelevancyService;
         _bpmProcessForwardService = bpmProcessForwardService;
-        _freeSql = freeSql;
+        _sqlSugar = sqlSugar;
         _bpmProcessNameService = bpmProcessNameService;
         _bpmnConfCommonService = bpmnConfCommonService;
         _taskService = taskService;
@@ -102,7 +100,14 @@ public class ProcessApprovalService : IProcessApprovalService
         }
 
         BusinessDataVo dataVo = null;
-        _freeSql.Ado.Transaction(() => { dataVo = _buttonOperationService.ButtonsOperationTransactional(vo); });
+        _sqlSugar.Ado.BeginTran();
+        try {
+            dataVo = _buttonOperationService.ButtonsOperationTransactional(vo);
+            _sqlSugar.Ado.CommitTran();
+        } catch {
+            _sqlSugar.Ado.RollbackTran();
+            throw;
+        }
 
         return dataVo;
 
@@ -361,7 +366,7 @@ public class ProcessApprovalService : IProcessApprovalService
 
 private bool IsOperatable(TaskMgmtVO taskMgmtVo)
 {
-    long count = _freeSql.Select<BpmProcessOperation>()
+    long count = _sqlSugar.Queryable<BpmProcessOperation>()
         .Where(a=>a.ProcessNode==taskMgmtVo.TaskName&&a.ProcessKey==taskMgmtVo.ProcessKey&&a.Type==taskMgmtVo.Type)
         .Count();
     return count <= 0;
@@ -370,211 +375,232 @@ private bool IsOperatable(TaskMgmtVO taskMgmtVo)
 
 List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
     {
-        BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
-        List<TaskMgmtVO> taskMgmtVos = _freeSql
-            .Select<BpmAfTaskInst, BpmBusinessProcess>()
-            .LeftJoin((h, b) => h.ProcInstId == b.ProcInstId)
-            .OrderByDescending((a, b) => a.StartTime)
-            .WithTempQuery(a => new TaskMgmtVO
+        PagingInfo basePagingInfo = page.ToPagingInfo();
+        int totalCount = 0;
+        List<TaskMgmtVO> taskMgmtVos = _sqlSugar
+            .Queryable<BpmAfTaskInst, BpmBusinessProcess>((h, b) => new JoinQueryInfos(
+                JoinType.Left, h.ProcInstId == b.ProcInstId
+            ))
+            .OrderByDescending((h, b) => h.StartTime)
+            .Select((h, b) => new TaskMgmtVO
             {
-                ProcessInstanceId = a.t1.ProcInstId,
-                ProcessId = a.t1.ProcDefId,
-                ProcessNumber = a.t2.BusinessNumber,
-                UserId = a.t2.CreateUser,
-                BusinessId = a.t2.BusinessId,
-                Description = a.t2.Description,
-                ProcessState = a.t2.ProcessState,
-                RunTime = a.t1.StartTime,
-                ProcessDigest = a.t2.ProcessDigest,
+                ProcessInstanceId = h.ProcInstId,
+                ProcessId = h.ProcDefId,
+                ProcessNumber = b.BusinessNumber,
+                UserId = b.CreateUser,
+                BusinessId = b.BusinessId,
+                Description = b.Description,
+                ProcessState = b.ProcessState,
+                RunTime = h.StartTime,
+                ProcessDigest = b.ProcessDigest,
             })
+            .MergeTable()
             .Where(CommonCond(taskMgmtVO))
-            .Page(basePagingInfo).ToList();
-        page.Total = (int)basePagingInfo.Count;
+            .ToPageList(basePagingInfo.PageNumber, basePagingInfo.PageSize, ref totalCount);
+        page.Total = totalCount;
         return taskMgmtVos;
     }
     
     List<TaskMgmtVO> ViewPcpNewlyBuildList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO){
-        BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
-        List<TaskMgmtVO> taskMgmtVos = _freeSql
-            .Select<BpmBusinessProcess,BpmAfTaskInst>()
-            .LeftJoin((b,h) => h.ProcInstId == b.ProcInstId&&h.TaskDefKey=="task1418018332271"&&h.Priority==0)
-            .Where((b,a)=>b.CreateUser==taskMgmtVO.ApplyUser&&b.IsDel==0)
-            .WithTempQuery(a=>new TaskMgmtVO
+        PagingInfo basePagingInfo = page.ToPagingInfo();
+        int totalCount = 0;
+        List<TaskMgmtVO> taskMgmtVos = _sqlSugar
+            .Queryable<BpmBusinessProcess, BpmAfTaskInst>((b, h) => new JoinQueryInfos(
+                JoinType.Left, h.ProcInstId == b.ProcInstId && h.TaskDefKey == "task1418018332271" && h.Priority == 0
+            ))
+            .Where((b, h) => b.CreateUser == taskMgmtVO.ApplyUser && b.IsDel == 0)
+            .Select((b, h) => new TaskMgmtVO
             {
-                ProcessInstanceId = a.t1.ProcInstId,
-                ProcessId = a.t2.ProcDefId,
-                UserId = a.t1.CreateUser,
-                CreateTime = a.t2.StartTime,
-                RunTime = a.t2.StartTime,
-                BusinessId = a.t1.BusinessId,
-                ProcessNumber = a.t1.BusinessNumber,
-                Description = a.t1.Description,
-                ProcessState = a.t1.ProcessState,
-                ProcessKey = a.t1.ProcessinessKey,
-                ProcessCode =a.t1.ProcessinessKey,
-                TaskStype = a.t1.ProcessState,
-                ProcessDigest = a.t1.ProcessDigest,
+                ProcessInstanceId = b.ProcInstId,
+                ProcessId = h.ProcDefId,
+                UserId = b.CreateUser,
+                CreateTime = h.StartTime,
+                RunTime = h.StartTime,
+                BusinessId = b.BusinessId,
+                ProcessNumber = b.BusinessNumber,
+                Description = b.Description,
+                ProcessState = b.ProcessState,
+                ProcessKey = b.ProcessinessKey,
+                ProcessCode = b.ProcessinessKey,
+                TaskStype = b.ProcessState,
+                ProcessDigest = b.ProcessDigest,
             })
+            .MergeTable()
             .Where(CommonCond(taskMgmtVO))
-            .OrderByDescending(a=>a.CreateTime)
-            .Page(basePagingInfo)
-            .ToList();
-        page.Total = (int)basePagingInfo.Count;
+            .OrderByDescending( a=> a.CreateTime)
+            .ToPageList(basePagingInfo.PageNumber, basePagingInfo.PageSize, ref totalCount);
+        page.Total = totalCount;
         return taskMgmtVos;
     }
     List<TaskMgmtVO> ViewPcAlreadyDoneList(Page<TaskMgmtVO> page,  TaskMgmtVO taskMgmtVO){
-        BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
-        List<TaskMgmtVO> taskMgmtVos = _freeSql
-            .Select<BpmAfTaskInst, BpmBusinessProcess>()
-            .LeftJoin((h, b) => h.ProcInstId == b.ProcInstId)
-            .Where((a,b)=>a.Assignee==taskMgmtVO.ApplyUser&&b.IsDel==0&&a.EndTime!=null&&a.TaskDefKey!="task1418018332271")
-            .WithTempQuery(a=>new TaskMgmtVO
+        PagingInfo basePagingInfo = page.ToPagingInfo();
+        int totalCount = 0;
+        List<TaskMgmtVO> taskMgmtVos = _sqlSugar
+            .Queryable<BpmAfTaskInst, BpmBusinessProcess>((h, b) => new JoinQueryInfos(
+                JoinType.Left, h.ProcInstId == b.ProcInstId
+            ))
+            .Where((h, b) => h.Assignee == taskMgmtVO.ApplyUser && b.IsDel == 0 && h.EndTime != null && h.TaskDefKey != "task1418018332271")
+            .Select((h, b) => new TaskMgmtVO
             {
-                ProcessInstanceId = a.t2.ProcInstId,
-                ProcessKey = a.t2.ProcessinessKey,
-                UserId = a.t2.CreateUser,
-                BusinessId = a.t2.BusinessId,
-                Description = a.t2.Description,
-                TaskStype = a.t2.ProcessState,
-                ProcessNumber = a.t2.BusinessNumber,
-                RunTime = a.t1.EndTime,
-                ProcessState = a.t2.ProcessState,
-                ProcessDigest = a.t2.ProcessDigest,
+                ProcessInstanceId = b.ProcInstId,
+                ProcessKey = b.ProcessinessKey,
+                UserId = b.CreateUser,
+                BusinessId = b.BusinessId,
+                Description = b.Description,
+                TaskStype = b.ProcessState,
+                ProcessNumber = b.BusinessNumber,
+                RunTime = h.EndTime,
+                ProcessState = b.ProcessState,
+                ProcessDigest = b.ProcessDigest,
             })
+            .MergeTable()
             .Where(CommonCond(taskMgmtVO))
-            .OrderByDescending(a=>a.RunTime)
-            .Page(basePagingInfo)
-            .ToList();
-        page.Total = (int)basePagingInfo.Count;
+            .OrderByDescending(a => a.RunTime)
+            .ToPageList(basePagingInfo.PageNumber, basePagingInfo.PageSize, ref totalCount);
+        page.Total = totalCount;
         return taskMgmtVos;
     }
     List<TaskMgmtVO> ViewPcToDoList(Page<TaskMgmtVO> page,TaskMgmtVO taskMgmtVO)
     {
-        BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
-        List<TaskMgmtVO> taskMgmtVos = _freeSql
-            .Select<BpmAfTask, BpmBusinessProcess>()
-            .LeftJoin((a, b) => a.ProcInstId == b.ProcInstId)
-            .Where((a,b)=>a.Assignee==taskMgmtVO.ApplyUser&&b.IsDel==0)
-            .WithTempQuery(a=>new TaskMgmtVO()
+        PagingInfo basePagingInfo = page.ToPagingInfo();
+        int totalCount = 0;
+        List<TaskMgmtVO> taskMgmtVos = _sqlSugar
+            .Queryable<BpmAfTask, BpmBusinessProcess>((a, b) => new JoinQueryInfos(
+                JoinType.Left, a.ProcInstId == b.ProcInstId
+            ))
+            .Where((a, b) => a.Assignee == taskMgmtVO.ApplyUser && b.IsDel == 0)
+            .Select((a, b) => new TaskMgmtVO
             {
-                ProcessInstanceId = a.t1.ProcInstId,
-                ProcessKey = a.t2.ProcessinessKey,
-                UserId = a.t2.CreateUser,
-                CreateTime = a.t2.CreateTime,
-                BusinessId= a.t2.BusinessId,
-                Description = a.t2.Description,
-                ProcessNumber = a.t2.BusinessNumber,
-                TaskStype = a.t2.ProcessState,
-                TaskId = a.t1.Id,
-                RunTime = a.t2.CreateTime,
-                ProcessState = a.t2.ProcessState,
-                ProcessDigest = a.t2.ProcessDigest,
+                ProcessInstanceId = a.ProcInstId,
+                ProcessKey = b.ProcessinessKey,
+                UserId = b.CreateUser,
+                CreateTime = b.CreateTime,
+                BusinessId = b.BusinessId,
+                Description = b.Description,
+                ProcessNumber = b.BusinessNumber,
+                TaskStype = b.ProcessState,
+                TaskId = a.Id,
+                RunTime = b.CreateTime,
+                ProcessState = b.ProcessState,
+                ProcessDigest = b.ProcessDigest,
             })
+            .MergeTable()
             .Where(CommonCond(taskMgmtVO))
-            .OrderByDescending(a=>a.RunTime)
-            .Page(basePagingInfo)
-            .ToList();
-        page.Total = (int)basePagingInfo.Count;
+            .OrderByDescending(a => a.RunTime)
+            .ToPageList(basePagingInfo.PageNumber, basePagingInfo.PageSize, ref totalCount);
+        page.Total = totalCount;
         return taskMgmtVos;
     }
     List<TaskMgmtVO> AllProcessList(Page<TaskMgmtVO> page,TaskMgmtVO taskMgmtVO){
-        BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
-        ISelect<BpmAfTask,BpmBusinessProcess> select = _freeSql
-            .Select<BpmAfTask, BpmBusinessProcess>();
+        PagingInfo basePagingInfo = page.ToPagingInfo();
+        int totalCount = 0;
+        ISugarQueryable<BpmAfTask, BpmBusinessProcess> queryable;
         if (taskMgmtVO.IncludeAllFlag == 1)
         {
-            select.RightJoin((a, b) => a.ProcInstId == b.ProcInstId);
+            queryable = _sqlSugar
+                .Queryable<BpmAfTask, BpmBusinessProcess>((a, b) => new JoinQueryInfos(
+                    JoinType.Right, a.ProcInstId == b.ProcInstId
+                ));
         }
         else
         {
-            select.LeftJoin((a, b) => a.ProcInstId == b.ProcInstId);
+            queryable = _sqlSugar
+                .Queryable<BpmAfTask, BpmBusinessProcess>((a, b) => new JoinQueryInfos(
+                    JoinType.Left, a.ProcInstId == b.ProcInstId
+                ));
         }
         List<TaskMgmtVO> taskMgmtVos =
-            select
-            .Where((a,b)=>b.IsDel==0)
-            .WithTempQuery(a=>new TaskMgmtVO()
+            queryable
+            .Where((a, b) => b.IsDel == 0)
+            .Select((a, b) => new TaskMgmtVO
             {
-                ProcessInstanceId = a.t1.ProcInstId,
-                ProcessKey = a.t2.ProcessinessKey,
-                UserId = a.t2.CreateUser,
-                BusinessId= a.t2.BusinessId,
-                Description = a.t2.Description,
-                TaskStype = a.t2.ProcessState,
-                ProcessNumber = a.t2.BusinessNumber,
-                CreateTime = a.t2.CreateTime,
-                RunTime = a.t2.CreateTime,
-                ProcessState = a.t2.ProcessState,
-                TaskId = a.t1.Id,
-                ProcessDigest = a.t2.ProcessDigest,
-                TaskOwner = a.t1.Assignee,
-                TaskName = a.t1.TaskDefKey,
+                ProcessInstanceId = a.ProcInstId,
+                ProcessKey = b.ProcessinessKey,
+                UserId = b.CreateUser,
+                BusinessId = b.BusinessId,
+                Description = b.Description,
+                TaskStype = b.ProcessState,
+                ProcessNumber = b.BusinessNumber,
+                CreateTime = b.CreateTime,
+                RunTime = b.CreateTime,
+                ProcessState = b.ProcessState,
+                TaskId = a.Id,
+                ProcessDigest = b.ProcessDigest,
+                TaskOwner = a.Assignee,
+                TaskName = a.TaskDefKey,
             })
+            .MergeTable()
             .Where(CommonCond(taskMgmtVO))
-            .OrderByDescending(a=>a.RunTime)
-            .Page(basePagingInfo)
-            .ToList();
-        page.Total = (int)basePagingInfo.Count;
+            .OrderByDescending(a => a.RunTime)
+            .ToPageList(basePagingInfo.PageNumber, basePagingInfo.PageSize, ref totalCount);
+        page.Total = totalCount;
         return taskMgmtVos;
     }
     List<TaskMgmtVO> ViewPcForwardList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO){
-        BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
-        List<TaskMgmtVO> taskMgmtVos = _freeSql
-            .Select<BpmBusinessProcess,BpmProcessForward>()
-            .LeftJoin((a,b)=>a.ProcInstId==b.ProcessInstanceId)
-            .Where((a,b)=>b.ForwardUserId==taskMgmtVO.ApplyUser&&b.IsDel==0&&b.IsDel==0)
-            .WithTempQuery(a=>new TaskMgmtVO()
+        PagingInfo basePagingInfo = page.ToPagingInfo();
+        int totalCount = 0;
+        List<TaskMgmtVO> taskMgmtVos = _sqlSugar
+            .Queryable<BpmBusinessProcess, BpmProcessForward>((a, b) => new JoinQueryInfos(
+                JoinType.Left, a.ProcInstId == b.ProcessInstanceId
+            ))
+            .Where((a, b) => b.ForwardUserId == taskMgmtVO.ApplyUser && b.IsDel == 0 && a.IsDel == 0)
+            .Select((a, b) => new TaskMgmtVO
             {
-                ProcessInstanceId = a.t1.ProcInstId,
-                ProcessKey = a.t1.ProcessinessKey,
-                UserId = a.t1.CreateUser,
-                CreateTime = a.t1.CreateTime,
-                BusinessId = a.t1.BusinessId,
-                Description = a.t1.Description,
-                TaskStype = a.t1.ProcessState,
-                ProcessNumber = a.t1.BusinessNumber,
-                RunTime = a.t1.CreateTime,
-                ProcessState = a.t1.ProcessState,
-                IsRead = a.t2.IsRead,
-                ProcessDigest = a.t1.ProcessDigest,
+                ProcessInstanceId = a.ProcInstId,
+                ProcessKey = a.ProcessinessKey,
+                UserId = a.CreateUser,
+                CreateTime = a.CreateTime,
+                BusinessId = a.BusinessId,
+                Description = a.Description,
+                TaskStype = a.ProcessState,
+                ProcessNumber = a.BusinessNumber,
+                RunTime = a.CreateTime,
+                ProcessState = a.ProcessState,
+                IsRead = b.IsRead,
+                ProcessDigest = a.ProcessDigest,
             })
+            .MergeTable()
             .Where(CommonCond(taskMgmtVO))
-            .OrderByDescending(a=>a.CreateTime)
-            .Page(basePagingInfo)
-            .ToList();
-        page.Total = (int)basePagingInfo.Count;
+            .OrderByDescending(a => a.CreateTime)
+            .ToPageList(basePagingInfo.PageNumber, basePagingInfo.PageSize, ref totalCount);
+        page.Total = totalCount;
         return taskMgmtVos;
     }
     List<TaskMgmtVO> BackToModifyList(Page<TaskMgmtVO> page,  TaskMgmtVO taskMgmtVO){
-        BasePagingInfo basePagingInfo = page.ToPagingInfo().ToBasePagingInfo();
-        List<TaskMgmtVO> taskMgmtVos = _freeSql
-            .Select<BpmAfTask, BpmVerifyInfo, BpmBusinessProcess>()
-            .InnerJoin((t, c, b) => c.RunInfoId == t.ProcInstId)
-            .InnerJoin((t, c, b) => b.ProcInstId == t.ProcInstId)
+        PagingInfo basePagingInfo = page.ToPagingInfo();
+        int totalCount = 0;
+        List<TaskMgmtVO> taskMgmtVos = _sqlSugar
+            .Queryable<BpmAfTask, BpmVerifyInfo, BpmBusinessProcess>(
+                (t, c, b) => new JoinQueryInfos(
+                    JoinType.Inner, c.RunInfoId == t.ProcInstId,
+                    JoinType.Inner, b.ProcInstId == t.ProcInstId
+                )
+            )
             .Where((t, c, b) =>
                 t.TaskDefKey == "task1418018332271" && c.VerifyStatus == 8 && c.IsDel == 0 && b.IsDel == 0)
-            .WithTempQuery(a => new TaskMgmtVO()
+            .Select((t, c, b) => new TaskMgmtVO
             {
-                ProcessInstanceId = a.t1.ProcInstId,
-                ProcessKey = a.t3.ProcessinessKey,
-                UserId = a.t3.CreateUser,
-                BusinessId= a.t3.BusinessId,
-                Description = a.t3.Description,
-                TaskStype = a.t3.ProcessState,
-                ProcessNumber = a.t3.BusinessNumber,
-                CreateTime = a.t3.CreateTime,
-                RunTime = a.t3.CreateTime,
-                ProcessState = a.t3.ProcessState,
-                TaskId = a.t1.Id,
-                ProcessDigest = a.t3.ProcessDigest,
-                TaskOwner = a.t1.Assignee,
-                TaskName = a.t1.TaskDefKey,
+                ProcessInstanceId = t.ProcInstId,
+                ProcessKey = b.ProcessinessKey,
+                UserId = b.CreateUser,
+                BusinessId = b.BusinessId,
+                Description = b.Description,
+                TaskStype = b.ProcessState,
+                ProcessNumber = b.BusinessNumber,
+                CreateTime = b.CreateTime,
+                RunTime = b.CreateTime,
+                ProcessState = b.ProcessState,
+                TaskId = t.Id,
+                ProcessDigest = b.ProcessDigest,
+                TaskOwner = t.Assignee,
+                TaskName = t.TaskDefKey,
             })
+            .MergeTable()
             .Where(CommonCond(taskMgmtVO))
             .OrderByDescending(a => a.CreateTime)
-            .Page(basePagingInfo)
-            .ToList();
+            .ToPageList(basePagingInfo.PageNumber, basePagingInfo.PageSize, ref totalCount);
 
-        page.Total = (int)basePagingInfo.Count;
+        page.Total = totalCount;
         return taskMgmtVos;
     }
     private Expression<Func<TaskMgmtVO, bool>> CommonCond(TaskMgmtVO paramVo)
@@ -587,54 +613,54 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
         
         if (!string.IsNullOrEmpty(paramVo.Search))
         {
-            exp=LambadaExpressionExtensions.And(exp, a => a.Search.Contains(paramVo.Search));
+            exp=exp.And(a => a.Search.Contains(paramVo.Search));
         }
 
         if (paramVo.ApplyUserId != 0)
         {
-            exp=LambadaExpressionExtensions.And(exp, a => a.ApplyUserId == paramVo.ApplyUserId);
+            exp=exp.And(a => a.ApplyUserId == paramVo.ApplyUserId);
         }
 
         if (!string.IsNullOrEmpty(paramVo.Description))
         {
-            exp=LambadaExpressionExtensions.And(exp, a => a.Description.Contains(paramVo.Description));
+            exp=exp.And(a => a.Description.Contains(paramVo.Description));
         }
 
         if (!string.IsNullOrEmpty(paramVo.ProcessNumber))
         {
-            exp=LambadaExpressionExtensions.And(exp, a => a.ProcessNumber == paramVo.ProcessNumber);
+            exp=exp.And(a => a.ProcessNumber == paramVo.ProcessNumber);
         }
 
         if (paramVo.ProcessState != null)
         {
-            exp=LambadaExpressionExtensions.And(exp, a => a.ProcessState == paramVo.ProcessState);
+            exp=exp.And(a => a.ProcessState == paramVo.ProcessState);
         }
 
         if (!string.IsNullOrEmpty(paramVo.StartTime) && !string.IsNullOrEmpty(paramVo.EndTime))
         {
             DateTime start = DateTime.Parse(paramVo.StartTime);
-            DateTime end = DateTime.Parse(paramVo.EndTime);
-            exp=LambadaExpressionExtensions.And(exp, a => a.RunTime.Value.Date.Between(start, end));
+            DateTime end = DateTime.Parse(paramVo.EndTime).AddDays(1).AddSeconds(-1);
+            exp=exp.And(a => a.RunTime.Value >= start && a.RunTime.Value <= end);
         }
 
         if (paramVo.ProcessKeyList != null && !paramVo.ProcessKeyList.Any())
         {
-            exp=LambadaExpressionExtensions.And(exp, a => paramVo.ProcessKeyList.Contains(a.ProcessKey));
+            exp=exp.And(a => paramVo.ProcessKeyList.Contains(a.ProcessKey));
         }
 
         if (paramVo.ProcessNumbers != null && paramVo.ProcessNumbers.Any())
         {
-            exp=LambadaExpressionExtensions.And(exp, a => !paramVo.ProcessNumbers.Contains(a.ProcessNumber));
+            exp=exp.And(a => !paramVo.ProcessNumbers.Contains(a.ProcessNumber));
         }
 
         if (paramVo.VersionProcessKeys != null && !paramVo.VersionProcessKeys.Any())
         {
-            exp=LambadaExpressionExtensions.And(exp, a => !paramVo.VersionProcessKeys.Contains(a.ProcessKey));
+            exp=exp.And(a => !paramVo.VersionProcessKeys.Contains(a.ProcessKey));
         }
 
         if (!string.IsNullOrEmpty(paramVo.ProcessDigest))
         {
-            exp=LambadaExpressionExtensions.And(exp, a => !a.ProcessDigest.Contains(paramVo.ProcessDigest));
+            exp=exp.And(a => !a.ProcessDigest.Contains(paramVo.ProcessDigest));
         }
 
         return exp;
@@ -643,7 +669,9 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
     public TaskMgmtVO ProcessStatistics()
     {
         string logInEmpIdStr = SecurityUtils.GetLogInEmpIdStr();
-        List<BpmAfTask> taskList = _taskService._repository.Find(a => a.Assignee == logInEmpIdStr);
+        List<BpmAfTask> taskList = _taskService._repository
+            .Find(a=>a.Assignee==logInEmpIdStr)
+            .ToList();
         int doneTodayProcess = _afTaskInstService.DoneTodayProcess(logInEmpIdStr);
         int doneCreateProcess = _afTaskInstService.DoneCreateProcess(logInEmpIdStr);
         TaskMgmtVO taskMgmtVo = new TaskMgmtVO()

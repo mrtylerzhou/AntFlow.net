@@ -60,8 +60,7 @@ public class OutSideBpmApproveTemplateService : IOutSideBpmApproveTemplateServic
         {
             return new List<OutSideBpmApproveTemplateVo>();
         }
-        var app = _bpmProcessAppApplicationRepository.GetQueryable()
-            .Where(t => t.Id == applicationId && t.IsDel == 0)
+        var app = _bpmProcessAppApplicationRepository.Find(t => t.Id == applicationId && t.IsDel == 0)
             .FirstOrDefault();
         return templates
             .Select(o => new OutSideBpmApproveTemplateVo

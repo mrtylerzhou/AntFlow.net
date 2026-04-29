@@ -6,6 +6,7 @@ using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 using AntFlowCore.Persist.api.interf.repository;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AntFlowCore.AspNetCore.conf.middleware;
 
@@ -18,7 +19,7 @@ public class HeaderMiddleware
         _next = next;
     }
 
-    public async Task InvokeAsync(HttpContext context, IUserService userService,ITenantIdHolder tenantIdHolder)
+    public async Task InvokeAsync(HttpContext context, ITenantIdHolder tenantIdHolder)
     {
         if (context.Request.Method != HttpMethod.Options.Method)
         {
@@ -46,6 +47,7 @@ public class HeaderMiddleware
                     }
                     else
                     {
+                        IUserService userService = context.RequestServices.GetRequiredService<IUserService>();
                         BaseIdTranStruVo struVo = userService.GetById(userId);
                         ThreadLocalContainer.Set("currentuser", struVo);
                     }

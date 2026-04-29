@@ -10,6 +10,7 @@ using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SqlSugar;
 
 namespace AntFlowCore.Api.controller;
 
@@ -19,7 +20,7 @@ public class BpmnConfController
     private readonly IProcessApprovalService _processApprovalService;
     private readonly IBpmVerifyInfoBizService _bpmVerifyInfoBizService;
     private readonly IBpmnConfService _bpmnConfService;
-    private readonly IFreeSql _freeSql;
+    private readonly ISqlSugarClient _sqlSugar;
     public IBpmnConfBizService _bpmnConfBizService;
     private readonly IBpmnConfCommonService _bpmnConfCommonService;
 
@@ -29,13 +30,13 @@ public class BpmnConfController
         IProcessApprovalService processApprovalService,
         IBpmVerifyInfoBizService bpmVerifyInfoBizService,
         IBpmnConfService bpmnConfService,
-        IFreeSql freeSql
+        ISqlSugarClient sqlSugar
         )
     {
         _processApprovalService = processApprovalService;
         _bpmVerifyInfoBizService = bpmVerifyInfoBizService;
         _bpmnConfService = bpmnConfService;
-        _freeSql = freeSql;
+        _sqlSugar = sqlSugar;
         _bpmnConfBizService = bpmnConfBizService;
         _bpmnConfCommonService = bpmnConfCommonService;
     }
@@ -47,7 +48,17 @@ public class BpmnConfController
     [HttpPost("Edit")]
     public Result<String> Edit([FromBody]BpmnConfVo bpmnConfVo)
     {
-        _freeSql.Ado.Transaction(()=> _bpmnConfBizService.Edit(bpmnConfVo));
+        _sqlSugar.Ado.BeginTran();
+        try
+        {
+            _bpmnConfBizService.Edit(bpmnConfVo);
+            _sqlSugar.Ado.CommitTran();
+        }
+        catch
+        {
+            _sqlSugar.Ado.RollbackTran();
+            throw;
+        }
         return Result<string>.Succ("ok");
     }
 
