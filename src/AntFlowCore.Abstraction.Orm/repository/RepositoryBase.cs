@@ -1,148 +1,137 @@
 using System.Linq.Expressions;
+using SqlSugar;
 
 namespace AntFlowCore.Abstraction.Orm.repository;
 
-/// <summary>
-/// FreeSql Repository 基类
-/// 替换 EF Core 版 RepositoryBase
-/// </summary>
 public class RepositoryBase<TEntity> : IBaseRepository<TEntity>
-    where TEntity : class
+    where TEntity : class, new()
 {
     protected readonly AntFlowOrmContext _ormContext;
-    
-    public RepositoryBase( AntFlowOrmContext ormContext)
+
+    public RepositoryBase(AntFlowOrmContext ormContext)
     {
-        _ormContext=ormContext;
+        _ormContext = ormContext;
     }
 
-    #region IBaseRepository 接口方法实现
+    public ISqlSugarClient Db => _ormContext.SqlSugar;
+    
 
-    public virtual IQueryable<TEntity> GetQueryable()
+    public virtual ISugarQueryable<TEntity> GetQueryable()
     {
-        return _ormContext.FreeSql.GetRepository<TEntity>().Select.AsQueryable();
+        return Db.Queryable<TEntity>();
     }
 
     public virtual TEntity? GetById(object id)
     {
-        return _ormContext.FreeSql.Select<TEntity>(id).First();
+        return Db.Queryable<TEntity>().InSingle(id);
     }
 
     public virtual List<TEntity> GetAll()
     {
-        return _ormContext.FreeSql.GetRepository<TEntity>().Select.ToList();
+        return Db.Queryable<TEntity>().ToList();
     }
 
     public virtual List<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
     {
-        return _ormContext.FreeSql.GetRepository<TEntity>().Select.Where(predicate).ToList();
+        return Db.Queryable<TEntity>().Where(predicate).ToList();
     }
 
     public virtual TEntity? FirstOrDefault(Expression<Func<TEntity, bool>> predicate)
     {
-        return _ormContext.FreeSql.GetRepository<TEntity>().Select.Where(predicate).First();
+        return Db.Queryable<TEntity>().Where(predicate).First();
     }
 
     public virtual TEntity? FirstOrDefault()
     {
-        return _ormContext.FreeSql.GetRepository<TEntity>().Select.First();
+        return Db.Queryable<TEntity>().First();
     }
 
     public virtual void Add(TEntity entity)
     {
-        _ormContext.FreeSql.GetRepository<TEntity>().Insert(entity);
+        Db.Insertable(entity).ExecuteCommand();
     }
 
     public virtual void AddRange(IEnumerable<TEntity> entities)
     {
-        _ormContext.FreeSql.GetRepository<TEntity>().Insert(entities);
+        Db.Insertable(entities.ToList()).ExecuteCommand();
     }
 
     public virtual void Update(TEntity entity)
     {
-        _ormContext.FreeSql.GetRepository<TEntity>().Update(entity);
+        Db.Updateable(entity).ExecuteCommand();
+    }
+
+    public virtual void UpdateRange(IEnumerable<TEntity> entities)
+    {
+        Db.Updateable(entities.ToList()).ExecuteCommand();
     }
 
     public virtual void Remove(TEntity entity)
     {
-        _ormContext.FreeSql.GetRepository<TEntity>().Delete(entity);
+        Db.Deleteable(entity).ExecuteCommand();
     }
 
     public virtual void RemoveRange(IEnumerable<TEntity> entities)
     {
-        _ormContext.FreeSql.GetRepository<TEntity>().Delete(entities);
+        Db.Deleteable(entities.ToList()).ExecuteCommand();
     }
 
     public virtual int Count(Expression<Func<TEntity, bool>>? predicate = null)
     {
         if (predicate == null)
         {
-            return (int) _ormContext.FreeSql.GetRepository<TEntity>().Select.Count();
+            return Db.Queryable<TEntity>().Count();
         }
-        return (int) _ormContext.FreeSql.GetRepository<TEntity>().Select.Where(predicate).Count();
+        return Db.Queryable<TEntity>().Where(predicate).Count();
     }
 
     public virtual bool Any(Expression<Func<TEntity, bool>> predicate)
     {
-        return  _ormContext.FreeSql.GetRepository<TEntity>().Select.Where(predicate).Any();
+        return Db.Queryable<TEntity>().Where(predicate).Any();
     }
 
     public virtual int SaveChanges()
     {
-        // FreeSql 的 IBaseRepository 操作即时生效，无需显式 SaveChanges
-        // 保留此方法以兼容接口，返回 1 表示成功
         return 1;
     }
 
-    #endregion
-
-    #region 额外的便捷异步方法
-
-    public virtual IQueryable<TEntity> Where(Expression<Func<TEntity, bool>> predicate)
+    public virtual ISugarQueryable<TEntity> Where(Expression<Func<TEntity, bool>> predicate)
     {
-        return  _ormContext.FreeSql.GetRepository<TEntity>().Select.Where(predicate).AsQueryable();
+        return Db.Queryable<TEntity>().Where(predicate);
     }
 
     public virtual Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
     {
-       return   _ormContext.FreeSql.GetRepository<TEntity>().Select.Where(predicate).FirstAsync(cancellationToken);
+        return Db.Queryable<TEntity>().Where(predicate).FirstAsync(cancellationToken);
     }
 
     public virtual Task<List<TEntity>> ToListAsync(CancellationToken cancellationToken = default)
     {
-        return  _ormContext.FreeSql.GetRepository<TEntity>().Select.ToListAsync();
+        return Db.Queryable<TEntity>().ToListAsync(cancellationToken);
     }
 
-    public virtual IQueryable<TEntity> Query()
+    public virtual ISugarQueryable<TEntity> Query()
     {
         return GetQueryable();
     }
 
     public virtual Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
-        return  _ormContext.FreeSql.GetRepository<TEntity>().InsertAsync(entity, cancellationToken);
+        return Db.Insertable(entity).ExecuteCommandAsync(cancellationToken);
     }
 
     public virtual Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
     {
-        return  _ormContext.FreeSql.GetRepository<TEntity>().InsertAsync(entities, cancellationToken);
-    }
-
-    public virtual void UpdateRange(IEnumerable<TEntity> entities)
-    {
-        _ormContext.FreeSql.GetRepository<TEntity>().Update(entities);
+        return Db.Insertable(entities.ToList()).ExecuteCommandAsync(cancellationToken);
     }
 
     public virtual Task<int> RemoveAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
     {
-        return  _ormContext.FreeSql.GetRepository<TEntity>().DeleteAsync(predicate, cancellationToken);
+        return Db.Deleteable<TEntity>().Where(predicate).ExecuteCommandAsync(cancellationToken);
     }
 
     public virtual Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException("SaveChangesAsync not implemented yet");
+        return Task.FromResult(1);
     }
-
-    #endregion
-
 }

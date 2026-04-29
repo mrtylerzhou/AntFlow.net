@@ -53,6 +53,7 @@ using AntFlowCore.Persist.repositorysitory;
 using AntFlowCore.VirtualNode.service;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SqlSugar;
 
 namespace AntFlowCore.Engine.Abstraction.conf.di.serviceregistration;
 
@@ -267,6 +268,7 @@ public static class ServiceRegistration
         #endregion
 
         services.AddSingleton<AntFlowOrmContext>();
+        services.AddSingleton<ISqlSugarClient>(sp => sp.GetRequiredService<AntFlowOrmContext>().SqlSugar);
         
         services.AddSingleton<AbstractBpmnPersonnelAdaptor, CustomizablePersonnelAdaptor>();
         services.AddSingleton<AbstractBpmnPersonnelAdaptor, DirectLeaderPersonnelAdaptor>();
@@ -429,7 +431,7 @@ public static class ServiceRegistration
         services.AddSingleton<ThirdPartyAccountApplyService>();
         services.AddSingleton<IThirdPartyAccountApplyService, ThirdPartyAccountApplyService>();
         
-        services.AddSingleton<IDictDataRepository, DictDataRepository>();
+        services.AddSingleton<IDictDataRepository, SsDictDataRepository>();
         services.AddSingleton<IBpmAfDeploymentRepository, FsBpmAfDeploymentRepository>();
         services.AddSingleton<IBpmAfTaskInstRepository, FsBpmAfTaskInstRepository>();
         services.AddSingleton<IBpmBusinessProcessRepository, FsBpmBusinessProcessRepository>();

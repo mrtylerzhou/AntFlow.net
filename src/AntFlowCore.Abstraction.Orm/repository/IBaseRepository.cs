@@ -1,14 +1,11 @@
 using System.Linq.Expressions;
+using SqlSugar;
 
 namespace AntFlowCore.Abstraction.Orm.repository;
 
-/// <summary>
-/// 基础仓储接口
-/// </summary>
-/// <typeparam name="TEntity">实体类型</typeparam>
 public interface IBaseRepository<TEntity> where TEntity : class
 {
-    IQueryable<TEntity> GetQueryable();
+    ISugarQueryable<TEntity> GetQueryable();
     TEntity? GetById(object id);
     List<TEntity> GetAll();
     List<TEntity> Find(Expression<Func<TEntity, bool>> predicate);

@@ -1,10 +1,13 @@
-﻿namespace AntFlowCore.Abstraction.Orm.repository;
+using SqlSugar;
+
+namespace AntFlowCore.Abstraction.Orm.repository;
 
 public class AntFlowOrmContext
 {
-    public AntFlowOrmContext(IFreeSql freeSql)
+    public AntFlowOrmContext(ISqlSugarClient sqlSugar)
     {
-        FreeSql = freeSql;
+        SqlSugar = sqlSugar;
     }
-   public IFreeSql FreeSql { get; }
+
+    public ISqlSugarClient SqlSugar { get; }
 }

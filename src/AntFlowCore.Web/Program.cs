@@ -7,8 +7,7 @@ using AntFlowCore.AspNetCore.conf.middleware;
 using AntFlowCore.Base.conf.json;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Engine.Abstraction.conf.di.serviceregistration;
-using AntFlowCore.Engine.Abstraction.conf.freesql;
-using FreeSql;
+using AntFlowCore.Engine.Abstraction.conf.sqlsugar;
 using Microsoft.OpenApi;
 
 public class Program
@@ -19,8 +18,8 @@ public class Program
         WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
         ServiceCollectionHolder.SetServiceCollection(builder.Services);
         ServiceProviderUtils.Initialize(builder.Services);
-        builder.Services.AddHttpContextAccessor(); 
-        builder.Services.AddControllers().AddAFApplicationComponents(); //Add Custom  Mvc Controller
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddControllers().AddAFApplicationComponents();
         builder.Services.AddOpenApi();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(c =>
@@ -49,7 +48,6 @@ public class Program
                 }
             }
         });
-        //解决跨域
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("CorsPolicy", bd => bd
@@ -69,23 +67,18 @@ public class Program
                 options.JsonSerializerOptions.Converters.Add(new NullAbleBooleanJsonConverter());
                 options.JsonSerializerOptions.Converters.Add(new BooleanToIntJsonConverter());
                 options.JsonSerializerOptions.Converters.Add(new BooleanToNullableIntJsonConverter());
-               //fixed https://gitee.com/antswarm/antflowcore/issues/IDI57X
                options.JsonSerializerOptions.Converters.Add(new GlobalNullableIntConverter());
             });
-        //freesqlset是创建的freesql的帮助类的方法名称
-        builder.Services.FreeSqlSet(builder.Configuration);//注册freesql的相关服务
-        builder.Services.AddFreeRepository();//freesql仓储
-        builder.Services.AddScoped<UnitOfWorkManager>();//freesql uow
-        builder.Services.AntFlowServiceSetUp(builder.Configuration);//注册AntFlow本身使用到的服务
+        builder.Services.SqlSugarSet(builder.Configuration);
+        builder.Services.AntFlowServiceSetUp(builder.Configuration);
         WebApplication app = builder.Build();
-        app.Services.AddFreeSqlFluentConfig();
+        app.Services.AddSqlSugarFluentConfig();
         app.MapOpenApi();
-        app.UseCors("CorsPolicy");//解决跨域
+        app.UseCors("CorsPolicy");
         ServiceProviderUtils.Initialize(app.Services);
         app.UseMiddleware<TransactionalMiddleware>();
         app.UseMiddleware<HeaderMiddleware>();
         app.UseMiddleware<GlobalExceptionMiddleware>();
-        //app.MapGet("/testvalue", () => service.testValue());
         app.MapControllers();
 
         if (app.Environment.IsDevelopment())
