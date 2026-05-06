@@ -1,0 +1,9 @@
+1.本项目采用apache 和AGPLV3双协议。默认情况下AGPLV3协议。
+2.个人接私活使用，一项目一登记，登记以后作者回复授权后获得apache授权。个人私活使用必须一项目一登记，必须登记客户信息。否则使用客户授权协议自动降为AGPLV3协议，
+不愿意公开透漏客户信息的，单项目支付399元。登记地址：https://gitee.com/antswarm/antflowcore/issues/ICYZV2
+3.企业内部使用，登记后作者回复后获得apache协议，不愿意透漏信息的支付1999元。登记地址同个人登记地址：https://gitee.com/antswarm/antflowcore/issues/ICYZV2
+4.不论是企业还是个人，将本软件作为SaaS服务的，需要支付10万元人民币，联系作者授权。
+5.不得修改类头版权声明信息。
+6.开源项目协议为MIT或者BSD协议的，可以直接集成本项目，自动获得apache协议授权。除文档，视频教程以外有其它额外收费项目的，请联系作者授权。否则视为侵权
+7.如果您使用的开源项目非MIT或者BSD协议，请到https://gitee.com/antswarm/antflowcore/issues/ICYZV2查看是否登记获得授权，未获得授权的为AGPLV3协议，请自觉遵守。
+8.不得删除本必看.txt文档
