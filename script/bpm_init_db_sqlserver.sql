@@ -13,6 +13,7 @@
     is_lowcode_flow     INT               DEFAULT 0,
     business_party_id   INT,
     extra_flags         INT,
+    conf_config_json    NVARCHAR(MAX),
     remark              NVARCHAR(255)     DEFAULT N'',
     tenant_id           NVARCHAR(64)      DEFAULT N'',
     is_del              TINYINT  NOT NULL DEFAULT 0,
@@ -52,6 +53,7 @@ CREATE TABLE t_bpmn_node
     remark               NVARCHAR(255)        DEFAULT '',
     tenant_id            NVARCHAR(64)         DEFAULT '',
     extra_flags          INT                         null,
+    node_config_json     NVARCHAR(MAX),
     is_del               TINYINT  NOT NULL DEFAULT 0,
     create_user          NVARCHAR(50)         DEFAULT '',
     create_time          DATETIME NOT NULL DEFAULT GETDATE(),
@@ -528,6 +530,7 @@ CREATE TABLE t_bpm_variable
     process_start_conditions NVARCHAR(MAX)        NOT NULL,
     bpmn_code                NVARCHAR(60)         DEFAULT '',
     is_new_data              INT                  DEFAULT 0,
+    variable_config_json     NVARCHAR(MAX),
     remark                   NVARCHAR(255)        DEFAULT '',
     is_del       TINYINT  NOT NULL DEFAULT 0,
     tenant_id    NVARCHAR(64)         DEFAULT '',
@@ -2368,4 +2371,3 @@ VALUES ('市场部', NULL, 9, '/1/2/3/4/5/6/7/8', 8, 8);
 
 INSERT INTO t_department(name, short_name, parent_id, path, level, leader_id)
 VALUES ('销售部', NULL, 9, '/1/2/3/4/5/6/7/8/9', 9, 9);
-

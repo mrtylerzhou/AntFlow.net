@@ -1,8 +1,7 @@
-using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.constant.enums;
-using AntFlowCore.Base.entity;
+using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
@@ -12,104 +11,49 @@ namespace AntFlowCore.Bpmn.adaptor.bpmnnodeadp;
 
 public class NodePropertyPersonnelAdaptor : AbstractAdditionSignNodeAdaptor
 {
-    private readonly IBpmnNodePersonnelConfService _bpmnNodePersonnelConfService;
-    private readonly IBpmnNodePersonnelEmplConfService _bpmnNodePersonnelEmplConfService;
     private readonly IBpmnEmployeeInfoProviderService _bpmnEmployeeInfoProviderService;
 
     public NodePropertyPersonnelAdaptor(
-        IBpmnNodePersonnelConfService bpmnNodePersonnelConfService,
-        IBpmnNodePersonnelEmplConfService bpmnNodePersonnelEmplConfService,
         IBpmnEmployeeInfoProviderService bpmnEmployeeInfoProviderService,
-        IBpmnNodeAdditionalSignConfService bpmnNodeAdditionalSignConfService,
         IRoleService roleService
-        ) : base(bpmnNodeAdditionalSignConfService, roleService)
+        ) : base(roleService)
     {
-        _bpmnNodePersonnelConfService = bpmnNodePersonnelConfService;
-        _bpmnNodePersonnelEmplConfService = bpmnNodePersonnelEmplConfService;
         _bpmnEmployeeInfoProviderService = bpmnEmployeeInfoProviderService;
     }
+
     public override void FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
     {
         base.FormatToBpmnNodeVo(bpmnNodeVo);
-        BpmnNodePersonnelConf bpmnNodePersonnelConf = _bpmnNodePersonnelConfService._repository.Find(a => a.BpmnNodeId == bpmnNodeVo.Id).FirstOrDefault();
-        if (bpmnNodePersonnelConf == null)
+
+        // Prefer JSON config if available
+        var nodeConfig = bpmnNodeVo.NodeConfigJsonObj;
+        if (nodeConfig?.ApproverConf?.PersonnelConf != null)
         {
-            throw new AFBizException($"未能根据节点id: {bpmnNodeVo.Id}查到指定人员信息!");
-        }
-        List<String> emplIds = new List<string>();
-        List<String> emplNames=new List<string>();
-        IEnumerable<BpmnNodePersonnelEmplConf> bpmnNodePersons = _bpmnNodePersonnelEmplConfService
-            ._repository
-            .Find(a => a.BpmnNodePersonneId == bpmnNodePersonnelConf.Id)
-            .ToList().Distinct();
-        if(ObjectUtils.IsEmpty(bpmnNodePersons)){
-            throw  new AFBizException("配置错误或者数据被删除,指定员人审批未获取到人员");
-        }
-        foreach (var bpmnNodePersonnelEmplConf in bpmnNodePersons)
-        {
-            String emplId = bpmnNodePersonnelEmplConf.EmplId;
-            String emplName = bpmnNodePersonnelEmplConf.EmplName;
-            emplIds.Add(emplId);
-            if(!String.IsNullOrEmpty(emplName)){
-                emplNames.Add(emplName);
+            var pc = nodeConfig.ApproverConf.PersonnelConf;
+            var emplIds = new List<string>();
+            var emplNames = new List<string>();
+            if (pc.Employees != null && pc.Employees.Count > 0)
+            {
+                foreach (var e in pc.Employees)
+                {
+                    emplIds.Add(e.EmplId);
+                    if (!string.IsNullOrEmpty(e.EmplName))
+                    {
+                        emplNames.Add(e.EmplName);
+                    }
+                }
             }
-        }
 
-        AfNodeUtils.AddOrEditProperty(bpmnNodeVo, p =>
-        {
-            p.SignType = bpmnNodePersonnelConf.SignType;
-            p.EmplIds = emplIds;
-            p.EmplList = GetEmplList(emplIds, emplNames);
-        });
-       
-   
-    }
-
-    public override void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
-    {
-        base.EditBpmnNode(bpmnNodeVo);
-        var bpmnNodePropertysVo = bpmnNodeVo.Property ?? new BpmnNodePropertysVo();
-
-        var bpmnNodePersonnelConf = new BpmnNodePersonnelConf
-        {
-            BpmnNodeId = (int)bpmnNodeVo.Id,
-            SignType = bpmnNodePropertysVo.SignType??0,
-            CreateTime = DateTime.Now,
-            CreateUser = SecurityUtils.GetLogInEmpNameSafe(),
-            UpdateTime = DateTime.Now,
-            UpdateUser = SecurityUtils.GetLogInEmpNameSafe()
-        };
-
-        _bpmnNodePersonnelConfService._repository.Add(bpmnNodePersonnelConf);
-        int nodePersonnelId = bpmnNodePersonnelConf.Id;
-
-        if (bpmnNodePropertysVo.EmplIds == null || !bpmnNodePropertysVo.EmplIds.Any())
-        {
+            AfNodeUtils.AddOrEditProperty(bpmnNodeVo, p =>
+            {
+                p.SignType = pc.SignType;
+                p.EmplIds = emplIds;
+                p.EmplList = GetEmplList(emplIds, emplNames);
+            });
             return;
         }
 
-        var personnelEmplConfs = new List<BpmnNodePersonnelEmplConf>();
-        var emplList = bpmnNodePropertysVo.EmplList ?? new List<BaseIdTranStruVo>();
-        var id2nameMap = emplList.ToDictionary(x => x.Id, x => x.Name, StringComparer.Ordinal);
-
-        foreach (var emplId in bpmnNodePropertysVo.EmplIds)
-        {
-            var personnelEmplConf = new BpmnNodePersonnelEmplConf
-            {
-                BpmnNodePersonneId = nodePersonnelId,
-                EmplId = emplId,
-                CreateTime = DateTime.Now,
-                CreateUser = SecurityUtils.GetLogInEmpNameSafe(),
-                UpdateTime = DateTime.Now,
-                UpdateUser = SecurityUtils.GetLogInEmpNameSafe(),
-                EmplName = id2nameMap.ContainsKey(emplId) ? id2nameMap[emplId] : null,
-                TenantId = MultiTenantUtil.GetCurrentTenantId(),
-            };
-
-            personnelEmplConfs.Add(personnelEmplConf);
-        }
-
-        _bpmnNodePersonnelEmplConfService._repository.AddRange(personnelEmplConfs);
+        throw new AFBizException("migration error,please contact the author");
     }
 
     /// <summary>
@@ -123,7 +67,7 @@ public class NodePropertyPersonnelAdaptor : AbstractAdditionSignNodeAdaptor
     {
         var result = new List<BaseIdTranStruVo>();
 
-        if (emplNames != null && emplNames.Any())
+        if (emplNames != null && emplNames.Count > 0)
         {
             if (emplIds.Count != emplNames.Count)
             {

@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.service.repository;
 using AntFlowCore.Base.constant.enums;
@@ -15,13 +15,11 @@ namespace AntFlowCore.Business.service.biz;
 public class DicDataBizService :  IDicDataBizSerivce
 {
     private readonly IDicDataSerivce _dicDataSerivce;
-    private readonly IBpmProcessNoticeService _bpmProcessNoticeService;
 
 
-    public DicDataBizService(IDicDataSerivce dicDataSerivce, IBpmProcessNoticeService bpmProcessNoticeService)
+    public DicDataBizService(IDicDataSerivce dicDataSerivce)
     {
         _dicDataSerivce = dicDataSerivce;
-        _bpmProcessNoticeService = bpmProcessNoticeService;
     }
 
     public ResultAndPage<BaseKeyValueStruVo> SelectLFActiveFormCodePageList(PageDto pageDto, TaskMgmtVO taskMgmtVO)
@@ -113,7 +111,6 @@ public class DicDataBizService :  IDicDataBizSerivce
                         b => b.FormCode,
                         b => b.ExtraFlags
                     );
-                    IDictionary<string,List<BpmProcessNotice>> processNoticeMap= _bpmProcessNoticeService.ProcessNoticeMap(formCodes);
                     foreach (var lfDto in results)
                     {
                         if (formCode2Flags.TryGetValue(lfDto.Key, out var flags))
@@ -121,28 +118,6 @@ public class DicDataBizService :  IDicDataBizSerivce
                             var hasStartUserChooseModules = BpmnConfFlagsEnum.HasFlag(flags, BpmnConfFlagsEnum.HAS_STARTUSER_CHOOSE_MODULES);
                             lfDto.HasStarUserChooseModule = hasStartUserChooseModules;
                         }
-                        String formCode = lfDto.Key;
-                        if (processNoticeMap.TryGetValue(formCode, out var bpmProcessNotices) && bpmProcessNotices.Any())
-                        {
-                            var processNotices = new List<BaseNumIdStruVo>();
-                            foreach (ProcessNoticeEnum processNoticeEnum in ProcessNoticeEnum.Values)
-                            {
-                                var type = processNoticeEnum.Code;
-                                var descByCode = processNoticeEnum.Desc;
-
-                                var struVo = new BaseNumIdStruVo
-                                {
-                                    Id = type,
-                                    Name = descByCode,
-                                    Active = bpmProcessNotices.Any(n => n.Type == type)
-                                };
-
-                                processNotices.Add(struVo);
-                            }
-                           
-                            lfDto.ProcessNotices = processNotices;
-                        }
-
                     }
                 }
             }

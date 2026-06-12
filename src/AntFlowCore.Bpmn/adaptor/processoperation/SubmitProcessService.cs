@@ -19,20 +19,17 @@ public class SubmitProcessService: IProcessOperationAdaptor
     private readonly IFormFactory _formFactory;
     private readonly IBpmnConfCommonService _bpmnConfCommonService;
     private readonly IBpmBusinessProcessService _bpmBusinessProcessService;
-    private readonly IBpmProcessNameService _bpmProcessNameService;
     private readonly ILogger<SubmitProcessService> _logger;
 
     public SubmitProcessService(
         IFormFactory formFactory,
         IBpmnConfCommonService bpmnConfCommonService,
         IBpmBusinessProcessService bpmBusinessProcessService,
-        IBpmProcessNameService bpmProcessNameService,
         ILogger<SubmitProcessService> logger)
     {
         _formFactory = formFactory;
         _bpmnConfCommonService = bpmnConfCommonService;
         _bpmBusinessProcessService = bpmBusinessProcessService;
-        _bpmProcessNameService = bpmProcessNameService;
         _logger = logger;
     }
     public void DoProcessButton(BusinessDataVo businessDataVo)
@@ -52,7 +49,7 @@ public class SubmitProcessService: IProcessOperationAdaptor
             throw new AFBizException("the process has already been submitted！");
         }
         //process's name
-        String processName = _bpmProcessNameService.GetBpmProcessName(businessDataVo.FormCode)?.ProcessName;
+        String processName = businessDataVo.FormCode;
         //apply user info
         String applyName = SecurityUtils.GetLogInEmpName();
         string processNumber = businessDataVo.FormCode+"_"+businessDataVo.BusinessId;

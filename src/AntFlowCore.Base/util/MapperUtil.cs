@@ -29,7 +29,9 @@ public static class MapperUtil
          CreateUser = entity.CreateUser,
          CreateTime = entity.CreateTime,
          UpdateUser = entity.UpdateUser,
-         UpdateTime = entity.UpdateTime
+         UpdateTime = entity.UpdateTime,
+         ExtraFlags = entity.ExtraFlags,
+         ConfConfigJson = entity.ConfConfigJson
       };
    }
 
@@ -56,7 +58,9 @@ public static class MapperUtil
          CreateUser = vo.CreateUser,
          CreateTime = vo.CreateTime,
          UpdateUser = vo.UpdateUser,
-         UpdateTime = vo.UpdateTime
+         UpdateTime = vo.UpdateTime,
+         ExtraFlags = vo.ExtraFlags,
+         ConfConfigJson = vo.ConfConfigJson
       };
    }
 
@@ -92,7 +96,8 @@ public static class MapperUtil
          IsDynamicCondition = node.IsDynamicCondition,
          IsParallel = node.IsParallel,
          NoHeaderAction = node.NoHeaderAction,
-         ExtraFlags = node.ExtraFlags
+         ExtraFlags = node.ExtraFlags,
+         NodeConfigJson = node.NodeConfigJson
       };
    }
 
@@ -126,56 +131,11 @@ public static class MapperUtil
          IsLowCodeFlow = vo.IsLowCodeFlow,
          IsParallel = vo.IsParallel,
          NoHeaderAction = vo.NoHeaderAction,
-         ExtraFlags = vo.ExtraFlags
+         ExtraFlags = vo.ExtraFlags,
+         NodeConfigJson = vo.NodeConfigJson
       };
    }
 
-
-   public static BpmnTemplateVo MapToVo(this BpmnTemplate template)
-   {
-      if (template == null) return null;
-
-      return new BpmnTemplateVo
-      {
-         Id = template.Id,
-         ConfId = template.ConfId,
-         NodeId = template.NodeId ?? 0,
-         Event = template.Event,
-         Informs = template.Informs,
-         Emps = template.Emps,
-         Roles = template.Roles,
-         Funcs = template.Funcs,
-         TemplateId = template.TemplateId,
-         IsDel = template.IsDel,
-         CreateTime = template.CreateTime,
-         CreateUser = template.CreateUser,
-         UpdateTime = template.UpdateTime,
-         UpdateUser = template.UpdateUser
-      };
-   }
-
-
-   public static BpmnTemplate MapToEntity(this BpmnTemplateVo vo)
-   {
-      if (vo == null) return null;
-
-      return new BpmnTemplate
-      {
-         ConfId = vo.ConfId,
-         NodeId = vo.NodeId,
-         Event = vo.Event,
-         Informs = vo.Informs,
-         Emps = vo.Emps,
-         Roles = vo.Roles,
-         Funcs = vo.Funcs,
-         TemplateId = vo.TemplateId,
-         IsDel = vo.IsDel,
-         CreateTime = vo.CreateTime,
-         CreateUser = vo.CreateUser,
-         UpdateTime = vo.UpdateTime,
-         UpdateUser = vo.UpdateUser
-      };
-   }
 
    public static BpmProcessAppApplicationVo MapToVo(this BpmProcessAppApplication app)
    {
@@ -243,45 +203,6 @@ public static class MapperUtil
          Source = vo.Source
       };
    }
-
-   public static BpmnApproveRemindVo MapToVo(this BpmnApproveRemind remind)
-   {
-      if (remind == null) return null;
-
-      return new BpmnApproveRemindVo
-      {
-         Id = remind.Id,
-         ConfId = remind.ConfId,
-         NodeId = remind.NodeId,
-         TemplateId = remind.TemplateId,
-         Days = remind.Days,
-         IsDel = remind.IsDel,
-         CreateTime = remind.CreateTime,
-         CreateUser = remind.CreateUser,
-         UpdateTime = remind.UpdateTime,
-         UpdateUser = remind.UpdateUser
-      };
-   }
-
-
-   public static BpmnApproveRemind MapToEntity(this BpmnApproveRemindVo vo)
-   {
-      if (vo == null) return null;
-
-      return new BpmnApproveRemind
-      {
-         ConfId = vo.ConfId,
-         NodeId = vo.NodeId,
-         TemplateId = vo.TemplateId,
-         Days = vo.Days,
-         IsDel = vo.IsDel,
-         CreateTime = vo.CreateTime,
-         CreateUser = vo.CreateUser,
-         UpdateTime = vo.UpdateTime,
-         UpdateUser = vo.UpdateUser
-      };
-   }
-
 
    public static ThirdPartyAccountApplyVo MapToVo(this ThirdPartyAccountApply apply)
    {

@@ -33,8 +33,9 @@ public class BpmnConfNodePropertyConverter
         IDictionary<int, List<int>> groupedConditionTypes = new Dictionary<int, List<int>>();
         int strEnumCode = (int)ConditionTypeEnum.CONDITION_TYPE_LF_STR_CONDITION;
         bool isLowCodeFlow = false;
-        List<List<BpmnNodeConditionsConfVueVo>> groupedNewModels = propertysVo.ConditionList;
-        if (groupedNewModels.IsEmpty() && (isDefault == 0))
+        List<List<BpmnNodeConditionsConfVueVo>> groupedNewModels =
+            propertysVo.ConditionList ?? new List<List<BpmnNodeConditionsConfVueVo>>();
+        if (groupedNewModels.IsEmpty() && isDefault != 1)
         {
             throw new AFBizException("input nodes is empty");
         }
@@ -76,6 +77,7 @@ public class BpmnConfNodePropertyConverter
                 }
 
                 conditionTypes.Add(columnIdInt);
+                currentGroupConditionTypes.Add(columnIdInt);
 
                 string fieldName = conditionTypeAttributes.FieldName;
                 string columnDbname = newModel.ColumnDbname;
@@ -110,29 +112,33 @@ public class BpmnConfNodePropertyConverter
                     var field = typeof(BpmnNodeConditionsConfBaseVo).GetProperty(conditionTypeAttributes.FieldName,
                         BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
 
-                    IList values = (IList)Activator.CreateInstance(field.PropertyType);
+                    bool isLowCodeCondition = enumByCode.Value.IsLowCodeFlow();
+                    Type valueType = GetListValueType(field.PropertyType, fieldCls);
+                    IList values = isLowCodeCondition
+                        ? new List<object>()
+                        : (IList)Activator.CreateInstance(field.PropertyType);
                     foreach (string key in keys)
                     {
                         BaseKeyValueStruVo baseKeyValueStruVo = valueStruVoList.First(v => v.Key == key);
-                        if (fieldCls == typeof(string))
+                        if (valueType == typeof(string))
                         {
                             values.Add(baseKeyValueStruVo.Key);
                         }
                         else
                         {
-                            object parsedObject = JsonSerializer.Deserialize(baseKeyValueStruVo?.Key, fieldCls);
+                            object parsedObject = JsonSerializer.Deserialize(baseKeyValueStruVo?.Key, valueType);
                             values.Add(parsedObject);
                         }
                     }
 
                     Object valueOrWrapper = null;
 
-                    if (enumByCode.Value.IsLowCodeFlow())
+                    if (isLowCodeCondition)
                     {
                         isLowCodeFlow = true;
                         wrapperResult.Add(columnDbname, values);
                         valueOrWrapper = wrapperResult;
-                        groupedLfConditionsMap.Add(index, wrapperResult);
+                        groupedLfConditionsMap[index] = wrapperResult;
                     }
                     else
                     {
@@ -177,7 +183,7 @@ public class BpmnConfNodePropertyConverter
                             isLowCodeFlow = true;
                             wrapperResult.Add(columnDbname, zdy1);
                             valueOrWrapper = wrapperResult;
-                            groupedLfConditionsMap.Add(index, wrapperResult);
+                            groupedLfConditionsMap[index] = wrapperResult;
                         }
                         else
                         {
@@ -187,13 +193,7 @@ public class BpmnConfNodePropertyConverter
                     else
                     {
                         Object valueOrWrapper = null;
-                        Object actualValue = zdy1;
-                        Object zdy2Value = null;
-                        if (!string.IsNullOrEmpty(zdy2))
-                        {
-                            zdy2Value = JsonSerializer.Deserialize(zdy2, fieldCls);
-                        }
-                       
+                        Object actualValue = ConvertConditionValue(zdy1, fieldCls, field.PropertyType);
                         if (optType != null && JudgeOperatorEnum.BinaryOperator().Contains(optType.Value))
                         {
                             actualValue = zdy1 + "," + zdy2; //antflow目前只有一个自定义值,介于之间的提前定义好JudgeOperatorEnum,值用字符串拼接,使用时再分割
@@ -204,7 +204,7 @@ public class BpmnConfNodePropertyConverter
                             isLowCodeFlow = true;
                             wrapperResult.Add(columnDbname, actualValue);
                             valueOrWrapper = wrapperResult;
-                            groupedLfConditionsMap.Add(index, wrapperResult);
+                            groupedLfConditionsMap[index] = wrapperResult;
                         }
                         else
                         {
@@ -228,6 +228,33 @@ public class BpmnConfNodePropertyConverter
         result.ConditionParamTypes = conditionTypes;
         result.GroupedConditionParamTypes = groupedConditionTypes;
         return result;
+    }
+
+    private static Type GetListValueType(Type propertyType, Type fallbackType)
+    {
+        Type? listType = propertyType.GetInterfaces()
+            .Concat(new[] { propertyType })
+            .FirstOrDefault(t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IList<>));
+
+        return listType?.GetGenericArguments()[0] ?? fallbackType;
+    }
+
+    private static object ConvertConditionValue(string value, Type fieldClass, Type propertyType)
+    {
+        Type targetType = Nullable.GetUnderlyingType(propertyType) ?? propertyType;
+        if (targetType == typeof(string))
+        {
+            return value;
+        }
+
+        Type deserializeType = targetType == typeof(object) ? fieldClass : targetType;
+        object parsedValue = JsonSerializer.Deserialize(value, deserializeType);
+        if (parsedValue == null || targetType.IsInstanceOfType(parsedValue))
+        {
+            return parsedValue;
+        }
+
+        return Convert.ChangeType(parsedValue, targetType);
     }
 
     public static List<BpmnNodeConditionsConfVueVo> ToVue3Model(BpmnNodeConditionsConfBaseVo baseVo)

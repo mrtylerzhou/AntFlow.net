@@ -1,4 +1,5 @@
 using AntFlowCore.Base.entity;
+using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Persist.api.interf.repository;
 
@@ -6,15 +7,26 @@ namespace AntFlowCore.Business.service;
 
 public class BpmnConfLfFormdataFieldService : IBpmnConfLfFormdataFieldService
 {
-    public BpmnConfLfFormdataFieldService(IBpmnConfLfFormdataFieldRepository repository)
+    private readonly IBpmnConfRepository _bpmnConfRepository;
+
+    public BpmnConfLfFormdataFieldService(
+        IBpmnConfLfFormdataFieldRepository repository,
+        IBpmnConfRepository bpmnConfRepository)
     {
         _repository = repository;
+        _bpmnConfRepository = bpmnConfRepository;
     }
 
     public IBpmnConfLfFormdataFieldRepository _repository { get; }
 
     public Dictionary<string, BpmnConfLfFormdataField> QryFormDataFieldMap(long confId)
     {
+        Dictionary<string, BpmnConfLfFormdataField> jsonFieldMap = QryFormDataFieldMapFromJson(confId);
+        if (jsonFieldMap.Any())
+        {
+            return jsonFieldMap;
+        }
+
         List<BpmnConfLfFormdataField> allFields = _repository.Find(x => x.BpmnConfId == confId);
         if (allFields == null || !allFields.Any())
         {
@@ -28,5 +40,12 @@ public class BpmnConfLfFormdataFieldService : IBpmnConfLfFormdataFieldService
         }
 
         return id2SelfMap;
+    }
+
+    private Dictionary<string, BpmnConfLfFormdataField> QryFormDataFieldMapFromJson(long confId)
+    {
+        BpmnConf? bpmnConf = _bpmnConfRepository.FirstOrDefault(a => a.Id == confId);
+        BpmnConfConfigJson? confConfig = JsonConfUtil.ParseConfConfig(bpmnConf?.ConfConfigJson);
+        return BpmnConfConfigHolder.ToFieldMap(confId, 0, confConfig?.LowCodeFormConfig);
     }
 }

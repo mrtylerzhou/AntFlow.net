@@ -1,8 +1,9 @@
-using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Base.adaptor;
+using AntFlowCore.Base.adaptor.bpmnnodeadp;
 using AntFlowCore.Base.constant.enums;
-using AntFlowCore.Base.entity;
+using AntFlowCore.Base.entity.jsonconf;
+using AntFlowCore.Base.exception;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Persist.api.interf.repository;
@@ -10,100 +11,82 @@ using Microsoft.Extensions.Logging;
 
 namespace AntFlowCore.Bpmn.adaptor.bpmnnodeadp;
 
-public class NodePropertyLoopAdaptor : AbstractAdditionSignNodeAdaptor
+public class NodePropertyLoopAdaptor : IBpmnNodeAdaptor
+{
+    private readonly IBpmnEmployeeInfoProviderService _bpmnEmployeeInfoProviderService;
+    private readonly IRoleService _roleService;
+    private readonly ILogger<NodePropertyLoopAdaptor> _logger;
+
+    public NodePropertyLoopAdaptor(
+        IBpmnEmployeeInfoProviderService bpmnEmployeeInfoProviderService,
+        IRoleService roleService,
+        ILogger<NodePropertyLoopAdaptor> logger)
     {
-        private readonly IBpmnNodeLoopConfService _bpmnNodeLoopConfService;
-        private readonly IBpmnEmployeeInfoProviderService _bpmnEmployeeInfoProviderService;
-        private readonly ILogger<NodePropertyLoopAdaptor> _logger;
+        _bpmnEmployeeInfoProviderService = bpmnEmployeeInfoProviderService;
+        _roleService = roleService;
+        _logger = logger;
+    }
 
-        public NodePropertyLoopAdaptor(
-            IBpmnNodeLoopConfService bpmnNodeLoopConfService,
-            IBpmnEmployeeInfoProviderService bpmnEmployeeInfoProviderService,
-            IBpmnNodeAdditionalSignConfService bpmnNodeAdditionalSignConfService,
-            IRoleService roleService,
-            ILogger<NodePropertyLoopAdaptor> logger) : base(bpmnNodeAdditionalSignConfService, roleService)
+    public void FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
+    {
+        // Prefer JSON config if available
+        var nodeConfig = bpmnNodeVo.NodeConfigJsonObj;
+        if (nodeConfig?.ApproverConf?.LoopConf != null)
         {
-            _bpmnNodeLoopConfService = bpmnNodeLoopConfService;
-            _bpmnEmployeeInfoProviderService = bpmnEmployeeInfoProviderService;
-            _logger = logger;
-        }
+            var lc = nodeConfig.ApproverConf.LoopConf;
 
-        public override void FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
-        {
-            base.FormatToBpmnNodeVo(bpmnNodeVo);
-            BpmnNodeLoopConf bpmnNodeLoopConf = _bpmnNodeLoopConfService
-                ._repository.Find(conf => conf.BpmnNodeId == bpmnNodeVo.Id).FirstOrDefault();
+            List<string> list = !string.IsNullOrEmpty(lc.LoopEndPerson)
+                ? lc.LoopEndPerson.Split(',').ToList()
+                : new List<string>();
 
-            if (bpmnNodeLoopConf != null)
-            {
-                List<string> loopEndPersonIds = !string.IsNullOrEmpty(bpmnNodeLoopConf.LoopEndPerson)
-                    ? bpmnNodeLoopConf.LoopEndPerson.Split(',').ToList()
-                    : new List<string>();
+            List<string> noList = !string.IsNullOrEmpty(lc.NoparticipatingStaffIds)
+                ? lc.NoparticipatingStaffIds.Split(',').ToList()
+                : new List<string>();
 
-                List<string> noParticipatingStaffIds = !string.IsNullOrEmpty(bpmnNodeLoopConf.NoparticipatingStaffIds)
-                    ? bpmnNodeLoopConf.NoparticipatingStaffIds.Split(',').ToList()
-                    : new List<string>();
-
-                var loopEndPersonList = _bpmnEmployeeInfoProviderService.ProvideEmployeeInfo(loopEndPersonIds)
-                    .Select(entry => new BaseIdTranStruVo
-                    {
-                        Id = entry.Key,
-                        Name = entry.Value
-                    }).ToList();
-
-                var noParticipatingStaffList = _bpmnEmployeeInfoProviderService.ProvideEmployeeInfo(noParticipatingStaffIds)
-                    .Select(entry => new BaseIdTranStruVo
-                    {
-                        Id = entry.Key,
-                        Name = entry.Value
-                    }).ToList();
-
-                AfNodeUtils.AddOrEditProperty(bpmnNodeVo, p =>
+            var loopEndPersonList = _bpmnEmployeeInfoProviderService.ProvideEmployeeInfo(list)
+                .Select(entry => new BaseIdTranStruVo
                 {
-                    p.LoopEndType = bpmnNodeLoopConf.LoopEndType;
-                    p.LoopNumberPlies = bpmnNodeLoopConf.LoopNumberPlies;
-                    p.LoopEndGrade = bpmnNodeLoopConf.LoopEndGrade;
-                    p.LoopEndPersonList = loopEndPersonIds;
-                    p.LoopEndPersonObjList = loopEndPersonList;
-                    p.NoparticipatingStaffIds = noParticipatingStaffIds;
-                    p.NoparticipatingStaffs = noParticipatingStaffList;
-                    
-                });
-                bpmnNodeVo.OrderedNodeType = (int)OrderNodeTypeEnum.LOOP_NODE;
-            }
-            
-        }
+                    Id = entry.Key,
+                    Name = entry.Value
+                }).ToList();
 
+            var noparticipatingStaffs = _bpmnEmployeeInfoProviderService.ProvideEmployeeInfo(noList)
+                .Select(entry => new BaseIdTranStruVo
+                {
+                    Id = entry.Key,
+                    Name = entry.Value
+                }).ToList();
 
-        public override void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
-        {
-            base.EditBpmnNode(bpmnNodeVo);
-            var property = bpmnNodeVo.Property ?? new BpmnNodePropertysVo();
-
-            var bpmnNodeLoopConf = new BpmnNodeLoopConf
+            bpmnNodeVo.Property = new BpmnNodePropertysVo
             {
-                BpmnNodeId = bpmnNodeVo.Id,
-                LoopEndType = property.LoopEndType,
-                LoopNumberPlies = property.LoopNumberPlies,
-                LoopEndGrade = property.LoopEndGrade,
-                LoopEndPerson = property.LoopEndPersonList != null
-                    ? string.Join(",", property.LoopEndPersonList)
-                    : null,
-                NoparticipatingStaffIds = property.NoparticipatingStaffIds != null
-                    ? string.Join(",", property.NoparticipatingStaffIds)
-                    : null,
-                CreateTime = DateTime.Now,
-                CreateUser = SecurityUtils.GetLogInEmpName(),
-                UpdateTime = DateTime.Now,
-                UpdateUser = SecurityUtils.GetLogInEmpName(),
-                TenantId = MultiTenantUtil.GetCurrentTenantId(),
+                LoopEndType = lc.LoopEndType,
+                LoopNumberPlies = lc.LoopNumberPlies,
+                LoopEndGrade = lc.LoopEndGrade,
+                LoopEndPersonList = list,
+                LoopEndPersonObjList = loopEndPersonList,
+                NoparticipatingStaffIds = noList,
+                NoparticipatingStaffs = noparticipatingStaffs
             };
-
-            _bpmnNodeLoopConfService._repository.Add(bpmnNodeLoopConf);
+            bpmnNodeVo.OrderedNodeType = (int)OrderNodeTypeEnum.LOOP_NODE;
         }
-
-        public override void SetSupportBusinessObjects()
+        else
         {
-            ((IAdaptorService)this).AddSupportBusinessObjects(BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_LOOP);
+            throw new AFBizException("migration error,please contact the author");
         }
     }
+
+    public void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
+    {
+        // Write path is now handled by BpmnNodeConfigHolder
+    }
+
+    public PersonnelRuleVo FormaFieldAttributeInfoVO()
+    {
+        return new PersonnelRuleVo();
+    }
+
+    public void SetSupportBusinessObjects()
+    {
+        ((IAdaptorService)this).AddSupportBusinessObjects(BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_LOOP);
+    }
+}

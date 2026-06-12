@@ -17,11 +17,6 @@ public class BpmnNodeService : IBpmnNodeService
         return _repository.GetNodesByFormCodeAndProperty(formCode, property);
     }
 
-    public int? GetCustomizeNodeSignType(long nodeId)
-    {
-        return _repository.GetCustomizeNodeSignType(nodeId);
-    }
-
     public int UpdateConfExtraFlags(long confId, int? extraFlags)
     {
         return _repository.UpdateConfExtraFlags(confId, extraFlags);

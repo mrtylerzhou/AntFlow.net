@@ -12,8 +12,7 @@ public class ThirdPartyAccountApplyFlowService : AbstractLowFlowSpyFormOperation
 {
     private readonly IThirdPartyAccountApplyService _thirdPartyAccountApplyService;
 
-    public ThirdPartyAccountApplyFlowService(IThirdPartyAccountApplyService thirdPartyAccountApplyService,
-        IBpmnNodeConditionsConfService bpmnNodeConditionsConfService) : base(bpmnNodeConditionsConfService)
+    public ThirdPartyAccountApplyFlowService(IThirdPartyAccountApplyService thirdPartyAccountApplyService)
     {
         _thirdPartyAccountApplyService = thirdPartyAccountApplyService;
     }

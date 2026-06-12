@@ -1,7 +1,6 @@
-﻿using System.Reflection;
+using System.Reflection;
 using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.service;
-using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.adaptor.processoperation;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
@@ -69,8 +68,6 @@ public class BpmnSendMessageAspect<T> : DispatchProxy
 
         //set bpmn name
         businessDataVo.BpmnName=bpmnConf.BpmnName;
-        //declare variable message vo
-        BpmVariableMessageVo vo;
 
         //to check if it is a submit operation then execute aspect method first then assemble variable message vo
         if (businessDataVo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_SUBMIT)
@@ -80,10 +77,7 @@ public class BpmnSendMessageAspect<T> : DispatchProxy
             return null;
         }
 
-        IBpmVariableMessageBizService bpmVariableMessageService = ServiceProviderUtils.GetService<IBpmVariableMessageBizService>();
-        //get bpmn variable message vo
-        vo =bpmVariableMessageService.GetBpmVariableMessageVo(businessDataVo);
-            
+        // IBpmVariableMessageBizService has been removed; variable message assembly is no longer supported
         //get process operation enum by operation type
         ProcessOperationEnum? processOperationEunm = ProcessOperationEnumExtensions.GetEnumByCode(businessDataVo.OperationType);
         if (processOperationEunm == null)

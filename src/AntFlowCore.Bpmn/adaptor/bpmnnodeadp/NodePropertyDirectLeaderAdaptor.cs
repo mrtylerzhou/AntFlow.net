@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.adaptor;
+using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Persist.api.interf.repository;
@@ -7,8 +7,7 @@ namespace AntFlowCore.Bpmn.adaptor.bpmnnodeadp;
 
 public class NodePropertyDirectLeaderAdaptor: AbstractAdditionSignNodeAdaptor
 {
-    public NodePropertyDirectLeaderAdaptor(IBpmnNodeAdditionalSignConfService bpmnNodeAdditionalSignConfService,
-        IRoleService roleService) : base(bpmnNodeAdditionalSignConfService, roleService)
+    public NodePropertyDirectLeaderAdaptor(IRoleService roleService) : base(roleService)
     {
         
     }

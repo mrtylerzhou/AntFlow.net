@@ -13,6 +13,7 @@
     `is_lowcode_flow` tinyint default 0 null comment '是否是低代码审批流0,否,1是',
     `business_party_id`   int(11)                      DEFAULT NULL COMMENT 'its belong to business party',
     `extra_flags`         int                                           null,
+    `conf_config_json`    text                         NULL COMMENT 'process-level consolidated json config',
     `remark`              varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
     `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `is_del`              tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:in use,1:delete',
@@ -51,6 +52,7 @@ CREATE TABLE if not exists `t_bpmn_node`
     `remark`            varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
     `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `extra_flags`          int                                        null,
+    `node_config_json`     text                                      null comment 'node-level consolidated json config',
     `is_del`            tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:No,1:yes',
     `create_user`       varchar(50)                  DEFAULT '' COMMENT 'as its name says',
     `create_time`       timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
@@ -471,6 +473,7 @@ CREATE TABLE if not exists `t_bpm_variable`
     `process_start_conditions` text                NOT NULL COMMENT 'process start conditions',
     `bpmn_code`                varchar(60)         NOT NULL DEFAULT '' COMMENT 'bpmn code',
     `is_new_data`              int(11)                      DEFAULT '0' COMMENT 'is new data 0:no 1:yes',
+    `variable_config_json`     text                NULL COMMENT 'runtime variable consolidated json config',
     `remark`                   varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
     `is_del`                   tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
     `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
@@ -1971,4 +1974,3 @@ INSERT INTO `t_department`(`id`, `name`, `short_name`, `parent_id`, `path`, `lev
 INSERT INTO `t_department`(`id`, `name`, `short_name`, `parent_id`, `path`, `level`, `leader_id`, `sort`, `is_del`, `is_hide`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (7, '七级部门', NULL, 8, '/1/2/3/4/5/6/7', 7, 7, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `t_department`(`id`, `name`, `short_name`, `parent_id`, `path`, `level`, `leader_id`, `sort`, `is_del`, `is_hide`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (8, '市场部', NULL, 9, '/1/2/3/4/5/6/7/8', 8, 8, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `t_department`(`id`, `name`, `short_name`, `parent_id`, `path`, `level`, `leader_id`, `sort`, `is_del`, `is_hide`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (9, '销售部', NULL, 9, '/1/2/3/4/5/6/7/8/9', 9, 9, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-

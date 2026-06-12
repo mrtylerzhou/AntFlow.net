@@ -2,6 +2,7 @@
 using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
+using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
@@ -68,6 +69,13 @@ public class LFFormDataPreProcessor : IAntFlowOrderPreProcessor<BpmnConfVo>
             if (!isLowCodeFlow) return;
 
             var confId = confVo.Id;
+
+            BpmnConfConfigJson? confConfig = JsonConfUtil.ParseConfConfig(confVo.ConfConfigJson);
+            if (!string.IsNullOrWhiteSpace(confConfig?.LowCodeFormConfig?.Formdata))
+            {
+                confVo.LfFormData = confConfig.LowCodeFormConfig.Formdata;
+                return;
+            }
 
             var bpmnConfLfFormdataList = _lfFormdataService.ListByConfId(confId);
 

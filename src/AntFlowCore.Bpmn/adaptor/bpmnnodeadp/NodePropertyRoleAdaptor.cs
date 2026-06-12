@@ -1,121 +1,63 @@
-using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.constant.enums;
-using AntFlowCore.Base.entity;
+using AntFlowCore.Base.entity.jsonconf;
+using AntFlowCore.Base.exception;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Persist.api.interf.repository;
-using Microsoft.Extensions.Logging;
 
 namespace AntFlowCore.Bpmn.adaptor.bpmnnodeadp;
 
- public class NodePropertyRoleAdaptor : AbstractAdditionSignNodeAdaptor
+public class NodePropertyRoleAdaptor : AbstractAdditionSignNodeAdaptor
+{
+    public NodePropertyRoleAdaptor(
+        IRoleService roleService
+        ) : base(roleService)
     {
-        private readonly IBpmnNodeRoleConfService _bpmnNodeRoleConfService;
-        private readonly IBpmnNodeRoleOutsideEmpConfService _bpmnNodeRoleOutsideEmpConfService;
-        private readonly ILogger<NodePropertyRoleAdaptor> _logger;
+    }
 
-        public NodePropertyRoleAdaptor(
-            IBpmnNodeRoleConfService bpmnNodeRoleConfService,
-            IBpmnNodeRoleOutsideEmpConfService bpmnNodeRoleOutsideEmpConfService,
-            IBpmnNodeAdditionalSignConfService bpmnNodeAdditionalSignConfService,
-            IRoleService roleService,
-            ILogger<NodePropertyRoleAdaptor> logger) : base(bpmnNodeAdditionalSignConfService, roleService)
+    public override void FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
+    {
+        base.FormatToBpmnNodeVo(bpmnNodeVo);
+
+        // Prefer JSON config if available
+        var nodeConfig = bpmnNodeVo.NodeConfigJsonObj;
+        if (nodeConfig?.ApproverConf?.RoleConfList != null && nodeConfig.ApproverConf.RoleConfList.Count > 0)
         {
-            _bpmnNodeRoleConfService = bpmnNodeRoleConfService;
-            _bpmnNodeRoleOutsideEmpConfService = bpmnNodeRoleOutsideEmpConfService;
-            _logger = logger;
-        }
-
-        public override void FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
-        {
-            base.FormatToBpmnNodeVo(bpmnNodeVo);
-            var list = _bpmnNodeRoleConfService._repository.Find(conf => conf.BpmnNodeId == bpmnNodeVo.Id).ToList();
-
-            if (list == null || !list.Any())
-            {
-                return;
-            };
-
-            var roles = list.Select(conf => new BaseIdTranStruVo
-            {
-                Id = conf.RoleId,
-                Name = conf.RoleName
-            }).ToList();
+            var roleConfs = nodeConfig.ApproverConf.RoleConfList;
+            var roles = roleConfs
+                .Select(rc => new BaseIdTranStruVo { Id = rc.RoleId, Name = rc.RoleName })
+                .ToList();
 
             AfNodeUtils.AddOrEditProperty(bpmnNodeVo, p =>
             {
                 p.RoleIds = roles.Select(r => r.Id).ToList();
                 p.RoleList = roles;
-                p.SignType = list.First().SignType;
+                p.SignType = roleConfs[0].SignType;
             });
-           
 
+            // Outside employees for role
             if (bpmnNodeVo.IsOutSideProcess == 1)
             {
-                var outsideEmpConfs = _bpmnNodeRoleOutsideEmpConfService._repository.Find(conf => conf.NodeId == bpmnNodeVo.Id).ToList();
-                if (outsideEmpConfs != null && outsideEmpConfs.Any())
+                var firstRole = roleConfs[0];
+                if (firstRole.OutsideEmployees != null && firstRole.OutsideEmployees.Count > 0)
                 {
-                    AfNodeUtils.AddOrEditProperty(bpmnNodeVo, p =>
-                    {
-                        p.EmplIds = outsideEmpConfs.Select(e => e.EmplId).ToList();
-                        p.EmplList = outsideEmpConfs.Select(e => new BaseIdTranStruVo
-                        {
-                            Id = e.EmplId,
-                            Name = e.EmplName
-                        }).ToList();
-                    });
+                    bpmnNodeVo.Property.EmplIds = firstRole.OutsideEmployees
+                        .Select(e => e.EmplId).Where(id => id != null).ToList()!;
+                    bpmnNodeVo.Property.EmplList = firstRole.OutsideEmployees
+                        .Select(e => new BaseIdTranStruVo { Id = e.EmplId!, Name = e.EmplName })
+                        .ToList();
                 }
             }
-            
-        }
-        
 
-        public override void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
-        {
-            base.EditBpmnNode(bpmnNodeVo);
-            var property = bpmnNodeVo.Property ?? new BpmnNodePropertysVo();
-
-            if (property.RoleList != null && property.RoleList.Any())
-            {
-                var roleList = property.RoleList;
-
-                _bpmnNodeRoleConfService._repository.AddRange(roleList.Select(role => new BpmnNodeRoleConf
-                {
-                    BpmnNodeId = bpmnNodeVo.Id,
-                    RoleId = role.Id,
-                    RoleName = role.Name,
-                    SignType = property.SignType,
-                    CreateTime = DateTime.Now,
-                    CreateUser = SecurityUtils.GetLogInEmpName(),
-                    UpdateTime = DateTime.Now,
-                    UpdateUser = SecurityUtils.GetLogInEmpName(),
-                    TenantId = MultiTenantUtil.GetCurrentTenantId(),
-                }).ToList());
-
-                if (bpmnNodeVo.IsOutSideProcess == 1)
-                {
-                    var emplList = property.EmplList;
-                    if (emplList != null && emplList.Any())
-                    {
-                        var outsideEmpConfs = emplList.Select(empl => new BpmnNodeRoleOutsideEmpConf
-                        {
-                            NodeId = bpmnNodeVo.Id,
-                            EmplId = empl.Id,
-                            EmplName = empl.Name,
-                            CreateUser = SecurityUtils.GetLogInEmpName(),
-                            UpdateUser = SecurityUtils.GetLogInEmpName(),
-                            TenantId = MultiTenantUtil.GetCurrentTenantId(),
-                        }).ToList();
-
-                        _bpmnNodeRoleOutsideEmpConfService._repository.AddRange(outsideEmpConfs);
-                    }
-                }
-            }
+            return;
         }
 
-        public override void SetSupportBusinessObjects()
-        {
-            ((IAdaptorService)this).AddSupportBusinessObjects(BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_ROLE);
-        }
+        throw new AFBizException("migration error,please contact the author");
     }
+
+    public override void SetSupportBusinessObjects()
+    {
+        ((IAdaptorService)this).AddSupportBusinessObjects(BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_ROLE);
+    }
+}

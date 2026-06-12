@@ -8,12 +8,9 @@ namespace AntFlowCore.VirtualNode.service;
 
 public class BpmnConfService : IBpmnConfService
 {
-    private readonly IBpmProcessNameService _bpmProcessNameService;
-
-    public BpmnConfService(IBpmnConfRepository repository, IBpmProcessNameService bpmProcessNameService)
+    public BpmnConfService(IBpmnConfRepository repository)
     {
         _repository = repository;
-        _bpmProcessNameService = bpmProcessNameService;
     }
 
     public IBpmnConfRepository _repository { get; }
@@ -36,7 +33,6 @@ public class BpmnConfService : IBpmnConfService
     public void EffectiveBpmnConf(int id)
     {
         _repository.EffectiveBpmnConf(id);
-        BpmnConf bpmnConf = _repository.Find(a => a.Id == id).FirstOrDefault();
-        _bpmProcessNameService.EditProcessName(bpmnConf);
+        // Process name edit removed (IBpmProcessNameService deleted)
     }
 }

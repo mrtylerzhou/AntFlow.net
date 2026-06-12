@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using AntFlowCore.Abstraction;
 using AntFlowCore.Abstraction.util;
 using AntFlowCore.Base.constant.enums;
@@ -17,12 +17,9 @@ namespace AntFlowCore.Api.controller;
 public class InformationTemplateController
 {
     private readonly IInformationTemplateService _informationTemplateService;
-    private readonly IBpmVariableApproveRemindService _bpmVariableApproveRemindService;
-    public InformationTemplateController(InformationTemplateService informationTemplateService, 
-        BpmVariableApproveRemindService bpmVariableApproveRemindService)
+    public InformationTemplateController(InformationTemplateService informationTemplateService)
     {
         _informationTemplateService = informationTemplateService;
-        _bpmVariableApproveRemindService = bpmVariableApproveRemindService;
     }
 
     [HttpPost("listPage")]

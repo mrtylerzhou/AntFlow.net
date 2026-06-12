@@ -1,10 +1,12 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using AntFlowCore.Abstraction.Orm.util;
+using AntFlowCore.Abstraction.service.repository;
 using AntFlowCore.Base.adaptor.formoperation;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
+using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.factory;
 using AntFlowCore.Base.util;
@@ -26,7 +28,7 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
     private readonly ILFMainFieldService _lfMainFieldService;
     private readonly IBpmnConfLfFormdataService _lfformdataService;
     private readonly IBpmnConfLfFormdataFieldService _lfformdataFieldService;
-    private readonly IBpmnNodeLfFormdataFieldControlService _bpmnNodeLfFormdataFieldControlService;
+    private readonly IBpmnConfService _bpmnConfService;
 
     private static Dictionary<long, List<String>> conditionFieldNameMap = new Dictionary<long, List<string>>();
 
@@ -38,14 +40,14 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         ILFMainFieldService lfMainFieldService,
         IBpmnConfLfFormdataService lfformdataService,
         IBpmnConfLfFormdataFieldService lfformdataFieldService,
-        IBpmnNodeLfFormdataFieldControlService _bpmnNodeLfFormdataFieldControlService)
+        IBpmnConfService bpmnConfService)
     {
         _logger = logger;
         _mainService = mainService;
         _lfMainFieldService = lfMainFieldService;
         _lfformdataService = lfformdataService;
         _lfformdataFieldService = lfformdataFieldService;
-        this._bpmnNodeLfFormdataFieldControlService = _bpmnNodeLfFormdataFieldControlService;
+        _bpmnConfService = bpmnConfService;
     }
 
     public BpmnStartConditionsVo PreviewSetCondition(UDLFApplyVo vo)
@@ -240,15 +242,20 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
 
         vo.LfFields = fieldVoMap;
 
-        List<BpmnConfLfFormdata> bpmnConfLfFormdataList =
-            _lfformdataService._repository.Find(x => x.BpmnConfId == confId);
-        if (bpmnConfLfFormdataList == null || !bpmnConfLfFormdataList.Any())
+        string? lfFormData = GetLfFormDataFromJson(confId);
+        if (string.IsNullOrWhiteSpace(lfFormData))
         {
-            throw new AFBizException($"can not get lowcode flow formdata by confId:{confId}");
+            List<BpmnConfLfFormdata> bpmnConfLfFormdataList =
+                _lfformdataService._repository.Find(x => x.BpmnConfId == confId);
+            if (bpmnConfLfFormdataList == null || !bpmnConfLfFormdataList.Any())
+            {
+                throw new AFBizException($"can not get lowcode flow formdata by confId:{confId}");
+            }
+
+            lfFormData = bpmnConfLfFormdataList.First().Formdata;
         }
 
-        var lfFormdata = bpmnConfLfFormdataList.First();
-        vo.LfFormData = lfFormdata.Formdata;
+        vo.LfFormData = lfFormData;
         IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
         foreach (var o in lfFormOperationAdaptors)
         {
@@ -371,16 +378,9 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
                 throw new AFBizException($"confId {confId}, formCode:{vo.FormCode} does not have a field config");
             }
         }
-        List<LFFieldControlVO> currentFieldControls = _bpmnNodeLfFormdataFieldControlService
-            .GetFieldControlByProcessNumberAndElementId(vo.ProcessNumber, vo.TaskDefKey);
+        // IBpmnNodeLfFormdataFieldControlService has been removed; field control check is no longer supported
         foreach (LFMainField field in lfMainFields)
         {
-            LFFieldControlVO? lfFieldControlVo = currentFieldControls.FirstOrDefault(a=>a.FieldId==field.FieldId);
-            if (lfFieldControlVo != null && (StringConstants.HIDDEN_FIELD_PERMISSION.Equals(lfFieldControlVo.Perm) ||
-                                             StringConstants.READ_ONLY_FIELD_PERMISSION.Equals(lfFieldControlVo.Perm)))
-            {
-                continue;
-            }
             string fValue = lfFields[field.FieldId]?.ToString()??null;
             if (!StringConstants.HIDDEN_FIELD_VALUE.Equals(fValue))//如果是******,实际上是隐藏字段,不更新
             {
@@ -442,5 +442,12 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
                 o.OnFinishData(vo);
             }
         }
+    }
+
+    private string? GetLfFormDataFromJson(long confId)
+    {
+        BpmnConf? bpmnConf = _bpmnConfService._repository.FirstOrDefault(a => a.Id == confId);
+        BpmnConfConfigJson? confConfig = JsonConfUtil.ParseConfConfig(bpmnConf?.ConfConfigJson);
+        return confConfig?.LowCodeFormConfig?.Formdata;
     }
 }

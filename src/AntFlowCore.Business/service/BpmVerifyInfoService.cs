@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.service;
+using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.util;
@@ -14,7 +14,6 @@ public class BpmVerifyInfoService : IBpmVerifyInfoService
     private readonly AFTaskService _afTaskService;
     private readonly IProcessConstantsService _processConstantsService;
     private readonly IBpmVariableService _bpmVariableService;
-    private readonly IBpmVariableSignUpService _bpmVariableSignUpService;
     private readonly IBpmnEmployeeInfoProviderService _bpmnEmployeeInfoProviderService;
     private readonly IBpmnNodeService _nodeService;
 
@@ -24,7 +23,6 @@ public class BpmVerifyInfoService : IBpmVerifyInfoService
         AFTaskService afTaskService,
         IProcessConstantsService processConstantsService,
         IBpmVariableService bpmVariableService,
-        IBpmVariableSignUpService bpmVariableSignUpService,
         IBpmnEmployeeInfoProviderService bpmnEmployeeInfoProviderService,
         IBpmnNodeService nodeService,
         IBpmVerifyInfoRepository repository
@@ -35,7 +33,6 @@ public class BpmVerifyInfoService : IBpmVerifyInfoService
         _afTaskService = afTaskService;
         _processConstantsService = processConstantsService;
         _bpmVariableService = bpmVariableService;
-        _bpmVariableSignUpService = bpmVariableSignUpService;
         _bpmnEmployeeInfoProviderService = bpmnEmployeeInfoProviderService;
         _nodeService = nodeService;
         _repository = repository;
@@ -75,17 +72,6 @@ public class BpmVerifyInfoService : IBpmVerifyInfoService
 
         string elementId = tasks[0].ElementId;
         var bpmnNodeIds = _bpmVariableService.GetNodeIdsByeElementId(processNumber, elementId);
-
-        if (bpmnNodeIds == null || bpmnNodeIds.Count == 0)
-        {
-            BpmAfTaskInst prevTask = _processConstantsService.GetPrevTask(elementId, procInstId);
-            if (prevTask != null)
-            {
-                string taskDefinitionKey = prevTask.TaskDefKey;
-                bpmnNodeIds = _bpmVariableSignUpService
-                    .GetSignUpPrevNodeIdsByeElementId(processNumber, taskDefinitionKey);
-            }
-        }
 
         if (bpmnNodeIds == null || bpmnNodeIds.Count == 0)
         {

@@ -8,17 +8,11 @@ namespace AntFlowCore.Engine.service.biz;
 
 public class DictService : IDictService
 {
-    private readonly IDicMainService _dictMainService;
-    private readonly IBpmProcessNoticeService _bpmProcessNoticeService;
     private readonly IDicDataSerivce _dicDataSerivce;
 
     public DictService(
-        IDicMainService dictMainService,
-        IBpmProcessNoticeService bpmProcessNoticeService,
         IDicDataSerivce dicDataSerivce)
     {
-        _dictMainService = dictMainService;
-        _bpmProcessNoticeService = bpmProcessNoticeService;
         _dicDataSerivce = dicDataSerivce;
     }
     

@@ -22,14 +22,11 @@ public class ProcessApprovalService : IProcessApprovalService
     private readonly IFormFactory _formFactory;
     private readonly IButtonOperationService _buttonOperationService;
     private readonly IBpmBusinessProcessService _bpmBusinessProcessService;
-    private readonly IBpmVariableSignUpService _bpmVariableSignUpService;
     private readonly IProcessConstantsService _processConstantsService;
     private readonly IConfigFlowButtonContantService _configFlowButtonContantService;
     private readonly IBpmVariableMultiplayerService _bpmVariableMultiplayerService;
-    private readonly IBpmProcessNameRelevancyService _processNameRelevancyService;
     private readonly IBpmProcessForwardService _bpmProcessForwardService;
     private readonly IFreeSql _freeSql;
-    private readonly IBpmProcessNameService _bpmProcessNameService;
     private readonly IBpmnConfCommonService _bpmnConfCommonService;
     private readonly IAFTaskService _taskService;
     private readonly IAfTaskInstService _afTaskInstService;
@@ -39,14 +36,11 @@ public class ProcessApprovalService : IProcessApprovalService
         IFormFactory formFactory,
         IButtonOperationService buttonOperationService,
         IBpmBusinessProcessService bpmBusinessProcessService,
-        IBpmVariableSignUpService bpmVariableSignUpService,
         IProcessConstantsService processConstantsService,
         IConfigFlowButtonContantService configFlowButtonContantService,
         IBpmVariableMultiplayerService bpmVariableMultiplayerService,
-        IBpmProcessNameRelevancyService processNameRelevancyService,
         IBpmProcessForwardService bpmProcessForwardService,
         IFreeSql freeSql,
-        IBpmProcessNameService bpmProcessNameService,
         IBpmnConfCommonService bpmnConfCommonService,
         IAFTaskService taskService,
         IAfTaskInstService afTaskInstService,
@@ -56,14 +50,11 @@ public class ProcessApprovalService : IProcessApprovalService
         _formFactory = formFactory;
         _buttonOperationService = buttonOperationService;
         _bpmBusinessProcessService = bpmBusinessProcessService;
-        _bpmVariableSignUpService = bpmVariableSignUpService;
         _processConstantsService = processConstantsService;
         _configFlowButtonContantService = configFlowButtonContantService;
         _bpmVariableMultiplayerService = bpmVariableMultiplayerService;
-        _processNameRelevancyService = processNameRelevancyService;
         _bpmProcessForwardService = bpmProcessForwardService;
         _freeSql = freeSql;
-        _bpmProcessNameService = bpmProcessNameService;
         _bpmnConfCommonService = bpmnConfCommonService;
         _taskService = taskService;
         _afTaskInstService = afTaskInstService;
@@ -160,14 +151,7 @@ public class ProcessApprovalService : IProcessApprovalService
 
         // 检查当前节点是否为报名节点，并设置属性
         string nodeId = businessDataVo.ProcessRecordInfo.NodeId;
-        bool nodeIsSignUp = _bpmVariableSignUpService.CheckNodeIsSignUp(vo.ProcessNumber, nodeId);
-        businessDataVo.IsSignUpNode = nodeIsSignUp;
-
-        // 如果是报名节点，则添加“选择审核人”按钮
-        if (nodeIsSignUp)
-        {
-            AddApproverButton(businessDataVo);
-        }
+        businessDataVo.IsSignUpNode = false;
 
         if ((vo.IsOutSideAccessProc == null || !vo.IsOutSideAccessProc.Value) && vo.IsLowCodeFlow == 1)
         {
@@ -240,23 +224,14 @@ public class ProcessApprovalService : IProcessApprovalService
                 break;
             // recently build task
             case 3:
-                if (!string.IsNullOrEmpty(vo.ProcessType)) {
-                    vo.ProcessKeyList=_processNameRelevancyService.ProcessKeyList(Convert.ToInt64(vo.ProcessType));
-                }
                 page.Records=(this.ViewPcpNewlyBuildList(page, vo));
                 break;
             // already finished tasks
             case 4:
-                if (!string.IsNullOrEmpty(vo.ProcessType)) {
-                    vo.ProcessKeyList=_processNameRelevancyService.ProcessKeyList(Convert.ToInt64(vo.ProcessType));
-                }
                 page.Records=(this.ViewPcAlreadyDoneList(page, vo));
                 break;
             // running tasks
             case 5:
-                if (!string.IsNullOrEmpty(vo.ProcessType)) {
-                    vo.ProcessKeyList=_processNameRelevancyService.ProcessKeyList(Convert.ToInt64(vo.ProcessType));
-                }
                 page.Records=(this.ViewPcToDoList(page, vo));
                 break;
             // my draft
@@ -348,12 +323,7 @@ public class ProcessApprovalService : IProcessApprovalService
 
             if (!string.IsNullOrEmpty(record.ProcessKey))
             {
-                var bpmProcessVo = _bpmProcessNameService.Get(record.ProcessKey);
-                if (bpmProcessVo != null && !string.IsNullOrEmpty(bpmProcessVo.ProcessKey))
-                {
-                    record.ProcessTypeName = bpmProcessVo.ProcessName;
-                    record.ProcessCode = bpmProcessVo.ProcessKey;
-                }
+                // Process name lookup removed (dependent service deleted)
             }
         }
     }
@@ -361,10 +331,8 @@ public class ProcessApprovalService : IProcessApprovalService
 
 private bool IsOperatable(TaskMgmtVO taskMgmtVo)
 {
-    long count = _freeSql.Select<BpmProcessOperation>()
-        .Where(a=>a.ProcessNode==taskMgmtVo.TaskName&&a.ProcessKey==taskMgmtVo.ProcessKey&&a.Type==taskMgmtVo.Type)
-        .Count();
-    return count <= 0;
+    // BpmProcessOperation entity deleted, default to operatable
+    return true;
 }
 
 

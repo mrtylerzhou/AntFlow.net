@@ -19,21 +19,18 @@ public class TaskMgmtService : ITaskMgmtService
 {
     private readonly IAFTaskService _taskService;
     private readonly IAfTaskInstService _taskInstService;
-    private readonly IBpmProcessNoticeService _bpmProcessNoticeService;
     private readonly IAFExecutionService _executionService;
     private readonly IBpmnConfService _bpmnConfService;
     private IEnumerable services = ServiceProviderUtils.GetServicesByOpenGenericType(typeof(IFormOperationAdaptor<>));
     public TaskMgmtService(
         IAFTaskService taskService,
         IAfTaskInstService taskInstService,
-        IBpmProcessNoticeService bpmProcessNoticeService,
         IAFExecutionService executionService,
         IBpmnConfService bpmnConfService
         )
     {
         _taskService = taskService;
         _taskInstService = taskInstService;
-        _bpmProcessNoticeService = bpmProcessNoticeService;
         _executionService = executionService;
         _bpmnConfService = bpmnConfService;
     }
@@ -96,35 +93,13 @@ public class TaskMgmtService : ITaskMgmtService
         if (bpmnConfs.Count > 0)
         {
             Dictionary<string, int?> formCode2Flags = bpmnConfs.ToDictionary(b => b.FormCode, x => x.ExtraFlags,StringComparer.Ordinal);
-            IDictionary<String, List<BpmProcessNotice>> processNoticeMap = _bpmProcessNoticeService.ProcessNoticeMap(formCodes);
+            // IBpmProcessNoticeService has been removed; process notice mapping is no longer supported
             foreach (var diyProcessInfoDTO in diyProcessInfoDTOS)
             {
                 if (formCode2Flags.TryGetValue(diyProcessInfoDTO.Key, out int? flags))
                 {
                     bool hasStartUserChooseModules = BpmnConfFlagsEnum.HasFlag(flags, BpmnConfFlagsEnum.HAS_STARTUSER_CHOOSE_MODULES);
                     diyProcessInfoDTO.HasStarUserChooseModule = hasStartUserChooseModules;
-                }
-
-                string formCode = diyProcessInfoDTO.Key;
-                if (processNoticeMap.TryGetValue(formCode, out var bpmProcessNotices) && bpmProcessNotices.Any())
-                {
-                    var processNotices = new List<BaseNumIdStruVo>();
-                    foreach (ProcessNoticeEnum processNoticeEnum in ProcessNoticeEnum.Values)
-                    {
-                        var type = processNoticeEnum.Code;
-                        var descByCode = processNoticeEnum.Desc;
-
-                        var struVo = new BaseNumIdStruVo
-                        {
-                            Id = type,
-                            Name = descByCode,
-                            Active = bpmProcessNotices.Any(n => n.Type == type)
-                        };
-
-                        processNotices.Add(struVo);
-                    }
-                           
-                    diyProcessInfoDTO.ProcessNotices = processNotices;
                 }
             }
         }

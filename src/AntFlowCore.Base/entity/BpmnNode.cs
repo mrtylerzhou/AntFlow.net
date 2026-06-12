@@ -58,5 +58,10 @@ public class BpmnNode
     public int?  NoHeaderAction { get; set; }
     
     public int? ExtraFlags { get; set; }
+
+    /// <summary>
+    /// Consolidated node-level JSON configuration.
+    /// </summary>
+    public string NodeConfigJson { get; set; }
     
 }

@@ -12,19 +12,16 @@ namespace AntFlowCore.Engine.service.biz;
 public class BpmvariableBizService: IBpmvariableBizService
 {
     private readonly IBpmVariableService _bpmVariableService;
-    private readonly IBpmVariableSingleService _bpmVariableSingleService;
     private readonly IBpmVariableMultiplayerService _multiplayerService;
     private readonly IBpmVariableMultiplayerPersonnelService _bpmVariableMultiplayerPersonnelService;
     private readonly ILogger<BpmvariableBizService> _logger;
 
     public BpmvariableBizService(IBpmVariableService bpmVariableService,
-        IBpmVariableSingleService bpmVariableSingleService,
         IBpmVariableMultiplayerService multiplayerService,
         IBpmVariableMultiplayerPersonnelService bpmVariableMultiplayerPersonnelService,
         ILogger<BpmvariableBizService> logger)
     {
         _bpmVariableService = bpmVariableService;
-        _bpmVariableSingleService = bpmVariableSingleService;
         _multiplayerService = multiplayerService;
         _bpmVariableMultiplayerPersonnelService = bpmVariableMultiplayerPersonnelService;
         _logger = logger;
@@ -100,7 +97,7 @@ public class BpmvariableBizService: IBpmvariableBizService
         {
             if (isSingle)
             {
-                _bpmVariableSingleService._repository.UpdateAssignee(long.Parse(old.VariableId), changed.Id, changed.Name, $"管理员变更{old.Id}:{old.Name}=>{changed.Id}:{changed.Name}");
+                // BpmVariableSingle has been removed; single assignee update is no longer supported
             }
             else
             {

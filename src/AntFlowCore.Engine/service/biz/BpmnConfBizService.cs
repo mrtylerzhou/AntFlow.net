@@ -4,6 +4,7 @@ using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Abstraction.service.repository;
 using AntFlowCore.Base.adaptor.bpmnnodeadp;
 using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.exception;
@@ -11,6 +12,7 @@ using AntFlowCore.Base.extension;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.adaptor;
+using AntFlowCore.Bpmn.util;
 using AntFlowCore.Core.vo;
 using AntFlowCore.Engine.factory;
 using AntFlowCore.Engine.service.processor;
@@ -21,65 +23,40 @@ namespace AntFlowCore.Engine.service.biz;
 public class BpmnConfBizService : IBpmnConfBizService
 {
     private readonly IBpmnConfService _bpmnConfService;
-    private readonly IBpmnConfNoticeTemplateService _bpmnConfNoticeTemplateService;
     private readonly IBpmnNodeService _bpmnNodeService;
     private readonly IBpmnNodeToService _bpmnNodeToService;
-    private readonly IBpmnNodeSignUpConfService _bpmnNodeSignUpConfService;
-    private readonly IBpmnTemplateService _bpmnTemplateService;
-    private readonly IBpmnApproveRemindService _approveRemindService;
     private readonly IAdaptorFactory _adaptorFactory;
     private readonly IOutSideBpmCallbackUrlConfService _outSideBpmCallbackUrlConfService;
     private readonly IOutSideBpmBusinessPartyService _outSideBpmBusinessPartyService;
     private readonly IBpmProcessAppApplicationService _bpmProcessAppApplicationService;
-    private readonly IBpmnNodeButtonConfService _bpmnNodeButtonConfService;
     private readonly IBpmnEmployeeInfoProviderService _employeeInfoProviderService;
     private readonly IInformationTemplateService _informationTemplateService;
-    private readonly IBpmnNodeLfFormdataFieldControlService _lfFormdataFieldControlService;
-    private readonly IBpmnViewPageButtonService _viewPageButtonService;
-    private readonly IBpmnViewPageButtonBizService _viewPageButtonBizService;
     private readonly ITaskMgmtService _taskMgmtService;
   
 
     public BpmnConfBizService(
         IBpmnConfService bpmnConfService,
-        IBpmnConfNoticeTemplateService bpmnConfNoticeTemplateService,
         IBpmnNodeService bpmnNodeService,
         IBpmnNodeToService bpmnNodeToService,
-        IBpmnNodeSignUpConfService bpmnNodeSignUpConfService,
-        IBpmnTemplateService bpmnTemplateService,
-        IBpmnApproveRemindService approveRemindService,
         IAdaptorFactory adaptorFactory,
         IOutSideBpmCallbackUrlConfService outSideBpmCallbackUrlConfService,
         IOutSideBpmBusinessPartyService outSideBpmBusinessPartyService,
         IBpmProcessAppApplicationService bpmProcessAppApplicationService,
-        IBpmnNodeButtonConfService bpmnNodeButtonConfService,
         IBpmnEmployeeInfoProviderService employeeInfoProviderService,
         IInformationTemplateService informationTemplateService,
-        IBpmnNodeLfFormdataFieldControlService lfFormdataFieldControlService,
-        IBpmnViewPageButtonService viewPageButtonService,
-        IBpmnViewPageButtonBizService viewPageButtonBizService,
         ITaskMgmtService taskMgmtService
         )
     {
         _bpmnConfService = bpmnConfService;
-        _bpmnConfNoticeTemplateService = bpmnConfNoticeTemplateService;
         _bpmnNodeService = bpmnNodeService;
         _bpmnNodeToService = bpmnNodeToService;
-        _bpmnNodeSignUpConfService = bpmnNodeSignUpConfService;
-        _bpmnTemplateService = bpmnTemplateService;
-        _approveRemindService = approveRemindService;
         _adaptorFactory = adaptorFactory;
         _outSideBpmCallbackUrlConfService = outSideBpmCallbackUrlConfService;
         _outSideBpmBusinessPartyService = outSideBpmBusinessPartyService;
         _bpmProcessAppApplicationService = bpmProcessAppApplicationService;
-        _bpmnNodeButtonConfService = bpmnNodeButtonConfService;
         _employeeInfoProviderService = employeeInfoProviderService;
         _informationTemplateService = informationTemplateService;
-        _lfFormdataFieldControlService = lfFormdataFieldControlService;
-        _viewPageButtonService = viewPageButtonService;
-        _viewPageButtonBizService = viewPageButtonBizService;
         _taskMgmtService = taskMgmtService;
-     
     }
     private const String LinkMark = "_";
 
@@ -89,6 +66,7 @@ public class BpmnConfBizService : IBpmnConfBizService
         String bpmnCode = GetBpmnCode(bpmnName);
         String formCode = bpmnConfVo.FormCode;
         //todo 注意查看映射效果
+        bpmnConfVo.ConfConfigJson = JsonConfUtil.ToConfConfigJson(BpmnConfConfigHolder.BuildConfConfig(bpmnConfVo));
         BpmnConf bpmnConf = bpmnConfVo.MapToEntity();
        
         bpmnConf.BpmnCode=bpmnCode;
@@ -100,15 +78,13 @@ public class BpmnConfBizService : IBpmnConfBizService
         bpmnConf.Remark=bpmnConfVo.Remark??"";
         bpmnConf.TenantId = MultiTenantUtil.GetCurrentTenantId();
         _bpmnConfService._repository.Add(bpmnConf);
-        //notice template
-        _bpmnConfNoticeTemplateService.Insert(bpmnCode);
+        //notice template - service removed, now handled via conf_config_json
         long confId = bpmnConf.Id;
         if(confId.IsNullOrZero()){
             throw new AFBizException($"conf id for formcode:{formCode} can not be null");
         }
         bpmnConfVo.Id=confId;
-        _viewPageButtonBizService.EditBpmnViewPageButton(bpmnConfVo,confId); 
-        _bpmnTemplateService.EditBpmnTemplate(bpmnConfVo,confId);
+        // view page buttons and template editing - services removed, now handled via conf_config_json
         int? isOutSideProcess = bpmnConfVo.IsOutSideProcess;
         int? isLowCodeFlow = bpmnConfVo.IsLowCodeFlow;
         
@@ -135,10 +111,26 @@ public class BpmnConfBizService : IBpmnConfBizService
             
             bpmnNodeVo.IsOutSideProcess=isOutSideProcess;
             bpmnNodeVo.IsLowCodeFlow=isLowCodeFlow;
+            bpmnNodeVo.ConfId=confId;
+            bpmnNodeVo.FormCode = formCode;
 
             //if the node has no property,the node property default is "1-no property"
             bpmnNodeVo.NodeProperty=bpmnNodeVo.NodeProperty ?? 1;
             EditNodeExtraFlags(bpmnNodeVo);
+            PrepareNodeConditionsForJson(bpmnNodeVo);
+            // Build node-level JSON config from VO data
+            BpmnNodeConfigHolder.SetButtonSignConf(bpmnNodeVo);
+            BpmnNodeConfigHolder.SetTemplateConf(bpmnNodeVo);
+            // Populate formdataId on LF field control VOs (comes from conf level, not frontend)
+            var lfFormDataId = bpmnConfVo.LfFormDataId;
+            if (lfFormDataId != null && bpmnNodeVo.LfFieldControlVOs != null && bpmnNodeVo.LfFieldControlVOs.Count > 0)
+            {
+                foreach (var fc in bpmnNodeVo.LfFieldControlVOs)
+                {
+                    fc.FormdataId = lfFormDataId.Value;
+                }
+            }
+            BpmnNodeConfigHolder.SetLowCodeConf(bpmnNodeVo);
             BpmnNode bpmnNode = bpmnNodeVo.MapToEntity();
             bpmnNode.ConfId=confId;
             bpmnNode.CreateTime=DateTime.Now;
@@ -150,30 +142,18 @@ public class BpmnConfBizService : IBpmnConfBizService
             if(bpmnNodeId.IsNullOrZero()){
                 throw new AFBizException("can not get bpmn node id!");
             }
-            //edit node to
-            _bpmnNodeToService.EditNodeTo(bpmnNodeVo,bpmnNodeId);
-            //edit node's button conf
-            _bpmnNodeButtonConfService.EditButtons(bpmnNodeVo, bpmnNodeId);
-            //edit node sign up
-            _bpmnNodeSignUpConfService.EditSignUpConf(bpmnNodeVo,bpmnNodeId);
-            
-            bpmnNodeVo.Id=bpmnNodeId;
-            bpmnNodeVo.ConfId=confId;
-            bpmnNodeVo.FormCode = formCode;
-            BpmnNodeAdpConfEnum? bpmnNodeAdpConfEnum = GetBpmnNodeAdpConfEnum(bpmnNodeVo);
-            //if it can not get the node's adapter,continue
-            if (bpmnNodeAdpConfEnum==null) {
-                continue;
-            }
-            //edit in node notice template
-            _bpmnTemplateService.EditBpmnTemplate(bpmnNodeVo);
-            //edit in node approver remind conf
-            _approveRemindService.EditBpmnApproveRemind(bpmnNodeVo);
-            //get node adaptor
-            IBpmnNodeAdaptor iBpmnNodeAdaptor = GetBpmnNodeAdaptor(bpmnNodeAdpConfEnum);
+            bpmnNodeVo.Id = bpmnNodeId;
 
-            //then edit the node
-            iBpmnNodeAdaptor.EditBpmnNode(bpmnNodeVo);
+            // Call the appropriate SetXxxConf based on node property
+            BuildNodeConfigJsonFromVo(bpmnNodeVo);
+
+            // Serialize node config JSON to DB
+            string? nodeConfigJsonStr = bpmnNodeVo.SerializeNodeConfigJson();
+            if (nodeConfigJsonStr != null)
+            {
+                var updateNode = new BpmnNode { Id = bpmnNodeId, NodeConfigJson = nodeConfigJsonStr };
+                _bpmnNodeService._repository.Update(updateNode);
+            }
             
             if((int)NodeTypeEnum.NODE_TYPE_COPY==bpmnNodeVo.NodeType&&bpmnNodeVo.NodeTo!=null&&bpmnNodeVo.NodeTo.Any()){
                 hasLastNodeCopy=BpmnConfFlagsEnum.HAS_LAST_NODE_COPY.Code;
@@ -238,6 +218,64 @@ public class BpmnConfBizService : IBpmnConfBizService
         }).ToList();
     
         return PageUtils.GetResultAndPage(page);
+    }
+
+    private void BuildNodeConfigJsonFromVo(BpmnNodeVo bpmnNodeVo)
+    {
+        int? nodeProperty = bpmnNodeVo.NodeProperty;
+        int? nodeType = bpmnNodeVo.NodeType;
+
+        // Node property-based adaptors
+        if (nodeProperty != null)
+        {
+            if (nodeProperty == (int)NodePropertyEnum.NODE_PROPERTY_PERSONNEL)
+            {
+                BpmnNodeConfigHolder.SetPersonnelConf(bpmnNodeVo);
+            }
+            else if (nodeProperty == (int)NodePropertyEnum.NODE_PROPERTY_ROLE)
+            {
+                BpmnNodeConfigHolder.SetRoleConf(bpmnNodeVo);
+            }
+            else if (nodeProperty == (int)NodePropertyEnum.NODE_PROPERTY_LOOP)
+            {
+                BpmnNodeConfigHolder.SetLoopConf(bpmnNodeVo);
+            }
+            else if (nodeProperty == (int)NodePropertyEnum.NODE_PROPERTY_LEVEL)
+            {
+                BpmnNodeConfigHolder.SetAssignLevelConf(bpmnNodeVo);
+            }
+            else if (nodeProperty == (int)NodePropertyEnum.NODE_PROPERTY_HRBP)
+            {
+                BpmnNodeConfigHolder.SetHrbpConf(bpmnNodeVo);
+            }
+            else if (nodeProperty == (int)NodePropertyEnum.NODE_PROPERTY_CUSTOMIZE)
+            {
+                BpmnNodeConfigHolder.SetCustomizeConf(bpmnNodeVo);
+            }
+            else if (nodeProperty == (int)NodePropertyEnum.NODE_PROPERTY_OUT_SIDE_ACCESS)
+            {
+                BpmnNodeConfigHolder.SetOutSideAccessConf(bpmnNodeVo);
+            }
+            else if (nodeProperty == (int)NodePropertyEnum.NODE_PROPERTY_BUSINESSTABLE)
+            {
+                BpmnNodeConfigHolder.SetBusinessTableConf(bpmnNodeVo);
+            }
+        }
+
+        // Node type-based adaptors
+        if (nodeType != null)
+        {
+            if (nodeType == (int)NodeTypeEnum.NODE_TYPE_COPY)
+            {
+                BpmnNodeConfigHolder.SetPersonnelConf(bpmnNodeVo);
+            }
+            // Conditions: build JSON directly from VO
+            if (nodeType == (int)NodeTypeEnum.NODE_TYPE_CONDITIONS
+                || nodeType == (int)NodeTypeEnum.NODE_TYPE_OUT_SIDE_CONDITIONS)
+            {
+                PrepareNodeConditionsForJson(bpmnNodeVo);
+            }
+        }
     }
 
     /**
@@ -379,43 +417,147 @@ public class BpmnConfBizService : IBpmnConfBizService
             }
            
         }
-        //set viewpage buttons
-        SetViewPageButton(bpmnConfVo);
+        BpmnConfConfigJson? confConfig = JsonConfUtil.ParseConfConfig(bpmnConfVo.ConfConfigJson);
+        if (!SetViewPageButtonFromJson(bpmnConfVo, confConfig))
+        {
+            SetViewPageButton(bpmnConfVo);
+        }
 
-
-        //set out node notice template
-        SetBpmnTemplateVos(bpmnConfVo);
+        if (!SetBpmnTemplateVosFromJson(bpmnConfVo, confConfig))
+        {
+            SetBpmnTemplateVos(bpmnConfVo);
+        }
         return bpmnConfVo;
     }
+    /// <summary>
+    /// Set conf-level notice templates from JSON (no DB table read).
+    /// Reads conf_config_json -> confTemplates[] for the given formCode.
+    /// </summary>
     private void SetBpmnTemplateVos(BpmnConfVo bpmnConfVo)
     {
-       
-        List<BpmnTemplate> bpmnTemplates = _bpmnTemplateService._repository
-            .Find(a => a.ConfId == bpmnConfVo.Id && a.IsDel == 0 && a.NodeId == null);
-        bpmnConfVo.TemplateVos  = bpmnTemplates.Select(o =>
+        var bpmnConf = _bpmnConfService._repository.GetQueryable()
+            .Where(a => a.FormCode == bpmnConfVo.FormCode && a.EffectiveStatus == 1 && a.ConfConfigJson != null)
+            .First();
+        
+        if (bpmnConf == null || string.IsNullOrEmpty(bpmnConf.ConfConfigJson))
         {
-            BpmnTemplateVo vo = BuildBpmnTemplateVo(o);
-            return vo;
-        }).ToList();
+            bpmnConfVo.TemplateVos = new List<BpmnTemplateVo>();
+            return;
+        }
+        
+        var confConfig = JsonConfUtil.ParseConfConfig(bpmnConf.ConfConfigJson);
+        if (confConfig?.ConfTemplates == null || confConfig.ConfTemplates.Count == 0)
+        {
+            bpmnConfVo.TemplateVos = new List<BpmnTemplateVo>();
+            return;
+        }
+        
+        SetBpmnTemplateVosFromJson(bpmnConfVo, confConfig);
+    }
+
+    private bool SetBpmnTemplateVosFromJson(BpmnConfVo bpmnConfVo, BpmnConfConfigJson? confConfig)
+    {
+        if (confConfig?.ConfTemplates == null)
+        {
+            return false;
+        }
+
+        bpmnConfVo.TemplateVos = confConfig.ConfTemplates;
+        HydrateBpmnTemplateVos(bpmnConfVo.TemplateVos);
+        return true;
+    }
+
+    private bool SetViewPageButtonFromJson(BpmnConfVo bpmnConfVo, BpmnConfConfigJson? confConfig)
+    {
+        if (confConfig?.ViewPageButtons == null)
+        {
+            return false;
+        }
+
+        bpmnConfVo.ViewPageButtons = new BpmnViewPageButtonBaseVo
+        {
+            ViewPageStart = confConfig.ViewPageButtons
+                .Where(o => o.ViewType == (int)ViewPageTypeEnum.VIEW_PAGE_TYPE_START)
+                .Select(o => o.ButtonType)
+                .ToList(),
+            ViewPageOther = confConfig.ViewPageButtons
+                .Where(o => o.ViewType == (int)ViewPageTypeEnum.VIEW_PAGE_TYPE_OTHER)
+                .Select(o => o.ButtonType)
+                .ToList()
+        };
+
+        return true;
+    }
+
+    private void HydrateBpmnTemplateVos(List<BpmnTemplateVo>? templateVos)
+    {
+        if (templateVos == null || templateVos.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var vo in templateVos)
+        {
+            vo.EventValue = EventTypeEnumExtensions.GetDescByCode(vo.Event);
+
+            if (vo.InformIdList.IsEmpty() && !string.IsNullOrEmpty(vo.Informs))
+            {
+                vo.InformIdList = vo.Informs.Split(',').ToList();
+            }
+
+            if (vo.EmpIdList.IsEmpty() && !string.IsNullOrEmpty(vo.Emps))
+            {
+                vo.EmpIdList = vo.Emps.Split(',').ToList();
+            }
+
+            if (!vo.EmpIdList.IsEmpty() && vo.EmpList.IsEmpty())
+            {
+                var employeeInfo = _employeeInfoProviderService.ProvideEmployeeInfo(vo.EmpIdList);
+                vo.EmpList = vo.EmpIdList
+                    .Select(id => new BaseIdTranStruVo
+                    {
+                        Id = id,
+                        Name = employeeInfo.ContainsKey(id) ? employeeInfo[id] : string.Empty
+                    })
+                    .ToList();
+            }
+
+            if (vo.TemplateId > 0)
+            {
+                vo.TemplateName = _informationTemplateService._repository.GetQueryable()
+                    .Where(a=>a.Id==vo.TemplateId).FirstOrDefault()
+                    ?.Name ?? vo.TemplateName;
+            }
+        }
+    }
+
+    private void HydrateApproveRemindVo(BpmnApproveRemindVo? vo)
+    {
+        if (vo == null)
+        {
+            return;
+        }
+
+        vo.IsInuse = vo.TemplateId != null && !string.IsNullOrEmpty(vo.Days);
+        if (!string.IsNullOrEmpty(vo.Days) && vo.DayList.IsEmpty())
+        {
+            vo.DayList = vo.Days.Split(',').Select(int.Parse).ToList();
+        }
+
+        if (vo.TemplateId != null)
+        {
+            vo.TemplateName = _informationTemplateService._repository.GetQueryable()
+                .Where(a=>a.Id==vo.TemplateId).FirstOrDefault()
+                ?.Name ?? vo.TemplateName;
+        }
     }
     private List<BpmnNodeVo> GetBpmnNodeVoList(List<BpmnNode> bpmnNodeList, String conditionsUrl)
     {
         List<long> idList = bpmnNodeList.Select(a => a.Id).ToList();
         Dictionary<long,List<string>> bpmnNodeToMap = GetBpmnNodeToMap(idList);
-        Dictionary<long,List<BpmnNodeButtonConf>> bpmnNodeButtonConfMap = GetBpmnNodeButtonConfMap(idList);
-        Dictionary<long,BpmnNodeSignUpConf> bpmnNodeSignUpConfMap = GetBpmnNodeSignUpConfMap(idList);
-        Dictionary<long,List<BpmnTemplateVo>> bpmnTemplateVoMap = GetBpmnTemplateVoMap(idList);
-        Dictionary<long,BpmnApproveRemindVo> bpmnApproveRemindVoMap = GetBpmnApproveRemindVoMap(idList);
-        int? isLowCodeFlow = bpmnNodeList[0].IsLowCodeFlow;
-        Dictionary<long, List<BpmnNodeLfFormdataFieldControl>> bpmnNodeFieldControlConfMap=new();
-        if (isLowCodeFlow is 1)
-        {
-            bpmnNodeFieldControlConfMap = GetBpmnNodeFieldControlConfMap(idList);
-        }
 
         return bpmnNodeList
-            .Select(o => GetBpmnNodeVo(o, bpmnNodeToMap, bpmnNodeButtonConfMap, bpmnNodeSignUpConfMap,
-                bpmnTemplateVoMap, bpmnApproveRemindVoMap, bpmnNodeFieldControlConfMap, conditionsUrl))
+            .Select(o => GetBpmnNodeVo(o, bpmnNodeToMap, conditionsUrl))
             .ToList();
     }
 
@@ -429,287 +571,40 @@ public class BpmnConfBizService : IBpmnConfBizService
 
         return result;
     }
-    private Dictionary<long, List<BpmnNodeLfFormdataFieldControl>> GetBpmnNodeFieldControlConfMap(List<long> idList)
-    {
-        var bpmnNodeLfFormdataFieldControls = _lfFormdataFieldControlService
-          ._repository.Find(a=>idList.Contains(a.Id)).ToList();
-
-        return bpmnNodeLfFormdataFieldControls
-            .GroupBy(x => x.NodeId)
-            .ToDictionary(
-                g => g.Key,
-                g => g.ToList()
-            );
-    }
-
-    private  Dictionary<long, BpmnNodeSignUpConf> GetBpmnNodeSignUpConfMap(List<long> idList)
-    {
-        var data = _bpmnNodeSignUpConfService._repository
-            .Find(x => idList.Contains(x.BpmnNodeId) && x.IsDel==0)
-            .ToList();
-
-        return data.ToDictionary(o => o.BpmnNodeId, o => o);
-    }
-    private Dictionary<long, BpmnApproveRemindVo> GetBpmnApproveRemindVoMap(List<long> ids)
-    {
-        if (ids == null || !ids.Any())
-        {
-            return new Dictionary<long, BpmnApproveRemindVo>();
-        }
-
-        var bpmnApproveRemindList = _approveRemindService._repository
-            .Find(a=>ids.Contains(a.Id)&&a.IsDel==0);
-            
-
-        return bpmnApproveRemindList
-            .ToDictionary(
-                o => o.NodeId,
-                o =>
-                {
-                    BpmnApproveRemindVo vo = o.MapToVo();
-                    vo.IsInuse = false;
-                    
-                    var template = _informationTemplateService._repository.GetQueryable().Where(a => a.Id == o.TemplateId).FirstOrDefault();
-                    vo.TemplateName = template?.Name ?? string.Empty;
-                    
-                    if (!string.IsNullOrEmpty(vo.Days))
-                    {
-                        vo.DayList = vo.Days.Split(',')
-                            .Select(int.Parse)
-                            .ToList();
-                    }
-                    // 检查是否启用
-                    if (vo.TemplateId!=null && !string.IsNullOrEmpty(vo.Days))
-                    {
-                        vo.IsInuse = true;
-                    }
-
-                    return vo;
-                });
-    }
-
-    private Dictionary<long, List<BpmnTemplateVo>> GetBpmnTemplateVoMap(List<long> ids)
-    {
-        if (ids == null || ids.Count == 0)
-        {
-            return new Dictionary<long, List<BpmnTemplateVo>>();
-        }
-
-        return _bpmnTemplateService._repository
-            .Find(x => x.NodeId!=null&&ids.Contains(x.NodeId.Value) && x.IsDel==0)
-            .GroupBy(x => x.NodeId.Value)
-            .ToDictionary(
-                g => g.Key,
-                g => g.Select(o =>
-                {
-                    BpmnTemplateVo vo = BuildBpmnTemplateVo(o);
-                    return vo;
-                }).ToList()
-            );
-    }
-    private BpmnTemplateVo BuildBpmnTemplateVo(BpmnTemplate entity)
-    {
-        BpmnTemplateVo vo = entity.MapToVo();
-        vo.EventValue = EventTypeEnumExtensions.GetDescByCode(vo.Event);
-
-        if (!string.IsNullOrEmpty(vo.Informs))
-        {
-            vo.InformIdList = vo.Informs.Split(',').ToList();
-            vo.InformList = vo.InformIdList
-                .Select(id => new BaseIdTranStruVo
-                {
-                    Id = id,
-                    Name = EventTypeEnumExtensions.GetDescByCode(int.Parse(id))
-                })
-                .ToList();
-        }
-
-        if (!string.IsNullOrEmpty(vo.Emps))
-        {
-            vo.EmpIdList = vo.Emps.Split(',').ToList();
-            var employeeInfo = _employeeInfoProviderService.ProvideEmployeeInfo(vo.EmpIdList);
-            vo.EmpList = vo.EmpIdList
-                .Select(id => new BaseIdTranStruVo
-                {
-                    Id = id,
-                    Name = employeeInfo.ContainsKey(id) ? employeeInfo[id] : string.Empty
-                })
-                .ToList();
-        }
-
-        if (!string.IsNullOrEmpty(entity.MessageSendType))
-        {
-            String[] messageSendTypesStr = entity.MessageSendType.Split(",");
-            List<BaseNumIdStruVo> baseNumIdStruVos = messageSendTypesStr.Select(a => new BaseNumIdStruVo()
-            {
-                Id = long.Parse(a),
-                Name = MessageSendTypeEnum.GetEnumByCode(int.Parse(a)).Description,
-            }).ToList();
-            vo.MessageSendTypeList = baseNumIdStruVos;
-        }
-        vo.TemplateName = _informationTemplateService._repository.GetQueryable()
-            .Where(a=>a.Id==vo.TemplateId).FirstOrDefault()
-            ?.Name ?? string.Empty;
-        return vo;
-    }
-
-    private  Dictionary<long, List<BpmnNodeButtonConf>> GetBpmnNodeButtonConfMap(List<long> idList)
-    {
-        
-        var data = _bpmnNodeButtonConfService._repository
-            .Find(x => idList.Contains(x.BpmnNodeId) && x.IsDel == 0);
-
-        return data
-            .GroupBy(x => x.BpmnNodeId)
-            .ToDictionary(
-                g => g.Key,
-                g => g.ToList()
-            );
-    }
-
-    private BpmnNodeVo GetBpmnNodeVo(BpmnNode bpmnNode, Dictionary<long, List<String>> bpmnNodeToMap, 
-        Dictionary<long, List<BpmnNodeButtonConf>> bpmnNodeButtonConfMap,
-        Dictionary<long, BpmnNodeSignUpConf> bpmnNodeSignUpConfMap,
-        Dictionary<long, List<BpmnTemplateVo>> bpmnTemplateVoMap,
-        Dictionary<long, BpmnApproveRemindVo> bpmnApproveRemindVoMap,
-        Dictionary<long, List<BpmnNodeLfFormdataFieldControl>> lfFieldControlMap,
-        String conditionsUrl)
+    private BpmnNodeVo GetBpmnNodeVo(BpmnNode bpmnNode, Dictionary<long, List<String>> bpmnNodeToMap, String conditionsUrl)
     {
         BpmnNodeVo bpmnNodeVo = bpmnNode.MapToVo();
+        bpmnNodeVo.ConditionsUrl = conditionsUrl;
       
         long bpmnNodeId = bpmnNode.Id;
         //set nodeto
         bpmnNodeVo.NodeTo=bpmnNodeToMap.ContainsKey(bpmnNodeId)?bpmnNodeToMap[bpmnNodeId]:null;
-        
-        //set buttons conf
-        SetButtons(bpmnNodeVo, bpmnNodeButtonConfMap[bpmnNodeId]);
-        //assign property name
-        bpmnNodeVo.NodePropertyName=NodePropertyEnumExtensions.GetDescByCode(bpmnNodeVo.NodeProperty);
-        //set in node notice template
-        bpmnNodeVo.TemplateVos=bpmnTemplateVoMap.ContainsKey(bpmnNodeId)?bpmnTemplateVoMap[bpmnNodeId]:null;
-        //set in node approvement remind
-        bpmnNodeVo.ApproveRemindVo=bpmnApproveRemindVoMap.ContainsKey(bpmnNodeId)?bpmnApproveRemindVoMap[bpmnNodeId]:null;
-        BpmnNodeAdpConfEnum? bpmnNodeAdpConfEnum = GetBpmnNodeAdpConfEnum(bpmnNodeVo);
-        if (bpmnNodeAdpConfEnum==null) {
+
+        BpmnNodeConfigJson? nodeConfig = JsonConfUtil.ParseNodeConfig(bpmnNode.NodeConfigJson);
+        if (nodeConfig != null)
+        {
+            bpmnNodeVo.NodeConfigJsonObj = nodeConfig;
+            bpmnNodeVo.NodePropertyName=NodePropertyEnumExtensions.GetDescByCode(bpmnNodeVo.NodeProperty);
+            HydrateBpmnTemplateVos(bpmnNodeVo.TemplateVos);
+            HydrateApproveRemindVo(bpmnNodeVo.ApproveRemindVo);
+            if (IsConditionNodeType(bpmnNode.NodeType))
+            {
+                BpmnNodeAdpConfEnum? adpConfEnum = GetBpmnNodeAdpConfEnum(bpmnNodeVo);
+                if (adpConfEnum != null)
+                {
+                    GetBpmnNodeAdaptor(adpConfEnum).FormatToBpmnNodeVo(bpmnNodeVo);
+                }
+            }
             return bpmnNodeVo;
         }
-        //get node adaptor
-        IBpmnNodeAdaptor iBpmnNodeAdaptor = GetBpmnNodeAdaptor(bpmnNodeAdpConfEnum);
-
-        //use adaptor to format nodevo
-        iBpmnNodeAdaptor.FormatToBpmnNodeVo(bpmnNodeVo);
-        if ((int)NodeTypeEnum.NODE_TYPE_OUT_SIDE_CONDITIONS==bpmnNode.NodeType) {
-            bpmnNodeVo.NodeType=(int)NodeTypeEnum.NODE_TYPE_CONDITIONS;
-        }
-        //set sign up conf
-        SetBpmnNodeSignUpConf(bpmnNode, bpmnNodeSignUpConfMap, bpmnNodeVo);
-        SetFieldControlVOs(bpmnNode,lfFieldControlMap,bpmnNodeVo);
-        return bpmnNodeVo;
+        
+        throw new AFBizException("migration error,please contact the author");
     }
 
-    private void SetFieldControlVOs(
-        BpmnNode bpmnNode, 
-        Dictionary<long, List<BpmnNodeLfFormdataFieldControl>> fieldControlMap, 
-        BpmnNodeVo nodeVo)
-    {
-        bool isLowFlow = bpmnNode.IsLowCodeFlow == 1;
-        if (!isLowFlow)
-        {
-            return;
-        }
-
-        if (fieldControlMap == null || fieldControlMap.Count == 0)
-        {
-            return;
-        }
-
-        if (!fieldControlMap.TryGetValue(bpmnNode.Id, out var fieldControls) || fieldControls == null || fieldControls.Count == 0)
-        {
-            return;
-        }
-
-        var fieldControlVOs = fieldControls
-            .Select(fieldControl => new LFFieldControlVO
-            {
-                FieldId = fieldControl.FieldId,
-                FieldName = fieldControl.FieldName,
-                Perm = fieldControl.Perm
-            })
-            .ToList();
-
-        nodeVo.LfFieldControlVOs = fieldControlVOs;
-    }
-
-    private void SetBpmnNodeSignUpConf(
-        BpmnNode bpmnNode, 
-        Dictionary<long, BpmnNodeSignUpConf> bpmnNodeSignUpConfMap, 
-        BpmnNodeVo bpmnNodeVo)
-    {
-        if (bpmnNode.IsSignUp != 1)
-        {
-            return;
-        }
-
-        if (!bpmnNodeSignUpConfMap.TryGetValue(bpmnNode.Id, out var bpmnNodeSignUpConf) || bpmnNodeSignUpConf == null)
-        {
-            return;
-        }
-
-        var propertysVo = bpmnNodeVo.Property ?? new BpmnNodePropertysVo();
-
-        propertysVo.AfterSignUpWay = bpmnNodeSignUpConf.AfterSignUpWay;
-        propertysVo.SignUpType = bpmnNodeSignUpConf.SignUpType;
-
-        bpmnNodeVo.Property = propertysVo;
-    }
-
-    private void SetButtons(BpmnNodeVo bpmnNodeVo, List<BpmnNodeButtonConf> bpmnNodeButtonConfs)
-    {
-
-        if (!ObjectUtils.IsEmpty(bpmnNodeButtonConfs))
-        {
-
-            BpmnNodeButtonConfBaseVo buttons = new BpmnNodeButtonConfBaseVo();
-            buttons.StartPage = GetButtons(bpmnNodeButtonConfs, ButtonPageTypeEnum.INITIATE);
-            buttons.ApprovalPage=GetButtons(bpmnNodeButtonConfs, ButtonPageTypeEnum.AUDIT);
-            buttons.ViewPage=GetButtons(bpmnNodeButtonConfs, ButtonPageTypeEnum.TOVIEW);
-            bpmnNodeVo.Buttons=buttons;
-
-        }
-    }
-    private List<int> GetButtons(List<BpmnNodeButtonConf> bpmnNodeButtonConfs, ButtonPageTypeEnum buttonPageTypeEnum)
-    {
-        return bpmnNodeButtonConfs
-            .Where(o => o.ButtonPageType == (int)buttonPageTypeEnum)
-            .Select(o => o.ButtonType)
-            .Distinct()
-            .ToList();
-    }
     private void SetViewPageButton(BpmnConfVo bpmnConfVo)
     {
-        List<BpmnViewPageButton> bpmnViewPageButtons = _viewPageButtonService._repository.Find(a => a.ConfId == bpmnConfVo.Id && a.IsDel == 0).ToList();
-        
-
-        BpmnViewPageButtonBaseVo bpmnViewPageButtonBaseVo = new BpmnViewPageButtonBaseVo();
-
-        //start user's view page
-        bpmnViewPageButtonBaseVo.ViewPageStart=GetViewPageButtonsByType(bpmnViewPageButtons, ViewPageTypeEnum.VIEW_PAGE_TYPE_START);
-
-        //approver's view page
-        bpmnViewPageButtonBaseVo.ViewPageOther=GetViewPageButtonsByType(bpmnViewPageButtons, ViewPageTypeEnum.VIEW_PAGE_TYPE_OTHER);
-
-        //set view page buttons
-        bpmnConfVo.ViewPageButtons=bpmnViewPageButtonBaseVo;
-
-    }
-    private List<int> GetViewPageButtonsByType(
-        List<BpmnViewPageButton> bpmnViewPageButtons, 
-        ViewPageTypeEnum viewPageTypeEnum)
-    {
-        return bpmnViewPageButtons
-            .Where(o => o.ViewType == (int)viewPageTypeEnum)
-            .Select(o => o.ButtonType)
-            .ToList();
+        // BpmnViewPageButton entity and service have been removed; view page buttons are now in conf_config_json
+        bpmnConfVo.ViewPageButtons = new BpmnViewPageButtonBaseVo();
     }
 
     private string FormatOutSideFormCode(BpmnConfVo bpmnConfVo)
@@ -733,7 +628,8 @@ public class BpmnConfBizService : IBpmnConfBizService
 
     public int? GetCustomizeNodeSignType(long nodeId)
     {
-        return _bpmnNodeService.GetCustomizeNodeSignType(nodeId);
+        // GetCustomizeNodeSignType has been removed from IBpmnNodeService
+        return null;
     }
     private BpmnConfVo FormatConfVo(BpmnConfVo confVo)
     {
@@ -798,5 +694,40 @@ public class BpmnConfBizService : IBpmnConfBizService
                 bpmnNodeVo.ExtraFlags=flags;
             }
         }
+    }
+
+    private static bool IsConditionNodeType(int nodeType)
+    {
+        return nodeType == (int)NodeTypeEnum.NODE_TYPE_CONDITIONS
+               || nodeType == (int)NodeTypeEnum.NODE_TYPE_OUT_SIDE_CONDITIONS;
+    }
+
+    private static void PrepareNodeConditionsForJson(BpmnNodeVo bpmnNodeVo)
+    {
+        if (!IsConditionNodeType(bpmnNodeVo.NodeType) || bpmnNodeVo.Property == null)
+        {
+            return;
+        }
+
+        BpmnNodePropertysVo property = bpmnNodeVo.Property;
+        string? outSideConditionsId = property.ConditionsConf?.OutSideConditionsId;
+        BpmnNodeConditionsConfBaseVo conditionsConf = property.IsDefault == 1
+            ? new BpmnNodeConditionsConfBaseVo
+            {
+                IsDefault = property.IsDefault,
+                Sort = property.Sort,
+                GroupRelation = ConditionRelationShipEnum.GetCodeByValue(property.GroupRelation),
+                ExtJson = property.ConditionList == null
+                    ? null
+                    : JsonConfUtil.ToJsonString(property.ConditionList)
+            }
+            : BpmnConfNodePropertyConverter.FromVue3Model(property);
+
+        if (!string.IsNullOrWhiteSpace(outSideConditionsId))
+        {
+            conditionsConf.OutSideConditionsId = outSideConditionsId;
+        }
+
+        property.ConditionsConf = conditionsConf;
     }
 }

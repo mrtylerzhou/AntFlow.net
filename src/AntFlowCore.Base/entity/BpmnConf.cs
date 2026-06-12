@@ -98,6 +98,11 @@ public class BpmnConf
     public int? ExtraFlags { get; set; }
 
     /// <summary>
+    /// Consolidated process-level JSON configuration.
+    /// </summary>
+    public string ConfConfigJson { get; set; }
+
+    /// <summary>
     /// Validate BpmnName for business rules.
     /// </summary>
     /// <param name="bpmnName">Bpmn Name</param>

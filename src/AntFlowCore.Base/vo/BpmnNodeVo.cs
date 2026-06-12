@@ -1,6 +1,7 @@
-﻿using System.Text.Json.Serialization;
+using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.util;
 using AntFlowCore.Core.vo;
+using System.Text.Json.Serialization;
 
 namespace AntFlowCore.Base.vo;
 
@@ -155,4 +156,50 @@ namespace AntFlowCore.Base.vo;
         public string ElementId { get; set; }
         [JsonPropertyName("noHeaderAction")]
         public int? NoHeaderAction { get; set; }
+        private string? _nodeConfigJson;
+        [JsonPropertyName("nodeConfigJson")]
+        public string? NodeConfigJson
+        {
+            get => _nodeConfigJson;
+            set
+            {
+                _nodeConfigJson = value;
+                if (!string.IsNullOrEmpty(value))
+                {
+                    _nodeConfigJsonObj = JsonConfUtil.ParseNodeConfig(value);
+                }
+            }
+        }
+
+        [JsonIgnore]
+        private BpmnNodeConfigJson? _nodeConfigJsonObj;
+
+        [JsonIgnore]
+        public BpmnNodeConfigJson? NodeConfigJsonObj
+        {
+            get
+            {
+                if (_nodeConfigJsonObj == null && !string.IsNullOrEmpty(NodeConfigJson))
+                {
+                    _nodeConfigJsonObj = JsonConfUtil.ParseNodeConfig(NodeConfigJson);
+                }
+                return _nodeConfigJsonObj;
+            }
+            set => _nodeConfigJsonObj = value;
+        }
+
+        public BpmnNodeConfigJson GetOrCreateNodeConfigJson()
+        {
+            _nodeConfigJsonObj ??= new BpmnNodeConfigJson();
+            return _nodeConfigJsonObj;
+        }
+
+        public string? SerializeNodeConfigJson()
+        {
+            if (_nodeConfigJsonObj == null)
+            {
+                return null;
+            }
+            return JsonConfUtil.ToNodeConfigJson(_nodeConfigJsonObj);
+        }
     }

@@ -5,8 +5,10 @@ using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
+using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
+using AntFlowCore.Base.exception;
 using AntFlowCore.Persist.api.interf.repository;
 using Microsoft.Extensions.Logging;
 
@@ -21,8 +23,6 @@ public class BpmVerifyInfoBizService : IBpmVerifyInfoBizService
     private readonly IBpmFlowrunEntrustService _bpmFlowrunEntrustService;
     private readonly ActivitiAdditionalInfoService _actitiAdditionalInfoService;
     private readonly IBpmVariableService _bpmVariableService;
-    private readonly IBpmVariableSignUpService _bpmVariableSignUpService;
-    private readonly IBpmVariableSingleService _bpmVariableSingleService;
     private readonly IBpmVariableMultiplayerService _bpmVariableMultiplayerService;
     private readonly IBpmVariableMultiplayerPersonnelService _bpmVariableMultiplayerPersonnelService;
     private readonly ILogger<BpmVerifyInfoBizService> _logger;
@@ -34,8 +34,6 @@ public class BpmVerifyInfoBizService : IBpmVerifyInfoBizService
         IBpmFlowrunEntrustService bpmFlowrunEntrustService,
         ActivitiAdditionalInfoService actitiAdditionalInfoService,
         IBpmVariableService bpmVariableService,
-        IBpmVariableSignUpService bpmVariableSignUpService,
-        IBpmVariableSingleService bpmVariableSingleService,
         IBpmVariableMultiplayerService bpmVariableMultiplayerService,
         IBpmVariableMultiplayerPersonnelService bpmVariableMultiplayerPersonnelService,
         ILogger<BpmVerifyInfoBizService> logger)
@@ -47,8 +45,6 @@ public class BpmVerifyInfoBizService : IBpmVerifyInfoBizService
         _bpmFlowrunEntrustService = bpmFlowrunEntrustService;
         _actitiAdditionalInfoService = actitiAdditionalInfoService;
         _bpmVariableService = bpmVariableService;
-        _bpmVariableSignUpService = bpmVariableSignUpService;
-        _bpmVariableSingleService = bpmVariableSingleService;
         _bpmVariableMultiplayerService = bpmVariableMultiplayerService;
         _bpmVariableMultiplayerPersonnelService = bpmVariableMultiplayerPersonnelService;
 
@@ -278,23 +274,7 @@ public class BpmVerifyInfoBizService : IBpmVerifyInfoBizService
     {
         var nodeApprovedsMap = new Dictionary<string, List<BaseIdTranStruVo>>();
 
-        // 查询单人审批变量
-        List<BpmVariableSingle> variableSingles = _bpmVariableSingleService._repository.Find(a=>a.VariableId == variableId);
-        if (variableSingles.Count >0)
-        {
-            
-            foreach (var bpmVariableSingle in variableSingles)
-            {
-                nodeApprovedsMap[bpmVariableSingle.ElementId] = new List<BaseIdTranStruVo>
-                {
-                    new BaseIdTranStruVo
-                    {
-                        Id = bpmVariableSingle.Assignee,
-                        Name = bpmVariableSingle.AssigneeName
-                    }
-                };
-            }
-        }
+        // BpmVariableSingle has been removed; single approver variable query is no longer supported
 
         // 查询多人审批变量
         List<BpmVariableMultiplayer> variableMultiplayers = _bpmVariableMultiplayerService._repository.Find(a => a.VariableId == variableId);
@@ -420,17 +400,19 @@ public class BpmVerifyInfoBizService : IBpmVerifyInfoBizService
     {
         var signUpNodeCollectionNameMap = new Dictionary<string, string>();
 
-        List<BpmVariableSignUp> bpmVariableSignUps = _bpmVariableSignUpService
-            ._repository
-            .Find(a=>a.VariableId==variableId);
-            
+        BpmVariable? bpmVariable = _bpmVariableService._repository.GetById(variableId);
+        VariableConfigJson? variableConfig = JsonConfUtil.ParseVariableConfig(bpmVariable?.VariableConfigJson);
         
-
-        foreach (var variableSignUp in bpmVariableSignUps)
+        if (variableConfig?.SignUps == null || !variableConfig.SignUps.Any())
         {
-            if (!string.IsNullOrEmpty(variableSignUp.SubElements))
+            return signUpNodeCollectionNameMap;
+        }
+
+        foreach (var signUpItem in variableConfig.SignUps)
+        {
+            if (!string.IsNullOrEmpty(signUpItem.SubElements))
             {
-                var bpmnConfCommonElementVos = JsonSerializer.Deserialize<List<BpmnConfCommonElementVo>>(variableSignUp.SubElements);
+                var bpmnConfCommonElementVos = JsonSerializer.Deserialize<List<BpmnConfCommonElementVo>>(signUpItem.SubElements);
                 if (bpmnConfCommonElementVos != null && bpmnConfCommonElementVos.Any())
                 {
                     foreach (var bpmnConfCommonElementVo in bpmnConfCommonElementVos)

@@ -60,32 +60,20 @@ public static class ServiceRegistration
 {
     public static void AntFlowServiceSetUp(this IServiceCollection services,IConfiguration configuration)
     {
-       
+
         services.Configure<MailSettings>(
             configuration.GetSection("MailSettings"));
-        
+
         services.AddSingleton<BpmnConfService>();
         services.AddSingleton<IBpmnConfService, BpmnConfService>();
         services.AddSingleton<BpmnConfCommonService>();
         services.AddSingleton<IBpmnConfCommonService, BpmnConfCommonService>();
         services.AddSingleton<IBpmnConfBizService, BpmnConfBizService>();
         services.AddSingleton<BpmnConfBizService>();
-        services.AddSingleton<BpmnConfNoticeTemplateService>();
-        services.AddSingleton<IBpmnConfNoticeTemplateService, BpmnConfNoticeTemplateService>();
         services.AddSingleton<BpmnNodeService>();
         services.AddSingleton<IBpmnNodeService, BpmnNodeService>();
         services.AddSingleton<BpmnNodeToService>();
         services.AddSingleton<IBpmnNodeToService, BpmnNodeToService>();
-        services.AddSingleton<BpmnNodeSignUpConfService>();
-        services.AddSingleton<IBpmnNodeSignUpConfService, BpmnNodeSignUpConfService>();
-        services.AddSingleton<BpmnTemplateService>();
-        services.AddSingleton<IBpmnTemplateService, BpmnTemplateService>();
-        services.AddSingleton<BpmnApproveRemindService>();
-        services.AddSingleton<IBpmnApproveRemindService, BpmnApproveRemindService>();
-        services.AddSingleton<BpmnNodePersonnelConfService>();
-        services.AddSingleton<IBpmnNodePersonnelConfService, BpmnNodePersonnelConfService>();
-        services.AddSingleton<BpmnNodePersonnelEmplConfService>();
-        services.AddSingleton<IBpmnNodePersonnelEmplConfService, BpmnNodePersonnelEmplConfService>();
         services.AddSingleton<IBpmnEmployeeInfoProviderService, BpmnEmployeeInfoProviderService>();
         services.AddSingleton<IUserService,UserService>();
         services.AddSingleton<IRoleService,RoleService>();
@@ -98,8 +86,6 @@ public static class ServiceRegistration
         services.AddSingleton<IAntFlowOrderPreProcessor<BpmnConfVo>,LFFormDataPreProcessor>();
         services.AddSingleton<IAntFlowOrderPostProcessor<BpmnConfVo>, LFFieldControlPostProcessor>();
         services.AddSingleton<IAntFlowOrderPostProcessor<BusinessDataVo>, AntFlowButtonsOperationPostProcessor>();
-        services.AddSingleton<BpmnNodeLfFormdataFieldControlService>();
-        services.AddSingleton<IBpmnNodeLfFormdataFieldControlService, BpmnNodeLfFormdataFieldControlService>();
         services.AddSingleton<LFFieldControlPostProcessor>();
         services.AddSingleton<ProcessApprovalService>();
         services.AddSingleton<IProcessApprovalService, ProcessApprovalService>();
@@ -119,32 +105,12 @@ public static class ServiceRegistration
         services.AddSingleton<IOutSideBpmCallbackUrlConfService, OutSideBpmCallbackUrlConfService>();
         services.AddSingleton<BpmVariableService>();
         services.AddSingleton<IBpmVariableService, BpmVariableService>();
-        services.AddSingleton<BpmVariableApproveRemindService>();
-        services.AddSingleton<IBpmVariableApproveRemindService, BpmVariableApproveRemindService>();
-        services.AddSingleton<BpmVariableMessageService>();
-        services.AddSingleton<IBpmVariableMessageService, BpmVariableMessageService>();
-        services.AddSingleton<BpmVariableViewPageButtonService>();
-        services.AddSingleton<IBpmVariableViewPageButtonService, BpmVariableViewPageButtonService>();
-        services.AddSingleton<BpmVariableButtonService>();
-        services.AddSingleton<IBpmVariableButtonService, BpmVariableButtonService>();
-        services.AddSingleton<BpmVariableSequenceFlowService>();
-        services.AddSingleton<IBpmVariableSequenceFlowService, BpmVariableSequenceFlowService>();
-        services.AddSingleton<BpmVariableSignUpService>();
-        services.AddSingleton<IBpmVariableSignUpService, BpmVariableSignUpService>();
         services.AddSingleton<BpmBusinessProcessService>();
         services.AddSingleton<IBpmBusinessProcessService, BpmBusinessProcessService>();
-        services.AddSingleton<BpmProcessNameService>();
-        services.AddSingleton<IBpmProcessNameService, BpmProcessNameService>();
-        services.AddSingleton<BpmProcessNameRelevancyService>();
-        services.AddSingleton<IBpmProcessNameRelevancyService, BpmProcessNameRelevancyService>();
         services.AddSingleton<BpmProcessAppApplicationService>();
         services.AddSingleton<IBpmProcessAppApplicationService, BpmProcessAppApplicationService>();
-        services.AddSingleton<BpmnNodeButtonConfService>();
-        services.AddSingleton<IBpmnNodeButtonConfService, BpmnNodeButtonConfService>();
         services.AddSingleton<InformationTemplateService>();
         services.AddSingleton<IInformationTemplateService, InformationTemplateService>();
-        services.AddSingleton<BpmnViewPageButtonService>();
-        services.AddSingleton<IBpmnViewPageButtonService, BpmnViewPageButtonService>();
         services.AddSingleton<IConditionService, ConditionService>();
         services.AddSingleton<ConditionFilterService>();
         services.AddSingleton<IBpmnStartFormat, BpmnStartFormatService>();
@@ -158,8 +124,6 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmVerifyInfoService, BpmVerifyInfoService>();
         services.AddSingleton<BpmProcessNodeSubmitService>();
         services.AddSingleton<IBpmProcessNodeSubmitService, BpmProcessNodeSubmitService>();
-        services.AddSingleton<BpmVariableSignUpPersonnelService>();
-        services.AddSingleton<IBpmVariableSignUpPersonnelService, BpmVariableSignUpPersonnelService>();
         services.AddSingleton<BpmFlowrunEntrustService>();
         services.AddSingleton<IBpmFlowrunEntrustService, BpmFlowrunEntrustService>();
         services.AddSingleton<TaskMgmtService>();
@@ -170,26 +134,6 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmProcessForwardService, BpmProcessForwardService>();
         services.AddSingleton<ThirdPartyCallBackService>();
         services.AddSingleton<IThirdPartyCallBackService, ThirdPartyCallBackService>();
-        services.AddSingleton<BpmnNodeBusinessTableConfService>();
-        services.AddSingleton<IBpmnNodeBusinessTableConfService, BpmnNodeBusinessTableConfService>();
-        services.AddSingleton<BpmnNodeHrbpConfService>();
-        services.AddSingleton<IBpmnNodeHrbpConfService, BpmnNodeHrbpConfService>();
-        services.AddSingleton<BpmnNodeAssignLevelConfService>();
-        services.AddSingleton<IBpmnNodeAssignLevelConfService, BpmnNodeAssignLevelConfService>();
-        services.AddSingleton<BpmnNodeLoopConfService>();
-        services.AddSingleton<IBpmnNodeLoopConfService, BpmnNodeLoopConfService>();
-        services.AddSingleton<BpmnNodeCustomizeConfService>();
-        services.AddSingleton<IBpmnNodeCustomizeConfService, BpmnNodeCustomizeConfService>();
-        services.AddSingleton<BpmnNodeOutSideAccessConfService>();
-        services.AddSingleton<IBpmnNodeOutSideAccessConfService, BpmnNodeOutSideAccessConfService>();
-        services.AddSingleton<BpmnNodeRoleConfService>();
-        services.AddSingleton<IBpmnNodeRoleConfService, BpmnNodeRoleConfService>();
-        services.AddSingleton<BpmnNodeRoleOutsideEmpConfService>();
-        services.AddSingleton<IBpmnNodeRoleOutsideEmpConfService, BpmnNodeRoleOutsideEmpConfService>();
-        services.AddSingleton<BpmnNodeConditionsConfService>();
-        services.AddSingleton<IBpmnNodeConditionsConfService, BpmnNodeConditionsConfService>();
-        services.AddSingleton<BpmnNodeConditionsParamConfService>();
-        services.AddSingleton<IBpmnNodeConditionsParamConfService, BpmnNodeConditionsParamConfService>();
         services.AddSingleton<BpmnInsertVariablesService>();
         services.AddSingleton<IBpmnInsertVariablesService, BpmnInsertVariablesService>();
         services.AddSingleton<ITaskListener,BpmnTaskListener>();
@@ -198,8 +142,6 @@ public static class ServiceRegistration
         services.AddSingleton<IProcessNodeJumpService, ProcessNodeJumpService>();
         services.AddSingleton<BpmnConfLFFormDataBizService>();
         services.AddSingleton<IBpmnConfLFFormDataBizService, BpmnConfLFFormDataBizService>();
-        services.AddSingleton<DicMainService>();
-        services.AddSingleton<IDicMainService, DicMainService>();
         services.AddSingleton<DicDataSerivce>();
         services.AddSingleton<IDicDataSerivce, DicDataSerivce>();
         services.AddSingleton<IDicDataBizSerivce, DicDataBizService>();
@@ -223,24 +165,19 @@ public static class ServiceRegistration
         services.AddSingleton<IConfigFlowButtonContantService, ConfigFlowButtonContantService>();
         services.AddSingleton<UserEntrustService>();
         services.AddSingleton<IUserEntrustService, UserEntrustService>();
-        services.AddSingleton<BpmnNodeAssignLevelConfService>();
-        
+
         services.AddSingleton<AbstractOrderedSignNodeAdp, BpmnLoopSignNodeAdp>();
         services.AddSingleton<AbstractOrderedSignNodeAdp, OutSideOrderedSignNodeAdp>();
         services.AddSingleton<AbstractOrderedSignNodeAdp, TestOrderedSignNodeAdp>();
-        
+
         services.AddSingleton<CustomizePersonnelProvider>();
-        services.AddSingleton<DefaultTemplateService>();
-        services.AddSingleton<IDefaultTemplateService, DefaultTemplateService>();
         services.AddSingleton<OutSideBpmApproveTemplateService>();
         services.AddSingleton<OutSideBpmAdminPersonnelService>();
         services.AddSingleton<IOutSideBpmAdminPersonnelService, OutSideBpmAdminPersonnelService>();
         services.AddSingleton<OutSideBpmBaseService>();
         services.AddSingleton<IOutSideBpmBaseService, OutSideBpmBaseService>();
-        services.AddSingleton<BpmnNodeAdditionalSignConfService>();
-        services.AddSingleton<IBpmnNodeAdditionalSignConfService, BpmnNodeAdditionalSignConfService>();
         #region IBpmnPersonnelProviderService with different register ways
-        
+
         services.AddSingleton<DirectLeaderPersonnelProvider>();
         services.AddSingleton<CustomizePersonnelProvider>();
         services.AddSingleton<HrbpPersonnelProvider>();
@@ -251,8 +188,8 @@ public static class ServiceRegistration
         services.AddSingleton<StartUserPersonnelProvider>();
         services.AddSingleton<UserPointedPersonnelProvider>();
         services.AddSingleton<BusinessTablePersonnelProvider>();
-        
-        
+
+
         services.AddSingleton<IBpmnPersonnelProviderService, DirectLeaderPersonnelProvider>();
         services.AddSingleton<IBpmnPersonnelProviderService, CustomizePersonnelProvider>();
         services.AddSingleton<IBpmnPersonnelProviderService, HrbpPersonnelProvider>();
@@ -267,7 +204,7 @@ public static class ServiceRegistration
         #endregion
 
         services.AddSingleton<AntFlowOrmContext>();
-        
+
         services.AddSingleton<AbstractBpmnPersonnelAdaptor, CustomizablePersonnelAdaptor>();
         services.AddSingleton<AbstractBpmnPersonnelAdaptor, DirectLeaderPersonnelAdaptor>();
         services.AddSingleton<AbstractBpmnPersonnelAdaptor, HrbpPersonnelAdaptor>();
@@ -284,7 +221,7 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmnNodeConditionsAdaptor, BpmnNodeConditionsEmptyAdaptor>();
         services.AddSingleton<IBpmnNodeConditionsAdaptor, BpmnNodeConditionsPurchaseTypeAdaptor>();
         services.AddSingleton<IBpmnNodeConditionsAdaptor, BpmnTemplateMarkAdaptor>();
-        
+
 
         services.AddSingleton<IConditionJudge, ThirdAccountJudgeService>();
         services.AddSingleton<IConditionJudge, AskLeaveJudge>();
@@ -318,9 +255,9 @@ public static class ServiceRegistration
         services.AddSingleton<IAdaptorService, NodePropertyStartUserAdaptor>();
         services.AddSingleton<IAdaptorService, NodeTypeConditionsAdaptor>();
         services.AddSingleton<IAdaptorService, NodePropertyCustomizeAdaptor>();
-        
-        
-        
+
+
+
         services.AddSingleton<IAdaptorService, BpmnElementBusinessTableAdaptor>();
         services.AddSingleton<IAdaptorService, BpmnElementCustomizeAdaptor>();
         services.AddSingleton<IAdaptorService, BpmnElementDirectLeaderAdaptor>();
@@ -340,25 +277,23 @@ public static class ServiceRegistration
 
         services.AddSingleton<BpmnNodeFormatService>();
         services.AddSingleton<IBpmnNodeFormatService, BpmnNodeFormatService>();
-        
+
         services.AddSingleton<BpmVariableMultiplayerPersonnelService>();
         services.AddSingleton<IBpmVariableMultiplayerPersonnelService, BpmVariableMultiplayerPersonnelService>();
         services.AddSingleton<BpmVariableMultiplayerService>();
         services.AddSingleton<IBpmVariableMultiplayerService, BpmVariableMultiplayerService>();
-        services.AddSingleton<BpmVariableSingleService>();
-        services.AddSingleton<IBpmVariableSingleService, BpmVariableSingleService>();
 
 
         services.AddSingleton<BpmnInsertVariableSubsMultiplayerOrSignAdaptor>();
         services.AddSingleton<BpmnInsertVariableSubsMultiplayerSignAdaptor>();
         services.AddSingleton<BpmnInsertVariableSubsSingleAdaptor>();
-        
+
         services.AddSingleton<IBpmnInsertVariableSubs, BpmnInsertVariableSubsMultiplayerOrSignAdaptor>();
         services.AddSingleton<IBpmnInsertVariableSubs, BpmnInsertVariableSubsMultiplayerSignAdaptor>();
         services.AddSingleton<IBpmnInsertVariableSubs, BpmnInsertVariableSubsSingleAdaptor>();
 
-        
-        
+
+
         services.AddSingleton<IProcessOperationAdaptor,EndProcessService>();
         services.AddSingleton<IProcessOperationAdaptorProxyFactory, ProcessOperationAdaptorProxyFactory>();
         services.AddSingleton<IProcessOperationAdaptor,SubmitProcessService>();
@@ -392,33 +327,23 @@ public static class ServiceRegistration
         services.AddSingleton<IAFExecutionService, AFExecutionService>();
         services.AddSingleton<RepositoryService>();
         services.AddSingleton<RuntimeService>();
-        
+
         services.AddSingleton<BpmnCreateAndStartService>();
         services.AddSingleton<IBpmnCreateAndStartService, BpmnCreateAndStartService>();
         services.AddSingleton<IBpmProcessNodeSubmitBizService, BpmProcessNodeSubmitBizService>();
-        services.AddSingleton<IBpmVariableMessageBizService, BpmVariableMessageBizService>();
-       
+
         services.AddSingleton<ICallbackAdaptor<CallbackReqVo,CallbackRespVo>,ProcBaseCallBackAdp>();
         services.AddSingleton<ICallbackAdaptor<CallbackReqVo,CallbackRespVo>,ProcSubmitCallbackAdp>();
         services.AddSingleton<ThirdPartyCallbackFactory>();
-        services.AddSingleton<BpmVariableMessageListenerService>();
-        services.AddSingleton<IBpmVariableMessageListenerService, BpmVariableMessageListenerService>();
-        services.AddSingleton<BpmProcessNoticeService>();
-        services.AddSingleton<IBpmProcessNoticeService, BpmProcessNoticeService>();
         services.AddSingleton<UserMessageStatusService>();
         services.AddSingleton<IUserMessageStatusService, UserMessageStatusService>();
         services.AddSingleton<MessageService>();
         services.AddSingleton<IMessageService, MessageService>();
         services.AddSingleton<MailUtils>();
-        services.AddSingleton<BpmnViewPageButtonBizService>();
-        services.AddSingleton<IBpmnViewPageButtonBizService, BpmnViewPageButtonBizService>();
-        services.AddSingleton<ProcessDeptBizService>();
-        services.AddSingleton<IProcessDeptBizService, ProcessDeptBizService>();
         services.AddSingleton<ITenantIdHolder, MultiTenantIdHolder>();
         services.AddSingleton<IWorkflowButtonOperationHandler, AntFlowOperationListener>();
         services.AddSingleton<ActivitiBpmMsgTemplateService>();
         services.AddSingleton<IActivitiBpmMsgTemplateService, ActivitiBpmMsgTemplateService>();
-        services.AddSingleton<BpmnConfNoticeTemplateDetailService>();
 
         services.AddSingleton<IProcessNoticeAdaptor, EmailSendAdaptor>();
         services.AddSingleton<IProcessNoticeAdaptor, AppPushAdaptor>();
@@ -428,7 +353,7 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmvariableBizService, BpmvariableBizService>();
         services.AddSingleton<ThirdPartyAccountApplyService>();
         services.AddSingleton<IThirdPartyAccountApplyService, ThirdPartyAccountApplyService>();
-        
+
         services.AddSingleton<IDictDataRepository, DictDataRepository>();
         services.AddSingleton<IBpmAfDeploymentRepository, FsBpmAfDeploymentRepository>();
         services.AddSingleton<IBpmAfTaskInstRepository, FsBpmAfTaskInstRepository>();
@@ -437,13 +362,8 @@ public static class ServiceRegistration
         services.AddSingleton<IAFTaskRepository, FsAFTaskRepository>();
         services.AddSingleton<IBpmnConfLfFormdataFieldRepository, FsBpmnConfLfFormdataFieldRepository>();
         services.AddSingleton<IBpmnConfLfFormdataRepository, FsBpmnConfLfFormdataRepository>();
-        services.AddSingleton<IBpmnConfNoticeTemplateDetailRepository, FsBpmnConfNoticeTemplateDetailRepository>();
-        services.AddSingleton<IBpmnConfNoticeTemplateRepository, FsBpmnConfNoticeTemplateRepository>();
-        services.AddSingleton<IBpmnNodeAdditionalSignConfRepository, FsBpmnNodeAdditionalSignConfRepository>();
         services.AddSingleton<IBpmnNodeRepository, FsBpmnNodeRepository>();
         services.AddSingleton<IBpmProcessForwardRepository, FsBpmProcessForwardRepository>();
-        services.AddSingleton<IBpmProcessNameRelevancyRepository, FsBpmProcessNameRelevancyRepository>();
-        services.AddSingleton<IBpmProcessNameRepository, FsBpmProcessNameRepository>();
         services.AddSingleton<IBpmProcessNodeSubmitRepository, FsBpmProcessNodeSubmitRepository>();
         services.AddSingleton<IBpmVerifyInfoRepository, FsBpmVerifyInfoRepository>();
         services.AddSingleton<ILFMainFieldRepository, FsLFMainFieldRepository>();
@@ -456,49 +376,18 @@ public static class ServiceRegistration
         services.AddSingleton<IOutSideBpmAdminPersonnelRepository, FsOutSideBpmAdminPersonnelRepository>();
         services.AddSingleton<IOutSideBpmConditionsTemplateRepository, FsOutSideBpmConditionsTemplateRepository>();
         services.AddSingleton<IBpmProcessAppApplicationRepository, FsBpmProcessAppApplicationRepository>();
-        services.AddSingleton<IBpmnNodeConditionsConfRepository, FsBpmnNodeConditionsConfRepository>();
-        services.AddSingleton<IBpmnNodeConditionsParamConfRepository, FsBpmnNodeConditionsParamConfRepository>();
-        services.AddSingleton<IBpmnNodeCustomizeConfRepository, FsBpmnNodeCustomizeConfRepository>();
-        services.AddSingleton<IBpmnNodeHrbpConfRepository, FsBpmnNodeHrbpConfRepository>();
-        services.AddSingleton<IBpmnNodeLfFormdataFieldControlRepository, FsBpmnNodeLfFormdataFieldControlRepository>();
-        services.AddSingleton<IBpmnNodeLoopConfRepository, FsBpmnNodeLoopConfRepository>();
-        services.AddSingleton<IBpmnNodeOutSideAccessConfRepository, FsBpmnNodeOutSideAccessConfRepository>();
-        services.AddSingleton<IBpmnNodePersonnelConfRepository, FsBpmnNodePersonnelConfRepository>();
-        services.AddSingleton<IBpmnNodePersonnelEmplConfRepository, FsBpmnNodePersonnelEmplConfRepository>();
-        services.AddSingleton<IBpmnNodeRoleConfRepository, FsBpmnNodeRoleConfRepository>();
-        services.AddSingleton<IBpmnNodeRoleOutsideEmpConfRepository, FsBpmnNodeRoleOutsideEmpConfRepository>();
-        services.AddSingleton<IBpmnNodeSignUpConfRepository, FsBpmnNodeSignUpConfRepository>();
         services.AddSingleton<IBpmnNodeToRepository, FsBpmnNodeToRepository>();
-        services.AddSingleton<IBpmnViewPageButtonRepository, FsBpmnViewPageButtonRepository>();
         services.AddSingleton<IUserEntrustRepository, FsUserEntrustRepository>();
-        services.AddSingleton<IBpmnApproveRemindRepository, FsBpmnApproveRemindRepository>();
-        services.AddSingleton<IBpmnTemplateRepository, FsBpmnTemplateRepository>();
-        services.AddSingleton<IBpmProcessNoticeRepository, FsBpmProcessNoticeRepository>();
-        services.AddSingleton<IDefaultTemplateRepository, FsDefaultTemplateRepository>();
-        services.AddSingleton<IDicMainRepository, FsDicMainRepository>();
         services.AddSingleton<IInformationTemplateRepository, FsInformationTemplateRepository>();
         services.AddSingleton<IOutSideBpmApproveTemplateRepository, FsOutSideBpmApproveTemplateRepository>();
         services.AddSingleton<IRoleRepository, FsRoleRepository>();
         services.AddSingleton<IUserMessageRepository, FsUserMessageRepository>();
         services.AddSingleton<IUserMessageStatusRepository, FsUserMessageStatusRepository>();
         services.AddSingleton<IUserRepository, FsUserRepository>();
-        services.AddSingleton<IBpmnNodeAssignLevelConfRepository, FsBpmnNodeAssignLevelConfRepository>();
-        services.AddSingleton<IBpmnNodeBusinessTableConfRepository, FsBpmnNodeBusinessTableConfRepository>();
-        services.AddSingleton<IBpmnNodeButtonConfRepository, FsBpmnNodeButtonConfRepository>();
-        services.AddSingleton<IBpmnNodeConditionsParamConfRepository, FsBpmnNodeConditionsParamConfRepository>();
-        services.AddSingleton<IBpmVariableApproveRemindRepository, FsBpmVariableApproveRemindRepository>();
-        services.AddSingleton<IBpmVariableButtonRepository, FsBpmVariableButtonRepository>();
-        services.AddSingleton<IBpmVariableMessageRepository, FsBpmVariableMessageRepository>();
         services.AddSingleton<IBpmVariableMultiplayerPersonnelRepository, FsBpmVariableMultiplayerPersonnelRepository>();
         services.AddSingleton<IBpmVariableMultiplayerRepository, FsBpmVariableMultiplayerRepository>();
-        services.AddSingleton<IBpmVariableSequenceFlowRepository, FsBpmVariableSequenceFlowRepository>();
-        services.AddSingleton<IBpmVariableSignUpRepository, FsBpmVariableSignUpRepository>();
-        services.AddSingleton<IBpmVariableSingleRepository, FsBpmVariableSingleRepository>();
-        services.AddSingleton<IBpmVariableViewPageButtonRepository, FsBpmVariableViewPageButtonRepository>();
-        services.AddSingleton<IBpmVariableSignUpPersonnelRepository, FsBpmVariableSignUpPersonnelRepository>();
         services.AddSingleton<IBpmAfExecutionRepository, FsBpmAfExecutionRepository>();
-        services.AddSingleton<IBpmnConfNoticeTemplateDetailService, BpmnConfNoticeTemplateDetailService>();
-        services.AddSingleton<IDepartmentRepository, FsDepartmentRepository > ();
+        services.AddSingleton<IDepartmentRepository, FsDepartmentRepository>();
         services.AddSingleton<IThirdPartyAccountApplyRepository, FsThirdPartyAccountApplyRepository>();
         //=================================不可越过的三八线==============================
         IAdaptorFactory adaptorFactory = AdaptorFactoryProxy.GetProxyInstance();

@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using AntFlowCore.Abstraction.Orm.ext;
 using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Base.constant.enums;
@@ -13,21 +13,11 @@ namespace AntFlowCore.Business.service
 {
     public class InformationTemplateService : IInformationTemplateService
     {
-        private readonly BpmnApproveRemindService _bpmnApproveRemindService;
-        private readonly IDefaultTemplateService _defaultTemplateService;
-        private readonly IBpmnTemplateService _bpmnTemplateService;
-
         public InformationTemplateService(
-            IInformationTemplateRepository repository,
-            BpmnApproveRemindService bpmnApproveRemindService,
-            IDefaultTemplateService defaultTemplateService,
-            IBpmnTemplateService bpmnTemplateService
+            IInformationTemplateRepository repository
         )
         {
             _repository = repository;
-            _bpmnApproveRemindService = bpmnApproveRemindService;
-            _defaultTemplateService = defaultTemplateService;
-            _bpmnTemplateService = bpmnTemplateService;
         }
 
         public IInformationTemplateRepository _repository { get; }
@@ -79,21 +69,7 @@ namespace AntFlowCore.Business.service
             {
                 if (informationTemplate.Status == 1)
                 {
-                    List<BpmnTemplate> templates = _bpmnTemplateService._repository
-                        .Find(a => a.IsDel == 0 && a.TemplateId == informationTemplate.Id);
-
-                    List<BpmnApproveRemind> approveReminds = _bpmnApproveRemindService._repository
-                        .Find(a => a.IsDel == 0 && a.TemplateId == informationTemplate.Id);
-
-                    List<DefaultTemplate> defaultTemplates = _defaultTemplateService._repository
-                        .Find(a => a.IsDel == 0 && a.TemplateId == informationTemplate.Id);
-
-                    if (templates.Any()
-                        || approveReminds.Any()
-                        || defaultTemplates.Any())
-                    {
-                        throw new AFBizException("该模板正在使用中，不可禁用！");
-                    }
+                    // Template in-use check removed (dependent services deleted)
                 }
 
                 informationTemplate.UpdateUser = SecurityUtils.GetLogInEmpIdSafe();
@@ -120,37 +96,18 @@ namespace AntFlowCore.Business.service
 
         public List<DefaultTemplateVo> GetList()
         {
-            List<DefaultTemplate> defaultTemplates = _defaultTemplateService._repository.Find(a => a.IsDel == 0);
-            Dictionary<int, long?> map = defaultTemplates
-                .Where(a => a.TemplateId != null && a.TemplateId > 0)
-                .GroupBy(t => t.Event)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.First().TemplateId
-                );
-
-            Dictionary<long, string> templateMap = map.Any()
-                ? _repository.GetQueryable()
-                    .Where(t => map.Values.Contains(t.Id))
-                    .ToDictionary(t => t.Id, t => t.Name)
-                : new Dictionary<long, string>();
-
             var result = Enum.GetValues(typeof(EventTypeEnum))
                 .Cast<EventTypeEnum>()
                 .Select(o =>
                 {
                     var eventCode = (int)o;
-                    var templateId = map.TryGetValue(eventCode, out var id) ? (long?)id : null;
-                    var templateName = templateId.HasValue && templateMap.TryGetValue(templateId.Value, out var name)
-                        ? name
-                        : null;
 
                     return new DefaultTemplateVo
                     {
                         Event = eventCode,
                         EventValue = o.GetDescription(),
-                        TemplateId = templateId,
-                        TemplateName = templateName
+                        TemplateId = null,
+                        TemplateName = null
                     };
                 })
                 .ToList();

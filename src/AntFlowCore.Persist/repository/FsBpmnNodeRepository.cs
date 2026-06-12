@@ -19,15 +19,6 @@ public class FsBpmnNodeRepository : RepositoryBase<BpmnNode>, IBpmnNodeRepositor
             .ToList((a, b) => b);
     }
 
-    public int? GetCustomizeNodeSignType(long nodeId)
-    {
-        return _ormContext.FreeSql.Select<BpmnNode, BpmnNodeCustomizeConf>()
-            .InnerJoin((a, b) => a.Id == b.BpmnNodeId)
-            .Where((a, b) => a.Id == nodeId)
-            .ToList<int?>((a, b) => b.SignType)
-            .FirstOrDefault();
-    }
-
     public int UpdateConfExtraFlags(long confId, int? extraFlags)
     {
         return _ormContext.FreeSql.Update<BpmnConf>()
