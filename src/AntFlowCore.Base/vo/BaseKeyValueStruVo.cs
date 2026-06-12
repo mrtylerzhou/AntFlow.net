@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using AntFlowCore.Base.conf.json;
 using AntFlowCore.Base.util;
 using AntFlowCore.Core.vo;
@@ -17,8 +17,6 @@ public class BaseKeyValueStruVo
     [JsonPropertyName("createTime")] 
     public DateTime CreateTime { get; set; }
 
-    [JsonPropertyName("processNotices")]
-    public List<BaseNumIdStruVo> ProcessNotices { get; set; }
     [JsonPropertyName("hasStarUserChooseModule")]
     public bool HasStarUserChooseModule { get; set; } = false;
 }

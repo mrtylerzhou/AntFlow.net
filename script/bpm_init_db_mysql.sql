@@ -1,4 +1,4 @@
-﻿CREATE TABLE if not exists `t_bpmn_conf`
+CREATE TABLE if not exists `t_bpmn_conf`
 (
     `id`                  int(11)             NOT NULL AUTO_INCREMENT COMMENT 'Auto Incr ID',
     `bpmn_code`           varchar(60)         NOT NULL DEFAULT '' COMMENT 'Process code',
@@ -203,36 +203,9 @@ CREATE TABLE if not exists `bpm_flowrun_entrust`
     COMMENT ='entrust and forward view conf table';
 
 
-CREATE TABLE if not exists `bpm_flowruninfo`
-(
-    `id`            bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',
-    `runinfoid`     varchar(64) NOT NULL COMMENT 'process instance id',
-    `create_UserId` varchar(64)   DEFAULT NULL COMMENT 'userid',
-    `entitykey`     varchar(100) DEFAULT NULL COMMENT 'business key',
-    `entityclass`   varchar(100) DEFAULT NULL COMMENT 'entity class',
-    `entitykeytype` varchar(10)  DEFAULT NULL COMMENT 'business type',
-    `createactor`   varchar(50)  DEFAULT NULL COMMENT 'create user',
-    `createdepart`  varchar(100) DEFAULT NULL COMMENT 'create user,s depart',
-    `createdate`    timestamp  NOT NULL     DEFAULT CURRENT_TIMESTAMP NULL COMMENT 'create time',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `is_del`           int(11)      DEFAULT '0',
-    PRIMARY KEY (`id`) USING BTREE
-    ) ENGINE = InnoDB
-    COMMENT ='process run time info';
+-- REMOVED: bpm_flowruninfo (migrated to JSON)
 
-CREATE TABLE if not exists `bpm_manual_notify`
-(
-    `id`          int(11)     NOT NULL AUTO_INCREMENT,
-    `business_id` bigint(20)  NOT NULL COMMENT 'business id',
-    `code`        varchar(10) NOT NULL COMMENT 'process type',
-    `last_time`   timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'latest remind time',
-    `create_time` timestamp   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `update_time` timestamp    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `is_del`           int(11)      DEFAULT '0',
-    PRIMARY KEY (`id`) USING BTREE
-    ) ENGINE = InnoDB
-    COMMENT ='manual notify';
+-- REMOVED: bpm_manual_notify (migrated to JSON)
 
 CREATE TABLE if not exists `t_bpmn_approve_remind`
 (
@@ -391,19 +364,7 @@ CREATE TABLE if not exists `bpm_process_forward`
     COMMENT ='process forward table';
 
 
-CREATE TABLE if not exists `bpm_process_node_overtime`
-(
-    `id`          bigint(20) NOT NULL AUTO_INCREMENT,
-    `notice_type` int(11)      DEFAULT NULL COMMENT 'notice type 1:email,2:sms 3:app push message',
-    `node_name`   varchar(50) DEFAULT NULL COMMENT 'node name',
-    `node_key`    varchar(50)  DEFAULT NULL COMMENT 'node id',
-    `process_key` varchar(50)  DEFAULT NULL COMMENT 'process key',
-    `notice_time` int(11)      DEFAULT NULL COMMENT 'update time',
-    `is_del`             int(11)               DEFAULT '0',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    PRIMARY KEY (`id`) USING BTREE
-    ) ENGINE = InnoDB
-    COMMENT ='process approve overtime notice';
+-- REMOVED: bpm_process_node_overtime (migrated to JSON)
 
 CREATE TABLE if not exists `bpm_process_node_record`
 (
@@ -728,40 +689,11 @@ CREATE TABLE if not exists `bpm_verify_info`
 
 
 
-CREATE TABLE if not exists `t_default_template`
-(
-    `id`          bigint(20) NOT NULL AUTO_INCREMENT,
-    `event`       int(11)             DEFAULT NULL COMMENT 'event',
-    `template_id` bigint(20)          DEFAULT NULL COMMENT 'template id',
-    `is_del`      tinyint(4) NOT NULL DEFAULT '0' COMMENT '（0:no 1:yes',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_time` timestamp  NOT NULL     DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `create_user` varchar(255)        DEFAULT '' COMMENT 'as its name says',
-    `update_time` timestamp      DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
-    `update_user` varchar(255)        DEFAULT '' COMMENT 'as its name says',
-    PRIMARY KEY (`id`) USING BTREE
-    ) ENGINE = InnoDB
-    COMMENT ='default tempalte';
+-- REMOVED: t_default_template (migrated to JSON)
 
 
 
-CREATE TABLE if not exists `t_user_email_send`
-(
-    `id`          int(11)      NOT NULL AUTO_INCREMENT,
-    `sender`      varchar(32)  NOT NULL COMMENT 'sender',
-    `receiver`    varchar(100) NOT NULL,
-    `title`       varchar(255) NOT NULL,
-    `content`     text         NOT NULL,
-    `create_time` timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `update_time` timestamp     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `create_user` varchar(50)  NOT NULL,
-    `update_user` varchar(50)  NOT NULL,
-    `is_del`      tinyint(4) NOT NULL DEFAULT '0' COMMENT '（0:no 1:yes',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    PRIMARY KEY (`id`) USING BTREE,
-    KEY `sender` (`receiver`) USING BTREE
-    ) ENGINE = InnoDB
-    COMMENT ='user email send';
+-- REMOVED: t_user_email_send (migrated to JSON)
 
 create table if not exists t_method_replay
 (
@@ -883,20 +815,7 @@ CREATE TABLE if not exists `bpm_business_process`
 
 
 
-CREATE TABLE if not exists `bpm_process_name_relevancy`
-(
-    `id`              bigint(20) NOT NULL AUTO_INCREMENT,
-    `process_name_id` bigint(20)      DEFAULT NULL COMMENT 'process name id',
-    `process_key`     varchar(50)     DEFAULT NULL COMMENT 'process key',
-    `is_del`          int(11)         DEFAULT '0',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_time`     timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`) USING BTREE,
-    KEY `process_key_index` (`process_key`) USING BTREE,
-    KEY `process_name_id_index` (`process_name_id`) USING BTREE
-    ) ENGINE = InnoDB
-    AUTO_INCREMENT = 1
-    COMMENT ='process advanced search table';
+-- REMOVED: bpm_process_name_relevancy (migrated to JSON)
 
 
 
@@ -935,44 +854,12 @@ CREATE TABLE if not exists `t_bpmn_node_personnel_empl_conf`
     AUTO_INCREMENT = 1
     COMMENT ='node assignee employee conf';
 
-CREATE TABLE IF NOT EXISTS `bpm_process_operation`
-(
-    `id`           bigint(20) NOT NULL AUTO_INCREMENT,
-    `process_key`  varchar(50) DEFAULT NULL COMMENT 'process key',
-    `process_node` varchar(50) DEFAULT NULL COMMENT 'process node id',
-    `type`         int(2)      DEFAULT NULL COMMENT '1:batch submit 2:entrust',
-    `is_del`                tinyint(255) DEFAULT NULL COMMENT '0:no,1:yes',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    PRIMARY KEY (`id`) USING BTREE
-    ) ENGINE = InnoDB
-    AUTO_INCREMENT = 1
-    COMMENT ='process operation table';
+-- REMOVED: bpm_process_operation (migrated to JSON)
 
-CREATE TABLE if not exists `bpm_process_node_back`
-(
-    `id`          bigint(20) NOT NULL AUTO_INCREMENT,
-    `node_key`    varchar(50)  DEFAULT NULL COMMENT 'node key',
-    node_id     bigint       null comment '节点id',
-    `back_type`   int(11)      DEFAULT NULL COMMENT 'back type',
-    `process_key` varchar(100) DEFAULT NULL COMMENT 'process key',
-    `is_del`                tinyint(255) DEFAULT NULL COMMENT '0:no,1:yes',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    PRIMARY KEY (`id`) USING BTREE
-    ) ENGINE = InnoDB
-    COMMENT ='process node back table';
+-- REMOVED: bpm_process_node_back (migrated to JSON)
 
 
-CREATE TABLE if not exists `bpm_process_name`
-(
-    `id`           bigint(20) NOT NULL AUTO_INCREMENT,
-    `process_name` varchar(50)     DEFAULT NULL COMMENT 'process name',
-    `is_del`       int(11)         DEFAULT '0',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_time`  timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`) USING BTREE
-    ) ENGINE = InnoDB
-    AUTO_INCREMENT = 1
-    COMMENT ='process advanced search table';
+-- REMOVED: bpm_process_name (migrated to JSON)
 
 CREATE TABLE if not exists `t_user_message`
 (
@@ -1295,20 +1182,11 @@ CREATE TABLE IF NOT EXISTS  `t_quick_entry` (
     `create_time` timestamp DEFAULT CURRENT_TIMESTAMP,
     `status` TINYINT NOT NULL DEFAULT 0,
     `variable_url_flag` TINYINT NOT NULL DEFAULT 0,
+    `type_config_json` TEXT NULL COMMENT 'type config json, replaces t_quick_entry_type',
     INDEX `idx_route` (`route`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE  IF NOT EXISTS `t_quick_entry_type` (
-   `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
-   `quick_entry_id` BIGINT NOT NULL,
-   `type` INT NOT NULL COMMENT 'Type 1 for PC and 2 for app',
-   `is_del` TINYINT DEFAULT 0 COMMENT 'Delete flag',
-   `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-   `create_time` timestamp DEFAULT CURRENT_TIMESTAMP,
-   `type_name` VARCHAR(255) NOT NULL COMMENT 'Type name',
-    INDEX `idx_quick_entry_id` (`quick_entry_id`)
-
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='quick entry type config';
+-- t_quick_entry_type table has been replaced by type_config_json column in t_quick_entry
 
 CREATE TABLE IF NOT EXISTS  `t_sys_version` (
     `id` BIGINT AUTO_INCREMENT PRIMARY KEY,

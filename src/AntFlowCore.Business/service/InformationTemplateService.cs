@@ -94,30 +94,42 @@ namespace AntFlowCore.Business.service
             return informationTemplate.Id;
         }
 
-        public List<DefaultTemplateVo> GetList()
+        public List<InformationTemplateVo> GetList()
         {
-            var result = Enum.GetValues(typeof(EventTypeEnum))
-                .Cast<EventTypeEnum>()
-                .Select(o =>
-                {
-                    var eventCode = (int)o;
-
-                    return new DefaultTemplateVo
-                    {
-                        Event = eventCode,
-                        EventValue = o.GetDescription(),
-                        TemplateId = null,
-                        TemplateName = null
-                    };
-                })
+            List<InformationTemplate> templates = _repository.GetQueryable()
+                .Where(a => a.IsDel == 0 && a.IsDefault == 1)
                 .ToList();
 
-            return result;
+            List<InformationTemplateVo> results = new List<InformationTemplateVo>();
+            foreach (InformationTemplate template in templates)
+            {
+                InformationTemplateVo templateVo = template.MapToVo();
+                templateVo.JumpUrlValue = JumpUrlEnum.GetDescByCode(template.JumpUrl);
+                templateVo.StatusValue = template.Status == 0 ? "启用" : "禁用";
+                results.Add(templateVo);
+            }
+
+            return results;
         }
 
-        public void SetList(List<DefaultTemplateVo> vos)
+        public void SetList(List<InformationTemplateVo> vos)
         {
-            throw new NotImplementedException();
+            if (vos == null || vos.Count == 0) return;
+
+            foreach (InformationTemplateVo vo in vos)
+            {
+                if (vo.Id == null) continue;
+                InformationTemplate template = _repository.GetQueryable()
+                    .Where(a => a.Id == vo.Id)
+                    .FirstOrDefault();
+                if (template != null)
+                {
+                    template.IsDefault = vo.IsDefault;
+                    template.UpdateUser = SecurityUtils.GetLogInEmpNameSafe();
+                    template.UpdateTime = DateTime.Now;
+                    _repository.Update(template);
+                }
+            }
         }
 
         public InformationTemplateVo GetInformationTemplateById(long id)

@@ -1,4 +1,4 @@
-﻿CREATE TABLE t_bpmn_conf
+CREATE TABLE t_bpmn_conf
 (
     id                  BIGINT IDENTITY(1,1) NOT NULL,
     bpmn_code           NVARCHAR(60)      DEFAULT N'',
@@ -223,40 +223,9 @@ CREATE
 NONCLUSTERED INDEX BPM_IDX_ID
     ON bpm_flowrun_entrust (runinfoid, original, actual);
 
--- ----------------------------
--- Table structure for bpm_flowruninfo
--- ----------------------------
-CREATE TABLE bpm_flowruninfo
-(
-    id            BIGINT IDENTITY(1,1) NOT NULL,
-    runinfoid     NVARCHAR(64)         NOT NULL,
-    create_UserId NVARCHAR(64),
-    entitykey     NVARCHAR(100),
-    entityclass   NVARCHAR(100),
-    entitykeytype NVARCHAR(10),
-    createactor   NVARCHAR(50),
-    createdepart  NVARCHAR(100),
-    createdate    DATETIME NOT NULL DEFAULT GETDATE(),
-    tenant_id     NVARCHAR(64)         DEFAULT '',
-    is_del        INT               DEFAULT 0,
-    CONSTRAINT PK_bpm_flowruninfo PRIMARY KEY (id)
-);
+-- REMOVED: bpm_flowruninfo (migrated to JSON)
 
--- ----------------------------
--- Table structure for bpm_manual_notify
--- ----------------------------
-CREATE TABLE bpm_manual_notify
-(
-    id          BIGINT IDENTITY(1,1) NOT NULL,
-    business_id BIGINT   NOT NULL,
-    code        NVARCHAR(10)      NOT NULL,
-    last_time   DATETIME NOT NULL DEFAULT GETDATE(),
-    create_time DATETIME NOT NULL DEFAULT GETDATE(),
-    update_time DATETIME          DEFAULT GETDATE(),
-    tenant_id   NVARCHAR(64)      DEFAULT '',
-    is_del      INT               DEFAULT 0,
-    CONSTRAINT PK_bpm_manual_notify PRIMARY KEY (id)
-);
+-- REMOVED: bpm_manual_notify (migrated to JSON)
 
 -- ----------------------------
 -- Table structure for t_bpmn_approve_remind
@@ -436,21 +405,7 @@ NONCLUSTERED INDEX index_forward_user_id_is_read
     ON bpm_process_forward (forward_user_id, is_read);
 
 
--- ----------------------------
--- Table structure for bpm_process_node_overtime
--- ----------------------------
-CREATE TABLE bpm_process_node_overtime
-(
-    id          BIGINT IDENTITY(1,1) NOT NULL,
-    notice_type INT,
-    node_name   NVARCHAR(50),
-    node_key    NVARCHAR(50),
-    process_key NVARCHAR(50),
-    notice_time INT,
-    is_del      INT DEFAULT 0,
-    tenant_id   NVARCHAR(64)         DEFAULT '',
-    CONSTRAINT PK_bpm_process_node_overtime PRIMARY KEY (id)
-);
+-- REMOVED: bpm_process_node_overtime (migrated to JSON)
 
 -- ----------------------------
 -- Table structure for bpm_process_node_record
@@ -849,45 +804,9 @@ CREATE
 NONCLUSTERED INDEX process_code_index
     ON bpm_verify_info (process_code);
 
--- ----------------------------
--- Table structure for t_default_template
--- ----------------------------
-CREATE TABLE t_default_template
-(
-    id          BIGINT IDENTITY(1,1) NOT NULL,
-    event       INT,
-    template_id BIGINT,
-    is_del      TINYINT  NOT NULL DEFAULT 0,
-    tenant_id   NVARCHAR(64)         DEFAULT '',
-    create_time DATETIME NOT NULL DEFAULT GETDATE(),
-    create_user NVARCHAR(255)        DEFAULT '',
-    update_time DATETIME          DEFAULT GETDATE(),
-    update_user NVARCHAR(255)        DEFAULT '',
-    CONSTRAINT PK_t_default_template PRIMARY KEY (id)
-);
+-- REMOVED: t_default_template (migrated to JSON)
 
--- ----------------------------
--- Table structure for t_user_email_send
--- ----------------------------
-CREATE TABLE t_user_email_send
-(
-    id          INT IDENTITY(1,1) NOT NULL,
-    sender      NVARCHAR(32)      NOT NULL,
-    receiver    NVARCHAR(100)     NOT NULL,
-    title       NVARCHAR(255)     NOT NULL,
-    content     NVARCHAR(MAX)     NOT NULL,
-    create_time DATETIME NOT NULL DEFAULT GETDATE(),
-    update_time DATETIME          DEFAULT GETDATE(),
-    create_user NVARCHAR(50)      NOT NULL,
-    update_user NVARCHAR(50)      NOT NULL,
-    is_del      TINYINT  NOT NULL DEFAULT 0,
-    tenant_id   NVARCHAR(64)      DEFAULT '',
-    CONSTRAINT PK_t_user_email_send PRIMARY KEY (id)
-);
-
-CREATE
-NONCLUSTERED INDEX sender
-    ON t_user_email_send (receiver);
+-- REMOVED: t_user_email_send (migrated to JSON)
 
 -- ----------------------------
 -- Table structure for t_method_replay
@@ -1043,29 +962,7 @@ NONCLUSTERED INDEX process_state_index
     ON bpm_business_process (process_state);
 
 
--- ----------------------------
--- Table structure for bpm_process_name_relevancy
--- ----------------------------
-CREATE TABLE bpm_process_name_relevancy
-(
-    id              BIGINT IDENTITY(1,1) NOT NULL,
-    process_name_id BIGINT,
-    process_key     NVARCHAR(50),
-    is_del          INT               DEFAULT 0,
-    tenant_id       NVARCHAR(64)         DEFAULT '',
-    create_time     DATETIME NOT NULL DEFAULT GETDATE(),
-    CONSTRAINT PK_bpm_process_name_relevancy PRIMARY KEY (id)
-);
-
-
-
-CREATE
-NONCLUSTERED INDEX process_key_index
-    ON bpm_process_name_relevancy (process_key);
-
-CREATE
-NONCLUSTERED INDEX process_name_id_index
-    ON bpm_process_name_relevancy (process_name_id);
+-- REMOVED: bpm_process_name_relevancy (migrated to JSON)
 
 
 -- ----------------------------
@@ -1108,50 +1005,14 @@ CREATE TABLE t_bpmn_node_personnel_empl_conf
 
 
 
--- ----------------------------
--- Table structure for bpm_process_operation
--- ----------------------------
-CREATE TABLE bpm_process_operation
-(
-    id           BIGINT IDENTITY(1,1) NOT NULL,
-    process_key  NVARCHAR(50),
-    process_node NVARCHAR(50),
-    type         INT,
-    is_del       TINYINT,
-    tenant_id    NVARCHAR(64) DEFAULT '',
-    CONSTRAINT PK_bpm_process_operation PRIMARY KEY (id)
-);
+-- REMOVED: bpm_process_operation (migrated to JSON)
 
 
 
--- ----------------------------
--- Table structure for bpm_process_node_back
--- ----------------------------
-CREATE TABLE bpm_process_node_back
-(
-    id          BIGINT IDENTITY(1,1) NOT NULL,
-    node_key    NVARCHAR(50),
-    node_id     BIGINT,
-    back_type   INT,
-    process_key NVARCHAR(100),
-    is_del      TINYINT,
-    tenant_id   NVARCHAR(64) DEFAULT '',
-    CONSTRAINT PK_bpm_process_node_back PRIMARY KEY (id)
-);
+-- REMOVED: bpm_process_node_back (migrated to JSON)
 
 
--- ----------------------------
--- Table structure for bpm_process_name
--- ----------------------------
-CREATE TABLE bpm_process_name
-(
-    id           BIGINT IDENTITY(1,1) NOT NULL,
-    process_name NVARCHAR(50),
-    is_del       INT      DEFAULT 0,
-    tenant_id    NVARCHAR(64) DEFAULT '',
-    create_time  DATETIME DEFAULT GETDATE(),
-    CONSTRAINT PK_bpm_process_name PRIMARY KEY (id)
-);
+-- REMOVED: bpm_process_name (migrated to JSON)
 
 
 -- ----------------------------
@@ -1544,25 +1405,15 @@ CREATE TABLE t_quick_entry
     create_time       DATETIME DEFAULT GETDATE(),
     status            TINYINT  DEFAULT 0,
     variable_url_flag TINYINT  DEFAULT 0,
+    type_config_json  NVARCHAR(MAX) NULL,
     CONSTRAINT PK_t_quick_entry PRIMARY KEY (id)
 );
 
 
 
 -- ----------------------------
--- Table structure for t_quick_entry_type
+-- t_quick_entry_type table has been replaced by type_config_json column in t_quick_entry
 -- ----------------------------
-CREATE TABLE t_quick_entry_type
-(
-    id             BIGINT IDENTITY(1,1) NOT NULL,
-    quick_entry_id BIGINT,
-    type           INT,
-    is_del         TINYINT  DEFAULT 0,
-    tenant_id      NVARCHAR(64) DEFAULT '',
-    create_time    DATETIME DEFAULT GETDATE(),
-    type_name      NVARCHAR(255),
-    CONSTRAINT PK_t_quick_entry_type PRIMARY KEY (id)
-);
 
 
 

@@ -636,6 +636,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.Status).Name("status");
                 a.Property(b => b.VariableUrlFlag).Name("variable_url_flag");
+                a.Property(b => b.TypeConfigJson).Name("type_config_json");
             }).ConfigEntity<SysVersion>(a =>
             {
                 a.Name("t_sys_version");

@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using AntFlowCore.Base.entity.jsonconf;
 
 namespace AntFlowCore.Base.vo
 {
@@ -59,5 +61,19 @@ namespace AntFlowCore.Base.vo
         public int? Sort { get; set; }
         [JsonPropertyName("nodeType")]
         public int?  NodeType { get; set; }
+
+        [JsonPropertyName("attachmentsJson")]
+        public string? AttachmentsJson { get; set; }
+
+        [JsonIgnore]
+        public List<BpmVerifyAttachmentVo>? Attachments
+        {
+            get => AttachmentsJson != null
+                ? JsonSerializer.Deserialize<List<BpmVerifyAttachmentVo>>(AttachmentsJson, JsonConfUtil.Options)
+                : null;
+            set => AttachmentsJson = value != null
+                ? JsonSerializer.Serialize(value, JsonConfUtil.Options)
+                : null;
+        }
     }
 }

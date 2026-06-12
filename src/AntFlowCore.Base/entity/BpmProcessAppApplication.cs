@@ -1,4 +1,6 @@
-﻿namespace AntFlowCore.Base.entity;
+using FreeSql.DataAnnotations;
+
+namespace AntFlowCore.Base.entity;
 
 /// <summary>
 /// Represents the BPM process application.
@@ -131,4 +133,7 @@ public class BpmProcessAppApplication
     /// Role request URI.
     /// </summary>
     public string RoleRequestUri { get; set; }
+
+    [Column(Name = "category_config_json")]
+    public string? CategoryConfigJson { get; set; }
 }

@@ -74,13 +74,13 @@ public class InformationTemplateController
     }
 
     [HttpGet("defaultTemplates")]
-    public Result<List<DefaultTemplateVo>> GetDefaultTemplates()
+    public Result<List<InformationTemplateVo>> GetDefaultTemplates()
     {
         return ResultHelper.Success(_informationTemplateService.GetList());
     }
 
     [HttpPost("defaultTemplates")]
-    public Result<string> SetDefaultTemplates([FromBody] DefaultTemplateVo[] vos)
+    public Result<string> SetDefaultTemplates([FromBody] InformationTemplateVo[] vos)
     {
         _informationTemplateService.SetList(vos.ToList());
         return ResultHelper.Success("ok");

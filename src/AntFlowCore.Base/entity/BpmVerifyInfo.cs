@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Base.entity
+namespace AntFlowCore.Base.entity
 {
     /// <summary>
     /// Represents the verify information entity.
@@ -79,5 +79,8 @@
         /// </summary>
         public int IsDel { get; set; }
         public string TenantId { get; set; }
+
+        [FreeSql.DataAnnotations.Column(Name = "attachments_json")]
+        public string? AttachmentsJson { get; set; }
     }
 }

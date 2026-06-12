@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Base.entity
+namespace AntFlowCore.Base.entity
 {
     /// <summary>
     /// Represents a quick entry configuration.
@@ -18,6 +18,9 @@
         public DateTime? CreateTime { get; set; } = DateTime.Now;
         public int Status { get; set; }
         public int VariableUrlFlag { get; set; }
+
+        [FreeSql.DataAnnotations.Column(Name = "type_config_json")]
+        public string? TypeConfigJson { get; set; }
 
         public QuickEntry() { }
     }

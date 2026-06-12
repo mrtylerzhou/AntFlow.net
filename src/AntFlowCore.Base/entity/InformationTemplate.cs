@@ -1,4 +1,5 @@
-﻿using AntFlowCore.Base.util;
+using AntFlowCore.Base.util;
+using FreeSql.DataAnnotations;
 
 namespace AntFlowCore.Base.entity
 {
@@ -75,6 +76,10 @@ namespace AntFlowCore.Base.entity
         public int IsDel { get; set; }
 
         public string TenantId { get; set; }
+
+        [Column(Name = "is_default")]
+        public int? IsDefault { get; set; }
+
         /// <summary>
         /// Creation time.
         /// </summary>

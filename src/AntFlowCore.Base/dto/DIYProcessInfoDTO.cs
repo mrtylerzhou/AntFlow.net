@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.util;
+using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 
@@ -16,5 +16,4 @@ public class DIYProcessInfoDTO
      * 是否包含发起人自选模块,否为不包含,true为包含
      */
     public bool HasStarUserChooseModule { get; set; } = false;
-    public List<BaseNumIdStruVo> ProcessNotices { get; set; }
 }

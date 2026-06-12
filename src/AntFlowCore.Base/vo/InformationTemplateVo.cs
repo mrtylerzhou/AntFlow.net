@@ -61,5 +61,8 @@ namespace AntFlowCore.Base.vo
 
         [JsonPropertyName("wildcardCharacterMap")]
         public Dictionary<int, string> WildcardCharacterMap { get; set; }
+
+        [JsonPropertyName("isDefault")]
+        public int? IsDefault { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace AntFlowCore.Base.vo;
     public class BpmProcessAppApplicationVo
@@ -308,4 +308,10 @@ namespace AntFlowCore.Base.vo;
         /// </summary>
         [JsonPropertyName("isCanDel")]
         public bool? IsCanDel { get; set; }
+
+        /// <summary>
+        /// Gets or sets the category config JSON.
+        /// </summary>
+        [JsonPropertyName("categoryConfigJson")]
+        public string? CategoryConfigJson { get; set; }
     }
