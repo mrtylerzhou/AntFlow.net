@@ -132,6 +132,20 @@ namespace AntFlowCore.Base.vo;
         [JsonPropertyName("approveRemindVo")]
         public BpmnApproveRemindVo ApproveRemindVo { get; set; }
 
+        /// <summary>
+        /// Overtime notice configuration (migrated from bpm_process_node_overtime).
+        /// Written to node_config_json.templateConf.overtimeConf during edit.
+        /// </summary>
+        [JsonPropertyName("overtimeConf")]
+        public TemplateOvertimeConf OvertimeConf { get; set; }
+
+        /// <summary>
+        /// Operation types for this node (migrated from bpm_process_operation).
+        /// Written to node_config_json.buttonSignConf.operationTypes during edit.
+        /// </summary>
+        [JsonPropertyName("operationTypes")]
+        public List<int> OperationTypes { get; set; }
+
         //===============>>third party processs service<<===================
 
         [JsonPropertyName("conditionsUrl")]

@@ -237,6 +237,12 @@ public static class BpmnNodeConfigHolder
             bs.AdditionalSignConfList = addSignList;
         }
 
+        // Operation types (migrated from bpm_process_operation)
+        if (vo.OperationTypes != null && vo.OperationTypes.Count > 0)
+        {
+            bs.OperationTypes = vo.OperationTypes;
+        }
+
         config.ButtonSignConf = bs;
     }
 
@@ -271,6 +277,12 @@ public static class BpmnNodeConfigHolder
             tc.ApproveRemind = remind;
         }
 
+        // Overtime conf (migrated from bpm_process_node_overtime)
+        if (vo.OvertimeConf != null)
+        {
+            tc.OvertimeConf = vo.OvertimeConf;
+        }
+
         config.TemplateConf = tc;
     }
 
@@ -286,6 +298,62 @@ public static class BpmnNodeConfigHolder
         {
             FieldControls = vo.LfFieldControlVOs
         };
+    }
+
+    /// <summary>
+    /// Set back type for disagree action (migrated from bpm_process_node_back)
+    /// </summary>
+    public static void SetBackType(BpmnNodeVo vo)
+    {
+        var prop = vo.Property;
+        if (prop == null || prop.BackType == null) return;
+
+        var config = vo.GetOrCreateNodeConfigJson();
+        config.BackType = prop.BackType;
+    }
+
+    /// <summary>
+    /// Build UDR (custom rule) approver config from node VO
+    /// </summary>
+    public static void SetUdrConf(BpmnNodeVo vo)
+    {
+        var prop = vo.Property;
+        if (prop == null || prop.UdrAssigneeProperty == null) return;
+
+        var approverConf = GetOrCreateApproverConf(vo);
+        approverConf.UdrConfList ??= new List<ApproverUDRConf>();
+        approverConf.UdrConfList.Add(new ApproverUDRConf
+        {
+            ValueJson = prop.UdrValueJson,
+            SignType = prop.SignType,
+            UdrProperty = prop.UdrAssigneeProperty.Id,
+            UdrPropertyName = prop.UdrAssigneeProperty.Name,
+            Ext1 = prop.Ext1,
+            Ext2 = prop.Ext2,
+            Ext3 = prop.Ext3,
+            Ext4 = prop.Ext4
+        });
+    }
+
+    /// <summary>
+    /// Build form-related user approver config from node VO
+    /// </summary>
+    public static void SetFormRelatedUserConf(BpmnNodeVo vo)
+    {
+        var prop = vo.Property;
+        if (prop == null || prop.FormInfos == null) return;
+
+        var approverConf = GetOrCreateApproverConf(vo);
+        approverConf.FormRelatedUserConfList ??= new List<ApproverFormRelatedUserConf>();
+        approverConf.FormRelatedUserConfList.Add(new ApproverFormRelatedUserConf
+        {
+            ValueJson = JsonConfUtil.ToJsonString(prop.FormInfos),
+            SignType = prop.SignType,
+            ValueType = prop.FormAssigneeProperty,
+            ValueTypeName = prop.FormAssigneeProperty != null
+                ? NodeFormAssigneePropertyEnumExtensions.GetDescByCode(prop.FormAssigneeProperty.Value)
+                : null
+        });
     }
 
     // ============ Private helpers ============

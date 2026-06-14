@@ -260,7 +260,18 @@ public class BpmnConfBizService : IBpmnConfBizService
             {
                 BpmnNodeConfigHolder.SetBusinessTableConf(bpmnNodeVo);
             }
+            else if (nodeProperty == (int)NodePropertyEnum.NODE_PROPERTY_ZDY_RULES)
+            {
+                BpmnNodeConfigHolder.SetUdrConf(bpmnNodeVo);
+            }
+            else if (nodeProperty == (int)NodePropertyEnum.NODE_PROPERTY_FORM_RELATED)
+            {
+                BpmnNodeConfigHolder.SetFormRelatedUserConf(bpmnNodeVo);
+            }
         }
+
+        // Set back type for all nodes (migrated from bpm_process_node_back)
+        BpmnNodeConfigHolder.SetBackType(bpmnNodeVo);
 
         // Node type-based adaptors
         if (nodeType != null)

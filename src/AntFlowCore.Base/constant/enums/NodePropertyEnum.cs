@@ -1,4 +1,4 @@
-﻿
+
 
 namespace AntFlowCore.Base.constant.enums;
 
@@ -13,7 +13,9 @@ public enum NodePropertyEnum
     NODE_PROPERTY_BUSINESSTABLE = 8,
     NODE_PROPERTY_OUT_SIDE_ACCESS = 11,
     NODE_PROPERTY_START_USER = 12,
-    NODE_PROPERTY_DIRECT_LEADER = 13
+    NODE_PROPERTY_DIRECT_LEADER = 13,
+    NODE_PROPERTY_FORM_RELATED = 16,
+    NODE_PROPERTY_ZDY_RULES = 17
 }
 public static class NodePropertyEnumExtensions
 {
@@ -30,7 +32,9 @@ public static class NodePropertyEnumExtensions
             { NodePropertyEnum.NODE_PROPERTY_BUSINESSTABLE, ("关联业务表", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) },
             { NodePropertyEnum.NODE_PROPERTY_OUT_SIDE_ACCESS, ("外部传入人员", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) },
             { NodePropertyEnum.NODE_PROPERTY_START_USER, ("发起人", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_SINGLE) },
-            { NodePropertyEnum.NODE_PROPERTY_DIRECT_LEADER, ("直属领导", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) }
+            { NodePropertyEnum.NODE_PROPERTY_DIRECT_LEADER, ("直属领导", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) },
+            { NodePropertyEnum.NODE_PROPERTY_FORM_RELATED, ("表单中相关人员", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) },
+            { NodePropertyEnum.NODE_PROPERTY_ZDY_RULES, ("自定义规则", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) }
         };
 
     public static BpmnNodeParamTypeEnum GetParamTypeEnum(this NodePropertyEnum property)

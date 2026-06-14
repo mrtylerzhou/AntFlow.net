@@ -421,7 +421,30 @@ public class ActivitiBpmMsgTemplateService : IActivitiBpmMsgTemplateService
     }
     private MessageSendTypeEnum[] GetMessageSendTypeEnums(string processId, string formCode, int selectMack)
     {
-        // IBpmProcessNoticeService has been removed; return default empty array
+        // Read notice channel types from conf_config_json (migrated from bpm_process_notice)
+        if (!string.IsNullOrEmpty(formCode))
+        {
+            var bpmnConf = _bpmnConfService._repository.GetQueryable()
+                .Where(a => a.FormCode == formCode && a.EffectiveStatus == 1 && a.ConfConfigJson != null)
+                .First();
+
+            if (bpmnConf != null && !string.IsNullOrEmpty(bpmnConf.ConfConfigJson))
+            {
+                var confConfig = JsonConfUtil.ParseConfConfig(bpmnConf.ConfConfigJson);
+                if (confConfig?.NoticeChannelTypes != null && confConfig.NoticeChannelTypes.Count > 0)
+                {
+                    var types = confConfig.NoticeChannelTypes
+                        .Select(type => MessageSendTypeEnum.GetEnumByCode(type))
+                        .Where(e => e != null)
+                        .ToList();
+                    if (types.Count > 0)
+                    {
+                        return types.ToArray()!;
+                    }
+                }
+            }
+        }
+
         return Array.Empty<MessageSendTypeEnum>();
     }
 

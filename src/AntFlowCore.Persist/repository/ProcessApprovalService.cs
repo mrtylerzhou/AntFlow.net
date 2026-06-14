@@ -5,6 +5,7 @@ using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
+using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.extension;
 using AntFlowCore.Base.factory;
@@ -323,17 +324,49 @@ public class ProcessApprovalService : IProcessApprovalService
 
             if (!string.IsNullOrEmpty(record.ProcessKey))
             {
-                // Process name lookup removed (dependent service deleted)
+                // Read process name from t_bpmn_conf.BpmnName (migrated from bpm_process_name)
+                if (bpmnConfMap.TryGetValue(record.ProcessKey, out var conf))
+                {
+                    record.ProcessTypeName = conf.BpmnName;
+                    record.ProcessCode = conf.FormCode;
+                }
             }
         }
     }
 }
 
 private bool IsOperatable(TaskMgmtVO taskMgmtVo)
-{
-    // BpmProcessOperation entity deleted, default to operatable
-    return true;
-}
+    {
+        // Read operationTypes from node_config_json (migrated from bpm_process_operation)
+        if (string.IsNullOrEmpty(taskMgmtVo.ProcessKey) || string.IsNullOrEmpty(taskMgmtVo.TaskName))
+        {
+            return true;
+        }
+
+        var bpmnConf = _bpmnConfCommonService.GetBpmnConfByFormCode(taskMgmtVo.ProcessKey);
+        if (bpmnConf == null || bpmnConf.Id == 0)
+        {
+            return true;
+        }
+
+        var nodes = _freeSql.Select<BpmnNode>()
+            .Where(a => a.ConfId == bpmnConf.Id && a.NodeId == taskMgmtVo.TaskName && a.IsDel == 0)
+            .ToList();
+
+        if (nodes == null || nodes.Count == 0)
+        {
+            return true;
+        }
+
+        var node = nodes[0];
+        var nodeConfig = JsonConfUtil.ParseNodeConfig(node.NodeConfigJson);
+        if (nodeConfig?.ButtonSignConf?.OperationTypes == null || nodeConfig.ButtonSignConf.OperationTypes.Count == 0)
+        {
+            return true;
+        }
+
+        return !nodeConfig.ButtonSignConf.OperationTypes.Contains(taskMgmtVo.Type);
+    }
 
 
 List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
