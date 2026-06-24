@@ -48,9 +48,9 @@ public class RepositoryBase<TEntity> : IBaseRepository<TEntity>
         return _ormContext.FreeSql.GetRepository<TEntity>().Select.First();
     }
 
-    public virtual void Add(TEntity entity)
+    public virtual TEntity Add(TEntity entity)
     {
-        _ormContext.FreeSql.GetRepository<TEntity>().Insert(entity);
+       return _ormContext.FreeSql.GetRepository<TEntity>().Insert(entity);
     }
 
     public virtual void AddRange(IEnumerable<TEntity> entities)

@@ -137,7 +137,7 @@ public class BpmnConfBizService : IBpmnConfBizService
             bpmnNode.CreateUser=SecurityUtils.GetLogInEmpNameSafe();
             bpmnNode.Remark ??= "";
             bpmnNode.TenantId = MultiTenantUtil.GetCurrentTenantId();
-            _bpmnNodeService._repository.Add(bpmnNode);
+            BpmnNode node = _bpmnNodeService._repository.Add(bpmnNode);
             long bpmnNodeId = bpmnNode.Id;
             if(bpmnNodeId.IsNullOrZero()){
                 throw new AFBizException("can not get bpmn node id!");
@@ -151,8 +151,8 @@ public class BpmnConfBizService : IBpmnConfBizService
             string? nodeConfigJsonStr = bpmnNodeVo.SerializeNodeConfigJson();
             if (nodeConfigJsonStr != null)
             {
-                var updateNode = new BpmnNode { Id = bpmnNodeId, NodeConfigJson = nodeConfigJsonStr };
-                _bpmnNodeService._repository.Update(updateNode);
+                bpmnNode.NodeConfigJson=nodeConfigJsonStr;
+                _bpmnNodeService._repository.Update(bpmnNode);
             }
             
             if((int)NodeTypeEnum.NODE_TYPE_COPY==bpmnNodeVo.NodeType&&bpmnNodeVo.NodeTo!=null&&bpmnNodeVo.NodeTo.Any()){

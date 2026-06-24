@@ -64,81 +64,13 @@ CREATE TABLE if not exists `t_bpmn_node`
     AUTO_INCREMENT = 1
     COMMENT ='the conf,s node table';
 
-CREATE TABLE if not exists `t_bpmn_node_business_table_conf`
-(
-    `id`                       int(11)             NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `bpmn_node_id`             bigint(20)          NOT NULL COMMENT 'node id',
-    `configuration_table_type` int(11)                      DEFAULT NULL COMMENT 'conf table type',
-    `table_field_type`         int(11)                      DEFAULT NULL COMMENT 'table field type',
-    `sign_type`                int(11)             NOT NULL COMMENT 'ign type 1:all sign,2: or sign',
-    `remark`                   varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `is_del`                   tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
-    `create_user`              varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `create_time`              timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
-    `update_user`              varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `update_time`              timestamp           DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
-    PRIMARY KEY (`id`) USING BTREE,
-    KEY `index_node_id` (`bpmn_node_id`) USING BTREE
-    ) ENGINE = InnoDB
-    COMMENT ='node conf,s business conf table';
+-- REMOVED: t_bpmn_node_business_table_conf (migrated to JSON)
 
-CREATE TABLE if not exists `t_bpmn_conf_notice_template`
-(
-    `id`          int(8)              NOT NULL AUTO_INCREMENT,
-    `bpmn_code`   varchar(60)         NOT NULL DEFAULT '' COMMENT 'bpmn code',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `is_del`      tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
-    `create_user` varchar(50)                  DEFAULT '' COMMENT '创建人',
-    `create_time` timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
-    `update_user` varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `update_time` timestamp            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
-    PRIMARY KEY (`id`) USING BTREE,
-    KEY `index_bpmn_code` (`bpmn_code`) USING BTREE
-    ) ENGINE = InnoDB
-    AUTO_INCREMENT = 1
-    COMMENT ='process,s notice template';
+-- REMOVED: t_bpmn_conf_notice_template (migrated to JSON)
 
-CREATE TABLE if not exists `t_bpmn_view_page_button`
-(
-    `id`          int(11)             NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `conf_id`     int(11)             NOT NULL COMMENT 'conf id',
-    `view_type`   int(11)             NOT NULL COMMENT 'view type 1:start use view,2:approvers view',
-    `button_type` int(11)             NOT NULL COMMENT 'button type,see ButtonTypeEnum for details',
-    `button_name` varchar(60)                  DEFAULT '' COMMENT 'button,s name',
-    `remark`      varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `is_del`      tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
-    `create_user` varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `create_time` timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
-    `update_user` varchar(50)                  DEFAULT '' COMMENT '更新人（邮箱前缀）',
-    `update_time` timestamp           DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
-    PRIMARY KEY (`id`) USING BTREE
-    ) ENGINE = InnoDB
-    COMMENT ='审批流查看页按钮配置表';
 
-CREATE TABLE if not exists `t_bpmn_template`
-(
-    `id`          int(11)    NOT NULL AUTO_INCREMENT,
-    `conf_id`     bigint(20)          DEFAULT NULL COMMENT 'conf,s id',
-    `node_id`     bigint(20)          DEFAULT NULL COMMENT 'node,s id',
-    `event`       int(11)             DEFAULT NULL COMMENT 'event type',
-    `informs`     varchar(255)        DEFAULT NULL COMMENT 'who to inform',
-    `emps`        varchar(255)        DEFAULT NULL COMMENT 'specified person to inform',
-    `roles`       varchar(255)        DEFAULT NULL COMMENT 'specified roles to inform',
-    `funcs`       varchar(255)        DEFAULT NULL COMMENT 'specified Functionality to inform',
-    `template_id` bigint(20)          DEFAULT NULL COMMENT 'template id id',
-    `form_code`         varchar(50)                           null,
-    `message_send_type` varchar(50)                           null comment 'message send type,via email,text message or app push and so on',
-    `is_del`      tinyint(4) NOT NULL DEFAULT '0' COMMENT '0:No,1:Yes',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_time` timestamp  NULL     DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
-    `create_user` varchar(50)        DEFAULT '' COMMENT 'create user',
-    `update_time` timestamp  NULL     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
-    `update_user` varchar(50)        DEFAULT '' COMMENT 'as its name says',
-    PRIMARY KEY (`id`) USING BTREE
-    ) ENGINE = InnoDB
-    COMMENT ='notice template';
+
+-- REMOVED: t_bpmn_template (migrated to JSON)
 
 CREATE TABLE if not exists `t_information_template`
 (
@@ -165,20 +97,7 @@ CREATE TABLE if not exists `t_information_template`
     ) ENGINE = InnoDB
     COMMENT ='消息模板';
 
-CREATE TABLE if not exists `bpm_business`
-(
-    `id`               bigint(20) NOT NULL AUTO_INCREMENT,
-    `business_id`      varchar(64)   DEFAULT NULL COMMENT 'business id',
-    `create_time`      timestamp    not null default CURRENT_TIMESTAMP COMMENT 'as its name says',
-    `process_code`     varchar(50)  DEFAULT NULL COMMENT 'process Number',
-    `create_user_name` varchar(50)  DEFAULT NULL COMMENT 'as its name says',
-    `create_user`      varchar(50)   DEFAULT NULL COMMENT 'as its name says',
-    `process_key`      varchar(50) DEFAULT NULL COMMENT 'as its name says',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `is_del`           int(11)      DEFAULT '0',
-    PRIMARY KEY (`id`) USING BTREE
-    ) ENGINE = InnoDB
-    COMMENT ='process draft';
+-- REMOVED: t_bpm_business (dead table)
 
 CREATE TABLE if not exists `bpm_flowrun_entrust`
 (
@@ -207,101 +126,16 @@ CREATE TABLE if not exists `bpm_flowrun_entrust`
 
 -- REMOVED: bpm_manual_notify (migrated to JSON)
 
-CREATE TABLE if not exists `t_bpmn_approve_remind`
-(
-    `id`          bigint(20) NOT NULL AUTO_INCREMENT,
-    `conf_id`     bigint(20)          DEFAULT NULL COMMENT 'conf id',
-    `node_id`     bigint(20)          DEFAULT NULL COMMENT 'node id',
-    `template_id` bigint(20)          DEFAULT NULL COMMENT 'template id',
-    `days`        varchar(255)        DEFAULT NULL COMMENT 'durations in day',
-    `is_del`      tinyint(4) NOT NULL DEFAULT '0' COMMENT '0:No,1:Yes',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_time` timestamp  NULL     DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
-    `create_user` varchar(50)        DEFAULT '' COMMENT 'create user',
-    `update_time` timestamp       DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
-    `update_user` varchar(50)        DEFAULT '' COMMENT 'update user',
-    PRIMARY KEY (`id`) USING BTREE
-    ) ENGINE = InnoDB
-    COMMENT ='approvement remind';
+-- REMOVED: t_bpmn_approve_remind (migrated to JSON)
 
-CREATE TABLE if not exists `t_bpmn_conf_notice_template_detail`
-(
-    `id`                     int(8)              NOT NULL AUTO_INCREMENT,
-    `bpmn_code`              varchar(60)         NOT NULL DEFAULT '' COMMENT 'bpmn Code',
-    `notice_template_type`   int(4)              NOT NULL DEFAULT '1' COMMENT 'notice type',
-    `notice_template_detail` varchar(512)                 DEFAULT NULL COMMENT 'content',
-    `is_del`                 tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_user`            varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `create_time`            timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
-    `update_user`            varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `update_time`            timestamp            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
-    PRIMARY KEY (`id`) USING BTREE,
-    KEY `index_bpmn_code` (`bpmn_code`) USING BTREE,
-    KEY `index_bpmn_type` (`notice_template_type`) USING BTREE
-    ) ENGINE = InnoDB
-    AUTO_INCREMENT = 1
-    COMMENT ='notice template detail';
+-- REMOVED: t_bpmn_conf_notice_template_detail (migrated to JSON)
 
 
-CREATE TABLE if not exists `t_bpmn_node_conditions_conf`
-(
-    `id`           bigint(20)          NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `bpmn_node_id` bigint(20)          NOT NULL COMMENT 'conf id',
-    `is_default`   int(11)             NOT NULL DEFAULT '0' COMMENT 'is default 0:no,1:yes',
-    `sort`         int(11)             NOT NULL COMMENT 'condition,s priority',
-    `group_relation` tinyint                                       null comment '0 for and and 1 for or',
-    `ext_json`     varchar(2000)                                 null comment '前端vue3版本conditionlist参数模型',
-    `remark`       varchar(255)        DEFAULT '' COMMENT 'remark',
-    `is_del`       tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_user`  varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `create_time`  timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
-    `update_user`  varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `update_time`  timestamp            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
-    PRIMARY KEY (`id`) USING BTREE
-    ) ENGINE = InnoDB
-    AUTO_INCREMENT = 1
-    COMMENT ='node,s conditions conf';
+-- REMOVED: t_bpmn_node_conditions_conf (migrated to JSON)
 
-CREATE TABLE if not exists `t_bpmn_node_conditions_param_conf`
-(
-    `id`                      bigint(20)          NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `bpmn_node_conditions_id` bigint(20)          NOT NULL COMMENT 'conf id',
-    `condition_param_type`    int(11)             NOT NULL COMMENT 'param type,used to determine ConditionTypeEnum',
-    `condition_param_name`  varchar(50)             NOT NULL COMMENT 'param field name',
-    `condition_param_jsom`    text                NOT NULL COMMENT 'paramJSON',
-    `operator`                int                 null,
-    `cond_relation`           tinyint              null comment 'condition''s relations,0 for and and 1 for or',
-    `cond_group`            int                 null comment 'group that a condition belongs to',
-    `remark`                  varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
-    `is_del`                  tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_user`             varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `create_time`             timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
-    `update_user`             varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `update_time`             timestamp           DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
-    PRIMARY KEY (`id`) USING BTREE
-    ) ENGINE = InnoDB
-    AUTO_INCREMENT = 1
-    COMMENT ='condition params conf';
+-- REMOVED: t_bpmn_node_conditions_param_conf (migrated to JSON)
 
-CREATE TABLE if not exists `t_bpmn_node_sign_up_conf`
-(
-    `id`                bigint(20)          NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `bpmn_node_id`      bigint(20)          NOT NULL COMMENT '节点配置表Id',
-    `after_sign_up_way` int(11)             NOT NULL DEFAULT '1' COMMENT 'sign up flow way 1: go back to assigner,2:no',
-    `sign_up_type`      int(11)             NOT NULL DEFAULT '1' COMMENT 'sign up way 1: all sign in sequencial,2:all sign,3:or sign',
-    `remark`            varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
-    `is_del`            tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_user`       varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `create_time`       timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
-    `update_user`       varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `update_time`       timestamp           DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
-    PRIMARY KEY (`id`) USING BTREE
-    ) ENGINE = InnoDB
-    COMMENT ='node sign up conf';
+-- REMOVED: t_bpmn_node_sign_up_conf (migrated to JSON)
 
 CREATE TABLE if not exists `t_bpmn_node_to`
 (
@@ -321,25 +155,7 @@ CREATE TABLE if not exists `t_bpmn_node_to`
     COMMENT ='审批流节点走向表';
 
 
-CREATE TABLE if not exists `bpm_process_dept`
-(
-    `id`           bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `process_code` varchar(50)         DEFAULT NULL COMMENT 'process number',
-    `process_type` int(11)             DEFAULT NULL COMMENT 'process type',
-    `process_name` varchar(50)         DEFAULT NULL COMMENT 'process name',
-    `dep_id`       bigint(20)          DEFAULT NULL COMMENT 'dept id',
-    `remarks`      varchar(255)        DEFAULT NULL COMMENT 'remark',
-    `create_time`  timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `create_user`  bigint(20)          DEFAULT NULL COMMENT 'as its name says',
-    `update_user`  bigint(20)          DEFAULT NULL COMMENT 'as its name says',
-    `update_time`  timestamp   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    `process_key`  varchar(50)         DEFAULT NULL COMMENT 'process key',
-    `is_del`       tinyint(11)             DEFAULT '0',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `is_all`       tinyint(11)             DEFAULT '0' COMMENT 'it to all',
-    PRIMARY KEY (`id`) USING BTREE
-    ) ENGINE = InnoDB
-    COMMENT ='process and department join table,used to control access right';
+-- REMOVED: bpm_process_dept (dead table)
 
 CREATE TABLE if not exists `bpm_process_forward`
 (
@@ -366,17 +182,7 @@ CREATE TABLE if not exists `bpm_process_forward`
 
 -- REMOVED: bpm_process_node_overtime (migrated to JSON)
 
-CREATE TABLE if not exists `bpm_process_node_record`
-(
-    `id`                 bigint(20) NOT NULL AUTO_INCREMENT,
-    `processInstance_id` varchar(64)         DEFAULT NULL COMMENT 'process instance id',
-    `task_id`            varchar(50)         DEFAULT NULL COMMENT 'taskid',
-    `create_time`        timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `is_del`             int(11)               DEFAULT '0',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    PRIMARY KEY (`id`) USING BTREE
-    ) ENGINE = InnoDB
-    COMMENT ='process over time node record';
+-- REMOVED: bpm_process_node_record (dead table)
 
 CREATE TABLE if not exists `bpm_process_node_submit`
 (
@@ -394,18 +200,7 @@ CREATE TABLE if not exists `bpm_process_node_submit`
     AUTO_INCREMENT = 1
     COMMENT ='process node submit';
 
-create table bpm_process_notice
-(
-    id          int auto_increment
-        primary key,
-    type        tinyint(11) null comment 'auto send notice 1.email 2:sms 3:app push',
-    process_key varchar(50) null comment 'process key',
-    `is_del`             int(11)               DEFAULT '0',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    constraint bpm_process_notice_unq
-        unique (process_key, type)
-)
-    comment 'process notice table';
+-- REMOVED: bpm_process_notice (migrated to JSON)
 
 CREATE TABLE if not exists `bpm_taskconfig`
 (
@@ -448,65 +243,11 @@ CREATE TABLE if not exists `t_bpm_variable`
     AUTO_INCREMENT = 1
     COMMENT ='process variable table';
 
-CREATE TABLE if not exists `t_bpm_variable_approve_remind`
-(
-    `id`          bigint(20)          NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `variable_id` bigint(20)          NOT NULL COMMENT 'variable id',
-    `element_id`  varchar(60)         NOT NULL DEFAULT '' COMMENT 'element id',
-    `content`     text                NOT NULL COMMENT 'approve content',
-    `remark`      varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
-    `is_del`      tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_user` varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `create_time` timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
-    `update_user` varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `update_time` timestamp           DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
-    PRIMARY KEY (`id`) USING BTREE,
-    KEY `variable_id_element_id` (`variable_id`, `element_id`) USING BTREE
-    ) ENGINE = InnoDB
-    COMMENT ='process remind variable';
+-- REMOVED: t_bpm_variable_approve_remind (migrated to JSON)
 
-CREATE TABLE if not exists `t_bpm_variable_button`
-(
-    `id`               bigint(20)          NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `variable_id`      bigint(20)          NOT NULL COMMENT 'variable id',
-    `element_id`       varchar(60)         NOT NULL DEFAULT '' COMMENT 'element id',
-    `button_page_type` int(11)             NOT NULL COMMENT 'button,s page type 1:submit page,2:approve page',
-    `button_type`      int(11)             NOT NULL COMMENT 'button type see ButtonTypeEnum',
-    `button_name`      varchar(60)         NOT NULL DEFAULT '' COMMENT 'button name',
-    `remark`           varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
-    `is_del`           tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_user`      varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `create_time`      timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
-    `update_user`      varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `update_time`      timestamp            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
-    PRIMARY KEY (`id`) USING BTREE,
-    KEY `variable_id` (`variable_id`) USING BTREE
-    ) ENGINE = InnoDB
-    AUTO_INCREMENT = 1
-    COMMENT ='variable button table';
+-- REMOVED: t_bpm_variable_button (migrated to JSON)
 
-CREATE TABLE if not exists `t_bpm_variable_message`
-(
-    `id`           bigint(20)          NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `variable_id`  bigint(20)          NOT NULL COMMENT 'variable id',
-    `element_id`   varchar(60)         NOT NULL DEFAULT '' COMMENT 'element id',
-    `message_type` int(11)             NOT NULL DEFAULT '0' COMMENT 'message type 1:out of node 2:in node',
-    `event_type`   int(11)             NOT NULL DEFAULT '0' COMMENT 'event type',
-    `content`      text                NOT NULL COMMENT 'content',
-    `remark`       varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
-    `is_del`       tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_user`  varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `create_time`  timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
-    `update_user`  varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `update_time`  timestamp            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
-    PRIMARY KEY (`id`) USING BTREE,
-    KEY `variable_id_element_id_message_type_event_type` (`variable_id`, `element_id`, `message_type`, `event_type`) USING BTREE,
-    KEY `variable_id_message_type_event_type` (`variable_id`, `message_type`, `event_type`) USING BTREE
-    ) ENGINE = InnoDB
-    COMMENT ='variable message table';
+-- REMOVED: t_bpm_variable_message (migrated to JSON)
 
 CREATE TABLE if not exists `t_bpm_variable_multiplayer`
 (
@@ -551,115 +292,19 @@ CREATE TABLE if not exists `t_bpm_variable_multiplayer_personnel`
     AUTO_INCREMENT = 1
     COMMENT ='multiplayer assignees variable table';
 
-CREATE TABLE if not exists `t_bpm_variable_sequence_flow`
-(
-    `id`                       bigint(20)          NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `variable_id`              bigint(20)          NOT NULL COMMENT 'variable id',
-    `element_id`               varchar(60)         NOT NULL DEFAULT '' COMMENT 'element id',
-    `element_name`             varchar(60)         NOT NULL DEFAULT '' COMMENT 'element name',
-    `element_from_id`          varchar(60)         NOT NULL DEFAULT '' COMMENT 'this node,s prev node',
-    `element_to_id`            varchar(60)         NOT NULL DEFAULT '' COMMENT 'this node,s next node',
-    `sequence_flow_type`       int(11)             NOT NULL COMMENT 'sequence flow type',
-    `sequence_flow_conditions` varchar(100)        NOT NULL DEFAULT '' COMMENT 'sequence flow condition',
-    `remark`                   varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
-    `is_del`                   tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_user`              varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `create_time`              timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
-    `update_user`              varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `update_time`              timestamp            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
-    PRIMARY KEY (`id`) USING BTREE
-    ) ENGINE = InnoDB
-    AUTO_INCREMENT = 1
-    COMMENT ='sequence flow table';
+-- REMOVED: t_bpm_variable_sequence_flow (dead table)
 
-CREATE TABLE if not exists `t_bpm_variable_sign_up`
-(
-    `id`                bigint(20)          NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `variable_id`       bigint(20)          NOT NULL COMMENT 'variable id',
-    `element_id`        varchar(60)         NOT NULL DEFAULT '' COMMENT 'element id',
-    `node_id`          varchar(60)                                        null,
-    `after_sign_up_way` int(11)             NOT NULL DEFAULT '1' COMMENT 'after sign up way,1:back to current assignee,2 go on',
-    `sub_elements`      text                NOT NULL COMMENT 'sub elements stored in json',
-    `remark`            varchar(255)        DEFAULT '' COMMENT 'remark',
-    `is_del`            tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_user`       varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `create_time`       timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
-    `update_user`       varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `update_time`       timestamp            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
-    PRIMARY KEY (`id`) USING BTREE,
-    KEY `variable_id` (`variable_id`) USING BTREE,
-    KEY `variable_id_element_id` (`variable_id`, `element_id`) USING BTREE
-    ) ENGINE = InnoDB
-    COMMENT ='process sign up node table';
+-- REMOVED: t_bpm_variable_sign_up (migrated to JSON)
 
 
-CREATE TABLE if not exists `t_bpm_variable_sign_up_personnel`
-(
-    `id`          bigint(20)          NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `variable_id` bigint(20)          NOT NULL COMMENT 'variable id',
-    `element_id`  varchar(60)         NOT NULL DEFAULT '' COMMENT 'element id',
-    `assignee`    varchar(60)         NOT NULL DEFAULT '' COMMENT 'assignee',
-    `assignee_name`    varchar(60)   NOT NULL DEFAULT '' COMMENT 'assigneeName',
-    `remark`      varchar(255)        DEFAULT '' COMMENT 'remark',
-    `is_del`      tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_user` varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `create_time` timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
-    `update_user` varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `update_time` timestamp            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
-    PRIMARY KEY (`id`) USING BTREE,
-    KEY `variable_id` (`variable_id`) USING BTREE,
-    KEY `variable_id_element_id` (`variable_id`, `element_id`) USING BTREE
-    ) ENGINE = InnoDB
-    COMMENT ='node sign up personnel table';
+-- REMOVED: t_bpm_variable_sign_up_personnel (migrated to JSON)
 
 
 
-CREATE TABLE if not exists `t_bpm_variable_single`
-(
-    `id`                  bigint(20)          NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `variable_id`         bigint(20)          NOT NULL COMMENT 'variable id',
-    `element_id`          varchar(60)         NOT NULL DEFAULT '' COMMENT 'element id',
-    `node_id`            varchar(60)                                      null,
-    `element_name`        varchar(60)         NOT NULL DEFAULT '' COMMENT 'element name',
-    `assignee_param_name` varchar(60)         NOT NULL DEFAULT '' COMMENT 'variable name',
-    `assignee`            varchar(60)         NOT NULL DEFAULT '' COMMENT 'assignee',
-    `assignee_name`       varchar(60)         NOT NULL DEFAULT '' COMMENT 'assigneeName',
-    `remark`              varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
-    `is_del`              tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_user`         varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `create_time`         timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
-    `update_user`         varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `update_time`         timestamp            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
-    PRIMARY KEY (`id`) USING BTREE,
-    KEY `variable_id` (`variable_id`) USING BTREE,
-    KEY `variable_id_element_id` (`variable_id`, `element_id`) USING BTREE
-    ) ENGINE = InnoDB
-    AUTO_INCREMENT = 1
-    COMMENT ='node single assignee table';
+-- REMOVED: t_bpm_variable_single (dead table)
 
 
-CREATE TABLE if not exists `t_bpm_variable_view_page_button`
-(
-    `id`          bigint(20)          NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `variable_id` bigint(20)          NOT NULL COMMENT 'variable id',
-    `view_type`   int(11)             NOT NULL COMMENT 'view type 1:start user,2:approvers',
-    `button_type` int(11)             NOT NULL COMMENT 'button type',
-    `button_name` varchar(60)         NOT NULL DEFAULT '' COMMENT 'button name',
-    `remark`      varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
-    `is_del`      tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_user` varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `create_time` timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
-    `update_user` varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `update_time` timestamp           DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
-    PRIMARY KEY (`id`) USING BTREE,
-    KEY `index_variable_id` (`variable_id`) USING BTREE
-    ) ENGINE = InnoDB
-    COMMENT ='start up view page button params';
+-- REMOVED: t_bpm_variable_view_page_button (migrated to JSON)
 
 
 CREATE TABLE if not exists `bpm_verify_info`
@@ -761,24 +406,7 @@ CREATE TABLE if not exists `t_user_message_status`
     ) ENGINE = InnoDB
     COMMENT ='user receive message table';
 
-CREATE TABLE if not exists `t_bpmn_node_button_conf`
-(
-    `id`               bigint(20)          NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `bpmn_node_id`     bigint(20)          NOT NULL COMMENT 'node id',
-    `button_page_type` int(11)             NOT NULL COMMENT 'button type 1:start page;2:approval page',
-    `button_type`      int(11)             NOT NULL COMMENT 'button type',
-    `button_name`      varchar(60)                  DEFAULT '' COMMENT 'button name',
-    `remark`           varchar(255)        NOT NULL DEFAULT '' COMMENT 'remark',
-    `is_del`           tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no 1:yes',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_user`      varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `create_time`      timestamp           NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'asits name says',
-    `update_user`      varchar(50)                  DEFAULT '' COMMENT 'as its name says',
-    `update_time`      timestamp            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
-    PRIMARY KEY (`id`) USING BTREE
-    ) ENGINE = InnoDB
-    AUTO_INCREMENT = 1
-    COMMENT ='node button conf';
+-- REMOVED: t_bpmn_node_button_conf (migrated to JSON)
 
 CREATE TABLE if not exists `bpm_business_process`
 (
@@ -819,40 +447,9 @@ CREATE TABLE if not exists `bpm_business_process`
 
 
 
-CREATE TABLE if not exists `t_bpmn_node_personnel_conf`
-(
-    `id`           int(11) NOT NULL AUTO_INCREMENT COMMENT 'd',
-    `bpmn_node_id` int(11) NOT NULL COMMENT '节点id',
-    `sign_type`    tinyint(11) DEFAULT NULL COMMENT 'sign type 1: all sign 2:or sign',
-    `remark`       varchar(100) DEFAULT NULL COMMENT 'remark',
-    `is_del`       tinyint(1) DEFAULT NULL COMMENT '0:no,1:yes',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_user`  varchar(50)  DEFAULT NULL COMMENT 'as its name says',
-    `create_time`  timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
-    `update_user`  varchar(50)  DEFAULT NULL COMMENT 'as its name says',
-    `update_time`  timestamp     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
-    PRIMARY KEY (`id`) USING BTREE
-    ) ENGINE = InnoDB
-    AUTO_INCREMENT = 1
-    COMMENT ='node person conf table';
+-- REMOVED: t_bpmn_node_personnel_conf (migrated to JSON)
 
-CREATE TABLE if not exists `t_bpmn_node_personnel_empl_conf`
-(
-    `id`                    int(11)    NOT NULL AUTO_INCREMENT COMMENT 'id',
-    `bpmn_node_personne_id` int(11)    NOT NULL COMMENT 'personnel id',
-    `empl_id`               varchar(50) NOT NULL COMMENT 'approver id',
-    `empl_name`             varchar(50) null comment 'approver name',
-    `remark`                varchar(100) DEFAULT NULL COMMENT 'remark',
-    `is_del`                tinyint(255) DEFAULT NULL COMMENT '0:no,1:yes',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_user`           varchar(30)  DEFAULT NULL COMMENT 'as its name says',
-    `create_time`           timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
-    `update_user`           varchar(30)  DEFAULT NULL COMMENT 'as its name says',
-    `update_time`           timestamp     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
-    PRIMARY KEY (`id`) USING BTREE
-    ) ENGINE = InnoDB
-    AUTO_INCREMENT = 1
-    COMMENT ='node assignee employee conf';
+-- REMOVED: t_bpmn_node_personnel_empl_conf (migrated to JSON)
 
 -- REMOVED: bpm_process_operation (migrated to JSON)
 
@@ -923,19 +520,7 @@ CREATE TABLE IF NOT EXISTS  `t_biz_account_apply`
     COLLATE = utf8mb4_general_ci COMMENT ='a third party account apply demo';
 
 
-CREATE TABLE IF NOT EXISTS `t_bpmn_node_out_side_access_conf` (
-                                                                  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'auto increment id',
-    `bpmn_node_id` bigint(20) NOT NULL COMMENT 'bpmn_node_id',
-    `node_mark` varchar(50) DEFAULT NULL COMMENT 'node mark',
-    `sign_type` int(11) DEFAULT NULL COMMENT 'sign type 1 for all sign 2 for or sign',
-    `remark` varchar(255) DEFAULT NULL COMMENT 'remark',
-    `is_del` int(11) NOT NULL DEFAULT '0' COMMENT '0 for normal 1 for delete',
-    `create_user` varchar(50) DEFAULT NULL COMMENT 'as its name says',
-    `create_time` timestamp not null default CURRENT_TIMESTAMP  COMMENT 'as its name says',
-    `update_user` varchar(50) DEFAULT NULL COMMENT 'as its name says',
-    `update_time`  timestamp  default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP COMMENT 'as its name says',
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='node conf for outside access';
+-- REMOVED: t_bpmn_node_out_side_access_conf (migrated to JSON)
 
 CREATE TABLE IF NOT EXISTS  bpm_process_app_application
 (
@@ -984,20 +569,7 @@ CREATE TABLE IF NOT EXISTS `bpm_process_app_data` (
     PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='App Online Process Data Table';
 
-CREATE TABLE IF NOT EXISTS `bpm_process_application_type` (
-     `id` BIGINT AUTO_INCREMENT COMMENT 'Primary key',
-     `application_id` BIGINT COMMENT 'Application ID',
-     `category_id` BIGINT COMMENT 'Category ID',
-     `is_del` INT COMMENT 'Deletion flag (0 for not deleted, 1 for deleted)',
-     `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-     `sort` INT COMMENT 'Sort order',
-     `state` INT COMMENT 'Is frequently used (0 for no, 1 for yes)',
-     `history_id` BIGINT COMMENT 'History ID',
-     `visble_state` INT COMMENT 'Visibility state (0 for hidden, 1 for visible)',
-     `create_time` timestamp not null default current_timestamp COMMENT 'Creation time',
-     `common_use_state` INT COMMENT 'Common use state',
-     PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='BPM Process Application Type Table';
+-- REMOVED: bpm_process_application_type (migrated to JSON)
 
 CREATE TABLE IF NOT EXISTS `bpm_process_category` (
      `id` BIGINT AUTO_INCREMENT COMMENT 'Primary key',
@@ -1141,18 +713,7 @@ CREATE TABLE IF NOT EXISTS  `t_out_side_bpm_conditions_template` (
     PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='outside access process,condition template config';
 
-CREATE TABLE IF NOT EXISTS  `t_out_side_bpmn_node_conditions_conf` (
-    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'auto increment id',
-    `bpmn_node_id` BIGINT NULL COMMENT 'node id',
-    `out_side_id` VARCHAR(50) NULL COMMENT 'outSide Conditions id',
-    `remark` varchar(255) NULL COMMENT 'remark',
-    `is_del` INT NULL COMMENT '0 for normal,1 for delete',
-    `create_user` VARCHAR(50) NULL COMMENT 'as its name says',
-    `create_time` timestamp DEFAULT CURRENT_TIMESTAMP  COMMENT 'as its name says',
-    `update_user` VARCHAR(50) NULL COMMENT 'as its name says',
-    `update_time` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='outside access process,business party,s conditions configs';
+-- REMOVED: t_out_side_bpmn_node_conditions_conf (migrated to JSON)
 
 CREATE TABLE IF NOT EXISTS  `t_out_side_bpm_call_back_record` (
     `id` INT NOT NULL AUTO_INCREMENT COMMENT 'auto increment id',
@@ -1186,7 +747,7 @@ CREATE TABLE IF NOT EXISTS  `t_quick_entry` (
     INDEX `idx_route` (`route`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- t_quick_entry_type table has been replaced by type_config_json column in t_quick_entry
+-- REMOVED: t_quick_entry_type (migrated to JSON)
 
 CREATE TABLE IF NOT EXISTS  `t_sys_version` (
     `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -1208,85 +769,16 @@ CREATE TABLE IF NOT EXISTS  `t_sys_version` (
     INDEX `idx_version` (`version`) -- Optional index for improved performance on `version` queries
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='sys version control';
 
-CREATE TABLE IF NOT EXISTS `t_bpmn_node_role_conf` (
-    `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'auto incr id',
-    `bpmn_node_id` BIGINT(20) NOT NULL COMMENT 'node id',
-    `role_id` varchar(64) NOT NULL COMMENT 'role id',
-    `role_name` varchar(64) NOT NULL COMMENT 'role name',
-    `sign_type` INT(11) NOT NULL COMMENT 'sign type 1 all sign,2 or sign',
-    `remark` VARCHAR(255) DEFAULT NULL COMMENT 'remark',
-    `is_del` TINYINT(1) NOT NULL DEFAULT '0' COMMENT '0:normal,1:deleted',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_user` VARCHAR(50) NOT NULL COMMENT 'create user',
-    `create_time` timestamp DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
-    `update_user` VARCHAR(50) DEFAULT NULL COMMENT 'update user',
-    `update_time` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='specified role approver configs';
+-- REMOVED: t_bpmn_node_role_conf (migrated to JSON)
 
-create table if NOT EXISTS t_bpmn_node_role_outside_emp_conf
-(
-    id          int auto_increment comment 'auto incr id'
-    primary key,
-    node_id     bigint                             null comment 'foreign key for connect with t_bpmn_node_role_conf',
-    empl_id     varchar(64)                             null comment 'assignee id',
-    empl_name   varchar(50)                        null comment 'assignee''s name',
-    create_user varchar(50) charset utf8           null,
-    `create_time` timestamp DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
-    update_user varchar(255) charset utf8          null,
-    `update_time` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
-    `is_del` TINYINT(1) NOT NULL DEFAULT '0' COMMENT '0:normal,1:deleted',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId'
-    )
-    comment 'approver info for a specified outsie business party''s specified role';
+-- REMOVED: t_bpmn_node_role_outside_emp_conf (migrated to JSON)
 
 
-CREATE TABLE IF NOT EXISTS  `t_bpmn_node_loop_conf` (
-    `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'auto incr id',
-    `bpmn_node_id` BIGINT(20) NULL COMMENT 'node id',
-    `loop_end_type` INT(11) NULL COMMENT 'loop type 1 for organizational line; 2 for reporting line',
-    `loop_number_plies` INT(11) NULL COMMENT 'how many levels',
-    `loop_end_person` VARCHAR(50) NULL COMMENT 'end user',
-    `noparticipating_staff_ids` VARCHAR(255) NULL COMMENT 'end staff ids',
-    `loop_end_grade` INT(11) NULL COMMENT 'end level',
-    `remark` VARCHAR(255) NULL COMMENT 'remark',
-    `is_del` TINYINT(1) NOT NULL DEFAULT '0' COMMENT '0:not deleted,1:deleted',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_user` VARCHAR(50) NULL COMMENT 'create user',
-    `create_time` timestamp DEFAULT CURRENT_TIMESTAMP COMMENT 'create time',
-    `update_user` VARCHAR(50) NULL COMMENT 'update user',
-    `update_time` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='loop approvement config';
+-- REMOVED: t_bpmn_node_loop_conf (migrated to JSON)
 
-CREATE TABLE IF NOT EXISTS `t_bpmn_node_assign_level_conf` (
-                                                               `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'auto incr id',
-    `bpmn_node_id` BIGINT(20) NULL COMMENT 'node id',
-    `assign_level_type` tinyint(11) NULL COMMENT 'level type 1 for organizational line; 2 for staff orginal head; 3 for reporting line',
-    `assign_level_grade` tinyint(11) NULL COMMENT 'level',
-    `remark` VARCHAR(255) NULL COMMENT 'remark',
-    `is_del` TINYINT(1) NOT NULL DEFAULT '0' COMMENT '0:not deleted,1:deleted',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    `create_user` VARCHAR(255) NULL COMMENT 'create user',
-    `create_time` timestamp DEFAULT CURRENT_TIMESTAMP  COMMENT 'create time',
-    `update_user` VARCHAR(255) NULL COMMENT 'update user',
-    `update_time` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'update time',
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='specified level approvement config';
+-- REMOVED: t_bpmn_node_assign_level_conf (migrated to JSON)
 
-CREATE TABLE `t_bpmn_node_hrbp_conf` (
-  `id` BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT 'auto incr id',
-  `bpmn_node_id` BIGINT(20) NULL COMMENT 'node id',
-  `hrbp_conf_type` INT(11) NULL COMMENT 'hrbp type 1-hrbp,2-hrbp leader,this is only for extensibility purpose,if your system do not have hrbp leader,you can ignore this field if your system have other concept,for example hrbp manager,you can use this field to store hrbp manager(eg 3 for hrbp manager)',
-  `remark` VARCHAR(255) NULL COMMENT 'remark',
-  `is_del` INT(11) NULL COMMENT '0 for normal,1 for deleted',
-  `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-  `create_user` VARCHAR(255) NULL COMMENT 'create user',
-  `create_time` DATETIME NULL COMMENT 'create time',
-  `update_user` VARCHAR(255) NULL COMMENT 'update user',
-  `update_time` DATETIME NULL COMMENT 'update time',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='hrpb config entity';
+-- REMOVED: t_bpmn_node_hrbp_conf (migrated to JSON)
 
 create table t_department
 (
@@ -1413,23 +905,7 @@ CREATE TABLE `t_biz_refund`  (
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 
-create table if not exists t_bpmn_node_lf_formdata_field_control
-(
-    id bigint auto_increment,
-    node_id bigint not null,
-    formdata_id bigint not null,
-    field_id    varchar(100)  null comment '字段id',
-    field_name varchar(255) null comment '字段名',
-    field_perm  varchar(10)  null comment '字段权限,是否显示,是否可编辑',
-    is_del tinyint default 0 not null,
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    create_user varchar(255) null,
-    create_time timestamp default current_timestamp,
-    update_user varchar(255) null,
-    update_time timestamp default current_timestamp ON UPDATE CURRENT_TIMESTAMP,
-    constraint t_bpmn_node_lf_formdata_field_control_pk
-    primary key (id)
-    )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- REMOVED: t_bpmn_node_lf_formdata_field_control (migrated to JSON)
 
 -- ----------------------------
 -- 此表为路由表,通过lf.main.table.count控制,默认为2个,索引从0开始,需要自己手动创建
@@ -1476,22 +952,7 @@ create table t_lf_main_field
         primary key (id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 comment '低代码表单字段值表';
 
-create table t_dict_main
-(
-    id          bigint auto_increment comment '字典主键'
-        primary key,
-    dict_name   varchar(100) default ''                null comment '字典名称',
-    dict_type   varchar(100) default ''                null comment '字典类型',
-    is_del      tinyint      default 0                 not null,
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    create_user varchar(255)                           null,
-    create_time timestamp    default CURRENT_TIMESTAMP not null,
-    update_user varchar(255)                           null,
-    update_time timestamp    default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
-    remark      varchar(500)                           null comment '备注',
-    constraint dict_type
-        unique (dict_type)
-) comment '字典类型表,仅作展示之用,用户可以替换为自己的字段表,能查出需要的内容就行了';
+-- REMOVED: t_dict_main (dead table)
 
 create table t_dict_data
 (
@@ -1575,25 +1036,7 @@ CREATE TABLE `t_user_role`  (
 
 SET FOREIGN_KEY_CHECKS = 1;
 
-create table t_bpmn_node_labels
-(
-    id bigint auto_increment,
-    nodeid bigint null,
-    label_name varchar(50) null,
-    label_value varchar(64) null comment 'a user defined tag',
-    remark            varchar(255)        default ''                not null comment '备注',
-    is_del            tinyint(1) unsigned default 0                 not null comment '0:正常,1:删除',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    create_user       varchar(32)         default ''                null comment '创建人（邮箱前缀）',
-    create_time       timestamp           default CURRENT_TIMESTAMP not null comment '创建时间',
-    update_user       varchar(32)         default ''                null comment '更新人（邮箱前缀）',
-    update_time       timestamp           default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
-    constraint t_bpmn_node_labels_pk
-        primary key (id)
-)
-    comment 'process node labels,to store additional custom information';
-create index indx_node_id
-    on t_bpmn_node_labels (nodeid);
+-- REMOVED: t_bpmn_node_labels (migrated to JSON)
 
 create table t_bpm_dynamic_condition_choosen
 (
@@ -1737,42 +1180,10 @@ create index AF_IDX_EXEC_PROCINSTID
 create index AF_IDX_EXEC_BUSKEY
     on bpm_af_execution (business_key);
 
-create table t_bpmn_node_customize_conf
-(
-    id           bigint auto_increment comment 'auto incr id'
-        primary key,
-    bpmn_node_id bigint       null comment 'node id',
-    sign_type    int          not null comment 'sign type 1 all sign,2 or sign',
-    remark       varchar(255) null comment 'remark',
-    is_del       int          null comment '0 for normal,1 for deleted',
-    tenant_id            varchar(255) default '' null,
-    create_user  varchar(255) null comment 'create user',
-    create_time  datetime     null comment 'create time',
-    update_user  varchar(255) null comment 'update user',
-    update_time  datetime     null comment 'update time'
-)
-    comment 'customize config entity';
+-- REMOVED: t_bpmn_node_customize_conf (migrated to JSON)
 
 
-CREATE TABLE t_bpmn_node_additional_sign_conf
-(
-    id                 INT AUTO_INCREMENT COMMENT 'id' PRIMARY KEY,
-    bpmn_node_id       INT                                    NOT NULL COMMENT '节点id',
-    sign_infos           VARCHAR(3000)                          NOT NULL COMMENT 'additional sign id stored as json value',
-    sign_property      SMALLINT                               NOT NULL COMMENT 'see NodePropertyEnum',
-    sign_property_type SMALLINT                               NOT NULL COMMENT '1 for add,2 for exclude',
-    sign_type          TINYINT                                NULL COMMENT 'sign type 1: all sign 2:or sign,it is meaning less for additional sign,it will inhere from parent',
-    remark             VARCHAR(100)                           NULL COMMENT 'remark',
-    is_del             tinyint      default 0                 null comment '0:no,1:yes',
-    tenant_id          VARCHAR(255) DEFAULT ''                NOT NULL COMMENT 'tenantId',
-    create_user        VARCHAR(50)                            NULL COMMENT 'as its name says',
-    create_time        TIMESTAMP    DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT 'as its name says',
-    update_user        VARCHAR(50)                            NULL COMMENT 'as its name says',
-    update_time        TIMESTAMP    DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says',
-
-    INDEX t_bpmn_node_adc__index_node_id (bpmn_node_id)
-)
-    COMMENT 'nodes additional sign';
+-- REMOVED: t_bpmn_node_additional_sign_conf (migrated to JSON)
 
 -- ----------------------------
 -- Records of t_user
