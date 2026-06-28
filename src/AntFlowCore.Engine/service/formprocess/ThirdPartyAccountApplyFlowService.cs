@@ -20,13 +20,17 @@ public class ThirdPartyAccountApplyFlowService : AbstractLowFlowSpyFormOperation
 
     public override void PreviewSetCondition(BpmnStartConditionsVo conditionsVo, ThirdPartyAccountApplyVo businessDataVo)
     {
+        
+        conditionsVo.AccountType=businessDataVo.AccountType;
+        conditionsVo.StartUserId=businessDataVo.StartUserId;
        
     }
     
 
     public override void LaunchParameters(BpmnStartConditionsVo conditionsVo, ThirdPartyAccountApplyVo businessDataVo)
     {
-       
+        conditionsVo.AccountType=businessDataVo.AccountType;
+        conditionsVo.StartUserId=businessDataVo.StartUserId;
     }
     
     

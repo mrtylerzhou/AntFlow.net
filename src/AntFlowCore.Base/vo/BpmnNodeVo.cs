@@ -171,7 +171,7 @@ namespace AntFlowCore.Base.vo;
         [JsonPropertyName("noHeaderAction")]
         public int? NoHeaderAction { get; set; }
         private string? _nodeConfigJson;
-        [JsonPropertyName("nodeConfigJson")]
+        [JsonIgnore]
         public string? NodeConfigJson
         {
             get => _nodeConfigJson;
@@ -202,6 +202,7 @@ namespace AntFlowCore.Base.vo;
             set => _nodeConfigJsonObj = value;
         }
 
+        
         public BpmnNodeConfigJson GetOrCreateNodeConfigJson()
         {
             _nodeConfigJsonObj ??= new BpmnNodeConfigJson();

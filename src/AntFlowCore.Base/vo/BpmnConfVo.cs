@@ -149,7 +149,7 @@ namespace AntFlowCore.Core.vo;
         public String FormCodeDisplayName { get; set; }
         [JsonPropertyName("extraFlags")]
         public int? ExtraFlags { get; set; }
-        [JsonPropertyName("confConfigJson")]
+        [JsonIgnore]
         public string ConfConfigJson { get; set; }
         [JsonPropertyName("noticeChannelTypes")]
         public List<int> NoticeChannelTypes { get; set; }
