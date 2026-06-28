@@ -23,7 +23,7 @@ public class VariableButtonItem
     public string? ElementId { get; set; }
 
     [JsonPropertyName("buttonPageType")]
-    public int ButtonPageType { get; set; }
+    public int? ButtonPageType { get; set; }
 
     [JsonPropertyName("viewType")]
     public int? ViewType { get; set; }
@@ -41,10 +41,10 @@ public class VariableMessageItem
     public string? ElementId { get; set; }
 
     [JsonPropertyName("messageType")]
-    public int MessageType { get; set; }
+    public int? MessageType { get; set; }
 
     [JsonPropertyName("eventType")]
-    public int EventType { get; set; }
+    public int? EventType { get; set; }
 
     [JsonPropertyName("content")]
     public string? Content { get; set; }

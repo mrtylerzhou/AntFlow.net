@@ -473,7 +473,16 @@ public class BpmnConfBizService : IBpmnConfBizService
             return false;
         }
 
-        bpmnConfVo.TemplateVos = confConfig.ConfTemplates;
+        bpmnConfVo.TemplateVos = confConfig.ConfTemplates.Select(c => new BpmnTemplateVo
+        {
+            Event = c.Event,
+            Informs = c.Informs,
+            Emps = c.Emps,
+            Roles = c.Roles,
+            Funcs = c.Funcs,
+            TemplateId = c.TemplateId ?? 0,
+            FormCode = c.FormCode
+        }).ToList();
         HydrateBpmnTemplateVos(bpmnConfVo.TemplateVos);
         return true;
     }
@@ -739,6 +748,19 @@ public class BpmnConfBizService : IBpmnConfBizService
             conditionsConf.OutSideConditionsId = outSideConditionsId;
         }
 
-        property.ConditionsConf = conditionsConf;
+        // Build ConditionGroup matching Java's buildConditionsJsonFromVo
+        var conditionGroup = new BpmnNodeConditionsConfJson.ConditionGroup
+        {
+            IsDefault = conditionsConf.IsDefault,
+            GroupRelation = conditionsConf.GroupRelation,
+            Sort = conditionsConf.Sort,
+            ExtJson = conditionsConf.ExtJson,
+            Params = new List<BpmnNodeConditionsConfJson.ConditionParam>()
+        };
+
+        // Store in nodeConfigJson.ConditionsConf (matching Java's BpmnNodeConfigHolder.setConditionsConf)
+        BpmnNodeConfigHolder.SetConditionsConf(bpmnNodeVo,
+            new List<BpmnNodeConditionsConfJson.ConditionGroup> { conditionGroup },
+            outSideConditionsId);
     }
 }

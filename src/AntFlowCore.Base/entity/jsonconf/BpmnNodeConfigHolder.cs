@@ -187,6 +187,19 @@ public static class BpmnNodeConfigHolder
     }
 
     /// <summary>
+    /// Build conditions config from pre-built condition groups, matching Java
+    /// </summary>
+    public static void SetConditionsConf(BpmnNodeVo vo, List<BpmnNodeConditionsConfJson.ConditionGroup> groups, string? outSideId)
+    {
+        var config = vo.GetOrCreateNodeConfigJson();
+        config.ConditionsConf = new BpmnNodeConditionsConfJson
+        {
+            ConditionGroups = groups,
+            OutSideConditionId = outSideId
+        };
+    }
+
+    /// <summary>
     /// Build button/sign config from node VO
     /// </summary>
     public static void SetButtonSignConf(BpmnNodeVo vo)
@@ -202,6 +215,26 @@ public static class BpmnNodeConfigHolder
             AddButtonsFromIntList(buttonList, btns.StartPage, 1, 0);
             AddButtonsFromIntList(buttonList, btns.ApprovalPage, 2, 0);
             AddButtonsFromIntList(buttonList, btns.ViewPage, 3, 0);
+
+            // START(发起人)节点的审批页必须要有"重新提交"按钮
+            // 前端设计器(promoterDrawer)没有审批按钮配置UI，需要后端兜底
+            bool isStartNode = vo.NodeType != null && vo.NodeType == (int)NodeTypeEnum.NODE_TYPE_START;
+            if (isStartNode)
+            {
+                bool hasResubmit = btns.ApprovalPage != null
+                    && btns.ApprovalPage.Contains((int)ButtonTypeEnum.BUTTON_TYPE_RESUBMIT);
+                if (!hasResubmit)
+                {
+                    buttonList.Add(new ButtonSignButtonConf
+                    {
+                        ButtonPageType = 2,
+                        ButtonType = (int)ButtonTypeEnum.BUTTON_TYPE_RESUBMIT,
+                        ButtonName = ButtonTypeEnumExtensions.GetDescByCode((int)ButtonTypeEnum.BUTTON_TYPE_RESUBMIT),
+                        StartPageOnly = 0
+                    });
+                }
+            }
+
             bs.ButtonConfList = buttonList;
         }
 
@@ -254,7 +287,8 @@ public static class BpmnNodeConfigHolder
         var config = vo.GetOrCreateNodeConfigJson();
         var tc = new BpmnNodeTemplateConfJson();
 
-        // Templates
+        // Templates — map to flat format; Java uses TemplateConf with messageSendType as string.
+        // .NET BpmnTemplateVo serializes lists only when non-null, so keep lists null to match Java's string shape.
         if (vo.TemplateVos != null && vo.TemplateVos.Count > 0)
         {
             tc.Templates = vo.TemplateVos.Select(t => new BpmnTemplateVo
@@ -265,7 +299,6 @@ public static class BpmnNodeConfigHolder
                 Roles = t.Roles,
                 Funcs = t.Funcs,
                 TemplateId = t.TemplateId,
-                MessageSendTypeList = t.MessageSendTypeList,
                 FormCode = t.FormCode
             }).ToList();
         }

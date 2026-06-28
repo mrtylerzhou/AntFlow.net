@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using AntFlowCore.Base.vo;
 
 namespace AntFlowCore.Base.entity.jsonconf;
 
@@ -9,7 +8,7 @@ public class BpmnConfConfigJson
     public List<ViewPageButtonItem>? ViewPageButtons { get; set; }
 
     [JsonPropertyName("confTemplates")]
-    public List<BpmnTemplateVo>? ConfTemplates { get; set; }
+    public List<ConfTemplateConf>? ConfTemplates { get; set; }
 
     [JsonPropertyName("lowCodeFormConfig")]
     public LowCodeFormConfig? LowCodeFormConfig { get; set; }
@@ -19,6 +18,41 @@ public class BpmnConfConfigJson
 
     [JsonPropertyName("noticeChannelTypes")]
     public List<int>? NoticeChannelTypes { get; set; }
+}
+
+public class ConfTemplateConf
+{
+    /// <summary>Event type</summary>
+    [JsonPropertyName("event")]
+    public int Event { get; set; }
+
+    /// <summary>Comma-separated inform IDs</summary>
+    [JsonPropertyName("informs")]
+    public string? Informs { get; set; }
+
+    /// <summary>Comma-separated employee IDs</summary>
+    [JsonPropertyName("emps")]
+    public string? Emps { get; set; }
+
+    /// <summary>Comma-separated role IDs</summary>
+    [JsonPropertyName("roles")]
+    public string? Roles { get; set; }
+
+    /// <summary>Comma-separated function IDs</summary>
+    [JsonPropertyName("funcs")]
+    public string? Funcs { get; set; }
+
+    /// <summary>Message template ID</summary>
+    [JsonPropertyName("templateId")]
+    public long? TemplateId { get; set; }
+
+    /// <summary>Message send type as string</summary>
+    [JsonPropertyName("messageSendType")]
+    public string? MessageSendType { get; set; }
+
+    /// <summary>Form code</summary>
+    [JsonPropertyName("formCode")]
+    public string? FormCode { get; set; }
 }
 
 public class NoticeTemplateConfig

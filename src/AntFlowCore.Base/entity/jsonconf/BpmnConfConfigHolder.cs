@@ -12,13 +12,30 @@ public static class BpmnConfConfigHolder
 {
     public static BpmnConfConfigJson BuildConfConfig(BpmnConfVo confVo)
     {
-        return new BpmnConfConfigJson
+        var config = new BpmnConfConfigJson();
+
+        // View page buttons
+        config.ViewPageButtons = BuildViewPageButtons(confVo.ViewPageButtons);
+
+        
+        config.NoticeTemplateConfig = BuildNoticeTemplateConfig();
+
+       
+        config.ConfTemplates = BuildConfTemplates(confVo.TemplateVos, confVo.FormCode);
+
+       
+        if (confVo.IsLowCodeFlow != null && confVo.IsLowCodeFlow == 1)
         {
-            ViewPageButtons = BuildViewPageButtons(confVo.ViewPageButtons),
-            ConfTemplates = confVo.TemplateVos,
-            LowCodeFormConfig = confVo.IsLowCodeFlow == 1 ? BuildLowCodeFormConfig(confVo.LfFormData) : null,
-            NoticeChannelTypes = confVo.NoticeChannelTypes
-        };
+            config.LowCodeFormConfig = BuildLowCodeFormConfig(confVo);
+        }
+
+        // Notice channel types
+        if (confVo.NoticeChannelTypes != null && confVo.NoticeChannelTypes.Count > 0)
+        {
+            config.NoticeChannelTypes = confVo.NoticeChannelTypes;
+        }
+
+        return config;
     }
 
     public static List<BpmnConfLfFormdataField> BuildLowCodeFields(
@@ -103,18 +120,72 @@ public static class BpmnConfConfigHolder
         }));
     }
 
-    private static LowCodeFormConfig? BuildLowCodeFormConfig(string? lfFormData)
+    private static LowCodeFormConfig? BuildLowCodeFormConfig(BpmnConfVo confVo)
     {
-        if (string.IsNullOrWhiteSpace(lfFormData))
+        // Java version only stores formdata; fields are built by LFFormDataPreProcessor separately
+        if (string.IsNullOrWhiteSpace(confVo.LfFormData))
         {
             return null;
         }
 
         return new LowCodeFormConfig
         {
-            Formdata = lfFormData,
-            Fields = BuildLowCodeFormFields(lfFormData)
+            Formdata = confVo.LfFormData
         };
+    }
+
+    /// <summary>
+    /// Build notice template config from MsgNoticeTypeEnum defaults, matching Java
+    /// </summary>
+    private static NoticeTemplateConfig BuildNoticeTemplateConfig()
+    {
+        var details = new List<NoticeTemplateDetailItem>();
+        foreach (var msgType in Enum.GetValues<MsgNoticeTypeEnum>())
+        {
+            details.Add(new NoticeTemplateDetailItem
+            {
+                NoticeTemplateType = (int)msgType,
+                NoticeTemplateDetailContent = MsgNoticeTypeEnumExtensions.GetDefaultValueByCode((int)msgType)
+            });
+        }
+        return new NoticeTemplateConfig
+        {
+            Details = details
+        };
+    }
+
+    /// <summary>
+    /// Build conf-level templates from BpmnTemplateVo list, matching Java's ConfTemplateConf format
+    /// </summary>
+    public static List<ConfTemplateConf>? BuildConfTemplates(List<BpmnTemplateVo>? templateVos, string? formCode)
+    {
+        if (templateVos == null || templateVos.Count == 0)
+        {
+            return null;
+        }
+        return templateVos.Select(t => new ConfTemplateConf
+        {
+            Event = t.Event,
+            Informs = JoinList(t.InformIdList),
+            Emps = JoinList(t.EmpIdList),
+            Roles = JoinList(t.RoleIdList),
+            Funcs = JoinList(t.FuncIdList),
+            TemplateId = t.TemplateId > 0 ? t.TemplateId : null,
+            MessageSendType = ConvertMessageSendTypeList(t.MessageSendTypeList),
+            FormCode = formCode
+        }).ToList();
+    }
+
+    private static string? JoinList(List<string>? list)
+    {
+        if (list == null || list.Count == 0) return null;
+        return string.Join(",", list);
+    }
+
+    private static string? ConvertMessageSendTypeList(List<BaseNumIdStruVo>? list)
+    {
+        if (list == null || list.Count == 0) return null;
+        return string.Join(",", list.Select(o => o.Id.ToString()));
     }
 
     private static List<LowCodeFormField> BuildLowCodeFormFields(string? lfFormData)
