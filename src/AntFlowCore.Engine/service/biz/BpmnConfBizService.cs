@@ -144,6 +144,9 @@ public class BpmnConfBizService : IBpmnConfBizService
             }
             bpmnNodeVo.Id = bpmnNodeId;
 
+            //edit node to
+            _bpmnNodeToService.EditNodeTo(bpmnNodeVo, bpmnNodeId);
+
             // Call the appropriate SetXxxConf based on node property
             BuildNodeConfigJsonFromVo(bpmnNodeVo);
 
@@ -595,30 +598,90 @@ public class BpmnConfBizService : IBpmnConfBizService
     {
         BpmnNodeVo bpmnNodeVo = bpmnNode.MapToVo();
         bpmnNodeVo.ConditionsUrl = conditionsUrl;
-      
-        long bpmnNodeId = bpmnNode.Id;
-        //set nodeto
-        bpmnNodeVo.NodeTo=bpmnNodeToMap.ContainsKey(bpmnNodeId)?bpmnNodeToMap[bpmnNodeId]:null;
 
+        long bpmnNodeId = bpmnNode.Id;
+        //set nodeto (still from DB — t_bpmn_node_to is kept)
+        bpmnNodeVo.NodeTo = bpmnNodeToMap.ContainsKey(bpmnNodeId) ? bpmnNodeToMap[bpmnNodeId] : null;
+
+        //parse node config JSON
         BpmnNodeConfigJson? nodeConfig = JsonConfUtil.ParseNodeConfig(bpmnNode.NodeConfigJson);
-        if (nodeConfig != null)
+        if (nodeConfig == null)
         {
-            bpmnNodeVo.NodeConfigJsonObj = nodeConfig;
-            bpmnNodeVo.NodePropertyName=NodePropertyEnumExtensions.GetDescByCode(bpmnNodeVo.NodeProperty);
-            HydrateBpmnTemplateVos(bpmnNodeVo.TemplateVos);
-            HydrateApproveRemindVo(bpmnNodeVo.ApproveRemindVo);
-            if (IsConditionNodeType(bpmnNode.NodeType))
-            {
-                BpmnNodeAdpConfEnum? adpConfEnum = GetBpmnNodeAdpConfEnum(bpmnNodeVo);
-                if (adpConfEnum != null)
-                {
-                    GetBpmnNodeAdaptor(adpConfEnum).FormatToBpmnNodeVo(bpmnNodeVo);
-                }
-            }
-            return bpmnNodeVo;
+            throw new AFBizException("migration error,please contact the author");
         }
-        
-        throw new AFBizException("migration error,please contact the author");
+        bpmnNodeVo.NodeConfigJsonObj = nodeConfig;
+
+        //set buttons from buttonSignConf
+        BpmnNodeButtonSignConfJson? bsConf = nodeConfig.ButtonSignConf;
+        if (bsConf?.ButtonConfList != null && bsConf.ButtonConfList.Count > 0)
+        {
+            bpmnNodeVo.Buttons = new BpmnNodeButtonConfBaseVo
+            {
+                StartPage = bsConf.ButtonConfList
+                    .Where(b => b.ButtonPageType == (int)ButtonPageTypeEnum.INITIATE)
+                    .Select(b => b.ButtonType ?? 0)
+                    .Distinct()
+                    .ToList(),
+                ApprovalPage = bsConf.ButtonConfList
+                    .Where(b => b.ButtonPageType == (int)ButtonPageTypeEnum.AUDIT)
+                    .Select(b => b.ButtonType ?? 0)
+                    .Distinct()
+                    .ToList(),
+                ViewPage = bsConf.ButtonConfList
+                    .Where(b => b.ButtonPageType == (int)ButtonPageTypeEnum.TOVIEW)
+                    .Select(b => b.ButtonType ?? 0)
+                    .Distinct()
+                    .ToList()
+            };
+        }
+
+        //set node property name
+        bpmnNodeVo.NodePropertyName = NodePropertyEnumExtensions.GetDescByCode(bpmnNodeVo.NodeProperty);
+
+        //set templates from templateConf
+        BpmnNodeTemplateConfJson? tcConf = nodeConfig.TemplateConf;
+        if (tcConf?.Templates != null && tcConf.Templates.Count > 0)
+        {
+            bpmnNodeVo.TemplateVos = tcConf.Templates;
+        }
+        HydrateBpmnTemplateVos(bpmnNodeVo.TemplateVos);
+
+        //set approve remind from templateConf
+        if (tcConf?.ApproveRemind != null)
+        {
+            bpmnNodeVo.ApproveRemindVo = tcConf.ApproveRemind;
+        }
+        HydrateApproveRemindVo(bpmnNodeVo.ApproveRemindVo);
+
+        //call adaptor formatToBpmnNodeVo — adaptor will read from nodeConfigJsonObj
+        BpmnNodeAdpConfEnum? adpConfEnum = GetBpmnNodeAdpConfEnum(bpmnNodeVo);
+        if (adpConfEnum != null)
+        {
+            GetBpmnNodeAdaptor(adpConfEnum).FormatToBpmnNodeVo(bpmnNodeVo);
+        }
+
+        if ((int)NodeTypeEnum.NODE_TYPE_OUT_SIDE_CONDITIONS == bpmnNode.NodeType)
+        {
+            bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_CONDITIONS;
+        }
+
+        //set sign up conf from buttonSignConf
+        if (bsConf?.SignUpConf != null)
+        {
+            BpmnNodePropertysVo propertysVo = bpmnNodeVo.Property ?? new BpmnNodePropertysVo();
+            propertysVo.AfterSignUpWay = bsConf.SignUpConf.AfterSignUpWay ?? 0;
+            propertysVo.SignUpType = bsConf.SignUpConf.SignUpType ?? 0;
+            bpmnNodeVo.Property = propertysVo;
+        }
+
+        //set field controls from lowCodeConf
+        BpmnNodeLowCodeConfJson? lowCodeConf = nodeConfig.LowCodeConf;
+        if (lowCodeConf?.FieldControls != null && lowCodeConf.FieldControls.Count > 0)
+        {
+            bpmnNodeVo.LfFieldControlVOs = lowCodeConf.FieldControls;
+        }
+
+        return bpmnNodeVo;
     }
 
     private void SetViewPageButton(BpmnConfVo bpmnConfVo)
