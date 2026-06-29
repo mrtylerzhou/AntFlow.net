@@ -8,4 +8,5 @@ public interface IRoleService : IAntFlowRepositoryMix<Role, IRoleRepository>
 {
     List<BaseIdTranStruVo> QueryUserByRoleIds(ICollection<string> roleIds);
     List<BaseIdTranStruVo> QuerySassUserByRoleIds(ICollection<String> roleIds);
+    List<BaseIdTranStruVo> GetAllRoles(); 
 }
