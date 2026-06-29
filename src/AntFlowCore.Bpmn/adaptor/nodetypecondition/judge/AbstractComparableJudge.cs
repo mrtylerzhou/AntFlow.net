@@ -79,5 +79,5 @@ public abstract class AbstractComparableJudge : IConditionJudge
 
 
     public abstract  bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf,
-        BpmnStartConditionsVo bpmnStartConditionsVo,int group);
+        BpmnStartConditionsVo bpmnStartConditionsVo,int group,int index);
 }

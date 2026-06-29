@@ -14,7 +14,7 @@ public class LFNumberFormatJudge : AbstractLFConditionJudge
         _logger = logger;
     }
 
-    public override bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo,int group)
+    public override bool Judge(string nodeId, BpmnNodeConditionsConfBaseVo conditionsConf, BpmnStartConditionsVo bpmnStartConditionsVo,int group,int index)
     {
         Func<object, object, int, bool> predicate = (a, b, c) =>
         {
@@ -37,6 +37,6 @@ public class LFNumberFormatJudge : AbstractLFConditionJudge
             return CompareJudge(valueInDbBig1, valueInDbBig2, userValue, c);
         };
 
-        return base.LfCommonJudge(conditionsConf, bpmnStartConditionsVo, predicate,group);
+        return base.LfCommonJudge(conditionsConf, bpmnStartConditionsVo, predicate,group,index);
     }
 }

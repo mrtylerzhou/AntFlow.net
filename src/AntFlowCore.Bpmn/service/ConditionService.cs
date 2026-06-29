@@ -55,8 +55,9 @@ public class ConditionService : IConditionService
 
             conditionParamTypeList = conditionParamTypeList.Distinct().ToList();
            
-            foreach (int conditionParam in conditionParamTypeList)
+            for (var i = 0; i < conditionParamTypeList.Count; i++)
             {
+                int conditionParam = conditionParamTypeList[i];
                 ConditionTypeEnum? conditionTypeEnum = ConditionTypeEnumExtensions.GetEnumByCode(conditionParam);
                 if (conditionTypeEnum == null)
                 {
@@ -97,7 +98,7 @@ public class ConditionService : IConditionService
 
                 try
                 {
-                    if (!conditionJudge.Judge(nodeId, conditionsConf, bpmnStartConditionsVo,currentGroup))
+                    if (!conditionJudge.Judge(nodeId, conditionsConf, bpmnStartConditionsVo,currentGroup,i))
                     {
                         currentGroupResult = false;
                         //如果是且关系,有一个条件判断为false则终止判断
@@ -124,7 +125,6 @@ public class ConditionService : IConditionService
                     _logger.LogInformation("conditionjudge error:{}", e);
                     throw;
                 }
-                
             }
             result = currentGroupResult;
             if(groupRelation==ConditionRelationShipEnum.AND.Code&&!result){//条件组之间如果为且关系,如果有一个条件组评估为false,则立刻返回false

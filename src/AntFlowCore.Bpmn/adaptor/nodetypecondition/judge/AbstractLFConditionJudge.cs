@@ -9,7 +9,7 @@ public abstract class AbstractLFConditionJudge: AbstractComparableJudge
     protected bool LfCommonJudge(
         BpmnNodeConditionsConfBaseVo conditionsConf, 
         BpmnStartConditionsVo bpmnStartConditionsVo, 
-        Func<object, object,int, bool> predicate,int currentGroup)
+        Func<object, object,int, bool> predicate,int currentGroup,int currentIndex)
     {
         IDictionary<int,IDictionary<string,object>> groupedLfConditionsMap = conditionsConf.GroupedLfConditionsMap;
         IDictionary<int,List<int>> groupedNumberOperatorListMap = conditionsConf.GroupedNumberOperatorListMap;
@@ -40,20 +40,26 @@ public abstract class AbstractLFConditionJudge: AbstractComparableJudge
         //operator type
         foreach (var kvp in lfConditionsFromDb)
         {
-           
-            string key = kvp.Key;
-            if (!lfConditionsFromUser.TryGetValue(key, out var valueFromUser) || valueFromUser == null)
+            if (iterIndex == currentIndex)
             {
-                throw new AFBizException($"Condition field from user '{key}' cannot be null.");
+                string key = kvp.Key;
+                int numberOperator = numberOperatorList[iterIndex];
+                if (!lfConditionsFromUser.TryGetValue(key, out var valueFromUser) || valueFromUser == null)
+                {
+                    throw new AFBizException($"Condition field from user '{key}' cannot be null.");
+                }
+                var valueFromDb = kvp.Value;
+                if (valueFromDb == null)
+                {
+                    throw new AFBizException($"Condition field from database '{key}' cannot be null.");
+                }
+                isMatch = predicate(valueFromDb, valueFromUser,numberOperator);
             }
-            
-            var valueFromDb = kvp.Value;
-            if (valueFromDb == null)
+            iterIndex++;
+            if (!isMatch)
             {
-                throw new AFBizException($"Condition field from database '{key}' cannot be null.");
+                return false;
             }
-            int numberOperator = numberOperatorList[iterIndex];
-            isMatch = predicate(valueFromDb, valueFromUser,numberOperator);
         }
 
         return isMatch;
