@@ -23,4 +23,14 @@ public class RoleService : IRoleService
     {
         throw new NotImplementedException("not implement yet");
     }
+
+    public List<BaseIdTranStruVo> GetAllRoles()
+    { 
+        List<BaseIdTranStruVo> results = _repository.GetQueryable()
+             .Where(a => 1 == 1)
+             .ToList()
+             .Select(a => new BaseIdTranStruVo(a.Id.ToString(), a.RoleName))
+             .ToList();
+        return results;
+    }
 }
