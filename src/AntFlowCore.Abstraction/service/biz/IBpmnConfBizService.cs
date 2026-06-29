@@ -11,4 +11,11 @@ public interface IBpmnConfBizService
     BpmnConfVo Detail(string bpmnCode);
     BpmnConfVo DetailByFormCode(string formCode);
     int? GetCustomizeNodeSignType(long nodeId);
+    
+    /// <summary>
+    /// Save process notice configuration (notice channel types and advanced
+    /// notification templates) by partially updating conf_config_json.
+    /// </summary>
+    /// <param name="vo">process configuration vo carrying processKey, notifyTypeIds and templateVos</param>
+    void SaveProcessNotices(ProcessConfVo vo);
 }

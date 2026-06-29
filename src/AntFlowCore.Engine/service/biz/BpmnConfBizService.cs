@@ -826,4 +826,62 @@ public class BpmnConfBizService : IBpmnConfBizService
             new List<BpmnNodeConditionsConfJson.ConditionGroup> { conditionGroup },
             outSideConditionsId);
     }
+
+    public void SaveProcessNotices(ProcessConfVo vo)
+    {
+        var processKey = vo.ProcessKey;
+        if (string.IsNullOrWhiteSpace(processKey))
+        {
+            throw new AFBizException("processKey can not be null");
+        }
+
+        var notifyTypeIds = vo.NotifyTypeIds;
+        var templateVos = vo.TemplateVos;
+
+        // Load the existing effective BpmnConf record for this formCode
+        var bpmnConf = _bpmnConfService._repository.GetBpmnConfByFormCode(processKey);
+        if (bpmnConf == null || bpmnConf.Id == 0)
+        {
+            throw new AFBizException($"can not find bpmn conf for formCode:{processKey}");
+        }
+
+        // Parse existing conf-level JSON (or start fresh)
+        var confConfig = JsonConfUtil.ParseConfConfig(bpmnConf.ConfConfigJson);
+        confConfig ??= new BpmnConfConfigJson();
+
+        // --- Advanced notification templates ---
+        if (templateVos is { Count: > 0 })
+        {
+            // If advanced notifications are set but no ordinary notice types, assign advanced to ordinary
+            if (confConfig.NoticeChannelTypes is not { Count: > 0 })
+            {
+                var advancedNotifyIds = templateVos
+                    .Where(t => t.MessageSendTypeList is { Count: > 0 })
+                    .SelectMany(t => t.MessageSendTypeList!)
+                    .Select(a => (int)a.Id)
+                    .Distinct()
+                    .ToList();
+                if (advancedNotifyIds.Count > 0)
+                {
+                    notifyTypeIds = new List<int>(advancedNotifyIds);
+                }
+            }
+            // Replace conf-level templates (equivalent to delete-all + re-insert)
+            confConfig.ConfTemplates = BpmnConfConfigHolder.BuildConfTemplates(templateVos, processKey);
+        }
+
+        // --- Notice channel types ---
+        if (notifyTypeIds is { Count: > 0 })
+        {
+            confConfig.NoticeChannelTypes = notifyTypeIds;
+        }
+
+        // Persist the updated JSON
+        var updateConf = new BpmnConf
+        {
+            Id = bpmnConf.Id,
+            ConfConfigJson = JsonConfUtil.ToConfConfigJson(confConfig)
+        };
+        _bpmnConfService._repository.Update(updateConf);
+    }
 }
