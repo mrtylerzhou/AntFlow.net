@@ -61,7 +61,7 @@ public class InformationTemplateController
     [HttpGet("listByName")]
     public Result<List<InformationTemplate>> ListByName([FromQuery] string name = null)
     {
-       
+
         Expression<Func<InformationTemplate, bool>> expression = a => a.IsDel == 0 && a.Status == 0;
         if (!string.IsNullOrEmpty(name))
         {
@@ -102,11 +102,24 @@ public class InformationTemplateController
 
         return ResultHelper.Success(results);
     }
+
+    [HttpGet("getWildcardCharacter")]
+    public Result<List<EnumerateVo>> getWildcardCharacter([FromQuery] string name = null)
+    {
+        List<EnumerateVo> lists = WildcardCharacterEnum.Values.Where(o => string.IsNullOrEmpty(name) || o.Desc.Contains(name)).Select(wildcardCharacterEnum => new EnumerateVo
+        {
+            Code = wildcardCharacterEnum.Code,
+            Desc = wildcardCharacterEnum.Desc,
+        }).ToList();
+        return ResultHelper.Success(lists);
+    }
+
+
     [HttpGet("getProcessEvents")]
     public Result<List<BaseNumIdStruVo>> getAllProcessEvents()
     {
         List<BaseNumIdStruVo> lists = new List<BaseNumIdStruVo>();
-        Dictionary<EventTypeEnum,EventTypeProperties> eventTypeMappings = EventTypeEnumExtensions.EventTypeMappings;
+        Dictionary<EventTypeEnum, EventTypeProperties> eventTypeMappings = EventTypeEnumExtensions.EventTypeMappings;
         foreach (var (key, eventTypeProperties) in eventTypeMappings)
         {
             BaseNumIdStruVo baseNumIdStruVo = new BaseNumIdStruVo
@@ -119,4 +132,17 @@ public class InformationTemplateController
 
         return ResultHelper.Success(lists);
     }
+
+
+    [HttpGet("getAllNoticeTypes")]
+    public Result<List<BaseNumIdStruVo>> getAllNoticeTypes()
+    {
+        List<BaseNumIdStruVo> lists = ProcessNoticeEnum.Values.Select(processNoticeEnum => new BaseNumIdStruVo
+        {
+            Id = processNoticeEnum.Code,
+            Name = processNoticeEnum.Desc,
+        }).ToList();
+        return ResultHelper.Success(lists);
+    }
+
 }

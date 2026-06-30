@@ -77,7 +77,6 @@ namespace AntFlowCore.Base.entity
 
         public string TenantId { get; set; }
 
-        [Column(Name = "is_default")]
         public int? IsDefault { get; set; }
 
         /// <summary>

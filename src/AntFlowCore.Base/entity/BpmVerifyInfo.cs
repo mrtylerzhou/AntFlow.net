@@ -80,7 +80,6 @@ namespace AntFlowCore.Base.entity
         public int IsDel { get; set; }
         public string TenantId { get; set; }
 
-        [FreeSql.DataAnnotations.Column(Name = "attachments_json")]
         public string? AttachmentsJson { get; set; }
     }
 }
