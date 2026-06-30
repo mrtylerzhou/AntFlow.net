@@ -130,7 +130,10 @@ public class RepositoryBase<TEntity> : IBaseRepository<TEntity>
 
     public virtual void UpdateRange(IEnumerable<TEntity> entities)
     {
-        _ormContext.FreeSql.GetRepository<TEntity>().Update(entities);
+        if (entities.Any())
+        {
+            _ormContext.FreeSql.Update<TEntity>().SetSource(entities).ExecuteAffrows();
+        }
     }
 
     public virtual Task<int> RemoveAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)

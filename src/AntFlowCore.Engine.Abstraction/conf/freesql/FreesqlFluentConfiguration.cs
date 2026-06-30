@@ -429,6 +429,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.ProcessCode).Name("process_code");
                 a.Property(b => b.IsDel).Name("is_del");
                 a.Property(b => b.TenantId).Name("tenant_id");
+                a.Property(b => b.AttachmentsJson).Name("attachments_json");
             }).ConfigEntity<Department>(entity =>
             {
                 entity.Name("t_department");
@@ -486,6 +487,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.UpdateTime).Name("update_time");
                 a.Property(b => b.UpdateUser).Name("update_user");
+                a.Property(b => b.IsDefault).Name("is_default");
             }).ConfigEntity<LFMain>(a =>
             {
                 a.Name("t_lf_main");
@@ -679,6 +681,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.HeadImg).Name("head_img");
             }).ConfigEntity<Role>(a =>
                 {
+                    a.Name("t_role");
                     a.Property(b => b.Id).Name("id");
                     a.Property(b=>b.RoleName).Name("role_name");
                 })
