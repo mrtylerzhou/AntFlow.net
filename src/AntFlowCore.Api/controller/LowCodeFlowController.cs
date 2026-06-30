@@ -17,14 +17,13 @@ public class LowCodeFlowController
 {
     private readonly IBpmnConfLFFormDataBizService _lfformDataBizService;
     private readonly IDicDataBizSerivce _dicDataBizSerivce;
-    private readonly IDicDataSerivce _dicDataSerivce;
     private readonly IDictService _dictService;
 
-    public LowCodeFlowController(IBpmnConfLFFormDataBizService lfformDataBizService,IDicDataBizSerivce dicDataBizSerivce,IDicDataSerivce dicDataSerivce)
+    public LowCodeFlowController(IBpmnConfLFFormDataBizService lfformDataBizService,IDicDataBizSerivce dicDataBizSerivce,IDictService dicSerivce)
     {
         _lfformDataBizService = lfformDataBizService;
         _dicDataBizSerivce = dicDataBizSerivce;
-        _dicDataSerivce = dicDataSerivce;
+        _dictService = dicSerivce;
     }
     [HttpPost("createLowCodeFormCode")]
     public Result<int> CreateLowCodeFormCode([FromBody] BaseKeyValueStruVo vo){
