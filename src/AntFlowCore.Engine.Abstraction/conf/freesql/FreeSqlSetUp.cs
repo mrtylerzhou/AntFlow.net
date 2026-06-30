@@ -9,9 +9,9 @@ public static class FreeSqlSetUp
     {
         Func<IServiceProvider, IFreeSql> fsqlFactory = _ =>
         {
-            //SqlServerConnection这是appsetting中数据库连接的字符串
+            //MySqlConnection这是appsetting中数据库连接的字符串
             IFreeSql fsql = new FreeSql.FreeSqlBuilder()
-                .UseConnectionString(FreeSql.DataType.SqlServer, configuration.GetConnectionString("SqlServerConnection"))
+                .UseConnectionString(FreeSql.DataType.MySql, configuration.GetConnectionString("MySqlConnection"))
                 .UseQuoteSqlName(false)
                 .UseAdoConnectionPool(true)
                 .UseMonitorCommand(cmd => Console.WriteLine($"Sql：{cmd.CommandText}")) //监听SQL语句
