@@ -876,12 +876,9 @@ public class BpmnConfBizService : IBpmnConfBizService
             confConfig.NoticeChannelTypes = notifyTypeIds;
         }
 
-        // Persist the updated JSON
-        var updateConf = new BpmnConf
-        {
-            Id = bpmnConf.Id,
-            ConfConfigJson = JsonConfUtil.ToConfConfigJson(confConfig)
-        };
-        _bpmnConfService._repository.Update(updateConf);
+        bpmnConf.ConfConfigJson = JsonConfUtil.ToConfConfigJson(confConfig);
+        bpmnConf.UpdateTime=DateTime.Now;
+        bpmnConf.UpdateUser = SecurityUtils.GetLogInEmpId();
+        _bpmnConfService._repository.Update(bpmnConf);
     }
 }
