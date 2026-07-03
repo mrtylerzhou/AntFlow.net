@@ -447,7 +447,7 @@ public class BpmnConfBizService : IBpmnConfBizService
     /// Set conf-level notice templates from JSON (no DB table read).
     /// Reads conf_config_json -> confTemplates[] for the given formCode.
     /// </summary>
-    private void SetBpmnTemplateVos(BpmnConfVo bpmnConfVo)
+    public void SetBpmnTemplateVos(BpmnConfVo bpmnConfVo)
     {
         var bpmnConf = _bpmnConfService._repository.GetQueryable()
             .Where(a => a.FormCode == bpmnConfVo.FormCode && a.EffectiveStatus == 1 && a.ConfConfigJson != null)
