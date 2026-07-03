@@ -87,6 +87,7 @@ CREATE TABLE if not exists `t_information_template`
     `status`         tinyint(4)   NOT NULL DEFAULT '0' COMMENT 'status 0:in use,1:disabled',
     `event`          int                                    null,
     `event_name`     varchar(50)              null,
+	 `is_default`     tinyint      default 0                 not null comment 'is default template for event, 0:no,1:yes',  
     `is_del`         tinyint(4)   NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
     `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
     `create_time`    timestamp    NOT NULL     DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',

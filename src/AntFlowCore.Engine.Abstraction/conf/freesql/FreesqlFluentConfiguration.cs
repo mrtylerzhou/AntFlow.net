@@ -481,6 +481,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.Status).Name("status");
                 a.Property(b => b.Evt).Name("event");
                 a.Property(b => b.EventName).Name("event_name");
+                a.Property(b => b.IsDefault).Name("is_default");
                 a.Property(b => b.IsDel).Name("is_del");
                 a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.CreateTime).Name("create_time");
