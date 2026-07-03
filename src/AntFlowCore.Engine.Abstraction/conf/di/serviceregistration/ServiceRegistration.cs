@@ -280,6 +280,8 @@ public static class ServiceRegistration
 
         services.AddSingleton<BpmVariableMultiplayerPersonnelService>();
         services.AddSingleton<IBpmVariableMultiplayerPersonnelService, BpmVariableMultiplayerPersonnelService>();
+        services.AddSingleton<BpmVariableSignUpPersonnelService>();
+        services.AddSingleton<IBpmVariableSignUpPersonnelService, BpmVariableSignUpPersonnelService>();
         services.AddSingleton<BpmVariableMultiplayerService>();
         services.AddSingleton<IBpmVariableMultiplayerService, BpmVariableMultiplayerService>();
 

@@ -20,19 +20,22 @@ public class ResubmitProcessService: IProcessOperationAdaptor
         private readonly IBpmVerifyInfoService _verifyInfoService;
         private readonly ITaskService _taskService;
         private readonly IBpmProcessNodeSubmitBizService _processNodeSubmitBizService;
+        private readonly IBpmVariableSignUpPersonnelService _bpmVariableSignUpPersonnelService;
 
         public ResubmitProcessService(
            IFormFactory formFactory,
            IBpmBusinessProcessService bpmBusinessProcessService,
            IBpmVerifyInfoService verifyInfoService,
            ITaskService taskService,
-           IBpmProcessNodeSubmitBizService processNodeSubmitBizServiceService)
+           IBpmProcessNodeSubmitBizService processNodeSubmitBizServiceService,
+           IBpmVariableSignUpPersonnelService bpmVariableSignUpPersonnelService)
         {
             _formFactory = formFactory;
             _bpmBusinessProcessService = bpmBusinessProcessService;
             _verifyInfoService = verifyInfoService;
             _taskService = taskService;
             _processNodeSubmitBizService = processNodeSubmitBizServiceService;
+            _bpmVariableSignUpPersonnelService = bpmVariableSignUpPersonnelService;
         }
 
         public void DoProcessButton(BusinessDataVo vo)
@@ -109,7 +112,11 @@ public class ResubmitProcessService: IProcessOperationAdaptor
 
             _verifyInfoService.AddVerifyInfo(bpmVerifyInfo);
 
-            // Sign-up personnel service has been removed; sign-up insertion is no longer supported
+            if (vo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_JP)
+            {
+                _bpmVariableSignUpPersonnelService.InsertSignUpPersonnel(
+                    vo.ProcessNumber, task.TaskDefKey, task.Assignee, vo.SignUpUsers);
+            }
 
             _processNodeSubmitBizService.ProcessComplete(task);
         }

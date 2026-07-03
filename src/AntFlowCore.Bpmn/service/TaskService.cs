@@ -20,6 +20,7 @@ public class TaskService : ITaskService
     private readonly IAfTaskInstService _afTaskInstService;
     private readonly IAFExecutionService _afExecutionService;
     private readonly IExecutionListener _executionListener;
+    private readonly IBpmVariableSignUpPersonnelService _signUpPersonnelService;
     private readonly IAFDeploymentService _afDeploymentService;
 
     public TaskService(
@@ -27,12 +28,14 @@ public class TaskService : ITaskService
         IAfTaskInstService afTaskInstService,
         IAFExecutionService afExecutionService,
         IExecutionListener executionListener,
+        IBpmVariableSignUpPersonnelService signUpPersonnelService,
         IAFDeploymentService afDeploymentService)
     {
         _afTaskService = afTaskService;
         _afTaskInstService = afTaskInstService;
         _afExecutionService = afExecutionService;
         _executionListener = executionListener;
+        _signUpPersonnelService = signUpPersonnelService;
         _afDeploymentService = afDeploymentService;
     }
     public List<BpmAfTask> CreateTaskQuery(Expression<Func<BpmAfTask,bool>> filter)
@@ -161,25 +164,45 @@ public class TaskService : ITaskService
             IDictionary<string, string> assigneeMap = elementToDeal.AssigneeMap;
             if (elementToDeal.IsSignUpSubElement == 1)
             {
-
-                // Sign-up personnel service has been removed; sign-up node handling is no longer supported
-                var (nextUserElement, nextFlowElement) = GetNextAssigneeNodeRecursively(elements, elementToDeal);
-                if (nextUserElement == null)
+                List<KeyValuePair<string, string>> signupNodeAssigneeMap = _signUpPersonnelService
+                    .GetSignUpNodeAssigneeMap(procInstId, elementToDeal.ElementId);
+                if (signupNodeAssigneeMap.Count <= 0 && elementToDeal.IsBackSignUp != 1)
                 {
-                    long count = _afTaskService._repository.Count(a=>a.ProcInstId==procInstId);
-                    if (count > 0)
+                    var (nextUserElement, nextFlowElement) = GetNextAssigneeNodeRecursively(elements, elementToDeal);
+                    if (nextUserElement == null)
                     {
-                        return;
-                    }
+                        long count = _afTaskService._repository.Count(a=>a.ProcInstId==procInstId);
+                        if (count > 0)
+                        {
+                            return;
+                        }
 
-                    elementToDeal = BpmnFlowUtil.GetAggNode(elements, elementToDeal);
+                        elementToDeal = BpmnFlowUtil.GetAggNode(elements, elementToDeal);
+                    }
+                    else
+                    {
+                        BpmnFlowUtil.GetNextNodeAndFlowNode(elements, elementToDeal.ElementId);
+                        elementToDeal = nextUserElement;
+                    }
+                    assigneeMap = elementToDeal.AssigneeMap;
                 }
                 else
                 {
-                    BpmnFlowUtil.GetNextNodeAndFlowNode(elements, elementToDeal.ElementId);
-                    elementToDeal = nextUserElement;
+                    if (elementToDeal.IsBackSignUp == 1)
+                    {
+                        BpmnConfCommonElementVo? confCommonElementVo = elements
+                            .FirstOrDefault(a => a.CollectionName == elementToDeal.CollectionName && a.ElementId != elementToDeal.ElementId);
+                        if (confCommonElementVo == null)
+                        {
+                            throw new AFBizException("未能找到加批原节点,请联系管理员");
+                        }
+                        assigneeMap = confCommonElementVo.AssigneeMap;
+                    }
+                    else
+                    {
+                        assigneeMap = signupNodeAssigneeMap.ToDictionary(k => k.Key, v => v.Value);
+                    }
                 }
-                assigneeMap = elementToDeal.AssigneeMap;
             }
 
             int taskCount = elementToDeal.SignType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode()
