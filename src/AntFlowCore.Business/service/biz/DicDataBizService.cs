@@ -1,12 +1,15 @@
 using System.Linq.Expressions;
 using AntFlowCore.Abstraction.Orm.util;
+using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Abstraction.service.repository;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
+using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.extension;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
+using AntFlowCore.Core.vo;
 using AntFlowCore.Persist.api.interf.biz;
 using AntFlowCore.Persist.api.interf.repository;
 
@@ -111,13 +114,49 @@ public class DicDataBizService :  IDicDataBizSerivce
                         b => b.FormCode,
                         b => b.ExtraFlags
                     );
+                    
+                    // 解析每个流程配置的通知渠道类型
+                    Dictionary<string, List<int>> formCode2NoticeTypes = new Dictionary<string, List<int>>(StringComparer.Ordinal);
+                    foreach (var conf in bpmnConfs)
+                    {
+                        BpmnConfConfigJson? confConfig = JsonConfUtil.ParseConfConfig(conf.ConfConfigJson);
+                        if (confConfig?.NoticeChannelTypes != null && confConfig.NoticeChannelTypes.Count > 0)
+                        {
+                            formCode2NoticeTypes[conf.FormCode] = confConfig.NoticeChannelTypes;
+                        }
+                    }
+                    
                     foreach (var lfDto in results)
                     {
-                        if (formCode2Flags.TryGetValue(lfDto.Key, out var flags))
+                        string formCode = lfDto.Key;
+                        
+                        if (formCode2Flags.TryGetValue(formCode, out var flags))
                         {
                             var hasStartUserChooseModules = BpmnConfFlagsEnum.HasFlag(flags, BpmnConfFlagsEnum.HAS_STARTUSER_CHOOSE_MODULES);
                             lfDto.HasStarUserChooseModule = hasStartUserChooseModules;
                         }
+                        
+                        // 构建流程通知渠道列表(遍历所有渠道,active 标记是否启用)
+                        if (formCode2NoticeTypes.TryGetValue(formCode, out List<int> noticeChannelTypes) && noticeChannelTypes.Any())
+                        {
+                            List<BaseNumIdStruVo> processNotices = new List<BaseNumIdStruVo>();
+                            foreach (var noticeEnum in ProcessNoticeEnum.Values)
+                            {
+                                processNotices.Add(new BaseNumIdStruVo
+                                {
+                                    Id = noticeEnum.Code,
+                                    Name = noticeEnum.Desc,
+                                    Active = noticeChannelTypes.Contains(noticeEnum.Code)
+                                });
+                            }
+                            lfDto.ProcessNotices = processNotices;
+                        }
+                        
+                        // 填充通知模板配置列表
+                        IBpmnConfBizService bpmnConfBizService = ServiceProviderUtils.GetService<IBpmnConfBizService>();
+                        BpmnConfVo confVo = new BpmnConfVo { FormCode = formCode };
+                        bpmnConfBizService.SetBpmnTemplateVos(confVo);
+                        lfDto.TemplateVos = confVo.TemplateVos;
                     }
                 }
             }
