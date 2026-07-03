@@ -15,4 +15,5 @@ public interface IBpmvariableBizService
     void InvalidNodeAssignees(List<string> assigneeIds, string processNumber, bool isSingle);
     BpmVariableMultiplayer GetCurrentMultiPlayerNode(string processNumber, string elementId, string nodeId = null);
     void ChangeVariableAssignees(IDictionary<BaseInfoTranStructVo, BaseIdTranStruVo> changedAssignees, bool isSingle);
+    bool IsMoreNode(string processNum, string elementId);
 }

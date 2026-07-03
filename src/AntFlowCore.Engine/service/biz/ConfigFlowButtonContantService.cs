@@ -109,9 +109,7 @@ public class ConfigFlowButtonContantService : IConfigFlowButtonContantService
                 toViewButtons.Add(change);
             }
 
-            var procInstId = bpmBusinessProcess?.ProcInstId ?? string.Empty;
-
-            if (IsMoreNode(procInstId, elementId))
+            if (IsMoreNode(processNum, elementId))
             {
                 // 添加承办按钮
                 var undertake = new ProcessActionButtonVo
@@ -191,31 +189,16 @@ public class ConfigFlowButtonContantService : IConfigFlowButtonContantService
         public BpmnNodeConfigJson? Config { get; set; }
     }
 
-    private bool IsMoreNode(string procInstId, string elementId)
+    private bool IsMoreNode(string processNum, string elementId)
     {
         if (string.IsNullOrEmpty(elementId))
         {
             return false;
         }
-        BpmAfTaskInst bpmAfTaskInst = _afTaskInstService._repository.FirstOrDefault(a=>a.ProcInstId==procInstId);
-        BpmAfDeployment bpmAfDeployment = _afDeploymentService._repository.FirstOrDefault(a=>a.Id==bpmAfTaskInst.ProcDefId);
-        if (bpmAfDeployment == null)
-        {
-            throw new ApplicationException($"deployment with id {procInstId} not found");
-        }
-        string content=bpmAfDeployment.Content;
-        List<BpmnConfCommonElementVo> elements = JsonSerializer.Deserialize<List<BpmnConfCommonElementVo>>(content);
-        if (elements == null || elements.Count == 0)
-        {
-            throw new AFBizException($"deployment with id {procInstId} not found");
-        }
-        BpmnConfCommonElementVo element = elements.Where(a => a.ElementId == elementId).FirstOrDefault();
-        if (element == null)
-        {
-            throw new AFBizException($"element with id {elementId} not found");
-        }
-
-        return element.SignType == 2;
+        // 查询 multiplayer LEFT JOIN personnel,过滤 undertake_status==0 的记录,
+        // 未被承办的人数 > 1 且 signType==2(或签)时返回 true。
+        // 承办后所有 personnel 的 undertake_status 被置为 1,过滤后为空,返回 false,不再显示承办按钮。
+        return _bpmvariableBizService.IsMoreNode(processNum, elementId);
     }
 
 
