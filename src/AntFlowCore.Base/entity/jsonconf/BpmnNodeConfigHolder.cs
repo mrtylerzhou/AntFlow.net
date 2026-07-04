@@ -291,16 +291,7 @@ public static class BpmnNodeConfigHolder
         // .NET BpmnTemplateVo serializes lists only when non-null, so keep lists null to match Java's string shape.
         if (vo.TemplateVos != null && vo.TemplateVos.Count > 0)
         {
-            tc.Templates = vo.TemplateVos.Select(t => new BpmnTemplateVo
-            {
-                Event = t.Event,
-                Informs = t.Informs,
-                Emps = t.Emps,
-                Roles = t.Roles,
-                Funcs = t.Funcs,
-                TemplateId = t.TemplateId,
-                FormCode = t.FormCode
-            }).ToList();
+            tc.Templates = vo.TemplateVos;
         }
 
         // Approve remind
