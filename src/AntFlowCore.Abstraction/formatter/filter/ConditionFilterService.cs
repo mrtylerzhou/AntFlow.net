@@ -257,7 +257,7 @@ public class ConditionFilterService
     }
     private string FindNext(string nodeId, List<string> addNodeIdList, Dictionary<string, BpmnNodeVo> notConditionNodeMap, Dictionary<string, BpmnNodeVo> conditionNodeMap)
     {
-        if (notConditionNodeMap.ContainsKey(nodeId) || string.IsNullOrWhiteSpace(nodeId))
+        if ( string.IsNullOrWhiteSpace(nodeId)||notConditionNodeMap.ContainsKey(nodeId))
         {
             return nodeId;
         }
