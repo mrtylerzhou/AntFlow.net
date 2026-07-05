@@ -1264,3 +1264,24 @@ INSERT INTO `t_department`(`id`, `name`, `short_name`, `parent_id`, `path`, `lev
 INSERT INTO `t_department`(`id`, `name`, `short_name`, `parent_id`, `path`, `level`, `leader_id`, `sort`, `is_del`, `is_hide`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (7, '七级部门', NULL, 8, '/1/2/3/4/5/6/7', 7, 7, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `t_department`(`id`, `name`, `short_name`, `parent_id`, `path`, `level`, `leader_id`, `sort`, `is_del`, `is_hide`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (8, '市场部', NULL, 9, '/1/2/3/4/5/6/7/8', 8, 8, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `t_department`(`id`, `name`, `short_name`, `parent_id`, `path`, `level`, `leader_id`, `sort`, `is_del`, `is_hide`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (9, '销售部', NULL, 9, '/1/2/3/4/5/6/7/8/9', 9, 9, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+-- ============================================================
+-- bpm_business_draft (process draft)
+-- ============================================================
+CREATE TABLE if not exists `bpm_business_draft`
+(
+    `id`               bigint        NOT NULL AUTO_INCREMENT,
+    `bpmn_code`        varchar(64)   DEFAULT NULL COMMENT 'business id',
+    `create_time`      timestamp     NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'as its name says',
+    `process_code`     varchar(50)   DEFAULT NULL COMMENT 'process Number',
+    `create_user_name` varchar(50)   DEFAULT NULL COMMENT 'as its name says',
+    `create_user`      varchar(50)   DEFAULT NULL COMMENT 'as its name says',
+    `process_key`      varchar(50)   DEFAULT NULL COMMENT 'as its name says',
+    `draft_json`       text          NULL,
+    `is_del`           int           DEFAULT '0',
+    `tenant_id`        varchar(255)  NOT NULL DEFAULT '' COMMENT 'tenantId',
+    PRIMARY KEY (`id`) USING BTREE,
+    UNIQUE KEY `bpm_business_draft_unq1` (`bpmn_code`, `create_user`) USING BTREE,
+    KEY `bpm_business_idx1` (`process_key`) USING BTREE
+) ENGINE = InnoDB
+  COMMENT ='process draft';

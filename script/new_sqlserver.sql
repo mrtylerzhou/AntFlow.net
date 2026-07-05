@@ -1456,3 +1456,27 @@ GO
 -- ============================================================
 -- End of Script
 -- ============================================================
+-- ============================================================
+-- bpm_business_draft (process draft)
+-- ============================================================
+IF OBJECT_ID(N'[dbo].[bpm_business_draft]', N'U') IS NULL
+BEGIN
+CREATE TABLE [dbo].[bpm_business_draft]
+(
+    [id]               BIGINT         NOT NULL IDENTITY(1,1),
+    [bpmn_code]        NVARCHAR(64)   NULL     DEFAULT NULL,   -- COMMENT: 'business id'
+    [create_time]      DATETIME2      NOT NULL DEFAULT GETDATE(), -- COMMENT: 'as its name says'
+    [process_code]     NVARCHAR(50)   NULL     DEFAULT NULL,   -- COMMENT: 'process Number'
+    [create_user_name] NVARCHAR(50)   NULL     DEFAULT NULL,   -- COMMENT: 'as its name says'
+    [create_user]      NVARCHAR(50)   NULL     DEFAULT NULL,   -- COMMENT: 'as its name says'
+    [process_key]      NVARCHAR(50)   NULL     DEFAULT NULL,   -- COMMENT: 'as its name says'
+    [draft_json]       NVARCHAR(MAX)  NULL,                    -- COMMENT: 'serialized form data json'
+    [is_del]           TINYINT        NOT NULL DEFAULT 0,      -- COMMENT: '0:no,1:yes'
+    [tenant_id]        NVARCHAR(255)  NOT NULL DEFAULT N'',    -- COMMENT: 'tenantId'
+    CONSTRAINT [PK_bpm_business_draft] PRIMARY KEY ([id])
+);
+CREATE UNIQUE INDEX [UQ_bpm_business_draft_bpmn_code_create_user] ON [dbo].[bpm_business_draft] ([bpmn_code], [create_user]);
+CREATE INDEX        [IX_bpm_business_draft_process_key]          ON [dbo].[bpm_business_draft] ([process_key]);
+END;
+-- COMMENT: 'process draft'
+GO
