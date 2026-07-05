@@ -55,5 +55,12 @@ namespace AntFlowCore.Base.util
         public const String HIDDEN_FIELD_PERMISSION="H";
         public const string HIDDEN_FIELD_VALUE = "******";
         public const string READ_ONLY_FIELD_PERMISSION="R";
+
+        // Node label value constants (aligned with Java StringConstants)
+        public const string DYNAMIC_CONDITION_NODE = "af_syslabel_dynamiccondition";
+        public const string COPY_NODE = "af_syslabel_copynode";
+        public const string COPY_NODEV2 = "af_syslabel_copynodeV2";
+        public const string AUTOMATIC_NODE = "auto_node";
+        public const string SKIPPED_ASSIGNEE = "lbl_skipped_assignee";
     }
 }

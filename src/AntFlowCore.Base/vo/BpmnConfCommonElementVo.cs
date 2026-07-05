@@ -78,6 +78,14 @@ namespace AntFlowCore.Base.vo
 
         [JsonPropertyName("approveRemindVo")]
         public BpmnApproveRemindVo ApproveRemindVo { get; set; }
+
+        /// <summary>
+        /// Node labels carried on the final BPMN element. Converted to BPMN element
+        /// extra attributes downstream. Populated from BpmnNodeVo.LabelList at runtime.
+        /// </summary>
+        [JsonPropertyName("labelList")]
+        public List<BpmnNodeLabelVO> LabelList { get; set; }
+
         [JsonPropertyName("signType")]
         public int SignType { get; set; }
         

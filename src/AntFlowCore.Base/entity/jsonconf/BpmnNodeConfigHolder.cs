@@ -276,6 +276,18 @@ public static class BpmnNodeConfigHolder
             bs.OperationTypes = vo.OperationTypes;
         }
 
+        // Labels (node labels persisted into buttonSignConf.labels)
+        if (vo.LabelList != null && vo.LabelList.Count > 0)
+        {
+            bs.Labels = vo.LabelList
+                .Select(l => new ButtonSignNodeLabel
+                {
+                    LabelName = l.LabelName,
+                    LabelValue = l.LabelValue
+                })
+                .ToList();
+        }
+
         config.ButtonSignConf = bs;
     }
 

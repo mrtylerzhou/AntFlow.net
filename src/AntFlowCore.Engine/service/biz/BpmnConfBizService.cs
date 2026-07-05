@@ -612,9 +612,83 @@ public class BpmnConfBizService : IBpmnConfBizService
         List<long> idList = bpmnNodeList.Select(a => a.Id).ToList();
         Dictionary<long,List<string>> bpmnNodeToMap = GetBpmnNodeToMap(idList);
 
-        return bpmnNodeList
+        List<BpmnNodeVo> bpmnNodeVoList = bpmnNodeList
             .Select(o => GetBpmnNodeVo(o, bpmnNodeToMap, conditionsUrl))
             .ToList();
+
+        // 动态条件节点是网关节点,找到网关节点的上一级节点,然后打上标签,
+        // 流程执行过程中如果有相应标签,则执行动态条件判断
+        // node id -> VO map, for looking up prev nodes by nodeId
+        Dictionary<string, BpmnNodeVo> nodeVoByNodeId = bpmnNodeVoList
+            .Where(o => o.NodeId != null)
+            .ToDictionary(o => o.NodeId, o => o);
+        // node id -> VO id list (for finding nodes that point to a given node)
+        Dictionary<string, List<long>> nodeToReverseMap = new Dictionary<string, List<long>>();
+        foreach (var entry in bpmnNodeToMap)
+        {
+            foreach (var nodeTo in entry.Value)
+            {
+                if (!nodeToReverseMap.TryGetValue(nodeTo, out var list))
+                {
+                    list = new List<long>();
+                    nodeToReverseMap[nodeTo] = list;
+                }
+                list.Add(entry.Key);
+            }
+        }
+
+        foreach (BpmnNodeVo bpmnNodeVo in bpmnNodeVoList)
+        {
+            if (bpmnNodeVo.IsDynamicCondition != null && bpmnNodeVo.IsDynamicCondition.Value)
+            {
+                // find the previous node by NodeFrom
+                BpmnNodeVo prevNodeVo = null;
+                if (bpmnNodeVo.NodeFrom != null && nodeVoByNodeId.TryGetValue(bpmnNodeVo.NodeFrom, out prevNodeVo))
+                {
+                    List<BpmnNodeVo> nodesToLabel = new List<BpmnNodeVo> { prevNodeVo };
+
+                    // if prev node is a gateway, also find all nodes pointing to it or the current node
+                    if (prevNodeVo.NodeType == (int)NodeTypeEnum.NODE_TYPE_GATEWAY)
+                    {
+                        List<long> dynamicLabelNodeIds = new List<long>();
+                        // nodes pointing to prev gateway node
+                        if (prevNodeVo.NodeId != null && nodeToReverseMap.TryGetValue(prevNodeVo.NodeId, out var pointingToPrev))
+                        {
+                            dynamicLabelNodeIds.AddRange(pointingToPrev);
+                        }
+                        // nodes pointing to current dynamic-condition node
+                        if (bpmnNodeVo.NodeId != null && nodeToReverseMap.TryGetValue(bpmnNodeVo.NodeId, out var pointingToCurrent))
+                        {
+                            dynamicLabelNodeIds.AddRange(pointingToCurrent);
+                        }
+
+                        if (dynamicLabelNodeIds.Count > 0)
+                        {
+                            var dynamicLabelNodes = bpmnNodeVoList
+                                .Where(a => a.Id != 0 && dynamicLabelNodeIds.Contains(a.Id))
+                                .ToList();
+                            nodesToLabel.AddRange(dynamicLabelNodes);
+                        }
+                    }
+
+                    // attach DynamicCondition label to each identified node
+                    foreach (BpmnNodeVo nodeToLabel in nodesToLabel)
+                    {
+                        nodeToLabel.LabelList ??= new List<BpmnNodeLabelVO>();
+                        if (!nodeToLabel.LabelList.Any(l => NodeLabelConstants.DynamicCondition.LabelValue == l.LabelValue))
+                        {
+                            nodeToLabel.LabelList.Add(NodeLabelConstants.DynamicCondition);
+                        }
+                    }
+                }
+                else
+                {
+                    // can not find prev node for the dynamic-condition node
+                }
+            }
+        }
+
+        return bpmnNodeVoList;
     }
 
     private Dictionary<long, List<String>> GetBpmnNodeToMap(List<long> idList)
@@ -712,6 +786,20 @@ public class BpmnConfBizService : IBpmnConfBizService
         if (lowCodeConf?.FieldControls != null && lowCodeConf.FieldControls.Count > 0)
         {
             bpmnNodeVo.LfFieldControlVOs = lowCodeConf.FieldControls;
+        }
+
+        //set labels from buttonSignConf
+        if (bsConf?.Labels != null && bsConf.Labels.Count > 0)
+        {
+            var labelVOList = bsConf.Labels
+                .Select(l => new BpmnNodeLabelVO(l.LabelValue, l.LabelName))
+                .ToList();
+            if (NodeLabelConstants.NodeLabelContainsAny(labelVOList, NodeLabelConstants.CopyNodeV2.LabelValue))
+            {
+                bpmnNodeVo.DeduplicationExclude = true;
+                bpmnNodeVo.IsCarbonCopyNode = true;
+            }
+            bpmnNodeVo.LabelList = labelVOList;
         }
 
         return bpmnNodeVo;

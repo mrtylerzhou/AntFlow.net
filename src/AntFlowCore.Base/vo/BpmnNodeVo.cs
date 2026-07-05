@@ -133,6 +133,21 @@ namespace AntFlowCore.Base.vo;
         public BpmnApproveRemindVo ApproveRemindVo { get; set; }
 
         /// <summary>
+        /// Node labels (user-defined or dynamically added). Persisted into
+        /// node_config_json.buttonSignConf.labels at design time and read back
+        /// for runtime use. Eventually carried on BpmnConfCommonElementVo.LabelList.
+        /// </summary>
+        [JsonPropertyName("labelList")]
+        public List<BpmnNodeLabelVO> LabelList { get; set; }
+
+        /// <summary>
+        /// Whether this node is a carbon-copy (抄送) node V2 (enters the engine).
+        /// Derived from LabelList at read time.
+        /// </summary>
+        [JsonIgnore]
+        public bool? IsCarbonCopyNode { get; set; }
+
+        /// <summary>
         /// Overtime notice configuration (migrated from bpm_process_node_overtime).
         /// Written to node_config_json.templateConf.overtimeConf during edit.
         /// </summary>

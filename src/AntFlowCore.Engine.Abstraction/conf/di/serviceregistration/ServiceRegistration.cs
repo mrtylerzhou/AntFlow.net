@@ -85,8 +85,10 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmnConfLfFormdataFieldService, BpmnConfLfFormdataFieldService>();
         services.AddSingleton<IAntFlowOrderPreProcessor<BpmnConfVo>,LFFormDataPreProcessor>();
         services.AddSingleton<IAntFlowOrderPostProcessor<BpmnConfVo>, LFFieldControlPostProcessor>();
+        services.AddSingleton<IAntFlowOrderPostProcessor<BpmnConfVo>, NodeLabelsPostProcessor>();
         services.AddSingleton<IAntFlowOrderPostProcessor<BusinessDataVo>, AntFlowButtonsOperationPostProcessor>();
         services.AddSingleton<LFFieldControlPostProcessor>();
+        services.AddSingleton<NodeLabelsPostProcessor>();
         services.AddSingleton<ProcessApprovalService>();
         services.AddSingleton<IProcessApprovalService, ProcessApprovalService>();
         services.AddSingleton<IFormOperationAdaptor<ThirdPartyAccountApplyVo>, ThirdPartyAccountApplyFlowService>();

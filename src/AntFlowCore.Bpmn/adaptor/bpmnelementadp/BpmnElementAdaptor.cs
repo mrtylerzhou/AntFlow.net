@@ -37,6 +37,8 @@ public abstract class BpmnElementAdaptor : IAdaptorService
             elementVo.TemplateVos = nodeVo.TemplateVos;
             elementVo.ApproveRemindVo = nodeVo.ApproveRemindVo;
             elementVo.SignType = signType;
+            // carry node labels onto the final BPMN element VO
+            elementVo.LabelList = nodeVo.LabelList;
             SetSignUpProperty(nodeVo, elementVo);
 
             bpmnConfCommonElementVos.Add(elementVo);
