@@ -205,5 +205,12 @@ namespace AntFlowCore.Base.vo
         
         [JsonPropertyName("approvalEmpls")]
         public List<BaseIdTranStruVo> ApprovalEmpls { get; set; }
+
+        /// <summary>
+        /// Carries the full business data vo (including form fields and form-related assignee map)
+        /// so that personnel providers like FormRelatedPersonnelProvider can access form data at runtime.
+        /// </summary>
+        [JsonPropertyName("businessDataVo")]
+        public BusinessDataVo BusinessDataVo { get; set; }
     }
 }

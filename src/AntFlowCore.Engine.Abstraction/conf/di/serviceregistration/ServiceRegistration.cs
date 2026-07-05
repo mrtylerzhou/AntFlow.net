@@ -190,6 +190,7 @@ public static class ServiceRegistration
         services.AddSingleton<StartUserPersonnelProvider>();
         services.AddSingleton<UserPointedPersonnelProvider>();
         services.AddSingleton<BusinessTablePersonnelProvider>();
+        services.AddSingleton<FormRelatedPersonnelProvider>();
 
 
         services.AddSingleton<IBpmnPersonnelProviderService, DirectLeaderPersonnelProvider>();
@@ -202,6 +203,7 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmnPersonnelProviderService, StartUserPersonnelProvider>();
         services.AddSingleton<IBpmnPersonnelProviderService, UserPointedPersonnelProvider>();
         services.AddSingleton<IBpmnPersonnelProviderService, BusinessTablePersonnelProvider>();
+        services.AddSingleton<IBpmnPersonnelProviderService, FormRelatedPersonnelProvider>();
         services.AddSingleton<IBpmnProcessAdminProvider, ProcessAddminProvider>();
         #endregion
 
@@ -217,6 +219,7 @@ public static class ServiceRegistration
         services.AddSingleton<AbstractBpmnPersonnelAdaptor, StartUserPersonnelAdaptor>();
         services.AddSingleton<AbstractBpmnPersonnelAdaptor, UserPointedPersonnelAdaptor>();
         services.AddSingleton<AbstractBpmnPersonnelAdaptor, BusinessTablePersonnelAdaptor>();
+        services.AddSingleton<AbstractBpmnPersonnelAdaptor, FormRelatedPersonnelAdaptor>();
 
 
         services.AddSingleton<IBpmnNodeConditionsAdaptor, BpmnNodeConditionsAccountTypeAdaptor>();
@@ -257,6 +260,7 @@ public static class ServiceRegistration
         services.AddSingleton<IAdaptorService, NodePropertyStartUserAdaptor>();
         services.AddSingleton<IAdaptorService, NodeTypeConditionsAdaptor>();
         services.AddSingleton<IAdaptorService, NodePropertyCustomizeAdaptor>();
+        services.AddSingleton<IAdaptorService, NodePropertyFormRelatedAdaptor>();
 
 
 

@@ -183,5 +183,12 @@ namespace AntFlowCore.Base.vo
         
         [JsonPropertyName("approvalEmpls")]
         public List<BaseIdTranStruVo> ApprovalEmpls { get; set; }
+
+        /// <summary>
+        /// key is node id, value is a list of form-related assignee ids extracted from form data.
+        /// Populated by LowFlowApprovalService.ProcessFormRelatedUserConf during process start.
+        /// </summary>
+        [JsonPropertyName("node2formRelatedAssignees")]
+        public Dictionary<string, List<string>> Node2formRelatedAssignees { get; set; }
     }
 }

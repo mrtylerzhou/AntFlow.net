@@ -32,4 +32,15 @@ public static class NodeFormAssigneePropertyEnumExtensions
             _ => ""
         };
     }
+
+    public static NodeFormAssigneePropertyEnum? GetByCode(int? code)
+    {
+        if (code == null)
+        {
+            return null;
+        }
+        return Enum.IsDefined(typeof(NodeFormAssigneePropertyEnum), code.Value)
+            ? (NodeFormAssigneePropertyEnum)code.Value
+            : null;
+    }
 }

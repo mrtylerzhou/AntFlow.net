@@ -94,6 +94,7 @@ public class BpmnConfBizService : IBpmnConfBizService
         int hasStartUserChooseModules=0;
         int hasCopy=0;
         int hasLastNodeCopy=0;
+        int hasChooseFromLowCodeform=0;
         foreach (BpmnNodeVo bpmnNodeVo in confNodes)
         {
             if (bpmnNodeVo.NodeType == (int)NodeTypeEnum.NODE_TYPE_APPROVER
@@ -107,6 +108,9 @@ public class BpmnConfBizService : IBpmnConfBizService
             if((int)NodeTypeEnum.NODE_TYPE_COPY==(bpmnNodeVo.NodeType))
             {
                 hasCopy = BpmnConfFlagsEnum.HAS_COPY.Code;
+            }
+            if((int)NodePropertyEnum.NODE_PROPERTY_FORM_RELATED==bpmnNodeVo.NodeProperty){
+                hasChooseFromLowCodeform = BpmnConfFlagsEnum.HAS_FORM_RELATED_ASSIGNEES.Code;
             }
             
             bpmnNodeVo.IsOutSideProcess=isOutSideProcess;
@@ -164,7 +168,7 @@ public class BpmnConfBizService : IBpmnConfBizService
         }
 
         int extraFlags = bpmnConfVo.ExtraFlags??0;
-        int currentFlags=hasStartUserChooseModules|hasCopy|hasLastNodeCopy;
+        int currentFlags=hasStartUserChooseModules|hasCopy|hasLastNodeCopy|hasChooseFromLowCodeform;
         if(currentFlags>0){
             int binariedOr = BpmnConfFlagsEnum.BinaryOr(extraFlags, currentFlags);
             bpmnConfVo.ExtraFlags=binariedOr;
