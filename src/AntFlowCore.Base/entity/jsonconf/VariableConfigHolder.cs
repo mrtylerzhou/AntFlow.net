@@ -1,5 +1,6 @@
 using System.Text.Json;
 using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.extension;
 using AntFlowCore.Base.vo;
 
 namespace AntFlowCore.Base.entity.jsonconf;
@@ -50,7 +51,7 @@ public static class VariableConfigHolder
         string elementId,
         int messageType)
     {
-        if (templateVos == null || templateVos.Count == 0)
+        if (templateVos.IsEmpty())
         {
             return;
         }
@@ -58,7 +59,7 @@ public static class VariableConfigHolder
         config.Messages.AddRange(templateVos.Select(o => new VariableMessageItem
         {
             ElementId = elementId,
-            MessageType = GetMessageSendType(o.Event, messageType),
+            MessageType = 2,
             EventType = o.Event,
             Content = JsonSerializer.Serialize(o, JsonConfUtil.Options)
         }));

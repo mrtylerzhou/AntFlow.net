@@ -155,7 +155,6 @@ public static class BpmnConfConfigHolder
     }
 
     /// <summary>
-    /// Build conf-level templates from BpmnTemplateVo list, matching Java's ConfTemplateConf format
     /// </summary>
     public static List<ConfTemplateConf>? BuildConfTemplates(List<BpmnTemplateVo>? templateVos, string? formCode)
     {
@@ -166,20 +165,14 @@ public static class BpmnConfConfigHolder
         return templateVos.Select(t => new ConfTemplateConf
         {
             Event = t.Event,
-            Informs = JoinList(t.InformIdList),
-            Emps = JoinList(t.EmpIdList),
-            Roles = JoinList(t.RoleIdList),
-            Funcs = JoinList(t.FuncIdList),
+            InformIdList = t.InformIdList,
+            EmpList = t.EmpList,
+            RoleList = t.RoleList,
+            FuncList = t.FuncList,
             TemplateId = t.TemplateId > 0 ? t.TemplateId : null,
             MessageSendType = ConvertMessageSendTypeList(t.MessageSendTypeList),
             FormCode = formCode
         }).ToList();
-    }
-
-    private static string? JoinList(List<string>? list)
-    {
-        if (list == null || list.Count == 0) return null;
-        return string.Join(",", list);
     }
 
     private static string? ConvertMessageSendTypeList(List<BaseNumIdStruVo>? list)

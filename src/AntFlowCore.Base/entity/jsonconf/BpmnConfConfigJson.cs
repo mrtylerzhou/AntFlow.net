@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using AntFlowCore.Base.vo;
 
 namespace AntFlowCore.Base.entity.jsonconf;
 
@@ -20,27 +21,30 @@ public class BpmnConfConfigJson
     public List<int>? NoticeChannelTypes { get; set; }
 }
 
+/// <summary>
+/// 对应 Java 版 BpmnNodeTemplateConfJson.TemplateConf,存直接接收的原始数据而非计算后的逗号字符串。
+/// </summary>
 public class ConfTemplateConf
 {
     /// <summary>Event type</summary>
     [JsonPropertyName("event")]
     public int Event { get; set; }
 
-    /// <summary>Comma-separated inform IDs</summary>
-    [JsonPropertyName("informs")]
-    public string? Informs { get; set; }
+    /// <summary>Inform ID list (原始数据)</summary>
+    [JsonPropertyName("informIdList")]
+    public List<string>? InformIdList { get; set; }
 
-    /// <summary>Comma-separated employee IDs</summary>
-    [JsonPropertyName("emps")]
-    public string? Emps { get; set; }
+    /// <summary>Employee list (原始数据)</summary>
+    [JsonPropertyName("empList")]
+    public List<BaseIdTranStruVo>? EmpList { get; set; }
 
-    /// <summary>Comma-separated role IDs</summary>
-    [JsonPropertyName("roles")]
-    public string? Roles { get; set; }
+    /// <summary>Role list (原始数据)</summary>
+    [JsonPropertyName("roleList")]
+    public List<BaseIdTranStruVo>? RoleList { get; set; }
 
-    /// <summary>Comma-separated function IDs</summary>
-    [JsonPropertyName("funcs")]
-    public string? Funcs { get; set; }
+    /// <summary>Function list (原始数据)</summary>
+    [JsonPropertyName("funcList")]
+    public List<BaseIdTranStruVo>? FuncList { get; set; }
 
     /// <summary>Message template ID</summary>
     [JsonPropertyName("templateId")]

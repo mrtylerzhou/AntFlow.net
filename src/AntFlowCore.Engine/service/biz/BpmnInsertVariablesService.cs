@@ -4,6 +4,7 @@ using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.entity.jsonconf;
+using AntFlowCore.Base.extension;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn;
@@ -190,17 +191,17 @@ public class BpmnInsertVariablesService : IBpmnInsertVariablesService
     private void BuildMessagesAndApproveReminds(VariableConfigJson config, BpmnConfCommonVo bpmnConfCommonVo)
     {
         // out-of-node messages
-        if (bpmnConfCommonVo.TemplateVos != null && bpmnConfCommonVo.TemplateVos.Count > 0)
+        if (!bpmnConfCommonVo.TemplateVos.IsEmpty())
         {
             VariableConfigHolder.AddMessages(config, bpmnConfCommonVo.TemplateVos, string.Empty, 1);
         }
 
         // in-node messages and approve reminds
-        if (bpmnConfCommonVo.ElementList != null)
+        if (!bpmnConfCommonVo.ElementList.IsEmpty())
         {
             foreach (var elementVo in bpmnConfCommonVo.ElementList)
             {
-                if (elementVo.TemplateVos == null || elementVo.TemplateVos.Count == 0)
+                if (elementVo.TemplateVos.IsEmpty())
                 {
                     continue;
                 }

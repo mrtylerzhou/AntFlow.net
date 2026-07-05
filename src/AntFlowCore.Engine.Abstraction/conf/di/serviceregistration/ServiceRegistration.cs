@@ -136,6 +136,8 @@ public static class ServiceRegistration
         services.AddSingleton<IThirdPartyCallBackService, ThirdPartyCallBackService>();
         services.AddSingleton<BpmnInsertVariablesService>();
         services.AddSingleton<IBpmnInsertVariablesService, BpmnInsertVariablesService>();
+        services.AddSingleton<IBpmVariableMessageBizService, BpmVariableMessageBizService>();
+        services.AddSingleton<IBpmVariableMessageListenerService, BpmVariableMessageListenerService>();
         services.AddSingleton<ITaskListener,BpmnTaskListener>();
         services.AddSingleton<IExecutionListener,BpmnExecutionListener>();
         services.AddSingleton<ProcessNodeJumpService>();

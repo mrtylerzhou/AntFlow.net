@@ -476,15 +476,44 @@ public class BpmnConfBizService : IBpmnConfBizService
             return false;
         }
 
-        bpmnConfVo.TemplateVos = confConfig.ConfTemplates.Select(c => new BpmnTemplateVo
+
+        bpmnConfVo.TemplateVos = confConfig.ConfTemplates.Select(c =>
         {
-            Event = c.Event,
-            Informs = c.Informs,
-            Emps = c.Emps,
-            Roles = c.Roles,
-            Funcs = c.Funcs,
-            TemplateId = c.TemplateId ?? 0,
-            FormCode = c.FormCode
+            var vo = new BpmnTemplateVo
+            {
+                Event = c.Event,
+                TemplateId = c.TemplateId ?? 0,
+                FormCode = c.FormCode
+            };
+
+            if (c.InformIdList != null && c.InformIdList.Count > 0)
+            {
+                vo.InformIdList = c.InformIdList;
+                vo.Informs = string.Join(",", c.InformIdList);
+            }
+
+            if (c.EmpList != null && c.EmpList.Count > 0)
+            {
+                vo.EmpList = c.EmpList;
+                vo.EmpIdList = c.EmpList.Select(a => a.Id).ToList();
+                vo.Emps = string.Join(",", vo.EmpIdList);
+            }
+
+            if (c.RoleList != null && c.RoleList.Count > 0)
+            {
+                vo.RoleList = c.RoleList;
+                vo.RoleIdList = c.RoleList.Select(a => a.Id).ToList();
+                vo.Roles = string.Join(",", vo.RoleIdList);
+            }
+
+            if (c.FuncList != null && c.FuncList.Count > 0)
+            {
+                vo.FuncList = c.FuncList;
+                vo.FuncIdList = c.FuncList.Select(a => a.Id).ToList();
+                vo.Funcs = string.Join(",", vo.FuncIdList);
+            }
+
+            return vo;
         }).ToList();
         HydrateBpmnTemplateVos(bpmnConfVo.TemplateVos);
         return true;

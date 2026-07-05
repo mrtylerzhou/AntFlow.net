@@ -19,6 +19,7 @@ public class BpmnTaskListener: ITaskListener
     private readonly IBpmBusinessProcessService _bpmBusinessProcessService;
     private readonly IBpmProcessForwardService _bpmProcessForwardService;
     private readonly IUserEntrustService _userEntrustService;
+    private readonly IBpmVariableMessageListenerService _bpmVariableMessageListenerService;
     private readonly IProcessBusinessContansService _processBusinessContansService;
     private readonly ILogger<BpmnTaskListener> _logger;
 
@@ -27,6 +28,7 @@ public class BpmnTaskListener: ITaskListener
        IBpmBusinessProcessService bpmBusinessProcessService,
        IBpmProcessForwardService bpmProcessForwardService,
        IUserEntrustService userEntrustService,
+       IBpmVariableMessageListenerService bpmVariableMessageListenerService,
        IProcessBusinessContansService processBusinessContansService,
         ILogger<BpmnTaskListener> logger)
     {
@@ -34,6 +36,7 @@ public class BpmnTaskListener: ITaskListener
         _bpmBusinessProcessService = bpmBusinessProcessService;
         _bpmProcessForwardService = bpmProcessForwardService;
         _userEntrustService = userEntrustService;
+        _bpmVariableMessageListenerService = bpmVariableMessageListenerService;
         _processBusinessContansService = processBusinessContansService;
         _logger = logger;
     }
@@ -91,28 +94,39 @@ public class BpmnTaskListener: ITaskListener
             EventTypeEnum = EventTypeEnum.PROCESS_FLOW,
             Type = 2,
         };
-        // Message listener service has been removed; sending template-based messages is no longer supported
-        ProcessInforVo processInforVo = new ProcessInforVo
+        bool sendByTemplate = _bpmVariableMessageListenerService.ListenerCheckIsSendByTemplate(bpmVariableMessageVo);
+        if (sendByTemplate)
         {
-            ProcessinessKey = bpmnCode,
-            BusinessNumber = processNumber,
-            FormCode = formCode,
-            Type = 2,
-        };
-        string emailUrl = _processBusinessContansService.GetRoute(ProcessNoticeEnum.EMAIL_TYPE.Code, processInforVo , isOutside);
-        string appUrl = _processBusinessContansService.GetRoute(ProcessNoticeEnum.EMAIL_TYPE.Code, processInforVo , isOutside);
-        ActivitiBpmMsgVo activitiBpmMsgVo = new ActivitiBpmMsgVo
+            //set is outside
+            bpmVariableMessageVo.IsOutside = isOutside;
+
+            //set template message
+            _bpmVariableMessageListenerService.ListenerSendTemplateMessages(bpmVariableMessageVo);
+        }
+        else
         {
-            UserId = delegateTask.Assignee,
-            ProcessId = processNumber,
-            BpmnCode = bpmnCode,
-            FormCode = formCode,
-            ProcessName = bpmnConf.BpmnName,
-            EmailUrl = emailUrl,
-            Url = emailUrl,
-            AppPushUrl = appUrl,
-            TaskId = delegateTask.ProcInstId,
-        };
-        ActivitiTemplateMsgUtils.sendBpmApprovalMsg(activitiBpmMsgVo);
+            ProcessInforVo processInforVo = new ProcessInforVo
+            {
+                ProcessinessKey = bpmnCode,
+                BusinessNumber = processNumber,
+                FormCode = formCode,
+                Type = 2,
+            };
+            string emailUrl = _processBusinessContansService.GetRoute(ProcessNoticeEnum.EMAIL_TYPE.Code, processInforVo , isOutside);
+            string appUrl = _processBusinessContansService.GetRoute(ProcessNoticeEnum.APP_TYPE.Code, processInforVo , isOutside);
+            ActivitiBpmMsgVo activitiBpmMsgVo = new ActivitiBpmMsgVo
+            {
+                UserId = delegateTask.Assignee,
+                ProcessId = processNumber,
+                BpmnCode = bpmnCode,
+                FormCode = formCode,
+                ProcessName = bpmnConf.BpmnName,
+                EmailUrl = emailUrl,
+                Url = emailUrl,
+                AppPushUrl = appUrl,
+                TaskId = delegateTask.ProcInstId,
+            };
+            ActivitiTemplateMsgUtils.sendBpmApprovalMsg(activitiBpmMsgVo);
+        }
     }
 }
