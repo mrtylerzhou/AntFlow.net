@@ -10,6 +10,9 @@ using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.adaptor;
 using AntFlowCore.Core.vo;
 using AntFlowCore.Engine.factory;
+using AntFlowCore.Abstraction.service.biz;
+using AntFlowCore.Base.entity.jsonconf;
+using AntFlowCore.Base.extension;
 using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Engine.Abstraction.aop;
@@ -69,24 +72,70 @@ public class BpmnSendMessageAspect<T> : DispatchProxy
         //set bpmn name
         businessDataVo.BpmnName=bpmnConf.BpmnName;
 
+        //declare variable message vo
+        BpmVariableMessageVo vo;
+        IBpmVariableMessageBizService bpmVariableMessageService = ServiceProviderUtils.GetService<IBpmVariableMessageBizService>();
+
         //to check if it is a submit operation then execute aspect method first then assemble variable message vo
         if (businessDataVo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_SUBMIT)
         {
             //do execute aspect method
             DoMethod( bpmnConf,businessDataVo,outSideBpmBusinessParty,ProcessOperationEnum.BUTTON_TYPE_SUBMIT, targetMethod,args);
-            return null;
+
+            //get bpmn variable message vo
+            vo = bpmVariableMessageService.FromBusinessDataVo(businessDataVo);
+
+            /**
+             * 因为发起流程组装流程发送vo对象是一个后置操作，所以从流程引擎中查到的是发起节点的下一个节点
+             * 所以默认设置元素节点Id为"task1418018332271"
+             */
+            if (vo != null)
+            {
+                vo.ElementId = ProcessEnum.StartTaskKey.Desc;
+            }
+        }
+        else
+        {
+            //get bpmn variable message vo
+            vo = bpmVariableMessageService.FromBusinessDataVo(businessDataVo);
+
+            //get process operation enum by operation type
+            ProcessOperationEnum? processOperationEunm = ProcessOperationEnumExtensions.GetEnumByCode(businessDataVo.OperationType);
+            if (processOperationEunm == null)
+            {
+                throw new AFBizException(
+                    $"can not get processOperationEunm by by providing operationtype:{businessDataVo.OperationType}");
+            }
+            //do execute aspect method
+            DoMethod( bpmnConf,businessDataVo,outSideBpmBusinessParty, processOperationEunm.Value,targetMethod,args);
         }
 
-        // IBpmVariableMessageBizService has been removed; variable message assembly is no longer supported
-        //get process operation enum by operation type
-        ProcessOperationEnum? processOperationEunm = ProcessOperationEnumExtensions.GetEnumByCode(businessDataVo.OperationType);
-        if (processOperationEunm == null)
+        string bpmnConfConfConfigJson = bpmnConf.ConfConfigJson;
+        if (!string.IsNullOrEmpty(bpmnConfConfConfigJson))
         {
-            throw new AFBizException(
-                $"can not get processOperationEunm by by providing operationtype:{businessDataVo.OperationType}");
+            BpmnConfConfigJson? bpmnConfConfigJson = JsonConfUtil.ParseConfConfig(bpmnConfConfConfigJson);
+            List<int>? noticeChannelTypes = bpmnConfConfigJson.NoticeChannelTypes;
+            if (noticeChannelTypes.IsEmpty())
+            {
+                return null;
+            }
         }
-        //do execute aspect method
-        DoMethod( bpmnConf,businessDataVo,outSideBpmBusinessParty, processOperationEunm.Value,targetMethod,args);
+        if((int)ProcessOperationEnum.BUTTON_TYPE_AGREE==businessDataVo.OperationType){
+            return null;
+        }
+        //send message
+        if (vo != null)
+        {
+            businessDataVo.IsLowCodeFlow = bpmnConfVo.IsLowCodeFlow;
+            //if it is a third party process then set flag to true
+            if (bpmnConf.IsOutSideProcess == 1)
+            {
+                vo.IsOutside = true;
+                businessDataVo.IsOutSideAccessProc = true;
+            }
+            bpmVariableMessageService.SendTemplateMessagesAsync(vo);
+        }
+
         return null;
     }
     

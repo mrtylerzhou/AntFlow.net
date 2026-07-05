@@ -3,7 +3,9 @@ using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Abstraction.service.repository;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
+using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.exception;
+using AntFlowCore.Base.extension;
 using AntFlowCore.Base.interf;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
@@ -94,6 +96,18 @@ public class BpmnTaskListener: ITaskListener
             EventTypeEnum = EventTypeEnum.PROCESS_FLOW,
             Type = 2,
         };
+
+        string bpmnConfConfConfigJson = bpmnConf.ConfConfigJson;
+        if (string.IsNullOrEmpty(bpmnConfConfConfigJson))
+        {
+            return;
+        }
+        BpmnConfConfigJson? bpmnConfConfigJson = JsonConfUtil.ParseConfConfig(bpmnConfConfConfigJson);
+        List<int>? noticeChannelTypes = bpmnConfConfigJson.NoticeChannelTypes;
+        if (noticeChannelTypes.IsEmpty())
+        {
+            return ;
+        }
         bool sendByTemplate = _bpmVariableMessageListenerService.ListenerCheckIsSendByTemplate(bpmVariableMessageVo);
         if (sendByTemplate)
         {

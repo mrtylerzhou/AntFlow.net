@@ -230,22 +230,62 @@ public class BpmVariableMessageBizService : IBpmVariableMessageBizService
     }
 
     /// <summary>
+    /// build variable message vo from business data vo
+    /// </summary>
+    public BpmVariableMessageVo FromBusinessDataVo(BusinessDataVo businessDataVo)
+    {
+        if (businessDataVo == null)
+        {
+            return null;
+        }
+
+        //get event type by operation type
+        EventTypeEnum? eventTypeEnum = EventTypeEnumExtensions.GetEnumByOperationType(businessDataVo.OperationType ?? 0);
+
+        if (eventTypeEnum == null)
+        {
+            return null;
+        }
+
+        //default link type is process type
+        int type = 2;
+
+        //if event type is cancel operation then link type is view type
+        if (eventTypeEnum == EventTypeEnum.PROCESS_CANCELLATION)
+        {
+            type = 1;
+        }
+
+        BpmVariableMessageVo vo = new BpmVariableMessageVo
+        {
+            ProcessNumber = businessDataVo.ProcessNumber,
+            FormCode = businessDataVo.FormCode,
+            EventType = (int)eventTypeEnum,
+            ForwardUsers = businessDataVo.UserIds ?? new List<string>(),
+            SignUpUsers = businessDataVo.SignUpUsers?.Select(o => o.Id).ToList() ?? new List<string>(),
+            MessageType = eventTypeEnum.IsInNode() ? 2 : 1,
+            EventTypeEnum = eventTypeEnum.Value,
+            Type = type,
+        };
+
+        //build message vo
+        return GetBpmVariableMessageVo(vo);
+    }
+
+    /// <summary>
+    /// send templated messages asynchronously (fire-and-forget)
+    /// </summary>
+    public void SendTemplateMessagesAsync(BpmVariableMessageVo vo)
+    {
+        DoSendTemplateMessages(vo);
+    }
+
+    /// <summary>
     /// do send templated messages
     /// </summary>
     private void DoSendTemplateMessages(BpmVariableMessageVo vo)
     {
-        //if next node's approvers is empty then query current tasks instead
-        if (vo.NextNodeApproveds.IsEmpty())
-        {
-            List<BpmAfTask> tasks = _taskService._repository
-                .Find(a => a.ProcInstId == vo.ProcessInsId);
-
-            if (!tasks.IsEmpty())
-            {
-                vo.NextNodeApproveds = tasks.Select(a => a.Assignee).ToList();
-            }
-        }
-
+        
         //read messages from variable config JSON
         BpmVariable bpmVariable = _variableService._repository
             .Find(a => a.Id == vo.VariableId).FirstOrDefault();
@@ -258,22 +298,18 @@ public class BpmVariableMessageBizService : IBpmVariableMessageBizService
         {
             return;
         }
-
+        //out of node messages
+        List<VariableMessageItem> messageItems = null;
         if (vo.MessageType == 1)
         {
-            //out of node messages
-            List<VariableMessageItem> messageItems = config.Messages
+             messageItems= config.Messages
                 .Where(m => m.MessageType != null && m.MessageType == 1 && m.EventType == vo.EventType)
                 .ToList();
-            foreach (VariableMessageItem messageItem in messageItems)
-            {
-                DoSendTemplateMessages(messageItem, vo);
-            }
         }
         else if (vo.MessageType == 2)
         {
             //in node messages
-            List<VariableMessageItem> messageItems = config.Messages
+             messageItems = config.Messages
                 .Where(m => m.EventType == vo.EventType)
                 .ToList();
             if (!string.IsNullOrEmpty(vo.ElementId))
@@ -284,6 +320,21 @@ public class BpmVariableMessageBizService : IBpmVariableMessageBizService
                 {
                     //如果当前节点有节点内通知消息,则覆盖全局通用的,否则使用全局的
                     messageItems = currentNodeVariableMessages;
+                }
+            }
+        }
+
+        if (!messageItems.IsEmpty())
+        {
+            //if next node's approvers is empty then query current tasks instead
+            if (vo.NextNodeApproveds.IsEmpty())
+            {
+                List<BpmAfTask> tasks = _taskService._repository
+                    .Find(a => a.ProcInstId == vo.ProcessInsId);
+
+                if (!tasks.IsEmpty())
+                {
+                    vo.NextNodeApproveds = tasks.Select(a => a.Assignee).ToList();
                 }
             }
             foreach (VariableMessageItem messageItem in messageItems)

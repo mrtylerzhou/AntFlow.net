@@ -24,4 +24,15 @@ public interface IBpmVariableMessageBizService
     /// Sends templated messages synchronously.
     /// </summary>
     void SendTemplateMessages(BpmVariableMessageVo vo);
+
+    /// <summary>
+    /// Builds a variable message vo from a business data vo, looking up event type
+    /// from operation type and enriching with process/task metadata.
+    /// </summary>
+    BpmVariableMessageVo FromBusinessDataVo(BusinessDataVo businessDataVo);
+
+    /// <summary>
+    /// Sends templated messages asynchronously (fire-and-forget).
+    /// </summary>
+    void SendTemplateMessagesAsync(BpmVariableMessageVo vo);
 }
