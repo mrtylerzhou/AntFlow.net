@@ -17,6 +17,7 @@ public enum BpmnNodeAdpConfEnum
     ADP_CONF_NODE_PROPERTY_DIRECT_LEADER = 12,
     ADP_CONF_NODE_PROPERTY_CUSTOMIZE=13,
     ADP_CONF_NODE_PROPERTY_FORM_RELATED_USERS=14,
+    ADP_CONF_NODE_PROPERTY_UDR_USERS=15,
 }
 
 public static class BpmnNodeAdpConfEnumExtensions
@@ -37,7 +38,8 @@ public static class BpmnNodeAdpConfEnumExtensions
         { BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_BUSINESSTABLE, NodePropertyEnum.NODE_PROPERTY_BUSINESSTABLE },
         { BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_DIRECT_LEADER, NodePropertyEnum.NODE_PROPERTY_DIRECT_LEADER },
         {BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_CUSTOMIZE,NodePropertyEnum.NODE_PROPERTY_CUSTOMIZE},
-        { BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_FORM_RELATED_USERS, NodePropertyEnum.NODE_PROPERTY_FORM_RELATED }
+        { BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_FORM_RELATED_USERS, NodePropertyEnum.NODE_PROPERTY_FORM_RELATED },
+        { BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_UDR_USERS, NodePropertyEnum.NODE_PROPERTY_ZDY_RULES }
     };
 
     

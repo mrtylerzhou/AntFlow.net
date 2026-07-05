@@ -12,7 +12,8 @@ public enum PersonnelEnum
         START_USER_PERSONNEL,
         DIRECT_LEADER_PERSONNEL,
         BUSINESS_TABLE_PERSONNEL,
-        FORM_USERS_PERSONNEL
+        FORM_USERS_PERSONNEL,
+        UDR_USERS_PERSONNEL
     }
 
     public static class PersonnelEnumExtensions
@@ -30,7 +31,8 @@ public enum PersonnelEnum
             { PersonnelEnum.START_USER_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_START_USER, "发起人自己") },
             { PersonnelEnum.DIRECT_LEADER_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_DIRECT_LEADER, "直属领导") },
             { PersonnelEnum.BUSINESS_TABLE_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_BUSINESSTABLE, "关联业务表") },
-            { PersonnelEnum.FORM_USERS_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_FORM_RELATED, "表单中相关人员") }
+            { PersonnelEnum.FORM_USERS_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_FORM_RELATED, "表单中相关人员") },
+            { PersonnelEnum.UDR_USERS_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_ZDY_RULES, "用户自定义规则人员") }
         };
 
         public static NodePropertyEnum GetNodeProperty(this PersonnelEnum personnelEnum)

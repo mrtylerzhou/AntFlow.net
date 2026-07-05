@@ -1,6 +1,7 @@
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Abstraction.util;
 using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.entity;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 using AntFlowCore.Persist.api.interf.repository;
@@ -54,6 +55,26 @@ public class ProcessControlController
         {
             list.Add(new BaseNumIdStruVo((int)value, NodeFormAssigneePropertyEnumExtensions.GetDescByCode((int)value)));
         }
+        return ResultHelper.Success(list);
+    }
+
+    /// <summary>
+    /// Returns the list of user-defined-rule (UDR) assignee type options
+    /// (e.g. 自定义审批人1, 自定义审批人2, etc.).
+    /// Sourced from the dictionary where dict_type = "udr".
+    /// Used by the frontend when configuring a "自定义规则" approver node.
+    /// </summary>
+    [HttpGet("getUDROptions")]
+    public Result<List<BaseIdTranStruVo>> GetUDROptions()
+    {
+        List<DictData> dictDataList = _dicDataService._repository
+            .Find(a => a.DictType == AFSpecialDictCategoryEnumExtensions.USER_DEFINED_RULE_FOR_ASSIGNEE)
+            .ToList();
+
+        var list = dictDataList
+            .Select(a => new BaseIdTranStruVo(a.Value, a.Label))
+            .ToList();
+
         return ResultHelper.Success(list);
     }
     
