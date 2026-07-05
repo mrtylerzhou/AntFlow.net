@@ -2,6 +2,7 @@ using System.Text.Json;
 using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Base.bpmnmodel;
 using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.extension;
@@ -103,6 +104,11 @@ public class RuntimeService
                     };
                     historyTaskInsts.Add(startTask);
                }
+               // serialize node labels into FormKey for BpmnTaskListener to read
+               string extraInfoJson = firstAssigneeNode.LabelList != null && firstAssigneeNode.LabelList.Count > 0
+                    ? System.Text.Json.JsonSerializer.Serialize(new NodeExtraInfoDTO { NodeLabelVOS = firstAssigneeNode.LabelList })
+                    : bpmnConfCommonVo.FormCode;
+
                foreach (var (key, value) in assigneeMap)
                {
                     BpmAfTask bpmAfTask = new BpmAfTask()
@@ -117,7 +123,7 @@ public class RuntimeService
                          Assignee = key,
                          AssigneeName = value,
                          CreateTime = nowTime.AddSeconds(1),
-                         FormKey = bpmnConfCommonVo.FormCode,
+                         FormKey = extraInfoJson,
                     };
                     tasks.Add(bpmAfTask);
                     if (signType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode())

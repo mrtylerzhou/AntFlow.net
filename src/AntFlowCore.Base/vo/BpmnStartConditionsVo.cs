@@ -209,6 +209,20 @@ namespace AntFlowCore.Base.vo
         /// </summary>
         [JsonPropertyName("isMigration")]
         public bool? IsMigration { get; set; }
+
+        /// <summary>
+        /// Deduplication type (1=none, 2=forward, 3=backward, 4=skip_next/adjacent).
+        /// Copied from BpmnConfVo.DeduplicationType during process start.
+        /// </summary>
+        [JsonPropertyName("deduplicationType")]
+        public int? DeduplicationType { get; set; }
+
+        /// <summary>
+        /// Duplication process strategy (1=remove, 2=skip).
+        /// When SKIP, deduplicated assignees still get tasks but are auto-completed.
+        /// </summary>
+        [JsonPropertyName("duplicationProcessStrategy")]
+        public int? DuplicationProcessStrategy { get; set; }
         
         [JsonPropertyName("approvalEmpls")]
         public List<BaseIdTranStruVo> ApprovalEmpls { get; set; }

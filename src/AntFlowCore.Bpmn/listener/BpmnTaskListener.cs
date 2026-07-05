@@ -1,7 +1,9 @@
 using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Abstraction.service.repository;
+using AntFlowCore.Base.dto;
 using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.exception;
@@ -12,6 +14,7 @@ using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.util;
 using AntFlowCore.Persist.api.interf.repository;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace AntFlowCore.Bpmn.listener;
 
@@ -23,6 +26,7 @@ public class BpmnTaskListener: ITaskListener
     private readonly IUserEntrustService _userEntrustService;
     private readonly IBpmVariableMessageListenerService _bpmVariableMessageListenerService;
     private readonly IProcessBusinessContansService _processBusinessContansService;
+    private readonly IBpmVerifyInfoService _bpmVerifyInfoService;
     private readonly ILogger<BpmnTaskListener> _logger;
 
     public BpmnTaskListener(
@@ -32,6 +36,7 @@ public class BpmnTaskListener: ITaskListener
        IUserEntrustService userEntrustService,
        IBpmVariableMessageListenerService bpmVariableMessageListenerService,
        IProcessBusinessContansService processBusinessContansService,
+       IBpmVerifyInfoService bpmVerifyInfoService,
         ILogger<BpmnTaskListener> logger)
     {
         _bpmnConfService = bpmnConfService;
@@ -40,6 +45,7 @@ public class BpmnTaskListener: ITaskListener
         _userEntrustService = userEntrustService;
         _bpmVariableMessageListenerService = bpmVariableMessageListenerService;
         _processBusinessContansService = processBusinessContansService;
+        _bpmVerifyInfoService = bpmVerifyInfoService;
         _logger = logger;
     }
    
@@ -64,6 +70,10 @@ public class BpmnTaskListener: ITaskListener
            taskService.Complete(delegateTask);
            return;
         }
+
+        // Adjacent deduplication auto-skip: check FormKey for skippedAssignees label
+        ProcessSkippedAssignee(delegateTask);
+
         BpmBusinessProcess bpmBusinessProcess = _bpmBusinessProcessService._repository
             .Find(a=>a.BusinessNumber==delegateTask.ProcessNumber)
             .First();
@@ -141,6 +151,82 @@ public class BpmnTaskListener: ITaskListener
                 TaskId = delegateTask.ProcInstId,
             };
             ActivitiTemplateMsgUtils.sendBpmApprovalMsg(activitiBpmMsgVo);
+        }
+    }
+
+    /// <summary>
+    /// 相邻节点去重自动跳过:检查任务的FormKey中是否包含skippedAssignees标签,
+    /// 如果当前任务审批人在标签的labelName(逗号分隔的审批人ID列表)中,
+    /// 则自动完成任务并记录审批信息.
+    /// </summary>
+    private void ProcessSkippedAssignee(BpmAfTask delegateTask)
+    {
+        string formKey = delegateTask.FormKey;
+        if (string.IsNullOrEmpty(formKey) || !formKey.StartsWith("{"))
+        {
+            return;
+        }
+
+        NodeExtraInfoDTO? extraInfoDTO = null;
+        try
+        {
+            extraInfoDTO = JsonSerializer.Deserialize<NodeExtraInfoDTO>(formKey);
+        }
+        catch
+        {
+            return;
+        }
+
+        if (extraInfoDTO?.NodeLabelVOS == null || extraInfoDTO.NodeLabelVOS.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var nodeLabelVO in extraInfoDTO.NodeLabelVOS)
+        {
+            if (!StringConstants.SKIPPED_ASSIGNEE.Equals(nodeLabelVO.LabelValue))
+            {
+                continue;
+            }
+
+            string labelName = nodeLabelVO.LabelName;
+            if (string.IsNullOrEmpty(labelName))
+            {
+                continue;
+            }
+
+            var skippedAssigneeIds = labelName.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+            var currentSkippedAssignee = skippedAssigneeIds.Where(a => a.Contains(delegateTask.Assignee)).ToList();
+            if (currentSkippedAssignee.Count > 0)
+            {
+                // auto-complete the task
+                var taskService = ServiceProviderUtils.GetService<ITaskService>();
+                taskService?.Complete(delegateTask);
+
+                // save verify info
+                BpmBusinessProcess? bpmBusinessProcess = _bpmBusinessProcessService._repository
+                    .Find(a => a.BusinessNumber == delegateTask.ProcessNumber)
+                    .FirstOrDefault();
+                if (bpmBusinessProcess != null)
+                {
+                    BpmVerifyInfo bpmVerifyInfo = new BpmVerifyInfo
+                    {
+                        VerifyDate = DateTime.Now,
+                        TaskName = delegateTask.Name,
+                        TaskId = delegateTask.Id,
+                        RunInfoId = bpmBusinessProcess.ProcInstId,
+                        VerifyUserId = delegateTask.Assignee,
+                        VerifyUserName = delegateTask.AssigneeName,
+                        TaskDefKey = delegateTask.TaskDefKey,
+                        VerifyStatus = (int)ProcessSubmitStateEnum.PROCESS_AGRESS_TYPE,
+                        VerifyDesc = StringConstants.AF_AUTO_SKIP_COMMENT,
+                        ProcessCode = delegateTask.ProcessNumber,
+                        TenantId = MultiTenantUtil.GetCurrentTenantId(),
+                    };
+                    _bpmVerifyInfoService.AddVerifyInfo(bpmVerifyInfo);
+                }
+                return;
+            }
         }
     }
 }

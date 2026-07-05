@@ -1,5 +1,8 @@
-﻿using AntFlowCore.Base.adaptor;
+﻿using AntFlowCore.Abstraction.util;
+using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.factory;
+using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.util;
 
@@ -22,16 +25,16 @@ namespace AntFlowCore.Bpmn.adaptor.bpmnelementadp;
 
             int? signType = property.SignType;
 
-            var assigneeMap = new SortedDictionary<string, string>();
-            var assignee = new List<string>();
-            foreach (var assigneeVo in assigneeList)
+            // Build assignee map respecting duplication strategy.
+            // SKIP strategy: include deduplicated assignees (auto-skipped at runtime)
+            // REMOVE strategy: exclude deduplicated assignees
+            var startConditions = new BpmnStartConditionsVo();
+            object strategyObj = ThreadLocalContainer.Get(StringConstants.DUPLICATION_PROCESS_STRATEGY);
+            if (strategyObj is int strategy)
             {
-                if (assigneeVo.IsDeduplication == 0)
-                {
-                    assignee.Add(assigneeVo.Assignee);
-                    assigneeMap[assigneeVo.Assignee] = assigneeVo.AssigneeName;
-                }
+                startConditions.DuplicationProcessStrategy = strategy;
             }
+            var assigneeMap = AssigneeVoBuildUtils.DealingWithMultiPlayerNodeDuplication(nodeParamsVo, startConditions);
 
             string elementCodeStr = string.Join("",collectionName, elementCode);
             if (signType == (int)SignTypeEnum.SIGN_TYPE_SIGN)

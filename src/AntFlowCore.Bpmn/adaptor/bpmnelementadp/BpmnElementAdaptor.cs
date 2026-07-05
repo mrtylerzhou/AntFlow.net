@@ -1,5 +1,7 @@
 ﻿using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.factory;
+using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.constants;
 using AntFlowCore.Bpmn.util;
@@ -39,6 +41,9 @@ public abstract class BpmnElementAdaptor : IAdaptorService
             elementVo.SignType = signType;
             // carry node labels onto the final BPMN element VO
             elementVo.LabelList = nodeVo.LabelList;
+            // Adjacent deduplication (SKIP_NEXT): if node is deduplicated, add skippedAssignees label
+            // so that BpmnTaskListener can auto-skip the task at runtime
+            AddSkippedAssigneesLabelIfNeeded(nodeVo);
             SetSignUpProperty(nodeVo, elementVo);
 
             bpmnConfCommonElementVos.Add(elementVo);
@@ -95,6 +100,72 @@ public abstract class BpmnElementAdaptor : IAdaptorService
             elementVo.IsSignUp = nodeVo.IsSignUp;
             elementVo.AfterSignUpWay = nodeVo.Property?.AfterSignUpWay ?? 0;
             elementVo.SignUpType = nodeVo.Property?.SignUpType ?? 0;
+        }
+
+        /// <summary>
+        /// 相邻节点去重(SKIP策略): 当 DuplicationProcessStrategy==SKIP 时,
+        /// 如果节点被标记为去重(IsNodeDeduplication==1),
+        /// 收集被去重的审批人ID,给节点打上 skippedAssignees 标签.
+        /// 流程运行时 BpmnTaskListener 检查此标签,自动完成匹配的任务.
+        /// 对应 Java BpmnElementAdaptor.doFormatNodesToElements 第49-77行.
+        /// </summary>
+        private void AddSkippedAssigneesLabelIfNeeded(BpmnNodeVo nodeVo)
+        {
+            // Only apply when strategy is SKIP
+            object strategyObj = ThreadLocalContainer.Get(StringConstants.DUPLICATION_PROCESS_STRATEGY);
+            int strategy = strategyObj is int s ? s : DuplicationProcessStrategyEnum.REMOVE.Code;
+            if (strategy != DuplicationProcessStrategyEnum.SKIP.Code)
+            {
+                return;
+            }
+
+            BpmnNodeParamsVo paramsVo = nodeVo.Params;
+            if (paramsVo == null)
+            {
+                return;
+            }
+
+            int? paramType = paramsVo.ParamType;
+            List<string> skippedIds = new List<string>();
+
+            if (paramsVo.IsNodeDeduplication == 1)
+            {
+                // Whole node is deduplicated
+                if (paramType == 1 && paramsVo.Assignee != null)
+                {
+                    // Single player: the assignee is skipped
+                    skippedIds.Add(paramsVo.Assignee.Assignee);
+                }
+                else if (paramType == 2 && paramsVo.AssigneeList != null)
+                {
+                    // Multiplayer: all assignees in this node are skipped
+                    skippedIds.AddRange(paramsVo.AssigneeList.Select(a => a.Assignee));
+                }
+            }
+            else if (paramType == 2 && paramsVo.AssigneeList != null)
+            {
+                // Node not fully deduplicated, but some assignees might be
+                var deduplicatedAssignees = paramsVo.AssigneeList.Where(a => a.IsDeduplication == 1).ToList();
+                if (deduplicatedAssignees.Count > 0)
+                {
+                    skippedIds.AddRange(deduplicatedAssignees.Select(a => a.Assignee));
+                }
+            }
+
+            if (skippedIds.Count == 0)
+            {
+                return;
+            }
+
+            nodeVo.LabelList ??= new List<BpmnNodeLabelVO>();
+            // avoid duplicate label
+            if (!nodeVo.LabelList.Any(l => StringConstants.SKIPPED_ASSIGNEE == l.LabelValue))
+            {
+                nodeVo.LabelList.Add(new BpmnNodeLabelVO(
+                    StringConstants.SKIPPED_ASSIGNEE,
+                    string.Join(",", skippedIds)
+                ));
+            }
         }
 
         // 处理加批

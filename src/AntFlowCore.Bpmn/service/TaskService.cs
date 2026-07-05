@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using System.Text.Json;
 using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.extension;
@@ -240,6 +241,11 @@ public class TaskService : ITaskService
             List<BpmAfTaskInst> historyTaskInsts = new List<BpmAfTaskInst>();
             List<BpmAfTask> tasks = new List<BpmAfTask>();
 
+            // serialize node labels into FormKey for BpmnTaskListener to read
+            string extraInfoJson = elementToDeal.LabelList != null && elementToDeal.LabelList.Count > 0
+                ? System.Text.Json.JsonSerializer.Serialize(new NodeExtraInfoDTO { NodeLabelVOS = elementToDeal.LabelList })
+                : bpmAfTask.FormKey;
+
             foreach (var (key, value) in assigneeMap)
             {
                 if (verifyUserIds.Contains(key))
@@ -261,7 +267,7 @@ public class TaskService : ITaskService
                     Assignee = key,
                     AssigneeName = value,
                     CreateTime = nowTime,
-                    FormKey = bpmAfTask.FormKey,
+                    FormKey = extraInfoJson,
                     TenantId = MultiTenantUtil.GetCurrentTenantId(),
                 };
                 tasks.Add(newTask);

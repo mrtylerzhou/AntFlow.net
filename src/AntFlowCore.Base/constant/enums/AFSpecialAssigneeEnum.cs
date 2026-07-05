@@ -15,12 +15,14 @@ public class AFSpecialAssigneeEnum
 
     public static readonly AFSpecialAssigneeEnum TO_BE_REMOVED = new AFSpecialAssigneeEnum(0, "0", "最终会被去除的人员");
     public static readonly AFSpecialAssigneeEnum COPY_NODE = new AFSpecialAssigneeEnum(1, "-1", "流程通知");
+    public static readonly AFSpecialAssigneeEnum SKIP = new AFSpecialAssigneeEnum(-2, "-2", "自动节点自动跳过");
     public static IEnumerable<AFSpecialAssigneeEnum> Values
     {
         get
         {
             yield return TO_BE_REMOVED;
             yield return COPY_NODE;
+            yield return SKIP;
         }
     }
 }

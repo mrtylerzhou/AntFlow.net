@@ -30,14 +30,14 @@ namespace AntFlowCore.Abstraction.formatter.filter;
 
                 if (bpmnNodeVo.Params.ParamType == 1)
                 {
-                    SinglePlayerNodeDeduplication(bpmnNodeVo, new HashSet<string>(),new List<string> { initiator });
+                    SinglePlayerNodeDeduplication(bpmnNodeVo, new HashSet<string>(),new List<string> { initiator }, bpmnStartConditions);
                     nodeVoList.Add(bpmnNodeVo);
                     continue;
                 }
 
                 if (bpmnNodeVo.Params.ParamType == 2)
                 {
-                    MultiPlayerNodeDeduplication(bpmnNodeVo, new HashSet<string>(),new List<string> { initiator }, false);
+                    MultiPlayerNodeDeduplication(bpmnNodeVo, new HashSet<string>(),new List<string> { initiator }, false, bpmnStartConditions);
                     nodeVoList.Add(bpmnNodeVo);
                 }
             }
@@ -49,14 +49,14 @@ namespace AntFlowCore.Abstraction.formatter.filter;
             {
                 if (bpmnNode.Params.ParamType == 1)
                 {
-                    SinglePlayerNodeDeduplication(bpmnNode,new HashSet<string>(), approverList);
+                    SinglePlayerNodeDeduplication(bpmnNode,new HashSet<string>(), approverList, bpmnStartConditions);
                     continue;
                 }
 
                 if (bpmnNode.Params.ParamType == 2)
                 {
                     bpmnNode.Params.AssigneeList.Reverse();
-                    MultiPlayerNodeDeduplication(bpmnNode,new HashSet<string>(), approverList, true);
+                    MultiPlayerNodeDeduplication(bpmnNode,new HashSet<string>(), approverList, true, bpmnStartConditions);
                     bpmnNode.Params.AssigneeList.Reverse();
                 }
             }
@@ -83,32 +83,50 @@ namespace AntFlowCore.Abstraction.formatter.filter;
             BpmnNodeVo bpmnNodeVo = mapNodes[startNodeId];
 
             // 使用递归处理并行网关
-            ProcessNodeRecursively(bpmnNodeVo,new HashSet<string>(), mapNodes, approverList);
+            ProcessNodeRecursively(bpmnNodeVo,new HashSet<string>(), mapNodes, approverList, bpmnStartConditions);
 
             return bpmnConfVo;
         }
 
-        private void SinglePlayerNodeDeduplication(BpmnNodeVo bpmnNodeVo,HashSet<String> alreadyProcessedNods, List<string> approverList)
+        private void SinglePlayerNodeDeduplication(BpmnNodeVo bpmnNodeVo,HashSet<String> alreadyProcessedNods, List<string> approverList, BpmnStartConditionsVo bpmnStartConditions)
         {
-            if (bpmnNodeVo.Params.IsNodeDeduplication == 1||alreadyProcessedNods.Contains(bpmnNodeVo.NodeId))
+            if (bpmnNodeVo.DeduplicationExclude || alreadyProcessedNods.Contains(bpmnNodeVo.NodeId))
+            {
+                return;
+            }
+            if (bpmnNodeVo.Params.IsNodeDeduplication == 1)
             {
                 return;
             }
 
             BpmnNodeParamsAssigneeVo assignee = bpmnNodeVo.Params.Assignee;
+            bool isSkipNext = bpmnStartConditions.DeduplicationType == (int)DeduplicationTypeEnum.DEDUPLICATION_TYPE_SKIP_NEXT;
             if (approverList.Contains(assignee.Assignee))
             {
                 assignee.IsDeduplication = 1;
                 bpmnNodeVo.Params.IsNodeDeduplication = 1;
+                if (isSkipNext)
+                {
+                    approverList.Clear();
+                    approverList.Add(assignee.Assignee);
+                }
             }
             else
             {
-                approverList.Add(assignee.Assignee);
+                if (isSkipNext)
+                {
+                    approverList.Clear();
+                    approverList.Add(assignee.Assignee);
+                }
+                else
+                {
+                    approverList.Add(assignee.Assignee);
+                }
             }
             alreadyProcessedNods.Add(bpmnNodeVo.NodeId);
         }
 
-        private void MultiPlayerNodeDeduplication(BpmnNodeVo bpmnNodeVo,HashSet<String> alreadyProcessedNods,List<string> approverList, bool flag)
+        private void MultiPlayerNodeDeduplication(BpmnNodeVo bpmnNodeVo,HashSet<String> alreadyProcessedNods,List<string> approverList, bool flag, BpmnStartConditionsVo bpmnStartConditions)
         {
             if (bpmnNodeVo.DeduplicationExclude||
                 bpmnNodeVo.Params.IsNodeDeduplication == 1
@@ -117,6 +135,7 @@ namespace AntFlowCore.Abstraction.formatter.filter;
                 return;
             }
 
+            bool isSkipNext = bpmnStartConditions.DeduplicationType == (int)DeduplicationTypeEnum.DEDUPLICATION_TYPE_SKIP_NEXT;
             List<BpmnNodeParamsAssigneeVo> assigneeList = bpmnNodeVo.Params.AssigneeList;
             int isNodeDeduplication = 1;
             foreach (var assignee in assigneeList)
@@ -129,12 +148,25 @@ namespace AntFlowCore.Abstraction.formatter.filter;
                 if (approverList.Contains(assignee.Assignee))
                 {
                     assignee.IsDeduplication = 1;
+                    if (isSkipNext)
+                    {
+                        approverList.Clear();
+                        approverList.Add(assignee.Assignee);
+                    }
                 }
                 else
                 {
                     if (flag)
                     {
-                        approverList.Add(assignee.Assignee);
+                        if (isSkipNext)
+                        {
+                            approverList.Clear();
+                            approverList.Add(assignee.Assignee);
+                        }
+                        else
+                        {
+                            approverList.Add(assignee.Assignee);
+                        }
                     }
                     isNodeDeduplication = 0;
                 }
@@ -142,7 +174,7 @@ namespace AntFlowCore.Abstraction.formatter.filter;
             bpmnNodeVo.Params.IsNodeDeduplication = isNodeDeduplication;
             alreadyProcessedNods.Add(bpmnNodeVo.NodeId);
         }
-        private void ProcessNodeRecursively(BpmnNodeVo bpmnNodeVo,HashSet<String> alreadyProcessedNodes, Dictionary<String, BpmnNodeVo> mapNodes, List<String> approverList) {
+        private void ProcessNodeRecursively(BpmnNodeVo bpmnNodeVo,HashSet<String> alreadyProcessedNodes, Dictionary<String, BpmnNodeVo> mapNodes, List<String> approverList, BpmnStartConditionsVo bpmnStartConditions) {
 
             String nextId=null;
             do {
@@ -153,9 +185,9 @@ namespace AntFlowCore.Abstraction.formatter.filter;
                     foreach (String parallelNodeToId in parallelNodeToIds) {
                         if (mapNodes.TryGetValue(parallelNodeToId, out var parallelNodeTo))
                         {
-                            ProcessNodeRecursively(parallelNodeTo,alreadyProcessedNodes, mapNodes, approverList);
+                            ProcessNodeRecursively(parallelNodeTo,alreadyProcessedNodes, mapNodes, approverList, bpmnStartConditions);
                         }
-                       
+
                     }
 
                 }
@@ -163,9 +195,9 @@ namespace AntFlowCore.Abstraction.formatter.filter;
 
                 // 处理单节点去重
                 if (bpmnNodeVo.Params.ParamType==1) {
-                    SinglePlayerNodeDeduplication(bpmnNodeVo,alreadyProcessedNodes, approverList);
+                    SinglePlayerNodeDeduplication(bpmnNodeVo,alreadyProcessedNodes, approverList, bpmnStartConditions);
                 }else if (bpmnNodeVo.Params.ParamType==2) {
-                    MultiPlayerNodeDeduplication(bpmnNodeVo,alreadyProcessedNodes, approverList, true);
+                    MultiPlayerNodeDeduplication(bpmnNodeVo,alreadyProcessedNodes, approverList, true, bpmnStartConditions);
                 }
 
                 String nodeTo = GetNodeTo(bpmnNodeVo);

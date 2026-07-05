@@ -66,5 +66,12 @@ namespace AntFlowCore.Base.util
         // Dynamic condition related constants
         public const string CONDITION_CHANGED = "condition_changed";
         public const string CURRENT_USER_ALREADY_PROCESSED = "currentUserAlreadyProcessed";
+
+        // Adjacent deduplication auto-skip comment and suffix
+        public const string AF_AUTO_SKIP_COMMENT = "相同审批人自动跳过";
+        public const string AF_SKIP_ASSIGNEE_NODE_SUFFIX = "⬇️";
+
+        // Thread-local key for duplication process strategy (used by element adaptors)
+        public const string DUPLICATION_PROCESS_STRATEGY = "duplicationProcessStrategy";
     }
 }

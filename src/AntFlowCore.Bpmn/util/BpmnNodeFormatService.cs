@@ -42,7 +42,7 @@ public class BpmnNodeFormatService : IBpmnNodeFormatService
         List<BpmnNodeVo> rebuildNodesList = new List<BpmnNodeVo>();
         BpmnNodeVo startNode = GetStartUserNode(nodes);
         rebuildNodesList.Add(startNode); // Set start node
-        TreatNodesRecursively(rebuildNodesList, nodes, startNode);
+        TreatNodesRecursively(rebuildNodesList, nodes, startNode, bpmnStartConditions);
 
         // Set start user node
         BpmnNodeVo startUserNode = GetStartUserNode(rebuildNodesList);
@@ -219,7 +219,7 @@ public class BpmnNodeFormatService : IBpmnNodeFormatService
     /// <param name="rebuildNodesList"></param>
     /// <param name="nodes"></param>
     /// <param name="nodeVo"></param>
-    private void TreatNodesRecursively(List<BpmnNodeVo> rebuildNodesList, List<BpmnNodeVo> nodes, BpmnNodeVo nodeVo)
+    private void TreatNodesRecursively(List<BpmnNodeVo> rebuildNodesList, List<BpmnNodeVo> nodes, BpmnNodeVo nodeVo, BpmnStartConditionsVo bpmnStartConditions)
     {
         var mapNodes = nodes.ToDictionary(node => node.NodeId, node => node);
         string nextId = null;
@@ -242,12 +242,12 @@ public class BpmnNodeFormatService : IBpmnNodeFormatService
             {
                 BpmnNodeVo aggregationNode = BpmnUtils.GetAggregationNode(nextNodeVo, mapNodes.Values);
                 
-                TreatParallelGatewayRecursively(nextNodeVo, aggregationNode, mapNodes, nodes, rebuildNodesList);
+                TreatParallelGatewayRecursively(nextNodeVo, aggregationNode, mapNodes, nodes, rebuildNodesList, bpmnStartConditions);
                 nodeVo = aggregationNode;
             }
             else
             {
-                RebuildNodes(rebuildNodesList, nodes, nextNodeVo);
+                RebuildNodes(rebuildNodesList, nodes, nextNodeVo, bpmnStartConditions);
                 nodeVo = nextNodeVo;
             }
 
@@ -268,7 +268,8 @@ public class BpmnNodeFormatService : IBpmnNodeFormatService
         BpmnNodeVo itsAggregationNode,
         Dictionary<string, BpmnNodeVo> mapNodes,
         List<BpmnNodeVo> nodes,
-        List<BpmnNodeVo> rebuildNodesList)
+        List<BpmnNodeVo> rebuildNodesList,
+        BpmnStartConditionsVo bpmnStartConditions)
     {
         if (itsAggregationNode == null)
         {
@@ -278,8 +279,8 @@ public class BpmnNodeFormatService : IBpmnNodeFormatService
         string aggregationNodeNodeId = itsAggregationNode.NodeId;
         var nodeTos = outerMostParallelGatewayNode.NodeTo;
 
-        RebuildNodes(rebuildNodesList, nodes, outerMostParallelGatewayNode);
-        RebuildNodes(rebuildNodesList, nodes, itsAggregationNode);
+        RebuildNodes(rebuildNodesList, nodes, outerMostParallelGatewayNode, bpmnStartConditions);
+        RebuildNodes(rebuildNodesList, nodes, itsAggregationNode, bpmnStartConditions);
 
         foreach (var nodeTo in nodeTos)
         {
@@ -296,11 +297,11 @@ public class BpmnNodeFormatService : IBpmnNodeFormatService
                 if ((int)NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY == nodeVo.NodeType)
                 {
                     var aggregationNode = BpmnUtils.GetAggregationNode(nodeVo, mapNodes.Values);
-                    TreatParallelGatewayRecursively(nodeVo, aggregationNode, mapNodes, nodes, rebuildNodesList);
+                    TreatParallelGatewayRecursively(nodeVo, aggregationNode, mapNodes, nodes, rebuildNodesList, bpmnStartConditions);
                 }
                 else
                 {
-                    RebuildNodes(rebuildNodesList, nodes, nodeVo);
+                    RebuildNodes(rebuildNodesList, nodes, nodeVo, bpmnStartConditions);
                 }
             }
         }
@@ -312,12 +313,17 @@ public class BpmnNodeFormatService : IBpmnNodeFormatService
     /// <param name="nodes"></param>
     /// <param name="nodeVo"></param>
     /// <exception cref="AFBizException"></exception>
-    private void RebuildNodes(List<BpmnNodeVo> rebuildNodesList, List<BpmnNodeVo> nodes, BpmnNodeVo nodeVo)
+    private void RebuildNodes(List<BpmnNodeVo> rebuildNodesList, List<BpmnNodeVo> nodes, BpmnNodeVo nodeVo, BpmnStartConditionsVo bpmnStartConditions)
     {
         BpmnNodeParamsVo nodeParamsVo = nodeVo.Params;
 
         if (nodeParamsVo.IsNodeDeduplication == 1)
         {
+            if (DuplicationProcessStrategyEnum.SKIP.Code == (bpmnStartConditions.DuplicationProcessStrategy ?? DuplicationProcessStrategyEnum.REMOVE.Code))
+            {
+                rebuildNodesList.Add(nodeVo);
+                return;
+            }
             // Skip deduplicated node and rebuild nodeTo
             var nextNodeTo = GetNodeTo(nodeVo);
             List<BpmnNodeVo> nodeVos = rebuildNodesList.Where(a => nodeVo.NodeId == a.Params.NodeTo).ToList();
@@ -460,6 +466,18 @@ public class BpmnNodeFormatService : IBpmnNodeFormatService
                         nodeVo.NodeId, numMap["nodeCode"], numMap["sequenceFlowNum"], numMap);
                 }
             }
+        }
+        if (!string.IsNullOrEmpty(lastAggNode.NodeId))
+        {
+            if (alreadyProcessNodeIds.Contains(lastAggNode.NodeId))
+            {
+                return;
+            }
+            alreadyProcessNodeIds.Add(lastAggNode.NodeId);
+            List<BpmnNodeVo> nodeFroms = GetNodeFroms(rebuildNodesList, lastAggNode);
+            lastAggNode.FromNodes = nodeFroms;
+            FormatNodesToElements(bpmnConfCommonElementVos, rebuildNodesList,
+                lastAggNode.NodeId, numMap["nodeCode"], numMap["sequenceFlowNum"], numMap);
         }
     }
     /// <summary>
