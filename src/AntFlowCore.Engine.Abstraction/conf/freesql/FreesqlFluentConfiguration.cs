@@ -780,6 +780,13 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.IsDel).Name("is_del");
                 a.Property(b => b.TenantId).Name("tenant_id");
+            }).ConfigEntity<BpmDynamicConditionChoosen>(a =>
+            {
+                a.Name("t_bpm_dynamic_condition_choosen");
+                a.Property(b => b.Id).IsPrimary(true).IsIdentity(true).Name("id");
+                a.Property(b => b.ProcessNumber).Name("process_number");
+                a.Property(b => b.NodeId).Name("node_id");
+                a.Property(b => b.NodeFrom).Name("node_from");
             });
     }
 }

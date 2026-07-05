@@ -184,7 +184,7 @@ public class ConditionFilterService
             }
 
             //determine next node by condition
-            BpmnNodeVo afterFilterNode = FilterCondition(beforeFilterNodeList, bpmnStartConditionsVo);
+            BpmnNodeVo afterFilterNode = FilterCondition(beforeFilterNodeList, bpmnStartConditionsVo, node.IsDynamicCondition == true);
             if (afterFilterNode == null)
             {
                 throw new AFBizException("999",
@@ -280,7 +280,7 @@ public class ConditionFilterService
     }
 
     public BpmnNodeVo FilterCondition(List<BpmnNodeVo> beforeFilterNodeList,
-        BpmnStartConditionsVo bpmnStartConditionsVo)
+        BpmnStartConditionsVo bpmnStartConditionsVo, bool isDynamicConditionGateway = false)
     {
         if (beforeFilterNodeList == null || !beforeFilterNodeList.Any())
         {
@@ -309,7 +309,7 @@ public class ConditionFilterService
             bool matchCondition = _conditionService.CheckMatchCondition(
                 bpmnNodeVo,
                 bpmnNodeVo.Property.ConditionsConf,
-                bpmnStartConditionsVo,false);
+                bpmnStartConditionsVo, isDynamicConditionGateway);
 
             if (!matchCondition)
             {

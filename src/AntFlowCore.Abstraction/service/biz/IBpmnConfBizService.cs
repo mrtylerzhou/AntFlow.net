@@ -1,4 +1,5 @@
 using AntFlowCore.Base.dto;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 
 namespace AntFlowCore.Abstraction.service.biz;
@@ -25,4 +26,11 @@ public interface IBpmnConfBizService
     /// 对应 Java 版 BpmnConfBizServiceImpl.setBpmnTemplateVos。
     /// </summary>
     void SetBpmnTemplateVos(BpmnConfVo bpmnConfVo);
+
+    /// <summary>
+    /// Check whether dynamic conditions have changed for the given process.
+    /// Re-evaluates conditions with isMigration=true, isPreview=true.
+    /// Returns true if conditions changed (CONDITION_CHANGED exception caught).
+    /// </summary>
+    bool MigrationCheckConditionsChange(BusinessDataVo vo);
 }

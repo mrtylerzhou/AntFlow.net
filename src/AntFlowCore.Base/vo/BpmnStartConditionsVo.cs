@@ -202,6 +202,13 @@ namespace AntFlowCore.Base.vo
         public List<string> TemplateMarkIds { get; set; }
         [JsonPropertyName("isPreview")]
         public bool IsPreview { get; set; }
+
+        /// <summary>
+        /// Whether this is a migration (re-evaluation) of a running process.
+        /// Set to true when checking if dynamic conditions have changed during resubmit.
+        /// </summary>
+        [JsonPropertyName("isMigration")]
+        public bool? IsMigration { get; set; }
         
         [JsonPropertyName("approvalEmpls")]
         public List<BaseIdTranStruVo> ApprovalEmpls { get; set; }

@@ -1285,3 +1285,17 @@ CREATE TABLE if not exists `bpm_business_draft`
     KEY `bpm_business_idx1` (`process_key`) USING BTREE
 ) ENGINE = InnoDB
   COMMENT ='process draft';
+
+-- ============================================================
+-- t_bpm_dynamic_condition_choosen (dynamic condition chosen)
+-- ============================================================
+CREATE TABLE if not exists `t_bpm_dynamic_condition_choosen`
+(
+    `id`              bigint        NOT NULL AUTO_INCREMENT,
+    `process_number`  varchar(64)   DEFAULT NULL COMMENT 'process number',
+    `node_id`         varchar(64)   DEFAULT NULL COMMENT 'chosen condition node id',
+    `node_from`       varchar(64)   DEFAULT NULL COMMENT 'gateway node id',
+    PRIMARY KEY (`id`) USING BTREE,
+    KEY `bpm_dyn_cond_idx1` (`process_number`) USING BTREE
+) ENGINE = InnoDB
+  COMMENT ='dynamic condition chosen record';

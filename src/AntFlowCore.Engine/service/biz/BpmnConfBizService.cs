@@ -1,4 +1,5 @@
 using AntFlowCore.Abstraction.Orm.util;
+using AntFlowCore.Abstraction.factory;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Abstraction.service.repository;
@@ -9,6 +10,7 @@ using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.extension;
+using AntFlowCore.Base.factory;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.adaptor;
@@ -32,7 +34,8 @@ public class BpmnConfBizService : IBpmnConfBizService
     private readonly IBpmnEmployeeInfoProviderService _employeeInfoProviderService;
     private readonly IInformationTemplateService _informationTemplateService;
     private readonly ITaskMgmtService _taskMgmtService;
-  
+    private readonly IFormFactory _formFactory;
+    private readonly IBpmnStartFormatFactory _bpmnStartFormatFactory;
 
     public BpmnConfBizService(
         IBpmnConfService bpmnConfService,
@@ -44,7 +47,9 @@ public class BpmnConfBizService : IBpmnConfBizService
         IBpmProcessAppApplicationService bpmProcessAppApplicationService,
         IBpmnEmployeeInfoProviderService employeeInfoProviderService,
         IInformationTemplateService informationTemplateService,
-        ITaskMgmtService taskMgmtService
+        ITaskMgmtService taskMgmtService,
+        IFormFactory formFactory,
+        IBpmnStartFormatFactory bpmnStartFormatFactory
         )
     {
         _bpmnConfService = bpmnConfService;
@@ -57,6 +62,8 @@ public class BpmnConfBizService : IBpmnConfBizService
         _employeeInfoProviderService = employeeInfoProviderService;
         _informationTemplateService = informationTemplateService;
         _taskMgmtService = taskMgmtService;
+        _formFactory = formFactory;
+        _bpmnStartFormatFactory = bpmnStartFormatFactory;
     }
     private const String LinkMark = "_";
 
@@ -1001,5 +1008,47 @@ public class BpmnConfBizService : IBpmnConfBizService
         bpmnConf.UpdateTime=DateTime.Now;
         bpmnConf.UpdateUser = SecurityUtils.GetLogInEmpId();
         _bpmnConfService._repository.Update(bpmnConf);
+    }
+
+    /// <summary>
+    /// 动态条件迁移预校验:重新评估条件,检查条件是否发生变化.
+    /// 对应 Java BpmnConfBizServiceImpl.migrationCheckConditionsChange.
+    /// 1. 根据bpmnCode获取流程配置
+    /// 2. 获取表单适配器,调用LaunchParameters获取启动条件
+    /// 3. 设置isPreview=true, isMigration=true
+    /// 4. 调用条件过滤(formatBpmnConf),触发条件重新评估
+    /// 5. 如果ConditionService抛出CONDITION_CHANGED异常,则返回true
+    /// </summary>
+    public bool MigrationCheckConditionsChange(BusinessDataVo vo)
+    {
+        // 根据bpmnCode获取流程配置
+        BpmnConfVo bpmnConfVo = Detail(vo.BpmnCode);
+        if (bpmnConfVo == null || bpmnConfVo.Id == 0)
+        {
+            throw new AFBizException("未找到对应的 bpmnConf 记录");
+        }
+
+        // 获取表单适配器,调用LaunchParameters获取启动条件
+        var formAdapter = _formFactory.GetFormAdaptor(vo);
+        BpmnStartConditionsVo bpmnStartConditionsVo = formAdapter.LaunchParameters(vo);
+        bpmnStartConditionsVo.IsPreview = true;
+        bpmnStartConditionsVo.ProcessNum = vo.ProcessNumber;
+        bpmnStartConditionsVo.IsMigration = true;
+
+        // 调用条件过滤,触发条件重新评估
+        try
+        {
+            _bpmnStartFormatFactory.formatBpmnConf(bpmnConfVo, bpmnStartConditionsVo);
+        }
+        catch (AFBizException ex)
+        {
+            if (StringConstants.CONDITION_CHANGED.Equals(ex.Code))
+            {
+                return true;
+            }
+            throw;
+        }
+
+        return false;
     }
 }

@@ -1480,3 +1480,20 @@ CREATE INDEX        [IX_bpm_business_draft_process_key]          ON [dbo].[bpm_b
 END;
 -- COMMENT: 'process draft'
 GO
+
+-- ============================================================
+-- t_bpm_dynamic_condition_choosen (dynamic condition chosen)
+-- ============================================================
+IF OBJECT_ID(N'[dbo].[t_bpm_dynamic_condition_choosen]', N'U') IS NULL
+BEGIN
+CREATE TABLE [dbo].[t_bpm_dynamic_condition_choosen]
+(
+    [id]              BIGINT         NOT NULL IDENTITY(1,1),
+    [process_number]  NVARCHAR(64)   NULL     DEFAULT NULL,   -- COMMENT: 'process number'
+    [node_id]         NVARCHAR(64)   NULL     DEFAULT NULL,   -- COMMENT: 'chosen condition node id'
+    [node_from]       NVARCHAR(64)   NULL     DEFAULT NULL,   -- COMMENT: 'gateway node id'
+    CONSTRAINT [PK_t_bpm_dynamic_condition_choosen] PRIMARY KEY ([id])
+);
+CREATE INDEX [IX_bpm_dyn_cond_process_number] ON [dbo].[t_bpm_dynamic_condition_choosen] ([process_number]);
+END;
+GO

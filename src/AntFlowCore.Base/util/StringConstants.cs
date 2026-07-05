@@ -62,5 +62,9 @@ namespace AntFlowCore.Base.util
         public const string COPY_NODEV2 = "af_syslabel_copynodeV2";
         public const string AUTOMATIC_NODE = "auto_node";
         public const string SKIPPED_ASSIGNEE = "lbl_skipped_assignee";
+
+        // Dynamic condition related constants
+        public const string CONDITION_CHANGED = "condition_changed";
+        public const string CURRENT_USER_ALREADY_PROCESSED = "currentUserAlreadyProcessed";
     }
 }
