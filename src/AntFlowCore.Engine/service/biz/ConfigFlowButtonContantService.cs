@@ -336,7 +336,10 @@ public class ConfigFlowButtonContantService : IConfigFlowButtonContantService
             foreach (var node in bpmnNodes)
             {
                 var nodeConfig = JsonConfUtil.ParseNodeConfig(node.NodeConfigJson);
-                var confs = nodeConfig?.ButtonSignConf?.ButtonConfList;
+                // 发起人查看时只取发起页按钮,避免把审批页按钮(同意/不同意/加批/转办)混入查看页
+                var confs = nodeConfig?.ButtonSignConf?.ButtonConfList
+                    ?.Where(a => a.ButtonPageType == (int)ButtonPageTypeEnum.INITIATE)
+                    .ToList();
                 if (confs != null && confs.Any())
                 {
                     buttonConfList = buttonConfList ?? new List<ButtonSignButtonConf>();
@@ -376,11 +379,8 @@ public class ConfigFlowButtonContantService : IConfigFlowButtonContantService
                         }
                     }
                 }
-                //只能显示在发起人页的按钮不应显示在其它页面
-                if(isInitiate&&!buttonConfList.IsEmpty()){
-                    buttonConfList = buttonConfList.Where(a=>a.ButtonPageType==(int)ButtonPageTypeEnum.INITIATE).ToList();
-                }
             }
+
 
         }
 
