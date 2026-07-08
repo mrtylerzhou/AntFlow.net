@@ -139,13 +139,14 @@ public class ConfigFlowButtonContantService : IConfigFlowButtonContantService
                 {
                     toViewButtons=nodeConfButtons;
                 }
-                // 过滤无效按钮
+                // 过滤无效按钮:查看页不应展示作废/撤回/终止/提交/重新提交/同意等流程级或纯操作类按钮
                 var toViewButtonsComplete = toViewButtons
                     .Where(btn => btn.ButtonType != (int)ButtonTypeEnum.BUTTON_TYPE_ABANDONED
                     && btn.ButtonType != (int)ButtonTypeEnum.BUTTON_TYPE_PROCESS_DRAW_BACK
                     && btn.ButtonType != (int)ButtonTypeEnum.BUTTON_TYPE_SUBMIT
                     && btn.ButtonType != (int)ButtonTypeEnum.BUTTON_TYPE_RESUBMIT
-                    && btn.ButtonType != (int)ButtonTypeEnum.BUTTON_TYPE_STOP)
+                    && btn.ButtonType != (int)ButtonTypeEnum.BUTTON_TYPE_STOP
+                    && btn.ButtonType != (int)ButtonTypeEnum.BUTTON_TYPE_AGREE)
                     .ToList();
 
                 initiateButtons.AddRange(toViewButtonsComplete);
