@@ -323,7 +323,7 @@ public class ConfigFlowButtonContantService : IConfigFlowButtonContantService
       private List<ProcessActionButtonVo> getNodeConfButtons(BpmBusinessProcess bpmBusinessProcess,Boolean isInitiate){
         List<ButtonSignButtonConf>? buttonConfList = null;
         if(isInitiate){
-            // For initiator page, read from node_config_json of all nodes with matching bpmnCode
+            // For initiator page, read from node_config_json of all nodes with matching bpmnCode 
             var bpmnConf = _bpmnConfService._repository.GetQueryable()
                 .Where(a => a.BpmnCode == bpmBusinessProcess.Version && a.EffectiveStatus == 1)
                 .First();
