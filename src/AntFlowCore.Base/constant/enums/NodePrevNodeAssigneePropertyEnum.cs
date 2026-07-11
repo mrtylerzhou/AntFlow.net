@@ -23,7 +23,7 @@ public static class NodePrevNodeAssigneePropertyEnumExtensions
         return code switch
         {
             1 => "上一节点人员",
-            2 => "上一节点人员的角色",
+            //2 => "上一节点人员的角色",
             3 => "上一节点人员的HRBP",
             4 => "上一节点人员的直属领导",
             5 => "上一节点人员所在部门负责人",
