@@ -39,13 +39,13 @@ public abstract class BpmnElementAdaptor : IAdaptorService
             elementVo.TemplateVos = nodeVo.TemplateVos;
             elementVo.ApproveRemindVo = nodeVo.ApproveRemindVo;
             elementVo.SignType = signType;
-            // carry node labels onto the final BPMN element VO
-            elementVo.LabelList = nodeVo.LabelList;
+          
             // Adjacent deduplication (SKIP_NEXT): if node is deduplicated, add skippedAssignees label
             // so that BpmnTaskListener can auto-skip the task at runtime
             AddSkippedAssigneesLabelIfNeeded(nodeVo);
             SetSignUpProperty(nodeVo, elementVo);
-
+            // carry node labels onto the final BPMN element VO
+            elementVo.LabelList = nodeVo.LabelList;
             bpmnConfCommonElementVos.Add(elementVo);
 
             bool hasAlreadyFlowTo = false;
