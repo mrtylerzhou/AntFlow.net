@@ -47,7 +47,7 @@ public class BpmProcessMigrationService : IBpmProcessMigrationService
         string currentComment = vo.ApprovalComment;
 
         // Build a submit VO for re-submitting the process
-        var submitVo = JsonSerializer.Deserialize<BusinessDataVo>(JsonSerializer.Serialize(vo));
+        var submitVo = vo;
         submitVo.IsLowCodeFlow = bpmBusinessProcess.IsLowCodeFlow;
         submitVo.StartUserId = bpmBusinessProcess.CreateUser;
         submitVo.BpmnCode = bpmBusinessProcess.Version;
@@ -56,7 +56,8 @@ public class BpmProcessMigrationService : IBpmProcessMigrationService
         // and condition filter doesn't prune dynamic condition branches
 
         // Re-submit the process (starts a new process instance)
-        string submitJson = JsonSerializer.Serialize(submitVo);
+        dynamic dynamicBusinessDataVo = submitVo;
+        string submitJson = JsonSerializer.Serialize(dynamicBusinessDataVo);
         _processApprovalService.ButtonsOperation(submitJson, submitVo.FormCode);
 
         // Get the updated business process (new procInstId after re-submit)
