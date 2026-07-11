@@ -962,7 +962,9 @@ create table t_dict_data
     dict_sort   int(4)       default 0                 null comment '字典排序',
     dict_label  varchar(100) default ''                null comment '字典标签',
     dict_value  varchar(100) default ''                null comment '字典键值',
+	dic_value_type         tinyint                                null comment '0:string,1.number,3.namevalue object,4 array of namevalue object,5.array of string,6.array of number',
     dict_type   varchar(100) default ''                null comment '字典类型',
+	dict_second_level_type varchar(100)                           null,
     css_class   varchar(100)                           null comment '样式属性（其他样式扩展）',
     list_class  varchar(100)                           null comment '表格回显样式',
     is_default  char         default 'N'               null comment '是否默认（Y是 N否）',
@@ -1180,6 +1182,23 @@ create index AF_IDX_EXEC_PROCINSTID
 
 create index AF_IDX_EXEC_BUSKEY
     on bpm_af_execution (business_key);
+	
+	
+	
+-- ============================================================
+-- t_bpm_dynamic_condition_choosen (dynamic condition chosen)
+-- ============================================================
+CREATE TABLE if not exists `t_bpm_dynamic_condition_choosen`
+(
+    `id`              bigint        NOT NULL AUTO_INCREMENT,
+    `process_number`  varchar(64)   DEFAULT NULL COMMENT 'process number',
+    `node_id`         varchar(64)   DEFAULT NULL COMMENT 'chosen condition node id',
+    `node_from`       varchar(64)   DEFAULT NULL COMMENT 'gateway node id',
+    PRIMARY KEY (`id`) USING BTREE,
+    KEY `bpm_dyn_cond_idx1` (`process_number`) USING BTREE
+) ENGINE = InnoDB
+  COMMENT ='dynamic condition chosen record';
+
 
 -- REMOVED: t_bpmn_node_customize_conf (migrated to JSON)
 
@@ -1286,16 +1305,28 @@ CREATE TABLE if not exists `bpm_business_draft`
 ) ENGINE = InnoDB
   COMMENT ='process draft';
 
--- ============================================================
--- t_bpm_dynamic_condition_choosen (dynamic condition chosen)
--- ============================================================
-CREATE TABLE if not exists `t_bpm_dynamic_condition_choosen`
-(
-    `id`              bigint        NOT NULL AUTO_INCREMENT,
-    `process_number`  varchar(64)   DEFAULT NULL COMMENT 'process number',
-    `node_id`         varchar(64)   DEFAULT NULL COMMENT 'chosen condition node id',
-    `node_from`       varchar(64)   DEFAULT NULL COMMENT 'gateway node id',
-    PRIMARY KEY (`id`) USING BTREE,
-    KEY `bpm_dyn_cond_idx1` (`process_number`) USING BTREE
-) ENGINE = InnoDB
-  COMMENT ='dynamic condition chosen record';
+
+
+-- 初始化自定义审批人规则字典数据
+INSERT INTO t_dict_data(`dict_label`, `dict_value`, `dic_value_type`, `remark`,`dict_type`, `dict_second_level_type`, `css_class`, `list_class`,`is_default`, `is_del`, `tenant_id`, `create_user`)
+VALUES ( '自定义审批人1', 'zdysp1', NULL, NULL, 'udr', NULL, NULL, NULL, 'N', 0, '', '系统');
+INSERT INTO t_dict_data(`dict_label`, `dict_value`, `dic_value_type`, `remark`,`dict_type`, `dict_second_level_type`, `css_class`, `list_class`,`is_default`, `is_del`, `tenant_id`, `create_user`)
+VALUES ( '自定义审批人2', 'zdysp2', NULL, NULL, 'udr', NULL, NULL, NULL, 'N', 0, '', '系统');
+INSERT INTO t_dict_data(`dict_label`, `dict_value`, `dic_value_type`, `remark`,`dict_type`, `dict_second_level_type`, `css_class`, `list_class`,`is_default`, `is_del`, `tenant_id`, `create_user`)
+VALUES ( '自定义审批人3', 'zdysp3', NULL, NULL, 'udr', NULL, NULL, NULL, 'N', 0, '', '系统');
+INSERT INTO t_dict_data(`dict_label`, `dict_value`, `dic_value_type`, `remark`,`dict_type`, `dict_second_level_type`, `css_class`, `list_class`,`is_default`, `is_del`, `tenant_id`, `create_user`)
+VALUES ( '自定义审批人4', 'zdysp4', NULL, NULL, 'udr', NULL, NULL, NULL, 'N', 0, '', '系统');
+INSERT INTO t_dict_data(`dict_label`, `dict_value`, `dic_value_type`, `remark`,`dict_type`, `dict_second_level_type`, `css_class`, `list_class`,`is_default`, `is_del`, `tenant_id`, `create_user`)
+VALUES ( '自定义审批人5', 'zdysp5', NULL, NULL, 'udr', NULL, NULL, NULL, 'N', 0, '', '系统');
+INSERT INTO t_dict_data(`dict_label`, `dict_value`, `dic_value_type`, `remark`,`dict_type`, `dict_second_level_type`, `css_class`, `list_class`,`is_default`, `is_del`, `tenant_id`, `create_user`)
+VALUES ( '自定义审批人6', 'zdysp6', NULL, NULL, 'udr', NULL, NULL, NULL, 'N', 0, '', '系统');
+INSERT INTO t_dict_data(`dict_label`, `dict_value`, `dic_value_type`, `remark`,`dict_type`, `dict_second_level_type`, `css_class`, `list_class`,`is_default`, `is_del`, `tenant_id`, `create_user`)
+VALUES ( '自定义审批人7', 'zdysp7', NULL, NULL, 'udr', NULL, NULL, NULL, 'N', 0, '', '系统');
+INSERT INTO t_dict_data(`dict_label`, `dict_value`, `dic_value_type`, `remark`,`dict_type`, `dict_second_level_type`, `css_class`, `list_class`,`is_default`, `is_del`, `tenant_id`, `create_user`)
+VALUES ( '自定义审批人8', 'zdysp8', NULL, NULL, 'udr', NULL, NULL, NULL, 'N', 0, '', '系统');
+INSERT INTO t_dict_data(`dict_label`, `dict_value`, `dic_value_type`, `remark`,`dict_type`, `dict_second_level_type`, `css_class`, `list_class`,`is_default`, `is_del`, `tenant_id`, `create_user`)
+VALUES ( '自定义审批人1', 'zdysp9', NULL, NULL, 'udr', NULL, NULL, NULL, 'N', 0, '', '系统');
+INSERT INTO t_dict_data(`dict_label`, `dict_value`, `dic_value_type`, `remark`,`dict_type`, `dict_second_level_type`, `css_class`, `list_class`,`is_default`, `is_del`, `tenant_id`, `create_user`)
+VALUES ( '自定义审批人1', 'zdysp10', NULL, NULL, 'udr', NULL, NULL, NULL, 'N', 0, '', '系统');
+-- ----------------------------
+
