@@ -242,7 +242,7 @@ public class BpmVariableMessageBizService : IBpmVariableMessageBizService
         //get event type by operation type
         EventTypeEnum? eventTypeEnum = EventTypeEnumExtensions.GetEnumByOperationType(businessDataVo.OperationType ?? 0);
 
-        if (eventTypeEnum == null)
+        if (eventTypeEnum.Value == 0)
         {
             return null;
         }
