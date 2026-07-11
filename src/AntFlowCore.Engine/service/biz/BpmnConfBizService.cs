@@ -282,6 +282,10 @@ public class BpmnConfBizService : IBpmnConfBizService
             {
                 BpmnNodeConfigHolder.SetFormRelatedUserConf(bpmnNodeVo);
             }
+            else if (nodeProperty == (int)NodePropertyEnum.NODE_PROPERTY_PREV_NODE_RELATED)
+            {
+                BpmnNodeConfigHolder.SetPrevNodeRelatedUserConf(bpmnNodeVo);
+            }
         }
 
         // Set back type for all nodes (migrated from bpm_process_node_back)

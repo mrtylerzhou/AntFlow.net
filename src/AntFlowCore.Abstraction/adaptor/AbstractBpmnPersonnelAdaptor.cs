@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.Orm.util;
+using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.constant.enums;
@@ -74,16 +74,18 @@ namespace AntFlowCore.Abstraction.adaptor;
 
             paramsVo.ParamType = (int)nodeParamTypeEnum;
             int approvalStandard = nodeVo.ApprovalStandard;
-            if (ApprovalStandardEnum.FROM_PREV_NODE.Code == approvalStandard)
+            if (ApprovalStandardEnum.FROM_PREV_NODE.Code == approvalStandard
+                || (nodeVo.NodeProperty.HasValue
+                    && nodeVo.NodeProperty.Value == (int)NodePropertyEnum.NODE_PROPERTY_PREV_NODE_RELATED))
             {
                 BpmnNodePropertysVo property = nodeVo.Property;
                 if(property==null){
-                    
+
                 }else
                 {
                     BpmnNodeVo bpmnNodeVo = mapPreNodes[nodeVo.NodeId];
                     if(bpmnNodeVo==null){
-                       
+
                     }else
                     {
                         List<BaseIdTranStruVo> emplList = bpmnNodeVo.Property.EmplList;

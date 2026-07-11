@@ -392,6 +392,25 @@ public static class BpmnNodeConfigHolder
         });
     }
 
+    /// <summary>
+    /// Build previous-node-related user approver config from node VO.
+    /// Unlike form-related config, this only needs node property (no form elements).
+    /// </summary>
+    public static void SetPrevNodeRelatedUserConf(BpmnNodeVo vo)
+    {
+        var prop = vo.Property;
+        if (prop == null || prop.FormAssigneeProperty == null) return;
+
+        var approverConf = GetOrCreateApproverConf(vo);
+        approverConf.PrevNodeRelatedUserConfList ??= new List<ApproverPrevNodeRelatedUserConf>();
+        approverConf.PrevNodeRelatedUserConfList.Add(new ApproverPrevNodeRelatedUserConf
+        {
+            SignType = prop.SignType,
+            ValueType = prop.FormAssigneeProperty,
+            ValueTypeName = NodePrevNodeAssigneePropertyEnumExtensions.GetDescByCode(prop.FormAssigneeProperty.Value)
+        });
+    }
+
     // ============ Private helpers ============
 
     private static BpmnNodeApproverConfJson GetOrCreateApproverConf(BpmnNodeVo vo)

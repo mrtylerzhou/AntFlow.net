@@ -1,4 +1,4 @@
-﻿
+
 namespace AntFlowCore.Base.constant.enums;
 
 public enum BpmnNodeAdpConfEnum
@@ -18,6 +18,7 @@ public enum BpmnNodeAdpConfEnum
     ADP_CONF_NODE_PROPERTY_CUSTOMIZE=13,
     ADP_CONF_NODE_PROPERTY_FORM_RELATED_USERS=14,
     ADP_CONF_NODE_PROPERTY_UDR_USERS=15,
+    ADP_CONF_NODE_PROPERTY_PREV_NODE_RELATED_USERS=16,
 }
 
 public static class BpmnNodeAdpConfEnumExtensions
@@ -39,7 +40,8 @@ public static class BpmnNodeAdpConfEnumExtensions
         { BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_DIRECT_LEADER, NodePropertyEnum.NODE_PROPERTY_DIRECT_LEADER },
         {BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_CUSTOMIZE,NodePropertyEnum.NODE_PROPERTY_CUSTOMIZE},
         { BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_FORM_RELATED_USERS, NodePropertyEnum.NODE_PROPERTY_FORM_RELATED },
-        { BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_UDR_USERS, NodePropertyEnum.NODE_PROPERTY_ZDY_RULES }
+        { BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_UDR_USERS, NodePropertyEnum.NODE_PROPERTY_ZDY_RULES },
+        { BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_PREV_NODE_RELATED_USERS, NodePropertyEnum.NODE_PROPERTY_PREV_NODE_RELATED }
     };
 
     

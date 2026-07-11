@@ -15,7 +15,8 @@ public enum NodePropertyEnum
     NODE_PROPERTY_START_USER = 12,
     NODE_PROPERTY_DIRECT_LEADER = 13,
     NODE_PROPERTY_FORM_RELATED = 16,
-    NODE_PROPERTY_ZDY_RULES = 17
+    NODE_PROPERTY_ZDY_RULES = 17,
+    NODE_PROPERTY_PREV_NODE_RELATED = 18
 }
 public static class NodePropertyEnumExtensions
 {
@@ -34,7 +35,8 @@ public static class NodePropertyEnumExtensions
             { NodePropertyEnum.NODE_PROPERTY_START_USER, ("发起人", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_SINGLE) },
             { NodePropertyEnum.NODE_PROPERTY_DIRECT_LEADER, ("直属领导", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) },
             { NodePropertyEnum.NODE_PROPERTY_FORM_RELATED, ("表单中相关人员", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) },
-            { NodePropertyEnum.NODE_PROPERTY_ZDY_RULES, ("自定义规则", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) }
+            { NodePropertyEnum.NODE_PROPERTY_ZDY_RULES, ("自定义规则", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) },
+            { NodePropertyEnum.NODE_PROPERTY_PREV_NODE_RELATED, ("上一节点相关人员", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) }
         };
 
     public static BpmnNodeParamTypeEnum GetParamTypeEnum(this NodePropertyEnum property)

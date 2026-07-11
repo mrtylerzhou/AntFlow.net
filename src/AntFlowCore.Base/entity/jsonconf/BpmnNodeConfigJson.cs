@@ -82,6 +82,9 @@ public class BpmnNodeApproverConfJson
     [JsonPropertyName("formRelatedUserConfList")]
     public List<ApproverFormRelatedUserConf>? FormRelatedUserConfList { get; set; }
 
+    [JsonPropertyName("prevNodeRelatedUserConfList")]
+    public List<ApproverPrevNodeRelatedUserConf>? PrevNodeRelatedUserConfList { get; set; }
+
     [JsonPropertyName("outSideAccessConf")]
     public ApproverOutSideAccessConf? OutSideAccessConf { get; set; }
 
@@ -193,6 +196,18 @@ public class ApproverFormRelatedUserConf
     [JsonPropertyName("valueJson")]
     public string? ValueJson { get; set; }
 
+    [JsonPropertyName("signType")]
+    public int? SignType { get; set; }
+
+    [JsonPropertyName("valueType")]
+    public int? ValueType { get; set; }
+
+    [JsonPropertyName("valueTypeName")]
+    public string? ValueTypeName { get; set; }
+}
+
+public class ApproverPrevNodeRelatedUserConf
+{
     [JsonPropertyName("signType")]
     public int? SignType { get; set; }
 
