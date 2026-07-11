@@ -148,7 +148,33 @@ public class RuntimeService
           };
           return executionEntity;
      }
-     
+
+     /// <summary>
+     /// Deletes a running process instance and all of its executions / tasks / task history.
+     /// Mirrors Activiti's runtimeService.deleteProcessInstance(procInstId, deleteReason).
+     /// Used when a process is migrated (dynamic condition re-evaluation): the old running
+     /// instance is removed before bpmbusinessprocess is repointed to the new instance.
+     /// </summary>
+     public void DeleteProcessInstance(string procInstId, string deleteReason)
+     {
+          // delete executions
+          _executionService._repository.DeleteByExpression(a => a.ProcInstId == procInstId);
+
+          // delete running tasks
+          List<BpmAfTask> tasks = _afTaskService._repository.Find(a => a.ProcInstId == procInstId);
+          if (tasks.Count > 0)
+          {
+               _afTaskService._repository.RemoveRange(tasks);
+          }
+
+          // delete task history
+          List<BpmAfTaskInst> taskInsts = _afTaskInstService._repository.Find(a => a.ProcInstId == procInstId);
+          if (taskInsts.Count > 0)
+          {
+               _afTaskInstService._repository.RemoveRange(taskInsts);
+          }
+     }
+
      public void InsertTasks(BpmBusinessProcess bpmBusinessProcess,string taskDefKey)
      {
           string procInstId = bpmBusinessProcess.ProcInstId;

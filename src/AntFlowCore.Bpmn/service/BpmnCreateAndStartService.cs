@@ -32,7 +32,16 @@ public class BpmnCreateAndStartService : IBpmnCreateAndStartService
         {
             throw new AFBizException($"can not find bpmn process by processNum:{processNum}");
         }
-        
-        _bpmBusinessProcessService._repository.UpdateProcInstId(bpmBusinessProcess.Id, startProcessInstance.ProcessInstanceId);
+
+        // migration (dynamic condition re-evaluation): the process is restarted with the new
+        // conditions, so the previous running process instance must be deleted. bpmbusinessprocess
+        // is then repointed to the new instance id while keeping the same business number.
+        if (bpmnStartConditions.IsMigration == true)
+        {
+            string oldProcInstId = bpmBusinessProcess.ProcInstId;
+            _runtimeService.DeleteProcessInstance(oldProcInstId, "migration");
+        }
+
+        _bpmBusinessProcessService._repository.UpdateProcInstId(bpmBusinessProcess.Id, startProcessInstance.ProcessInstanceId, bpmnStartConditions.BusinessId);
     }
 }

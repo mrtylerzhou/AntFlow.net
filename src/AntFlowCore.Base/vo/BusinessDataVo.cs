@@ -142,6 +142,14 @@ namespace AntFlowCore.Base.vo
         [JsonPropertyName("isLowCodeFlow"),JsonConverter(typeof(BooleanToNullableIntJsonConverter))]
         public int? IsLowCodeFlow { get; set; } = 0;
 
+        /// <summary>
+        /// Whether this submit is a migration (dynamic condition re-evaluation) of a running
+        /// process. When true the original process number is reused and no new BpmBusinessProcess
+        /// is created; the existing one is updated with the new instance id.
+        /// </summary>
+        [JsonPropertyName("isMigration")]
+        public bool? IsMigration { get; set; }
+
         [JsonPropertyName("bpmFlowCallbackUrl")]
         public string BpmFlowCallbackUrl { get; set; }
 

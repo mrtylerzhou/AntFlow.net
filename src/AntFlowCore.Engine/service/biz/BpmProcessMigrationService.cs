@@ -48,6 +48,7 @@ public class BpmProcessMigrationService : IBpmProcessMigrationService
 
         // Build a submit VO for re-submitting the process
         var submitVo = vo;
+        submitVo.IsMigration = true;
         submitVo.IsLowCodeFlow = bpmBusinessProcess.IsLowCodeFlow;
         submitVo.StartUserId = bpmBusinessProcess.CreateUser;
         submitVo.BpmnCode = bpmBusinessProcess.Version;
