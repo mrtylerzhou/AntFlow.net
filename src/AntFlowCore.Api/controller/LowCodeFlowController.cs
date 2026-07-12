@@ -101,6 +101,16 @@ public class LowCodeFlowController
         {
             result.LfFormData = confVo.LfFormData;
         }
+        // 提取发起人节点(nodeType=1)的表单字段权限
+        if (confVo.Nodes != null)
+        {
+            var startNode = confVo.Nodes.FirstOrDefault(n => n.NodeType == (int)NodeTypeEnum.NODE_TYPE_START);
+            if (startNode != null)
+            {
+                result.LfFieldControlVOs = startNode.LfFieldControlVOs;
+                result.FormHidden = startNode.FormHidden;
+            }
+        }
         return ResultHelper.Success(result);
     }
 

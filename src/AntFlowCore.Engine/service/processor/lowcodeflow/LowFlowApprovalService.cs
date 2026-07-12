@@ -281,6 +281,20 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         long confId = bpmnConfVo.Id;
         string formCode = vo.FormCode;
 
+        // 发起人节点字段权限校验: 过滤掉隐藏(H)字段,防止前端绕过
+        var startLowCodeConf = GetLowCodeConfJson(confId, ProcessNodeEnum.START_TASK_KEY.Description);
+        if (startLowCodeConf?.FieldControls != null && startLowCodeConf.FieldControls.Count > 0)
+        {
+            foreach (var key in lfFields.Keys.ToList())
+            {
+                var ctrl = startLowCodeConf.FieldControls.FirstOrDefault(c => c.FieldId == key);
+                if (ctrl != null && StringConstants.HIDDEN_FIELD_PERMISSION.Equals(ctrl.Perm))
+                {
+                    lfFields.Remove(key);
+                }
+            }
+        }
+
         var main = new LFMain
         {
             Id = SnowFlake.NextId(),
@@ -364,13 +378,39 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         long mainId = main.Id;
 
         var allMainFields = new List<LFMainField>();
+
+        // 发起人节点字段权限校验: 过滤隐藏表单和隐藏字段
+        var startLowCodeConf = GetLowCodeConfJson(confId, ProcessNodeEnum.START_TASK_KEY.Description);
+        var startFormHidden = startLowCodeConf?.FormHidden;
+        var startFieldControls = (startLowCodeConf?.FieldControls != null) ? startLowCodeConf.FieldControls : new List<LFFieldControlVO>();
+
         foreach (var entry in lfFieldsMulti)
         {
             long formdataId = long.Parse(entry.Key);
+
+            // 整表隐藏: 跳过该表单
+            if (startFormHidden != null && startFormHidden.TryGetValue(formdataId.ToString(), out var isHidden) && isHidden)
+            {
+                continue;
+            }
+
             var fields = entry.Value;
             if (fields == null || fields.Count == 0)
             {
                 continue;
+            }
+
+            // 过滤隐藏字段
+            if (startFieldControls.Count > 0)
+            {
+                foreach (var key in fields.Keys.ToList())
+                {
+                    var ctrl = startFieldControls.FirstOrDefault(c => c.FormdataId == formdataId && c.FieldId == key);
+                    if (ctrl != null && StringConstants.HIDDEN_FIELD_PERMISSION.Equals(ctrl.Perm))
+                    {
+                        fields.Remove(key);
+                    }
+                }
             }
 
             if (!allFieldConfMapByFormdataId.TryGetValue(formdataId, out var fieldConfMap) || fieldConfMap == null)

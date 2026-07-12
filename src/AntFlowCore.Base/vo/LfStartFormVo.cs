@@ -28,4 +28,18 @@ public class LfStartFormVo
     /// </summary>
     [JsonPropertyName("lfFormdataList")]
     public List<BpmnConfLfFormdata> LfFormdataList { get; set; }
+
+    /// <summary>
+    /// 发起人节点的表单字段权限控制列表
+    /// 从发起人节点(nodeType=1)的 node_config_json.lowCodeConf 中提取
+    /// </summary>
+    [JsonPropertyName("lfFieldControlVOs")]
+    public List<LFFieldControlVO> LfFieldControlVOs { get; set; }
+
+    /// <summary>
+    /// 发起人节点的外部表单整表隐藏标记
+    /// Key = formdataId, Value = true 表示该表单在发起时整表隐藏
+    /// </summary>
+    [JsonPropertyName("formHidden")]
+    public Dictionary<string, bool> FormHidden { get; set; }
 }
