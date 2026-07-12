@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using AntFlowCore.Base.constant;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.util;
@@ -58,6 +58,11 @@ public class BpmnConf
     public int? IsOutSideProcess { get; set; }
 
     public int? IsLowCodeFlow { get; set; }
+
+    /// <summary>
+    /// 外部表单引用的表单版本id列表(CSV),仅外部表单模式(extra_flags含USE_EXTERNAL_FORM)使用
+    /// </summary>
+    public string LfFormdataIds { get; set; }
 
     /// <summary>
     /// business party mark

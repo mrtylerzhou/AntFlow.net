@@ -12,4 +12,9 @@ public interface IBpmnConfRepository : IBaseRepository<BpmnConf>
     void EffectiveBpmnConf(int id);
     BpmnConf GetBpmnConfByFormCode(string formCode);
     List<BpmnConf> GetBpmnConfByFormCodeBatch(List<string> formCodes);
+
+    /// <summary>
+    /// 统计有多少生效流程引用了指定表单版本id（删除保护）
+    /// </summary>
+    int CountEffectiveConfReferencingFormdata(long formdataId);
 }

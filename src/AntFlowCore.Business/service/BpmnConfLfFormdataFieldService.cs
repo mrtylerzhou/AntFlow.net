@@ -42,6 +42,27 @@ public class BpmnConfLfFormdataFieldService : IBpmnConfLfFormdataFieldService
         return id2SelfMap;
     }
 
+    /// <summary>
+    /// 按表单版本ID(formdataId)查询字段配置Map
+    /// 用于外部表单模式,每个表单版本有独立的字段配置
+    /// </summary>
+    public Dictionary<string, BpmnConfLfFormdataField> QryFieldMapByFormdataId(long formdataId)
+    {
+        List<BpmnConfLfFormdataField> allFields = _repository.Find(x => x.FormDataId == formdataId);
+        if (allFields == null || !allFields.Any())
+        {
+            throw new AFBizException($"lowcode form data has no fields by formdataId:{formdataId}");
+        }
+
+        var id2SelfMap = new Dictionary<string, BpmnConfLfFormdataField>();
+        foreach (var field in allFields)
+        {
+            id2SelfMap[field.FieldId] = field;
+        }
+
+        return id2SelfMap;
+    }
+
     private Dictionary<string, BpmnConfLfFormdataField> QryFormDataFieldMapFromJson(long confId)
     {
         BpmnConf? bpmnConf = _bpmnConfRepository.FirstOrDefault(a => a.Id == confId);

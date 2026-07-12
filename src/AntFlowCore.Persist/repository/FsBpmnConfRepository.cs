@@ -136,4 +136,36 @@ public class FsBpmnConfRepository : RepositoryBase<BpmnConf>, IBpmnConfRepositor
             .Where(a => a.Id == id)
             .ExecuteAffrows();
     }
+
+    /// <summary>
+    /// 统计有多少生效流程引用了指定表单版本id（删除保护）
+    /// lf_formdata_ids 是 CSV 格式,需要用 FIND_IN_SET 或内存过滤
+    /// </summary>
+    public int CountEffectiveConfReferencingFormdata(long formdataId)
+    {
+        // FreeSql 对 FIND_IN_SET 支持有限,先查所有候选行再内存过滤
+        string formdataIdStr = formdataId.ToString();
+        List<BpmnConf> candidates = _ormContext.FreeSql
+            .Select<BpmnConf>()
+            .Where(a => a.IsDel == 0 && a.EffectiveStatus == 1 && a.LfFormdataIds != null)
+            .ToList();
+
+        int count = 0;
+        foreach (var conf in candidates)
+        {
+            if (string.IsNullOrEmpty(conf.LfFormdataIds))
+            {
+                continue;
+            }
+            var idArray = conf.LfFormdataIds.Split(',')
+                .Select(s => s.Trim())
+                .Where(s => !string.IsNullOrEmpty(s));
+            if (idArray.Contains(formdataIdStr))
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
 }

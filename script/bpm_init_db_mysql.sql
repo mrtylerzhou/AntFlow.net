@@ -326,6 +326,7 @@ CREATE TABLE if not exists `bpm_verify_info`
     `process_code`     varchar(64)         DEFAULT NULL COMMENT 'process number',
     `is_del`      tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '0:no,1:yes',
     `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
+    `attachments_json` varchar(3000) NULL DEFAULT NULL COMMENT 'attachments json',
     PRIMARY KEY (`id`) USING BTREE,
     KEY `BPM_IDX__INFOR` (`business_type`, `business_id`) USING BTREE,
     KEY `process_code_index` (`process_code`) USING BTREE

@@ -24,6 +24,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.IsAll).Name("is_all");
                 a.Property(b => b.IsOutSideProcess).Name("is_out_side_process");
                 a.Property(b => b.IsLowCodeFlow).Name("is_lowcode_flow");
+                a.Property(b => b.LfFormdataIds).Name("lf_formdata_ids");
                 a.Property(b => b.BusinessPartyId).Name("business_party_id");
                 a.Property(b => b.Remark).Name("remark");
                 a.Property(b => b.IsDel).Name("is_del");
@@ -178,7 +179,10 @@ public static class FreesqlFluentConfiguration
             {
                 a.Name("t_bpmn_conf_lf_formdata");
                 a.Property(b => b.Id).IsPrimary(true).IsIdentity(true).Name("id");
-                a.Property(b => b.BpmnConfId).Name("bpmn_conf_id");
+                a.Property(b => b.BpmnConfId).Name("bpmn_conf_id").IsNullable(true);
+                a.Property(b => b.FormCode).Name("form_code");
+                a.Property(b => b.FormName).Name("form_name");
+                a.Property(b => b.EffectiveStatus).Name("effective_status");
                 a.Property(b => b.Formdata).Name("formdata");
                 a.Property(b => b.IsDel).Name("is_del");
                 a.Property(b => b.TenantId).Name("tenant_id");
@@ -752,6 +756,7 @@ public static class FreesqlFluentConfiguration
                 entity.Property(e => e.Id).IsPrimary(true).IsIdentity(false);
                 entity.Property(e => e.MainId).Name("main_id");
                 entity.Property(e => e.FormCode).Name("form_code");
+                entity.Property(e => e.FormdataId).Name("formdata_id");
                 entity.Property(e => e.FieldId).Name("field_id");
                 entity.Property(e => e.FieldName).Name("field_name");
                 entity.Property(e => e.ParentFieldId).Name("parent_field_id");

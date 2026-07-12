@@ -798,6 +798,11 @@ public class BpmnConfBizService : IBpmnConfBizService
         {
             bpmnNodeVo.LfFieldControlVOs = lowCodeConf.FieldControls;
         }
+        //set whole-form hide flags from lowCodeConf (external-form mode only)
+        if (lowCodeConf?.FormHidden != null && lowCodeConf.FormHidden.Count > 0)
+        {
+            bpmnNodeVo.FormHidden = lowCodeConf.FormHidden;
+        }
 
         //set labels from buttonSignConf
         if (bsConf?.Labels != null && bsConf.Labels.Count > 0)

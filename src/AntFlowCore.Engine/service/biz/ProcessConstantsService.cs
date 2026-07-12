@@ -2,8 +2,10 @@ using AntFlowCore.Abstraction;
 using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
+using AntFlowCore.Abstraction.service.repository;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
+using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.extension;
 using AntFlowCore.Base.util;
@@ -144,7 +146,43 @@ public class ProcessConstantsService : IProcessConstantsService
 
         if (!string.IsNullOrEmpty(taskDefKey) && bpmBusinessProcess.IsLowCodeFlow == 1)
         {
-            // IBpmnNodeLfFormdataFieldControlService has been removed; LF field control query is no longer supported
+            // 读取节点级低代码表单配置: 整表隐藏(formHidden) + 字段级权限(fieldControls)
+            // 与 java 版 ProcessBusinessContans.processInfo 行为对齐
+            try
+            {
+                var bpmnConfService = ServiceProviderUtils.GetService<IBpmnConfService>();
+                var bpmnNodeService = ServiceProviderUtils.GetService<IBpmnNodeService>();
+                if (bpmnConfService != null && bpmnNodeService != null)
+                {
+                    BpmnConf? bpmnConf = bpmnConfService._repository.GetBpmnConfByFormCode(bpmBusinessProcess.BusinessNumber);
+                    if (bpmnConf != null && bpmnConf.Id != 0)
+                    {
+                        BpmnNode? node = bpmnNodeService._repository
+                            .FirstOrDefault(a => a.ConfId == bpmnConf.Id && a.NodeId == taskDefKey && a.IsDel == 0);
+                        if (node != null && !string.IsNullOrEmpty(node.NodeConfigJson))
+                        {
+                            BpmnNodeConfigJson? nodeConfig = JsonConfUtil.ParseNodeConfig(node.NodeConfigJson);
+                            BpmnNodeLowCodeConfJson? lowCodeConf = nodeConfig?.LowCodeConf;
+                            if (lowCodeConf != null)
+                            {
+                                if (lowCodeConf.FormHidden != null && lowCodeConf.FormHidden.Count > 0)
+                                {
+                                    processInfoVo.FormHidden = lowCodeConf.FormHidden;
+                                }
+                                if (lowCodeConf.FieldControls != null && lowCodeConf.FieldControls.Count > 0)
+                                {
+                                    processInfoVo.LfFieldControlVOs = lowCodeConf.FieldControls;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to load low-code form config for process:{BusinessNumber}, node:{TaskDefKey}",
+                    bpmBusinessProcess.BusinessNumber, taskDefKey);
+            }
         }
 
         return processInfoVo;

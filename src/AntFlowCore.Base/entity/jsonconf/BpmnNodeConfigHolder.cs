@@ -327,13 +327,21 @@ public static class BpmnNodeConfigHolder
     /// </summary>
     public static void SetLowCodeConf(BpmnNodeVo vo)
     {
-        if (vo.LfFieldControlVOs == null || vo.LfFieldControlVOs.Count == 0) return;
+        bool hasFieldControls = vo.LfFieldControlVOs != null && vo.LfFieldControlVOs.Count > 0;
+        bool hasFormHidden = vo.FormHidden != null && vo.FormHidden.Count > 0;
+        if (!hasFieldControls && !hasFormHidden) return;
 
         var config = vo.GetOrCreateNodeConfigJson();
-        config.LowCodeConf = new BpmnNodeLowCodeConfJson
+        var lowCodeConf = new BpmnNodeLowCodeConfJson();
+        if (hasFieldControls)
         {
-            FieldControls = vo.LfFieldControlVOs
-        };
+            lowCodeConf.FieldControls = vo.LfFieldControlVOs;
+        }
+        if (hasFormHidden)
+        {
+            lowCodeConf.FormHidden = vo.FormHidden;
+        }
+        config.LowCodeConf = lowCodeConf;
     }
 
     /// <summary>

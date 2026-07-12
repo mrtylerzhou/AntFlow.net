@@ -342,6 +342,17 @@ public class TemplateOvertimeConf
 /// </summary>
 public class BpmnNodeLowCodeConfJson
 {
+    /// <summary>
+    /// Form field permissions for this node (per formdataId via FieldControl.FormdataId)
+    /// </summary>
     [JsonPropertyName("fieldControls")]
     public List<LFFieldControlVO>? FieldControls { get; set; }
+
+    /// <summary>
+    /// Per-form whole-form hide flag for external-form mode.
+    /// Key = formdataId, Value = true if the whole form is hidden at this node.
+    /// Only used in external-form mode; null/empty in inline mode.
+    /// </summary>
+    [JsonPropertyName("formHidden")]
+    public Dictionary<string, bool>? FormHidden { get; set; }
 }
