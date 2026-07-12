@@ -135,10 +135,24 @@ public class FsBpmnConfLfFormdataRepository : RepositoryBase<BpmnConfLfFormdata>
             return new List<BpmnConfLfFormdata>();
         }
 
-        return _ormContext.FreeSql
+        var result = _ormContext.FreeSql
             .Select<BpmnConfLfFormdata>()
             .Where(a => ids.Contains(a.Id))
             .ToList();
+
+        // 保持传入 ids 的顺序(即 t_bpmn_conf.lf_formdata_ids 中设计时的选择顺序),
+        // 而非数据库的默认排序(如按主键),避免多表单 tab 渲染顺序与设计时不一致
+        var indexMap = ids
+            .Select((id, index) => new { id, index })
+            .ToDictionary(x => x.id, x => x.index);
+        result.Sort((a, b) =>
+        {
+            indexMap.TryGetValue(a.Id, out var ia);
+            indexMap.TryGetValue(b.Id, out var ib);
+            return ia.CompareTo(ib);
+        });
+
+        return result;
     }
 
     /// <summary>
