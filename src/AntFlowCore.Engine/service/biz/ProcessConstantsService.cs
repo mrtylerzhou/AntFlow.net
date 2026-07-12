@@ -147,18 +147,24 @@ public class ProcessConstantsService : IProcessConstantsService
         if (!string.IsNullOrEmpty(taskDefKey) && bpmBusinessProcess.IsLowCodeFlow == 1)
         {
             // 读取节点级低代码表单配置: 整表隐藏(formHidden) + 字段级权限(fieldControls)
-            // 与 java 版 ProcessBusinessContans.processInfo 行为对齐
+            // taskDefKey 是 ACT 任务定义 key,需经 BpmVariableMultiplayer 解析为 BpmnNode 主键 id 后再读取节点配置
             try
             {
-                var bpmnConfService = ServiceProviderUtils.GetService<IBpmnConfService>();
+                var bpmVariableMultiplayerService = ServiceProviderUtils.GetService<IBpmVariableMultiplayerService>();
                 var bpmnNodeService = ServiceProviderUtils.GetService<IBpmnNodeService>();
-                if (bpmnConfService != null && bpmnNodeService != null)
+                if (bpmVariableMultiplayerService != null && bpmnNodeService != null)
                 {
-                    BpmnConf? bpmnConf = bpmnConfService._repository.GetBpmnConfByFormCode(bpmBusinessProcess.BusinessNumber);
-                    if (bpmnConf != null && bpmnConf.Id != 0)
+                    List<BpmVariableMultiplayer> multiplayers =
+                        bpmVariableMultiplayerService._repository.QueryMultiplayersByProcessNumAndElementId(
+                            bpmBusinessProcess.BusinessNumber, taskDefKey) ?? new List<BpmVariableMultiplayer>();
+                    long nodeId = multiplayers
+                        .Where(a => !string.IsNullOrEmpty(a.NodeId) && long.TryParse(a.NodeId, out _))
+                        .Select(a => long.Parse(a.NodeId!))
+                        .FirstOrDefault();
+                    if (nodeId > 0)
                     {
                         BpmnNode? node = bpmnNodeService._repository
-                            .FirstOrDefault(a => a.ConfId == bpmnConf.Id && a.NodeId == taskDefKey && a.IsDel == 0);
+                            .FirstOrDefault(a => a.Id == nodeId && a.IsDel == 0);
                         if (node != null && !string.IsNullOrEmpty(node.NodeConfigJson))
                         {
                             BpmnNodeConfigJson? nodeConfig = JsonConfUtil.ParseNodeConfig(node.NodeConfigJson);
