@@ -493,7 +493,7 @@ public class BpmnConfCommonService : IBpmnConfCommonService
 
         if (string.IsNullOrEmpty(processNumber))
         {
-            throw new ArgumentException("processNumber cannot be null or empty");
+            return GetPreviewNode(paramsJson, false);
         }
 
      
