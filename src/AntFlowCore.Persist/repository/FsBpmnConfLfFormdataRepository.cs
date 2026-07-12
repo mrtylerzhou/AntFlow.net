@@ -82,13 +82,13 @@ public class FsBpmnConfLfFormdataRepository : RepositoryBase<BpmnConfLfFormdata>
     }
 
     /// <summary>
-    /// 查询某家族所有版本（历史版本查看，含已软删）
+    /// 查询某家族所有版本（历史版本查看，排除已软删）
     /// </summary>
     public List<LfFormManageVo> ListVersionsByFormCode(string formCode)
     {
         var result = _ormContext.FreeSql
             .Select<BpmnConfLfFormdata>()
-            .Where(a => a.FormCode == formCode && a.BpmnConfId == null)
+            .Where(a => a.FormCode == formCode && a.BpmnConfId == null && a.IsDel == 0)
             .OrderByDescending(a => a.Id)
             .ToList(a => new LfFormManageVo
             {

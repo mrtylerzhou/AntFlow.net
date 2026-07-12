@@ -5,6 +5,7 @@ using AntFlowCore.Base.entity;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
+using AntFlowCore.Core.vo;
 using AntFlowCore.Engine.service.processor.lowcodeflow;
 using AntFlowCore.Persist.api.interf.repository;
 
@@ -114,6 +115,12 @@ public class LfFormManageBizService : ILfFormManageBizService
             throw new AFBizException("表单不存在或已删除");
         }
 
+        // 删除保护：当前生效版本不可删除
+        if (formdata.EffectiveStatus == 1)
+        {
+            throw new AFBizException("当前生效的版本不可删除");
+        }
+
         // 删除保护：被生效流程引用时拒绝
         int refCount = _bpmnConfRepository.CountEffectiveConfReferencingFormdata(id);
         if (refCount > 0)
@@ -165,6 +172,15 @@ public class LfFormManageBizService : ILfFormManageBizService
     public List<LfFormManageVo> ListEffectiveForSelect()
     {
         return _lfFormdataRepository.ListAllEffectiveForms();
+    }
+
+    public List<BpmnConfVo> ListReferencingConfs(long formdataId)
+    {
+        if (formdataId <= 0)
+        {
+            throw new AFBizException("formdataId不能为空");
+        }
+        return _bpmnConfRepository.ListConfsReferencingFormdata(formdataId);
     }
 
     /// <summary>

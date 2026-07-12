@@ -1,5 +1,6 @@
 using AntFlowCore.Base.dto;
 using AntFlowCore.Base.vo;
+using AntFlowCore.Core.vo;
 
 namespace AntFlowCore.Abstraction.service.biz;
 
@@ -44,4 +45,9 @@ public interface ILfFormManageBizService
     /// 列出所有生效独立表单（流程设计多选下拉框）
     /// </summary>
     List<LfFormManageVo> ListEffectiveForSelect();
+
+    /// <summary>
+    /// 查询引用了指定表单版本的所有流程配置（查看引用/表单血缘）
+    /// </summary>
+    List<BpmnConfVo> ListReferencingConfs(long formdataId);
 }

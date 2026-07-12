@@ -14,7 +14,7 @@ public interface IBpmnConfLfFormdataRepository : IBaseRepository<BpmnConfLfFormd
     List<LfFormManageVo> ListEffectiveFormPage(Page<LfFormManageVo> page, LfFormManageVo vo);
 
     /// <summary>
-    /// 查询某家族所有版本（历史版本查看，含已软删）
+    /// 查询某家族所有版本（历史版本查看，排除已软删）
     /// </summary>
     List<LfFormManageVo> ListVersionsByFormCode(string formCode);
 

@@ -180,4 +180,13 @@ public class LowCodeFlowController
         _lfFormManageBizService.Effective(id);
         return ResultHelper.Success<object>(null);
     }
+
+    /// <summary>
+    /// 查询引用了指定表单版本的所有流程配置（查看引用/表单血缘）
+    /// </summary>
+    [HttpGet("form/references/{formdataId}")]
+    public Result<List<BpmnConfVo>> ListReferencingConfs(long formdataId)
+    {
+        return ResultHelper.Success(_lfFormManageBizService.ListReferencingConfs(formdataId));
+    }
 }
