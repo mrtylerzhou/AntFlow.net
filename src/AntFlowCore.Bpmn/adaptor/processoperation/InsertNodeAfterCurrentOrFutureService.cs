@@ -36,11 +36,26 @@ public class InsertNodeAfterCurrentOrFutureService : AbstractAddOrRemoveFutureAs
 
     public void DoProcessButton(BusinessDataVo vo)
     {
-        vo.NodeId = "xxx";
         base.checkParam(vo);
         string processNumber = vo.ProcessNumber;
         string taskDefKey = vo.TaskDefKey;
         List<BaseIdTranStruVo> userInfos = vo.UserInfos;
+
+        // taskDefKey为空时，根据nodeId反查elementId作为taskDefKey
+        if (string.IsNullOrEmpty(taskDefKey))
+        {
+            if (string.IsNullOrEmpty(vo.NodeId))
+            {
+                throw new AFBizException("taskDefKey和nodeId不能同时为空");
+            }
+            NodeElementDto elementDto = _bpmvariableBizService.GetElementIdByNodeId(processNumber, vo.NodeId);
+            if (elementDto == null)
+            {
+                throw new AFBizException("未能根据nodeId获取taskDefKey:" + vo.NodeId);
+            }
+            taskDefKey = elementDto.ElementId;
+            vo.TaskDefKey = taskDefKey;
+        }
 
         BpmBusinessProcess bpmBusinessProcess = _bpmBusinessProcessService.GetBpmBusinessProcess(processNumber);
         if (bpmBusinessProcess == null)
