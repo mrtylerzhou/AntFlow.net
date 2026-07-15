@@ -124,7 +124,7 @@ namespace AntFlowCore.Base.vo;
         public BpmnNodeParamsVo Params { get; set; }
 
         [JsonPropertyName("buttons")]
-        public BpmnNodeButtonConfBaseVo Buttons { get; set; }
+        public BpmnNodeButtonConfBaseVo Buttons { get; set; }=new BpmnNodeButtonConfBaseVo();
 
         [JsonPropertyName("templateVos")]
         public List<BpmnTemplateVo> TemplateVos { get; set; }
