@@ -1,4 +1,4 @@
-﻿
+
 namespace AntFlowCore.Base.util
 {
     public interface StringConstants
@@ -69,6 +69,7 @@ namespace AntFlowCore.Base.util
 
         // Adjacent deduplication auto-skip comment and suffix
         public const string AF_AUTO_SKIP_COMMENT = "相同审批人自动跳过";
+        public const string AF_AUTO_EVALUATE_SKIP_COMMENT = "自动节点自动跳过,条件评估结果:{0}";
         public const string AF_SKIP_ASSIGNEE_NODE_SUFFIX = "⬇️";
 
         // Thread-local key for duplication process strategy (used by element adaptors)

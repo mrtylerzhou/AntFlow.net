@@ -1,4 +1,6 @@
-﻿namespace AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.vo;
+
+namespace AntFlowCore.Base.constant.enums;
 
 public class AFSpecialAssigneeEnum
 {
@@ -16,6 +18,7 @@ public class AFSpecialAssigneeEnum
     public static readonly AFSpecialAssigneeEnum TO_BE_REMOVED = new AFSpecialAssigneeEnum(0, "0", "最终会被去除的人员");
     public static readonly AFSpecialAssigneeEnum COPY_NODE = new AFSpecialAssigneeEnum(1, "-1", "流程通知");
     public static readonly AFSpecialAssigneeEnum SKIP = new AFSpecialAssigneeEnum(-2, "-2", "自动节点自动跳过");
+    public static readonly AFSpecialAssigneeEnum AUTO_NODE_SKIP = new AFSpecialAssigneeEnum(-3, "-3", "自动节点自动跳过");
     public static IEnumerable<AFSpecialAssigneeEnum> Values
     {
         get
@@ -23,6 +26,35 @@ public class AFSpecialAssigneeEnum
             yield return TO_BE_REMOVED;
             yield return COPY_NODE;
             yield return SKIP;
+            yield return AUTO_NODE_SKIP;
         }
+    }
+
+    /// <summary>
+    /// 返回所有特殊指派人列表
+    /// </summary>
+    public static List<BaseIdTranStruVo> GetAllSpecialAssignees()
+    {
+        var result = new List<BaseIdTranStruVo>();
+        foreach (var value in Values)
+        {
+            result.Add(new BaseIdTranStruVo(value.Id, value.Desc));
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// 根据 id 查找特殊指派人
+    /// </summary>
+    public static BaseIdTranStruVo GetSpecialAssignee(string id)
+    {
+        foreach (var value in Values)
+        {
+            if (value.Id.Equals(id))
+            {
+                return new BaseIdTranStruVo(value.Id, value.Desc);
+            }
+        }
+        return null;
     }
 }

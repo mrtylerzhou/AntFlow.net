@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction;
+using AntFlowCore.Abstraction;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.util;
 using AntFlowCore.Base.conf;
@@ -36,18 +36,15 @@ public class UserPointedPersonnelProvider : IBpmnPersonnelProviderService
             elementName = "指定人员";
         }
 
+        List<BaseIdTranStruVo> emplList = bpmnNodeVo.Property.EmplList;
+
         if (bpmnNodeVo.IsOutSideProcess != null && bpmnNodeVo.IsOutSideProcess == 1)
         {
-            List<BaseIdTranStruVo> emplList = bpmnNodeVo.Property.EmplList;
-            if (emplList == null || emplList.Count == 0)
-            {
-                throw new AFBizException("third party process role node has no employee info");
-            }
-
             return _assigneeVoBuildUtils.BuildVOs(emplList, elementName, false);
         }
 
-        List<string> emplIds = propertysVo.EmplIds;
-        return _assigneeVoBuildUtils.BuildVos(emplIds, elementName, false);
+        // 使用 emplList 构建指派人(对应Java: buildVOs 而非 buildVos),
+        // 这样自动节点的虚拟指派人 AUTO_NODE_SKIP(-3) 不需要经过员工信息查询
+        return _assigneeVoBuildUtils.BuildVOs(emplList, elementName, false);
     }
 }

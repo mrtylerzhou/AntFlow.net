@@ -104,6 +104,9 @@ public class BpmnConfBizService : IBpmnConfBizService
         int hasChooseFromLowCodeform=0;
         foreach (BpmnNodeVo bpmnNodeVo in confNodes)
         {
+            // 设计期节点类型特殊处理: 自动节点(9)→审批人(4), 抄送V2(8)→审批人(4)
+            AfNodeUtils.NodeSpecialProcess(bpmnNodeVo);
+
             if (bpmnNodeVo.NodeType == (int)NodeTypeEnum.NODE_TYPE_APPROVER
                 && bpmnNodeVo.NodeProperty==null) {
                 throw new AFBizException("apporver node has no property,can not be saved！");
@@ -142,6 +145,14 @@ public class BpmnConfBizService : IBpmnConfBizService
                 }
             }
             BpmnNodeConfigHolder.SetLowCodeConf(bpmnNodeVo);
+
+            // Transfer autoNodeConf from VO to node config JSON (for auto nodes)
+            if (bpmnNodeVo.AutoNodeConf != null)
+            {
+                BpmnNodeConfigJson nodeCfgJson = bpmnNodeVo.GetOrCreateNodeConfigJson();
+                nodeCfgJson.AutoNodeConf = bpmnNodeVo.AutoNodeConf;
+            }
+
             BpmnNode bpmnNode = bpmnNodeVo.MapToEntity();
             bpmnNode.ConfId=confId;
             bpmnNode.CreateTime=DateTime.Now;
@@ -361,7 +372,15 @@ public class BpmnConfBizService : IBpmnConfBizService
     public BpmnConfVo Detail(long id)
     {
         BpmnConf bpmnConf = _bpmnConfService._repository.Find(a => a.Id == id).FirstOrDefault();
-        return FormatConfVo(GetBpmnConfVo(bpmnConf));
+        BpmnConfVo confVo = FormatConfVo(GetBpmnConfVo(bpmnConf));
+        if (confVo.Nodes != null)
+        {
+            foreach (BpmnNodeVo node in confVo.Nodes)
+            {
+                AfNodeUtils.NodeLabelSpecialProcess(node);
+            }
+        }
+        return confVo;
     }
 
    
@@ -815,7 +834,18 @@ public class BpmnConfBizService : IBpmnConfBizService
                 bpmnNodeVo.DeduplicationExclude = true;
                 bpmnNodeVo.IsCarbonCopyNode = true;
             }
+            if (NodeLabelConstants.NodeLabelContainsAny(labelVOList, NodeLabelConstants.AutomaticNode.LabelValue))
+            {
+                bpmnNodeVo.DeduplicationExclude = true;
+                bpmnNodeVo.IsAutomaticNode = true;
+            }
             bpmnNodeVo.LabelList = labelVOList;
+        }
+
+        // set autoNodeConf from node config JSON (for auto node display)
+        if (nodeConfig.AutoNodeConf != null)
+        {
+            bpmnNodeVo.AutoNodeConf = nodeConfig.AutoNodeConf;
         }
 
         return bpmnNodeVo;
@@ -843,7 +873,15 @@ public class BpmnConfBizService : IBpmnConfBizService
         if(bpmnConf==null){
             throw new AFBizException("can not get a bpmnConf by provided formCode");
         }
-        return GetBpmnConfVo(bpmnConf);
+        BpmnConfVo confVo = GetBpmnConfVo(bpmnConf);
+        if (confVo.Nodes != null)
+        {
+            foreach (BpmnNodeVo node in confVo.Nodes)
+            {
+                AfNodeUtils.NodeLabelSpecialProcess(node);
+            }
+        }
+        return confVo;
     }
 
     public int? GetCustomizeNodeSignType(long nodeId)

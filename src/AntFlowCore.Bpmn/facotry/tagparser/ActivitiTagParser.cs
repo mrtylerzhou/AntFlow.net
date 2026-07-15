@@ -143,6 +143,25 @@ public class ActivitiTagParser<T>: TagParser<IFormOperationAdaptor<T>,BusinessDa
         {
             _inner.OnFinishData(vo);
         }
+
+        public bool? AutomaticCondition(T vo)
+        {
+            if (vo is TSubClass subClassVo)
+            {
+                return _inner.AutomaticCondition(subClassVo);
+            }
+            throw new ArgumentException($"The provided argument is not of the expected type {typeof(TSubClass).Name}.");
+        }
+
+        public void AutomaticAction(T vo, bool? conditionResult)
+        {
+            if (vo is TSubClass subClassVo)
+            {
+                _inner.AutomaticAction(subClassVo, conditionResult);
+                return;
+            }
+            throw new ArgumentException($"The provided argument is not of the expected type {typeof(TSubClass).Name}.");
+        }
     }
 
 }

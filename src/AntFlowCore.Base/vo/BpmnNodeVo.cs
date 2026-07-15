@@ -193,6 +193,21 @@ namespace AntFlowCore.Base.vo;
         public string ElementId { get; set; }
         [JsonPropertyName("noHeaderAction")]
         public int? NoHeaderAction { get; set; }
+
+        /// <summary>
+        /// Whether this node is an automatic node (UX abstraction over approver node
+        /// with automaticNode label and virtual assignee AUTO_NODE_SKIP(-3)).
+        /// Derived from LabelList at read time.
+        /// </summary>
+        [JsonIgnore]
+        public bool? IsAutomaticNode { get; set; }
+
+        /// <summary>
+        /// Auto node condition configuration (received from frontend during edit,
+        /// sent to frontend during display). Stored in node_config_json.autoNodeConf.
+        /// </summary>
+        [JsonPropertyName("autoNodeConf")]
+        public BpmnNodeAutoNodeConfJson? AutoNodeConf { get; set; }
         private string? _nodeConfigJson;
         [JsonIgnore]
         public string? NodeConfigJson

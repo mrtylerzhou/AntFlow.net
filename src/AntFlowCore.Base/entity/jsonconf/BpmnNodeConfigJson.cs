@@ -41,6 +41,12 @@ public class BpmnNodeConfigJson
     public BpmnNodeLowCodeConfJson? LowCodeConf { get; set; }
 
     /// <summary>
+    /// Auto node configuration (conditions for automatic execution)
+    /// </summary>
+    [JsonPropertyName("autoNodeConf")]
+    public BpmnNodeAutoNodeConfJson? AutoNodeConf { get; set; }
+
+    /// <summary>
     /// Back type for disagree action (migrated from bpm_process_node_back)
     /// </summary>
     [JsonPropertyName("backType")]

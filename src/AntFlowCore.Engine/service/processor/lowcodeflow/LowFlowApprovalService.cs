@@ -5,6 +5,7 @@ using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.service.repository;
 using AntFlowCore.Base.adaptor.formoperation;
 using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.exception;
@@ -680,6 +681,246 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
             {
                 o.OnFinishData(vo);
             }
+        }
+    }
+
+    // ===================== 自动节点条件判断 =====================
+
+    /// <summary>
+    /// 自动节点条件判断.
+    /// 从节点配置的 autoNodeConf 中读取条件, 对 lfFields 进行基础评估.
+    /// 如果没有配置条件, 返回 null (无条件执行 automaticAction).
+    /// 对应 Java AbstractFormOperationAdaptor.automaticCondition.
+    /// </summary>
+    public bool? AutomaticCondition(UDLFApplyVo vo)
+    {
+        try
+        {
+            BpmnNodeAutoNodeConfJson? autoNodeConf = LoadAutoNodeConf(vo);
+            if (autoNodeConf == null || autoNodeConf.ConditionList == null || autoNodeConf.ConditionList.Count == 0)
+            {
+                return null;
+            }
+            Dictionary<string, object>? lfFields = vo.LfFields;
+            if (lfFields == null || lfFields.Count == 0)
+            {
+                return false;
+            }
+            return EvaluateConditions(autoNodeConf, lfFields);
+        }
+        catch (AFBizException)
+        {
+            throw;
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(e, "automaticCondition evaluation failed, returning null");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// 自动节点动作执行. 默认不做任何操作.
+    /// 对应 Java AbstractFormOperationAdaptor.automaticAction.
+    /// </summary>
+    public void AutomaticAction(UDLFApplyVo vo, bool? conditionResult)
+    {
+        // 默认不执行任何动作, 子类可重写
+    }
+
+    /// <summary>
+    /// 从数据库加载自动节点条件配置.
+    /// 对应 Java AbstractFormOperationAdaptor.loadAutoNodeConf.
+    /// </summary>
+    private BpmnNodeAutoNodeConfJson? LoadAutoNodeConf(BusinessDataVo vo)
+    {
+        string? processNumber = vo.ProcessNumber;
+        string? taskDefKey = vo.TaskDefKey;
+        if (string.IsNullOrEmpty(processNumber) || string.IsNullOrEmpty(taskDefKey))
+        {
+            return null;
+        }
+
+        BpmnConf bpmnConf = _bpmnConfService._repository.GetBpmnConfByFormCode(vo.FormCode);
+        if (bpmnConf == null || bpmnConf.Id == 0)
+        {
+            throw new AFBizException("cant not get bpmnconf by formcode:" + vo.FormCode);
+        }
+
+        IBpmVariableService bpmVariableService = ServiceProviderUtils.GetService<IBpmVariableService>();
+        NodeElementDto? nodeElementDto = bpmVariableService._repository.GetNodeIdByElementId(processNumber, taskDefKey);
+        if (nodeElementDto == null || string.IsNullOrEmpty(nodeElementDto.NodeId))
+        {
+            return null;
+        }
+        long longId = long.Parse(nodeElementDto.NodeId);
+
+        BpmnNode? bpmnNode = _bpmnNodeService._repository
+            .FirstOrDefault(a => a.ConfId == bpmnConf.Id && a.Id == longId && a.IsDel == 0);
+        if (bpmnNode == null || string.IsNullOrEmpty(bpmnNode.NodeConfigJson))
+        {
+            return null;
+        }
+
+        BpmnNodeConfigJson? configJson = JsonConfUtil.ParseNodeConfig(bpmnNode.NodeConfigJson);
+        return configJson?.AutoNodeConf;
+    }
+
+    /// <summary>
+    /// 评估自动节点条件.
+    /// groupRelation: false=组间AND, true=组间OR
+    /// 对应 Java AbstractFormOperationAdaptor.evaluateConditions.
+    /// </summary>
+    private bool EvaluateConditions(BpmnNodeAutoNodeConfJson autoNodeConf, Dictionary<string, object> formFields)
+    {
+        List<List<BpmnNodeConditionsConfVueVo>>? conditionList = autoNodeConf.ConditionList;
+        if (conditionList == null || conditionList.Count == 0)
+        {
+            return false;
+        }
+
+        bool isOrBetweenGroups = autoNodeConf.GroupRelation ?? false;
+        bool overallResult = !isOrBetweenGroups; // AND starts true, OR starts false
+
+        foreach (var group in conditionList)
+        {
+            if (group == null || group.Count == 0)
+            {
+                continue;
+            }
+            bool groupResult = EvaluateConditionGroup(group, formFields);
+
+            if (isOrBetweenGroups)
+            {
+                overallResult = overallResult || groupResult;
+                if (overallResult) break; // OR: first true wins
+            }
+            else
+            {
+                overallResult = overallResult && groupResult;
+                if (!overallResult) break; // AND: first false wins
+            }
+        }
+        return overallResult;
+    }
+
+    /// <summary>
+    /// 评估单个条件组.
+    /// condRelation (取组内第一个条件的值): false=组内AND, true=组内OR
+    /// </summary>
+    private bool EvaluateConditionGroup(List<BpmnNodeConditionsConfVueVo> group, Dictionary<string, object> formFields)
+    {
+        bool isOrWithinGroup = group[0].CondRelation;
+        bool groupResult = !isOrWithinGroup;
+
+        foreach (var item in group)
+        {
+            bool itemResult = EvaluateSingleCondition(item, formFields);
+            if (isOrWithinGroup)
+            {
+                groupResult = groupResult || itemResult;
+                if (groupResult) break;
+            }
+            else
+            {
+                groupResult = groupResult && itemResult;
+                if (!groupResult) break;
+            }
+        }
+        return groupResult;
+    }
+
+    /// <summary>
+    /// 评估单个条件项.
+    /// </summary>
+    private bool EvaluateSingleCondition(BpmnNodeConditionsConfVueVo item, Dictionary<string, object> formFields)
+    {
+        string? fieldName = item.ColumnDbname;
+        if (string.IsNullOrEmpty(fieldName))
+        {
+            return false;
+        }
+        formFields.TryGetValue(fieldName, out var formValue);
+        string formValueStr = formValue != null ? formValue.ToString() : "";
+        string targetValue = item.Zdy1 ?? "";
+
+        string? fieldTypeName = item.FieldTypeName;
+        int? optType = item.OptType;
+
+        // switch: 比较布尔值
+        if ("switch".Equals(fieldTypeName))
+        {
+            return "1".Equals(formValueStr) == "1".Equals(targetValue);
+        }
+
+        // select / radio: 等值判断
+        if ("select".Equals(fieldTypeName) || "radio".Equals(fieldTypeName))
+        {
+            return targetValue.Equals(formValueStr);
+        }
+
+        // checkbox: 检查表单值集合是否包含目标元素
+        if ("checkbox".Equals(fieldTypeName))
+        {
+            if (string.IsNullOrEmpty(formValueStr) || string.IsNullOrEmpty(targetValue))
+            {
+                return false;
+            }
+            return formValueStr.Split(',').Contains(targetValue);
+        }
+
+        // 数字 / 日期 / 时间比较
+        try
+        {
+            if ("number".Equals(fieldTypeName) || "date".Equals(fieldTypeName) || "time".Equals(fieldTypeName))
+            {
+                return CompareNumeric(formValueStr, targetValue, optType, item.Zdy2, item.Opt1, item.Opt2);
+            }
+        }
+        catch (FormatException)
+        {
+            _logger.LogDebug("Numeric comparison failed for field {FieldName}", fieldName);
+        }
+
+        // 默认: 字符串等值
+        return targetValue.Equals(formValueStr);
+    }
+
+    /// <summary>
+    /// 数字比较, 支持: >=, >, <=, <, ==, between.
+    /// optType: 1=>=, 2=>, 3=<=, 4=<, 5===, 6~9=between(zdy1 opt1 x opt2 zdy2)
+    /// </summary>
+    private bool CompareNumeric(string formValueStr, string targetValue, int? optType,
+        string? zdy2, string? opt1, string? opt2)
+    {
+        if (string.IsNullOrEmpty(formValueStr) || string.IsNullOrEmpty(targetValue))
+        {
+            return false;
+        }
+        double formVal = double.Parse(formValueStr);
+        double target = double.Parse(targetValue);
+
+        if (optType == null) return formVal == target;
+
+        switch (optType.Value)
+        {
+            case 1: return formVal >= target;
+            case 2: return formVal > target;
+            case 3: return formVal <= target;
+            case 4: return formVal < target;
+            case 5: return formVal == target;
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+                // Between: zdy1 opt1 x opt2 zdy2
+                if (string.IsNullOrEmpty(zdy2)) return false;
+                double target2 = double.Parse(zdy2);
+                bool leftBound = "<".Equals(opt1) ? formVal > target : formVal >= target;
+                bool rightBound = "<".Equals(opt2) ? formVal < target2 : formVal <= target2;
+                return leftBound && rightBound;
+            default:
+                return formVal == target;
         }
     }
 
