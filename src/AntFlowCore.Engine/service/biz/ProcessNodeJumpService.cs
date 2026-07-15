@@ -104,6 +104,8 @@ public class ProcessNodeJumpService : IProcessNodeJumpService
                 ExecutionId = executionId,
                 Name = turnToElement.ElementName,
                 TaskDefKey = turnToElement.ElementId,
+                NodeId = turnToElement.NodeId,
+                NodeType = turnToElement.NodeType,
                 Owner = bpmAfTask.Owner,
                 Assignee = key,
                 AssigneeName = value,
