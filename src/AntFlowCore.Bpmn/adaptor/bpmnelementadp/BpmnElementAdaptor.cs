@@ -296,21 +296,21 @@ public abstract class BpmnElementAdaptor : IAdaptorService
         {
             elementVo.Buttons = new BpmnConfCommonButtonsVo
             {
-                StartPage = nodeVo.Buttons.StartPage
+                StartPage = nodeVo.Buttons?.StartPage?
                     .Select(o => new BpmnConfCommonButtonPropertyVo
                     {
                         ButtonType = o,
                         ButtonName = ButtonTypeEnumExtensions.GetDescByCode(o)
                     })
                     .ToList(),
-                ApprovalPage = nodeVo.Buttons.ApprovalPage
+                ApprovalPage = nodeVo.Buttons?.ApprovalPage?
                     .Select(o => new BpmnConfCommonButtonPropertyVo
                     {
                         ButtonType = o,
                         ButtonName = ButtonTypeEnumExtensions.GetDescByCode(o)
                     })
                     .ToList(),
-                ViewPage = nodeVo.Buttons.ViewPage
+                ViewPage = nodeVo.Buttons?.ViewPage?
                     .Select(o => new BpmnConfCommonButtonPropertyVo
                     {
                         ButtonType = o,
