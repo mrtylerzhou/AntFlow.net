@@ -1,4 +1,4 @@
-﻿
+
 namespace AntFlowCore.Base.util
 {
     public interface StringConstants
@@ -70,6 +70,14 @@ namespace AntFlowCore.Base.util
         // Adjacent deduplication auto-skip comment and suffix
         public const string AF_AUTO_SKIP_COMMENT = "相同审批人自动跳过";
         public const string AF_SKIP_ASSIGNEE_NODE_SUFFIX = "⬇️";
+
+        // Element name suffixes for special node types (aligned with Java StringConstants)
+        public const string AF_COPY_V2_NODE_SUFFIX = "\uD83D\uDCE2";        // 抄送节点v2后缀
+        public const string AF_NODE_SIGN_SUFFIX = "\uD83D\uDD00";           // 会签后缀
+        public const string AF_NODE_SIGN_IN_ORDER_SUFFIX = "\uD83D\uDD03";  // 顺序会签后缀
+        public const string AF_NODE_OR_SIGN_SUFFIX = "\uD83D\uDD02";        // 或签后缀
+        public const string AF_DEFAULT_NODE_NAME = "审核人";
+        public const string LASTNODE_COPY = "af_syslabel_lastnode_copy";
 
         // Thread-local key for duplication process strategy (used by element adaptors)
         public const string DUPLICATION_PROCESS_STRATEGY = "duplicationProcessStrategy";

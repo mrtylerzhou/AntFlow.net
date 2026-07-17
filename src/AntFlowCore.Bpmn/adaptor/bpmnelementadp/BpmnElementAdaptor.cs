@@ -19,6 +19,8 @@ public abstract class BpmnElementAdaptor : IAdaptorService
             BpmnConfCommonElementVo elementVo = FormatNodesToElements(bpmnConfCommonElementVos, nodeVo, nodeCode, sequenceFlowNum, numMap);
             elementVo.NodeId = nodeVo.Id.ToString();
             elementVo.NodeType = nodeVo.NodeType;
+            // 为元素名称添加特殊标记后缀(抄送节点v2📢,会签,或签等)
+            AfNodeUtils.ElementWithSpecialMarks(elementVo);
             // 处理签到元素
             DoSignUp(bpmnConfCommonElementVos, elementVo, numMap);
         }

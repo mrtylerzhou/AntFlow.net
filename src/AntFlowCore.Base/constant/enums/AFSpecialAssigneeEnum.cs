@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Base.constant.enums;
+namespace AntFlowCore.Base.constant.enums;
 
 public class AFSpecialAssigneeEnum
 {
@@ -15,6 +15,7 @@ public class AFSpecialAssigneeEnum
 
     public static readonly AFSpecialAssigneeEnum TO_BE_REMOVED = new AFSpecialAssigneeEnum(0, "0", "最终会被去除的人员");
     public static readonly AFSpecialAssigneeEnum COPY_NODE = new AFSpecialAssigneeEnum(1, "-1", "流程通知");
+    public static readonly AFSpecialAssigneeEnum CC_NODE = new AFSpecialAssigneeEnum(-1, "-1", "抄送人");
     public static readonly AFSpecialAssigneeEnum SKIP = new AFSpecialAssigneeEnum(-2, "-2", "自动节点自动跳过");
     public static IEnumerable<AFSpecialAssigneeEnum> Values
     {
@@ -22,6 +23,7 @@ public class AFSpecialAssigneeEnum
         {
             yield return TO_BE_REMOVED;
             yield return COPY_NODE;
+            yield return CC_NODE;
             yield return SKIP;
         }
     }

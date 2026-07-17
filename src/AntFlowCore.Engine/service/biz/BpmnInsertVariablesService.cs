@@ -149,7 +149,7 @@ public class BpmnInsertVariablesService : IBpmnInsertVariablesService
                 {
                     ElementId = elementId,
                     ButtonPageType = (int)ButtonPageTypeEnum.TOVIEW,
-                    ViewType = (int)ViewPageTypeEnum.VIEW_PAGE_TYPE_START,
+                    ViewType = (int)ViewPageTypeEnum.VIEW_PAGE_TYPE_OTHER,
                     ButtonType = o.ButtonType,
                     ButtonName = o.ButtonName
                 });

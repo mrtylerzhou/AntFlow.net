@@ -71,6 +71,12 @@ public class BpmnTaskListener: ITaskListener
            return;
         }
 
+        // 抄送节点v2:节点以普通审批人身份进入引擎,通过标签识别后自动完成
+        if (ProcessCopyV2(delegateTask))
+        {
+            return;
+        }
+
         // Adjacent deduplication auto-skip: check FormKey for skippedAssignees label
         ProcessSkippedAssignee(delegateTask);
 
@@ -228,5 +234,104 @@ public class BpmnTaskListener: ITaskListener
                 return;
             }
         }
+    }
+
+    /// <summary>
+    /// 抄送节点v2运行时处理:当任务带有 copyNodeV2 标签时,将该任务标记为抄送,
+    /// 自动完成任务,并记录抄送信息和审批日志.
+    /// 对应 Java NextNodeLabelsProcessor.processCopyV2.
+    /// </summary>
+    /// <returns>true 表示任务是抄送节点v2并已自动完成;false 表示不是</returns>
+    private bool ProcessCopyV2(BpmAfTask delegateTask)
+    {
+        string formKey = delegateTask.FormKey;
+        if (string.IsNullOrEmpty(formKey) || !formKey.StartsWith("{"))
+        {
+            return false;
+        }
+
+        NodeExtraInfoDTO? extraInfoDTO = null;
+        try
+        {
+            extraInfoDTO = JsonSerializer.Deserialize<NodeExtraInfoDTO>(formKey);
+        }
+        catch
+        {
+            return false;
+        }
+
+        if (extraInfoDTO?.NodeLabelVOS == null || extraInfoDTO.NodeLabelVOS.Count == 0)
+        {
+            return false;
+        }
+
+        bool isCopyV2 = false;
+        foreach (var nodeLabelVO in extraInfoDTO.NodeLabelVOS)
+        {
+            if (StringConstants.COPY_NODEV2.Equals(nodeLabelVO.LabelValue))
+            {
+                isCopyV2 = true;
+                break;
+            }
+        }
+
+        if (!isCopyV2)
+        {
+            return false;
+        }
+
+        string procInstId = delegateTask.ProcInstId;
+        string processNumber = delegateTask.ProcessNumber;
+        string assignee = delegateTask.Assignee;
+        string assigneeName = delegateTask.AssigneeName;
+
+        // 检查是否已存在抄送记录,避免重复添加
+        var existingForwards = _bpmProcessForwardService._repository
+            .Find(a => a.ProcessInstanceId == procInstId && a.ForwardUserId == assignee);
+
+        // 设置任务审批人为抄送人特殊标记,并自动完成任务
+        delegateTask.Assignee = AFSpecialAssigneeEnum.CC_NODE.Id;
+        string ccAssigneeName = AFSpecialAssigneeEnum.CC_NODE.Desc + "(" + assigneeName + ")";
+        delegateTask.AssigneeName = ccAssigneeName;
+
+        var taskService = ServiceProviderUtils.GetService<ITaskService>();
+        taskService?.Complete(delegateTask);
+
+        // 若不存在抄送记录,则新增
+        if (existingForwards == null || existingForwards.Count == 0)
+        {
+            BpmProcessForward bpmProcessForward = new BpmProcessForward
+            {
+                CreateTime = DateTime.Now,
+                CreateUserId = assignee,
+                ForwardUserId = assignee,
+                ForwardUserName = assigneeName,
+                ProcessInstanceId = procInstId,
+                ProcessNumber = processNumber,
+                IsRead = 0,
+                IsDel = 0,
+                TenantId = MultiTenantUtil.GetCurrentTenantId(),
+            };
+            _bpmProcessForwardService.AddProcessForward(bpmProcessForward);
+        }
+
+        // 记录审批日志:(抄送给xxx)自动通过
+        BpmVerifyInfo bpmVerifyInfo = new BpmVerifyInfo
+        {
+            VerifyDate = DateTime.Now,
+            TaskName = delegateTask.Name,
+            TaskId = delegateTask.Id,
+            RunInfoId = procInstId,
+            VerifyUserId = delegateTask.Assignee,
+            VerifyUserName = ccAssigneeName,
+            TaskDefKey = delegateTask.TaskDefKey,
+            VerifyStatus = (int)ProcessSubmitStateEnum.PROCESS_AGRESS_TYPE,
+            VerifyDesc = "(抄送给" + assigneeName + ")自动通过",
+            ProcessCode = processNumber,
+            TenantId = MultiTenantUtil.GetCurrentTenantId(),
+        };
+        _bpmVerifyInfoService.AddVerifyInfo(bpmVerifyInfo);
+
+        return true;
     }
 }

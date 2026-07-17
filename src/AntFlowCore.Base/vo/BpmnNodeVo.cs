@@ -142,9 +142,9 @@ namespace AntFlowCore.Base.vo;
 
         /// <summary>
         /// Whether this node is a carbon-copy (抄送) node V2 (enters the engine).
-        /// Derived from LabelList at read time.
+        /// Derived from LabelList at read time. Serialized to frontend for V2 rendering.
         /// </summary>
-        [JsonIgnore]
+        [JsonPropertyName("isCarbonCopyNode")]
         public bool? IsCarbonCopyNode { get; set; }
 
         /// <summary>

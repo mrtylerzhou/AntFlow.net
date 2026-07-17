@@ -104,6 +104,7 @@ public class BpmnConfBizService : IBpmnConfBizService
         int hasChooseFromLowCodeform=0;
         foreach (BpmnNodeVo bpmnNodeVo in confNodes)
         {
+            AfNodeUtils.NodeSpecialProcess(bpmnNodeVo);
             if (bpmnNodeVo.NodeType == (int)NodeTypeEnum.NODE_TYPE_APPROVER
                 && bpmnNodeVo.NodeProperty==null) {
                 throw new AFBizException("apporver node has no property,can not be saved！");
@@ -435,6 +436,7 @@ public class BpmnConfBizService : IBpmnConfBizService
             foreach (BpmnNodeVo node in bpmnConfVo.Nodes)
             {
                 node.FormCode=bpmnConfVo.FormCode;
+                AfNodeUtils.NodeLabelSpecialProcess(node);
                 if((int)NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY==node.NodeType){
                     BpmnNodeVo aggregationNode = BpmnUtils.GetAggregationNode(node, bpmnConfVo.Nodes);
                     if(aggregationNode==null){
