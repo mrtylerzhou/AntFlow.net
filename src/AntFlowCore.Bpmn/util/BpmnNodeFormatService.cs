@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.service.processor;
+using AntFlowCore.Abstraction.service.processor;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.extension;
@@ -555,19 +555,29 @@ public class BpmnNodeFormatService : IBpmnNodeFormatService
         startNodeElement.Buttons = new BpmnConfCommonButtonsVo
         {
             StartPage = startUserNode.Buttons.StartPage
-                .Select(o => new BpmnConfCommonButtonPropertyVo
-                {
-                    ButtonType = o,
-                    ButtonName = ButtonTypeEnumExtensions.GetDescByCode(o)
-                })
+                .Select(ToButtonPropertyVo)
                 .ToList(),
             ApprovalPage = startUserNode.Buttons.ApprovalPage
-                .Select(o => new BpmnConfCommonButtonPropertyVo
-                {
-                    ButtonType = o,
-                    ButtonName = ButtonTypeEnumExtensions.GetDescByCode(o)
-                })
+                .Select(ToButtonPropertyVo)
                 .ToList()
+        };
+    }
+
+    /// <summary>
+    /// 将设计时按钮 VO 转换为运行时按钮 VO.
+    /// 自定义名称非空时使用自定义值,否则回退到按钮类型对应的默认名称.
+    /// </summary>
+    private static BpmnConfCommonButtonPropertyVo ToButtonPropertyVo(BpmnConfCommonButtonPropertyVo src)
+    {
+        int btnType = src.ButtonType ?? 0;
+        string customName = src.ButtonName;
+        string resolvedName = !string.IsNullOrWhiteSpace(customName)
+            ? customName
+            : ButtonTypeEnumExtensions.GetDescByCode(btnType);
+        return new BpmnConfCommonButtonPropertyVo
+        {
+            ButtonType = btnType,
+            ButtonName = resolvedName
         };
     }
 

@@ -737,18 +737,27 @@ public class BpmnConfBizService : IBpmnConfBizService
             {
                 StartPage = bsConf.ButtonConfList
                     .Where(b => b.ButtonPageType == (int)ButtonPageTypeEnum.INITIATE)
-                    .Select(b => b.ButtonType ?? 0)
-                    .Distinct()
+                    .Select(b => new BpmnConfCommonButtonPropertyVo
+                    {
+                        ButtonType = b.ButtonType,
+                        ButtonName = b.ButtonName
+                    })
                     .ToList(),
                 ApprovalPage = bsConf.ButtonConfList
                     .Where(b => b.ButtonPageType == (int)ButtonPageTypeEnum.AUDIT)
-                    .Select(b => b.ButtonType ?? 0)
-                    .Distinct()
+                    .Select(b => new BpmnConfCommonButtonPropertyVo
+                    {
+                        ButtonType = b.ButtonType,
+                        ButtonName = b.ButtonName
+                    })
                     .ToList(),
                 ViewPage = bsConf.ButtonConfList
                     .Where(b => b.ButtonPageType == (int)ButtonPageTypeEnum.TOVIEW)
-                    .Select(b => b.ButtonType ?? 0)
-                    .Distinct()
+                    .Select(b => new BpmnConfCommonButtonPropertyVo
+                    {
+                        ButtonType = b.ButtonType,
+                        ButtonName = b.ButtonName
+                    })
                     .ToList()
             };
         }

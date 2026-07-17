@@ -207,14 +207,14 @@ public static class BpmnNodeConfigHolder
         var config = vo.GetOrCreateNodeConfigJson();
         var bs = new BpmnNodeButtonSignConfJson();
 
-        // Buttons - BpmnNodeButtonConfBaseVo has startPage, approvalPage, viewPage (List<int>)
+        // Buttons - BpmnNodeButtonConfBaseVo has startPage, approvalPage, viewPage (List<BpmnConfCommonButtonPropertyVo>)
         var btns = vo.Buttons;
         if (btns != null)
         {
             var buttonList = new List<ButtonSignButtonConf>();
-            AddButtonsFromIntList(buttonList, btns.StartPage, 1, 0);
-            AddButtonsFromIntList(buttonList, btns.ApprovalPage, 2, 0);
-            AddButtonsFromIntList(buttonList, btns.ViewPage, 3, 0);
+            AddButtonsFromList(buttonList, btns.StartPage, 1, 0);
+            AddButtonsFromList(buttonList, btns.ApprovalPage, 2, 0);
+            AddButtonsFromList(buttonList, btns.ViewPage, 3, 0);
 
             // START(发起人)节点的审批页必须要有"重新提交"按钮
             // 前端设计器(promoterDrawer)没有审批按钮配置UI，需要后端兜底
@@ -222,7 +222,7 @@ public static class BpmnNodeConfigHolder
             if (isStartNode)
             {
                 bool hasResubmit = btns.ApprovalPage != null
-                    && btns.ApprovalPage.Contains((int)ButtonTypeEnum.BUTTON_TYPE_RESUBMIT);
+                    && btns.ApprovalPage.Any(b => (int)ButtonTypeEnum.BUTTON_TYPE_RESUBMIT == b.ButtonType);
                 if (!hasResubmit)
                 {
                     buttonList.Add(new ButtonSignButtonConf
@@ -420,18 +420,24 @@ public static class BpmnNodeConfigHolder
         return config.ApproverConf;
     }
 
-    private static void AddButtonsFromIntList(List<ButtonSignButtonConf> list,
-        List<int> buttonTypes, int pageType, int startPageOnly)
+    private static void AddButtonsFromList(List<ButtonSignButtonConf> list,
+        List<BpmnConfCommonButtonPropertyVo> buttonItems, int pageType, int startPageOnly)
     {
-        if (buttonTypes == null || buttonTypes.Count == 0) return;
+        if (buttonItems == null || buttonItems.Count == 0) return;
 
-        foreach (var btnType in buttonTypes)
+        foreach (var item in buttonItems)
         {
+            int btnType = item.ButtonType ?? 0;
+            string customName = item.ButtonName;
+            // 自定义名称非空时使用自定义值,否则回退到按钮类型对应的默认名称
+            string resolvedName = !string.IsNullOrWhiteSpace(customName)
+                ? customName
+                : ButtonTypeEnumExtensions.GetDescByCode(btnType);
             list.Add(new ButtonSignButtonConf
             {
                 ButtonPageType = pageType,
                 ButtonType = btnType,
-                ButtonName = ButtonTypeEnumExtensions.GetDescByCode(btnType),
+                ButtonName = resolvedName,
                 StartPageOnly = startPageOnly
             });
         }

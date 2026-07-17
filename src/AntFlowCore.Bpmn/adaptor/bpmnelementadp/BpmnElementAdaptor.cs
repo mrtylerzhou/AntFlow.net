@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.adaptor;
+using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.factory;
 using AntFlowCore.Base.util;
@@ -297,25 +297,32 @@ public abstract class BpmnElementAdaptor : IAdaptorService
             elementVo.Buttons = new BpmnConfCommonButtonsVo
             {
                 StartPage = nodeVo.Buttons?.StartPage?
-                    .Select(o => new BpmnConfCommonButtonPropertyVo
-                    {
-                        ButtonType = o,
-                        ButtonName = ButtonTypeEnumExtensions.GetDescByCode(o)
-                    })
+                    .Select(ToButtonPropertyVo)
                     .ToList(),
                 ApprovalPage = nodeVo.Buttons?.ApprovalPage?
-                    .Select(o => new BpmnConfCommonButtonPropertyVo
-                    {
-                        ButtonType = o,
-                        ButtonName = ButtonTypeEnumExtensions.GetDescByCode(o)
-                    })
+                    .Select(ToButtonPropertyVo)
                     .ToList(),
                 ViewPage = nodeVo.Buttons?.ViewPage?
-                    .Select(o => new BpmnConfCommonButtonPropertyVo
-                    {
-                        ButtonType = o,
-                        ButtonName = ButtonTypeEnumExtensions.GetDescByCode(o)
-                    }).ToList()
+                    .Select(ToButtonPropertyVo)
+                    .ToList()
+            };
+        }
+
+        /// <summary>
+        /// 将设计时按钮 VO 转换为运行时按钮 VO.
+        /// 自定义名称非空时使用自定义值,否则回退到按钮类型对应的默认名称.
+        /// </summary>
+        private static BpmnConfCommonButtonPropertyVo ToButtonPropertyVo(BpmnConfCommonButtonPropertyVo src)
+        {
+            int btnType = src.ButtonType ?? 0;
+            string customName = src.ButtonName;
+            string resolvedName = !string.IsNullOrWhiteSpace(customName)
+                ? customName
+                : ButtonTypeEnumExtensions.GetDescByCode(btnType);
+            return new BpmnConfCommonButtonPropertyVo
+            {
+                ButtonType = btnType,
+                ButtonName = resolvedName
             };
         }
 

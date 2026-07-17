@@ -1,16 +1,16 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace AntFlowCore.Base.vo
 {
     public class BpmnNodeButtonConfBaseVo
     {
         [JsonPropertyName("startPage")]
-        public List<int> StartPage { get; set; }
+        public List<BpmnConfCommonButtonPropertyVo> StartPage { get; set; } = new List<BpmnConfCommonButtonPropertyVo>();
 
         [JsonPropertyName("approvalPage")]
-        public List<int> ApprovalPage { get; set; }
+        public List<BpmnConfCommonButtonPropertyVo> ApprovalPage { get; set; } = new List<BpmnConfCommonButtonPropertyVo>();
 
         [JsonPropertyName("viewPage")]
-        public List<int> ViewPage { get; set; }
+        public List<BpmnConfCommonButtonPropertyVo> ViewPage { get; set; } = new List<BpmnConfCommonButtonPropertyVo>();
     }
 }
