@@ -92,5 +92,11 @@ namespace AntFlowCore.Base.util
 
         // Thread-local key for duplication process strategy (used by element adaptors)
         public const string DUPLICATION_PROCESS_STRATEGY = "duplicationProcessStrategy";
+
+        // 上一节点指定审批人相关常量 (对等 Java StringConstants)
+        public const string AF_SYSLABEL_PREV_NODE_APPOINTED = "af_syslabel_prev_node_appointed";
+        public const string AF_SYSLABEL_APPOINT_NEXT_NODE_APPROVER = "af_syslabel_appoint_next_node_approver";
+        // Thread-local key for passing nextNodeApprovers from ButtonOperationService to AFTaskService
+        public const string NEXT_NODE_APPROVER = "nextNodeApprover";
     }
 }

@@ -834,6 +834,11 @@ public class BpmnConfBizService : IBpmnConfBizService
             {
                 bpmnNodeVo.IsConditionCopyNode = true;
             }
+            // 上一节点指定审批人节点:标签匹配时设置标记位,前端据此在编辑面板回显"上一节点指定"选项
+            if (NodeLabelConstants.NodeLabelContainsAny(labelVOList, NodeLabelConstants.PrevNodeAppointed.LabelValue))
+            {
+                bpmnNodeVo.IsPrevNodeAppointed = true;
+            }
             bpmnNodeVo.LabelList = labelVOList;
         }
 

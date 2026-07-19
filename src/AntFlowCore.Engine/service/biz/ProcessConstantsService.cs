@@ -127,6 +127,9 @@ public class ProcessConstantsService : IProcessConstantsService
            }
            
             processInfoVo.TaskId = tasks[0].Id;
+            // 设置 FormKey (含节点标签 NodeExtraInfoDTO JSON),供 ProcessApprovalService.GetBusinessInfo
+            // 据此判断当前节点是否需要渲染[指定下一节点审批人]按钮
+            processInfoVo.FormKey = tasks[0].FormKey;
             processInfoVo.ViewNodeIds=viewNodeIds;
             processInfoVo.NodeId = taskDefKey;
         }

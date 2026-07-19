@@ -1,4 +1,4 @@
-﻿﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using AntFlowCore.Abstraction.Orm.ext;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
@@ -150,6 +150,13 @@ public class ProcessApprovalService : IProcessApprovalService
             flag
         );
 
+        // 上一节点指定审批人: 当前节点贴有 appoint_next_node_approver 标签时,
+        // 渲染[指定下一节点审批人]按钮. 标签从 ProcessRecordInfo.FormKey (NodeExtraInfoDTO JSON) 中读取.
+        if (HasAppointNextNodeApproverLabel(businessDataVo))
+        {
+            AddAppointNextNodeApproverButton(businessDataVo);
+        }
+
         // 检查当前节点是否为报名节点，并设置属性
         string nodeId = businessDataVo.ProcessRecordInfo.NodeId;
         businessDataVo.IsSignUpNode = false;
@@ -203,6 +210,72 @@ public class ProcessApprovalService : IProcessApprovalService
             pcProcButtons.Add(addApproverButton);
         }
 
+    }
+
+    /// <summary>
+    /// 检查当前节点是否需要渲染[指定下一节点审批人]按钮.
+    /// 从 ProcessRecordInfoVo.FormKey 读取 NodeExtraInfoDTO, 检查是否包含
+    /// af_syslabel_appoint_next_node_approver 标签.
+    /// 对应 Java ProcessApprovalServiceImpl.hasAppointNextNodeApproverLabel.
+    /// </summary>
+    private bool HasAppointNextNodeApproverLabel(BusinessDataVo businessDataVo)
+    {
+        try
+        {
+            if (businessDataVo?.ProcessRecordInfo == null)
+            {
+                return false;
+            }
+            string formKey = businessDataVo.ProcessRecordInfo.FormKey;
+            if (string.IsNullOrEmpty(formKey) || !formKey.StartsWith("{"))
+            {
+                return false;
+            }
+            NodeExtraInfoDTO? extraInfoDTO = System.Text.Json.JsonSerializer.Deserialize<NodeExtraInfoDTO>(formKey);
+            if (extraInfoDTO?.NodeLabelVOS == null || extraInfoDTO.NodeLabelVOS.Count == 0)
+            {
+                return false;
+            }
+            return NodeLabelConstants.NodeLabelContainsAny(
+                extraInfoDTO.NodeLabelVOS,
+                StringConstants.AF_SYSLABEL_APPOINT_NEXT_NODE_APPROVER);
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(e, "HasAppointNextNodeApproverLabel check failed");
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 添加[指定下一节点审批人]按钮到 PC 审批页按钮列表.
+    /// 对应 Java ProcessApprovalServiceImpl.addAppointNextNodeApproverButton.
+    /// </summary>
+    private void AddAppointNextNodeApproverButton(BusinessDataVo businessDataVo)
+    {
+        ProcessActionButtonVo button = new ProcessActionButtonVo
+        {
+            ButtonType = (int)ButtonTypeEnum.BUTTON_TYPE_APPOINT_NEXT_NODE_APPROVER,
+            Name = ButtonTypeEnumExtensions.GetDescByCode((int)ButtonTypeEnum.BUTTON_TYPE_APPOINT_NEXT_NODE_APPROVER)
+        };
+
+        var pcButtons = businessDataVo.ProcessRecordInfo.PcButtons;
+        if (pcButtons == null)
+        {
+            return;
+        }
+        if (!pcButtons.TryGetValue(ButtonPageTypeEnumExtensions.GetName(ButtonPageTypeEnum.AUDIT),
+                out var pcProcButtons))
+        {
+            pcProcButtons = new List<ProcessActionButtonVo>();
+            pcButtons[ButtonPageTypeEnumExtensions.GetName(ButtonPageTypeEnum.AUDIT)] = pcProcButtons;
+        }
+
+        int buttonTypeCode = (int)ButtonTypeEnum.BUTTON_TYPE_APPOINT_NEXT_NODE_APPROVER;
+        if (pcProcButtons != null && !pcProcButtons.Any(a => buttonTypeCode.Equals(a.ButtonType)))
+        {
+            pcProcButtons.Add(button);
+        }
     }
 
     public ResultAndPage<TaskMgmtVO> FindPcProcessList(PageDto pageDto, TaskMgmtVO vo)

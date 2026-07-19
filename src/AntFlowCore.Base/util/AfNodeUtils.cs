@@ -24,6 +24,12 @@ public class AfNodeUtils
     /// </summary>
     public static void NodeSpecialProcess(BpmnNodeVo bpmnNodeVo)
     {
+        // 上一节点指定审批人: 根据前端传入的 isPrevNodeAppointed 标识, 自动贴 af_syslabel_prev_node_appointed 标签
+        if (bpmnNodeVo.IsPrevNodeAppointed == true)
+        {
+            bpmnNodeVo.SetOrAddLabelList(NodeLabelConstants.PrevNodeAppointed);
+        }
+
         int? nodeType = bpmnNodeVo.NodeType == 0 ? null : (int?)bpmnNodeVo.NodeType;
         if (nodeType == null)
         {
@@ -78,6 +84,10 @@ public class AfNodeUtils
             else if (NodeLabelConstants.ConditionCopyNode.LabelValue.Equals(nodeLabelVO.LabelValue))
             {
                 bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_CONDITION_COPY;
+            }
+            else if (NodeLabelConstants.PrevNodeAppointed.LabelValue.Equals(nodeLabelVO.LabelValue))
+            {
+                bpmnNodeVo.IsPrevNodeAppointed = true;
             }
         }
     }

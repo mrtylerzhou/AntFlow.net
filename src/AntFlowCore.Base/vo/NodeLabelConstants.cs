@@ -32,6 +32,20 @@ namespace AntFlowCore.Base.vo
         public static readonly BpmnNodeLabelVO ConditionCopyNode = new BpmnNodeLabelVO(StringConstants.CONDITION_COPY_NODE, "条件抄送节点");
 
         /// <summary>
+        /// 上一节点指定审批人: 当前节点使用虚拟审批人 PREV_NODE_APPOINTED("-4"),
+        /// 运行时由 AFTaskService.InsertTasks 替换为上一节点审批人通过[指定下一节点审批人]按钮选择的实际审批人.
+        /// 对应 Java NodeLabelConstants.prevNodeAppointed.
+        /// </summary>
+        public static readonly BpmnNodeLabelVO PrevNodeAppointed = new BpmnNodeLabelVO(StringConstants.AF_SYSLABEL_PREV_NODE_APPOINTED, "上一节点指定审批人");
+
+        /// <summary>
+        /// 指定下一节点审批人: 贴在上一节点上,审批页据此渲染[指定下一节点审批人]按钮.
+        /// 由 AbstractBpmnPersonnelAdaptor.SetNodeParams 在格式化下一节点时自动添加.
+        /// 对应 Java NodeLabelConstants.appointNextNodeApprover.
+        /// </summary>
+        public static readonly BpmnNodeLabelVO AppointNextNodeApprover = new BpmnNodeLabelVO(StringConstants.AF_SYSLABEL_APPOINT_NEXT_NODE_APPROVER, "指定下一节点审批人");
+
+        /// <summary>
         /// 不可操作节点,存在于引擎中,但是不可退回到的节点.
         /// 动态条件和抄送节点v1版本虽然也不可退回到,但是他们本身不会进入引擎.
         /// 条件抄送节点加入(总是自动完成);条件审批节点不加入(可能需要人工审批,支持退回).

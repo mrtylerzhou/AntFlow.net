@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using AntFlowCore.Base.conf.json;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Core.vo;
@@ -191,6 +191,22 @@ namespace AntFlowCore.Base.vo
         
         [JsonPropertyName("approvalEmpls")]
         public List<BaseIdTranStruVo> ApprovalEmpls { get; set; }
+
+        /// <summary>
+        /// 上一节点审批人通过[指定下一节点审批人]按钮选择的下一节点实际审批人.
+        /// 由 ButtonOperationService 写入 ThreadLocalContainer, AFTaskService.InsertTasks 读取并替换虚拟审批人 -4.
+        /// 简化规则: 仅允许 1 人.
+        /// </summary>
+        [JsonPropertyName("nextNodeApprovers")]
+        public List<BaseIdTranStruVo> NextNodeApprovers { get; set; }
+
+        /// <summary>
+        /// 低代码表单字段及值. 由 UDLFApplyVo 上移至 BusinessDataVo,
+        /// 以便 NextNodeLabelsProcessor 等运行时处理器无需类型转换即可访问.
+        /// 对应 Java BusinessDataVo.lfFields.
+        /// </summary>
+        [JsonPropertyName("lfFields")]
+        public Dictionary<string, object> LfFields { get; set; }
 
         /// <summary>
         /// key is node id, value is a list of form-related assignee ids extracted from form data.

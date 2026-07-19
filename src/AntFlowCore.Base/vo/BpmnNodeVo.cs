@@ -163,6 +163,30 @@ namespace AntFlowCore.Base.vo;
         [JsonPropertyName("autoNodeConf")]
         public AutoNodeConfVo? AutoNodeConf { get; set; }
 
+        /// <summary>
+        /// 标识当前节点为"上一节点指定"审批人类型.
+        /// 前端传入,后端在 AfNodeUtils.NodeSpecialProcess 中据此自动贴 af_syslabel_prev_node_appointed 标签.
+        /// 对应 Java BpmnNodeVo.isPrevNodeAppointed.
+        /// </summary>
+        [JsonPropertyName("isPrevNodeAppointed")]
+        public bool? IsPrevNodeAppointed { get; set; }
+
+        /// <summary>
+        /// 添加标签到 LabelList, 若 LabelList 为空则初始化.
+        /// 对应 Java BpmnNodeVo.setOrAddLabelList.
+        /// </summary>
+        public void SetOrAddLabelList(BpmnNodeLabelVO labelVO)
+        {
+            if (LabelList != null && LabelList.Count > 0)
+            {
+                LabelList.Add(labelVO);
+            }
+            else
+            {
+                LabelList = new List<BpmnNodeLabelVO> { labelVO };
+            }
+        }
+
         [JsonPropertyName("overtimeConf")]
         public TemplateOvertimeConf OvertimeConf { get; set; }
 
