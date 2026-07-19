@@ -1,3 +1,4 @@
+using System.Text.Json;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.vo;
 
@@ -197,6 +198,33 @@ public static class BpmnNodeConfigHolder
             ConditionGroups = groups,
             OutSideConditionId = outSideId
         };
+    }
+
+    /// <summary>
+    /// Persists autoNodeConf (conditionList + groupRelation) from BpmnNodeVo.AutoNodeConf
+    /// into node_config_json.autoNodeConf. Used by condition-approve (12) and
+    /// condition-copy (13) nodes. Mirrors Java BpmnNodeConfigHolder.setAutoNodeConf.
+    /// </summary>
+    public static void SetAutoNodeConf(BpmnNodeVo vo)
+    {
+        if (vo.AutoNodeConf == null)
+        {
+            return;
+        }
+        BpmnNodeConfigJson config = vo.GetOrCreateNodeConfigJson();
+
+        // Serialize conditionList (List<List<BpmnNodeConditionsConfVueVo>>) as raw JSON
+        // to preserve the front-end structure for runtime evaluation.
+        var autoNodeConfJson = new AutoNodeConfJson
+        {
+            ConditionList = vo.AutoNodeConf.ConditionList?
+                .Select(group => group?
+                    .Select(item => JsonSerializer.SerializeToElement(item))
+                    .ToList() ?? new List<JsonElement>())
+                .ToList() ?? new List<List<JsonElement>>(),
+            GroupRelation = vo.AutoNodeConf.GroupRelation
+        };
+        config.AutoNodeConf = autoNodeConfJson;
     }
 
     /// <summary>

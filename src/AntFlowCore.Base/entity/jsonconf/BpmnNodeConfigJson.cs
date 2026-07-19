@@ -1,3 +1,4 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using AntFlowCore.Base.vo;
 
@@ -45,6 +46,27 @@ public class BpmnNodeConfigJson
     /// </summary>
     [JsonPropertyName("backType")]
     public int? BackType { get; set; }
+
+    /// <summary>
+    /// Auto-node style condition configuration. Used by condition-approve (nodeType=12)
+    /// and condition-copy (nodeType=13) nodes. Persisted under JSON key "autoNodeConf"
+    /// to align with the front-end (shared with Java version).
+    /// </summary>
+    [JsonPropertyName("autoNodeConf")]
+    public AutoNodeConfJson? AutoNodeConf { get; set; }
+}
+
+/// <summary>
+/// Condition configuration JSON for condition-approve / condition-copy nodes.
+/// Mirrors the front-end autoNodeConf structure (conditionList + groupRelation).
+/// </summary>
+public class AutoNodeConfJson
+{
+    [JsonPropertyName("conditionList")]
+    public List<List<JsonElement>>? ConditionList { get; set; }
+
+    [JsonPropertyName("groupRelation")]
+    public bool? GroupRelation { get; set; }
 }
 
 /// <summary>

@@ -43,7 +43,6 @@ namespace AntFlowCore.Base.vo;
                 _nodeFroms = value;
                 if (!string.IsNullOrEmpty(value))
                 {
-                    // 当设置 NodeFroms 时，自动更新 PrevId
                     PrevId = new List<string>(value.Split(','));
                 }
             }
@@ -59,7 +58,6 @@ namespace AntFlowCore.Base.vo;
                 _prevId = value;
                 if (_prevId != null && _prevId.Count > 0)
                 {
-                    // 当设置 PrevId 时，自动更新 NodeFroms
                     NodeFroms = string.Join(",", _prevId);
                 }
             }
@@ -112,7 +110,6 @@ namespace AntFlowCore.Base.vo;
 
         [JsonPropertyName("extraFlags")]
         public int? ExtraFlags { get; set; }
-        //===============>>ext fields<<===================
 
         [JsonPropertyName("nodeTo")]
         public List<string> NodeTo { get; set; }
@@ -132,36 +129,45 @@ namespace AntFlowCore.Base.vo;
         [JsonPropertyName("approveRemindVo")]
         public BpmnApproveRemindVo ApproveRemindVo { get; set; }
 
-        /// <summary>
-        /// Node labels (user-defined or dynamically added). Persisted into
-        /// node_config_json.buttonSignConf.labels at design time and read back
-        /// for runtime use. Eventually carried on BpmnConfCommonElementVo.LabelList.
-        /// </summary>
         [JsonPropertyName("labelList")]
         public List<BpmnNodeLabelVO> LabelList { get; set; }
 
-        /// <summary>
-        /// Whether this node is a carbon-copy (抄送) node V2 (enters the engine).
-        /// Derived from LabelList at read time. Serialized to frontend for V2 rendering.
-        /// </summary>
         [JsonPropertyName("isCarbonCopyNode")]
         public bool? IsCarbonCopyNode { get; set; }
 
         /// <summary>
-        /// Overtime notice configuration (migrated from bpm_process_node_overtime).
-        /// Written to node_config_json.templateConf.overtimeConf during edit.
+        /// Whether this node is a condition-approve node (nodeType=12 at design time,
+        /// converted to nodeType=4 at runtime by AfNodeUtils.NodeSpecialProcess).
+        /// Condition-approve node auto-completes only when condition is true;
+        /// otherwise waits for human approval.
         /// </summary>
+        [JsonPropertyName("isConditionApproveNode")]
+        public bool? IsConditionApproveNode { get; set; }
+
+        /// <summary>
+        /// Whether this node is a condition-copy node (nodeType=13 at design time,
+        /// converted to nodeType=4 at runtime by AfNodeUtils.NodeSpecialProcess).
+        /// Condition-copy node always completes; only writes BpmProcessForward
+        /// when condition is true.
+        /// </summary>
+        [JsonPropertyName("isConditionCopyNode")]
+        public bool? IsConditionCopyNode { get; set; }
+
+        /// <summary>
+        /// Auto-node style condition configuration. Used by condition-approve (12)
+        /// and condition-copy (13) nodes to store conditionList + groupRelation.
+        /// Front-end submits under JSON key "autoNodeConf" (shared with Java version).
+        /// Persisted to node_config_json.autoNodeConf at design time and read back
+        /// for runtime condition evaluation.
+        /// </summary>
+        [JsonPropertyName("autoNodeConf")]
+        public AutoNodeConfVo? AutoNodeConf { get; set; }
+
         [JsonPropertyName("overtimeConf")]
         public TemplateOvertimeConf OvertimeConf { get; set; }
 
-        /// <summary>
-        /// Operation types for this node (migrated from bpm_process_operation).
-        /// Written to node_config_json.buttonSignConf.operationTypes during edit.
-        /// </summary>
         [JsonPropertyName("operationTypes")]
         public List<int> OperationTypes { get; set; }
-
-        //===============>>third party processs service<<===================
 
         [JsonPropertyName("conditionsUrl")]
         public string ConditionsUrl { get; set; }
@@ -217,7 +223,6 @@ namespace AntFlowCore.Base.vo;
             set => _nodeConfigJsonObj = value;
         }
 
-        
         public BpmnNodeConfigJson GetOrCreateNodeConfigJson()
         {
             _nodeConfigJsonObj ??= new BpmnNodeConfigJson();
@@ -232,4 +237,20 @@ namespace AntFlowCore.Base.vo;
             }
             return JsonConfUtil.ToNodeConfigJson(_nodeConfigJsonObj);
         }
+    }
+
+    /// <summary>
+    /// Condition configuration for condition-approve / condition-copy nodes.
+    /// Mirrors Java AutoNodeConf: { conditionList, groupRelation }.
+    /// conditionList is the same nested-array structure used by condition nodes
+    /// (nodeType=3) and is converted to BpmnNodeConditionsConfBaseVo at runtime
+    /// via BpmnConfNodePropertyConverter.FromVue3Model.
+    /// </summary>
+    public class AutoNodeConfVo
+    {
+        [JsonPropertyName("conditionList")]
+        public List<List<BpmnNodeConditionsConfVueVo>>? ConditionList { get; set; }
+
+        [JsonPropertyName("groupRelation")]
+        public bool? GroupRelation { get; set; }
     }

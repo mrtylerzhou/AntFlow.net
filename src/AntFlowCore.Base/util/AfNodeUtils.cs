@@ -35,12 +35,26 @@ public class AfNodeUtils
             bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_APPROVER;
             bpmnNodeVo.IsCarbonCopyNode = true;
         }
+        // 条件审批节点:设计期 nodeType=12,运行期转为 nodeType=4,标记 isConditionApproveNode
+        // 保留真实审批人(不替换为虚拟审批人),仅条件满足时自动 complete
+        else if (nodeType == (int)NodeTypeEnum.NODE_TYPE_CONDITION_APPROVE)
+        {
+            bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_APPROVER;
+            bpmnNodeVo.IsConditionApproveNode = true;
+        }
+        // 条件抄送节点:设计期 nodeType=13,运行期转为 nodeType=4,标记 isConditionCopyNode
+        // 总是 complete;仅条件满足时写 BpmProcessForward 抄送记录
+        else if (nodeType == (int)NodeTypeEnum.NODE_TYPE_CONDITION_COPY)
+        {
+            bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_APPROVER;
+            bpmnNodeVo.IsConditionCopyNode = true;
+        }
     }
 
     /// <summary>
     /// 反显(查看流程模板)时的特殊节点标签处理.
-    /// 根据节点标签将普通审批人节点还原为抄送节点v2(nodeType=8),
-    /// 以便前端按抄送节点v2的视觉效果渲染.
+    /// 根据节点标签将普通审批人节点还原为抄送节点v2(nodeType=8)等特殊节点类型,
+    /// 以便前端按对应节点的视觉效果渲染.
     /// 对应 Java NodeUtil.nodeLabelSpecialProcess.
     /// </summary>
     public static void NodeLabelSpecialProcess(BpmnNodeVo bpmnNodeVo)
@@ -56,6 +70,14 @@ public class AfNodeUtils
             if (NodeLabelConstants.CopyNodeV2.LabelValue.Equals(nodeLabelVO.LabelValue))
             {
                 bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_COPY_V2;
+            }
+            else if (NodeLabelConstants.ConditionApproveNode.LabelValue.Equals(nodeLabelVO.LabelValue))
+            {
+                bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_CONDITION_APPROVE;
+            }
+            else if (NodeLabelConstants.ConditionCopyNode.LabelValue.Equals(nodeLabelVO.LabelValue))
+            {
+                bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_CONDITION_COPY;
             }
         }
     }

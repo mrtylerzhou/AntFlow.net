@@ -20,13 +20,27 @@ namespace AntFlowCore.Base.vo
         public static readonly BpmnNodeLabelVO SkippedAssignees = new BpmnNodeLabelVO(StringConstants.SKIPPED_ASSIGNEE, "跳过的审批人");
 
         /// <summary>
+        /// 条件审批节点:本质是审批人节点 + 条件配置,条件满足时自动通过,否则等人工审批.
+        /// 对应 Java NodeLabelConstants.conditionApproveNode.
+        /// </summary>
+        public static readonly BpmnNodeLabelVO ConditionApproveNode = new BpmnNodeLabelVO(StringConstants.CONDITION_APPROVE_NODE, "条件审批节点");
+
+        /// <summary>
+        /// 条件抄送节点:本质是抄送V2节点 + 条件配置,总是自动完成,仅条件满足时写抄送记录.
+        /// 对应 Java NodeLabelConstants.conditionCopyNode.
+        /// </summary>
+        public static readonly BpmnNodeLabelVO ConditionCopyNode = new BpmnNodeLabelVO(StringConstants.CONDITION_COPY_NODE, "条件抄送节点");
+
+        /// <summary>
         /// 不可操作节点,存在于引擎中,但是不可退回到的节点.
         /// 动态条件和抄送节点v1版本虽然也不可退回到,但是他们本身不会进入引擎.
+        /// 条件抄送节点加入(总是自动完成);条件审批节点不加入(可能需要人工审批,支持退回).
         /// </summary>
         public static readonly List<BpmnNodeLabelVO> NoneOperationalNodes = new List<BpmnNodeLabelVO>
         {
             CopyNodeV2,
-            AutomaticNode
+            AutomaticNode,
+            ConditionCopyNode
         };
 
         /// <summary>

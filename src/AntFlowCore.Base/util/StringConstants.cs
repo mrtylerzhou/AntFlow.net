@@ -34,6 +34,7 @@ namespace AntFlowCore.Base.util
         public const string TENANT_USER = "tenantUser";
         public const string LOWCODE_FLOW_DICT_TYPE = "lowcodeflow";
         
+
     
         public  const String outSideMarker = "outSide";
        
@@ -62,6 +63,16 @@ namespace AntFlowCore.Base.util
         public const string COPY_NODEV2 = "af_syslabel_copynodeV2";
         public const string AUTOMATIC_NODE = "auto_node";
         public const string SKIPPED_ASSIGNEE = "lbl_skipped_assignee";
+
+        // 条件审批节点 / 条件抄送节点 (对等 Java 版 nodeType=12/13)
+        public const string CONDITION_APPROVE_NODE = "condition_approve_node";
+        public const string CONDITION_COPY_NODE = "condition_copy_node";
+
+        // 条件审批/条件抄送运行时 verifyInfo 备注
+        public const string AF_CONDITION_APPROVE_AUTO_COMMENT = "条件审批自动通过,条件评估结果:True";
+        public const string AF_CONDITION_APPROVE_WAIT_COMMENT = "条件审批条件未满足,等待人工审批";
+        public const string AF_CONDITION_COPY_EXECUTE_COMMENT = "条件抄送执行,条件评估结果:True";
+        public const string AF_CONDITION_COPY_SKIP_COMMENT = "条件抄送跳过,条件评估结果:False";
 
         // Dynamic condition related constants
         public const string CONDITION_CHANGED = "condition_changed";

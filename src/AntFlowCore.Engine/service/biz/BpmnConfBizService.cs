@@ -19,6 +19,7 @@ using AntFlowCore.Core.vo;
 using AntFlowCore.Engine.factory;
 using AntFlowCore.Engine.service.processor;
 using AntFlowCore.Persist.api.interf.repository;
+using System.Text.Json;
 
 namespace AntFlowCore.Engine.service.biz;
 
@@ -132,6 +133,8 @@ public class BpmnConfBizService : IBpmnConfBizService
             PrepareNodeConditionsForJson(bpmnNodeVo);
             // Build node-level JSON config from VO data
             BpmnNodeConfigHolder.SetButtonSignConf(bpmnNodeVo);
+            // 条件审批/条件抄送节点:持久化 autoNodeConf 条件配置
+            BpmnNodeConfigHolder.SetAutoNodeConf(bpmnNodeVo);
             BpmnNodeConfigHolder.SetTemplateConf(bpmnNodeVo);
             // Populate formdataId on LF field control VOs (comes from conf level, not frontend)
             var lfFormDataId = bpmnConfVo.LfFormDataId;
@@ -821,7 +824,36 @@ public class BpmnConfBizService : IBpmnConfBizService
                 bpmnNodeVo.DeduplicationExclude = true;
                 bpmnNodeVo.IsCarbonCopyNode = true;
             }
+            // 条件审批节点:标签匹配时设置标记位
+            if (NodeLabelConstants.NodeLabelContainsAny(labelVOList, NodeLabelConstants.ConditionApproveNode.LabelValue))
+            {
+                bpmnNodeVo.IsConditionApproveNode = true;
+            }
+            // 条件抄送节点:标签匹配时设置标记位
+            if (NodeLabelConstants.NodeLabelContainsAny(labelVOList, NodeLabelConstants.ConditionCopyNode.LabelValue))
+            {
+                bpmnNodeVo.IsConditionCopyNode = true;
+            }
             bpmnNodeVo.LabelList = labelVOList;
+        }
+
+        //set autoNodeConf from nodeConfig (for condition-approve 12 / condition-copy 13)
+        if (nodeConfig.AutoNodeConf != null)
+        {
+            bpmnNodeVo.AutoNodeConf = new AutoNodeConfVo
+            {
+                GroupRelation = nodeConfig.AutoNodeConf.GroupRelation,
+                // 反序列化每个 JsonElement 还原为 BpmnNodeConditionsConfVueVo
+                ConditionList = nodeConfig.AutoNodeConf.ConditionList?
+                    .Select(group => group?
+                        .Select(item => item.ValueKind == JsonValueKind.Null
+                            ? null
+                            : JsonSerializer.Deserialize<BpmnNodeConditionsConfVueVo>(item.GetRawText()))
+                        .Where(x => x != null)
+                        .Select(x => x!)
+                        .ToList() ?? new List<BpmnNodeConditionsConfVueVo>())
+                    .ToList() ?? new List<List<BpmnNodeConditionsConfVueVo>>()
+            };
         }
 
         return bpmnNodeVo;

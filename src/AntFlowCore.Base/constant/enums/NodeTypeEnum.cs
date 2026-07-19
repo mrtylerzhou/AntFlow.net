@@ -1,4 +1,4 @@
-namespace AntFlowCore.Base.constant.enums;
+﻿namespace AntFlowCore.Base.constant.enums;
 
 public enum NodeTypeEnum
     {
@@ -9,7 +9,9 @@ public enum NodeTypeEnum
         NODE_TYPE_OUT_SIDE_CONDITIONS = 5, // 接入方条件节点
         NODE_TYPE_COPY = 6,            // 抄送节点
         NODE_TYPE_PARALLEL_GATEWAY = 7, // 并行网关
-        NODE_TYPE_COPY_V2 = 8          // 抄送节点v2
+        NODE_TYPE_COPY_V2 = 8,         // 抄送节点v2
+        NODE_TYPE_CONDITION_APPROVE = 12, // 条件审批节点
+        NODE_TYPE_CONDITION_COPY = 13   // 条件抄送节点
     }
 
     public class NodeTypeEnumExtensions
@@ -27,6 +29,8 @@ public enum NodeTypeEnum
                 case NodeTypeEnum.NODE_TYPE_COPY: return "抄送节点";
                 case NodeTypeEnum.NODE_TYPE_PARALLEL_GATEWAY: return "并行网关";
                 case NodeTypeEnum.NODE_TYPE_COPY_V2: return "抄送节点v2";
+                case NodeTypeEnum.NODE_TYPE_CONDITION_APPROVE: return "条件审批节点";
+                case NodeTypeEnum.NODE_TYPE_CONDITION_COPY: return "条件抄送节点";
                 default: return string.Empty;
             }
         }
@@ -62,4 +66,3 @@ public enum NodeTypeEnum
             return nodeTypeEnums.FirstOrDefault(x => (int)x == code);
         }
     }
-
