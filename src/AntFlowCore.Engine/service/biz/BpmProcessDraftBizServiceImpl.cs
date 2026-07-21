@@ -7,6 +7,7 @@ using AntFlowCore.Base.exception;
 using AntFlowCore.Base.factory;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
+using AntFlowCore.Core.vo;
 using AntFlowCore.Persist.api.interf.repository;
 using Microsoft.Extensions.Logging;
 
@@ -53,6 +54,17 @@ public class BpmProcessDraftBizServiceImpl : IBpmProcessDraftBizService
 
         BpmnConf bpmnConf = bpmnConfs[0];
         string bpmnCode = bpmnConf.BpmnCode;
+
+        // 将 bpmnCode 写入 BpmnConfVo, 确保序列化后的 DraftJson 包含模板版本信息,
+        // 否则 LoadDraft 反序列化后 BpmnConfVo 为 null, 版本比对会误判草稿过期并删除
+        if (businessDataVo.BpmnConfVo == null)
+        {
+            businessDataVo.BpmnConfVo = new BpmnConfVo { BpmnCode = bpmnCode };
+        }
+        else
+        {
+            businessDataVo.BpmnConfVo.BpmnCode = bpmnCode;
+        }
 
         // 同一个流程只保留最新版本的一个草稿,历史草稿是没有意义的
         List<BpmBusinessDraft> existingDrafts = _bpmBusinessDraftService._repository
