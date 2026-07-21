@@ -140,7 +140,7 @@ public class BpmnPersonnelFormatService: IBpmnPersonnelFormat
     }
     private void ProcessAssigneeNode(BpmnNodeVo baseNodeVo, Dictionary<String, BpmnNodeVo> mapPreNodes, HashSet<BpmnNodeVo> setAddNodes,String nextId,BpmnStartConditionsVo bpmnStartConditions){
 
-        if (baseNodeVo.NodeType==(int)NodeTypeEnum.NODE_TYPE_APPROVER||baseNodeVo.NodeType==(int)NodeTypeEnum.NODE_TYPE_COPY) {
+        if (baseNodeVo.NodeType==(int)NodeTypeEnum.NODE_TYPE_APPROVER||baseNodeVo.NodeType==(int)NodeTypeEnum.NODE_TYPE_COPY||baseNodeVo.NodeType==(int)NodeTypeEnum.NODE_TYPE_COPY_V2) {
             BpmnNodeParamsVo paramsVo = baseNodeVo.Params;
             if (baseNodeVo.NodeProperty==1) {
                 throw new AFBizException("the assignee node has no property,can not go on");

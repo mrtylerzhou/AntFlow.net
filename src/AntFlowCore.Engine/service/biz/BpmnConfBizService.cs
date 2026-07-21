@@ -122,6 +122,29 @@ public class BpmnConfBizService : IBpmnConfBizService
                 hasChooseFromLowCodeform = BpmnConfFlagsEnum.HAS_FORM_RELATED_ASSIGNEES.Code;
             }
             
+            // NodeSpecialProcess 将 nodeType=8/12/13 转为 nodeType=4 并置标记位,
+            // 此处根据标记位将对应标签写入 LabelList,最终持久化到 buttonSignConf.labels
+            if ((int)NodeTypeEnum.NODE_TYPE_APPROVER == bpmnNodeVo.NodeType)
+            {
+                BpmnNodeLabelVO nodeLabelVO = null;
+                if (bpmnNodeVo.IsCarbonCopyNode == true)
+                {
+                    nodeLabelVO = NodeLabelConstants.CopyNodeV2;
+                }
+                else if (bpmnNodeVo.IsConditionApproveNode == true)
+                {
+                    nodeLabelVO = NodeLabelConstants.ConditionApproveNode;
+                }
+                else if (bpmnNodeVo.IsConditionCopyNode == true)
+                {
+                    nodeLabelVO = NodeLabelConstants.ConditionCopyNode;
+                }
+                if (nodeLabelVO != null)
+                {
+                    bpmnNodeVo.SetOrAddLabelList(nodeLabelVO);
+                }
+            }
+
             bpmnNodeVo.IsOutSideProcess=isOutSideProcess;
             bpmnNodeVo.IsLowCodeFlow=isLowCodeFlow;
             bpmnNodeVo.ConfId=confId;

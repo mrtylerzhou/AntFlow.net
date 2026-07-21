@@ -27,7 +27,7 @@ CREATE TABLE if not exists `t_bpmn_conf`
     KEY `index_form_code` (`form_code`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    COMMENT ='process main configuration table';
+    COMMENT ='process main configuration table' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE if not exists `t_bpmn_node`
 (
@@ -62,7 +62,7 @@ CREATE TABLE if not exists `t_bpmn_node`
     KEY `index_conf_id` (`conf_id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    COMMENT ='the conf,s node table';
+    COMMENT ='the conf,s node table' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- REMOVED: t_bpmn_node_business_table_conf (migrated to JSON)
 
@@ -96,7 +96,7 @@ CREATE TABLE if not exists `t_information_template`
     `update_user`    varchar(50)          DEFAULT '' COMMENT 'as its name says',
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
-    COMMENT ='消息模板';
+    COMMENT ='消息模板' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- REMOVED: t_bpm_business (dead table)
 
@@ -120,7 +120,7 @@ CREATE TABLE if not exists `bpm_flowrun_entrust`
     PRIMARY KEY (`id`) USING BTREE,
     KEY `BPM_IDX_ID` (`runinfoid`, `original`, `actual`) USING BTREE
     ) ENGINE = InnoDB
-    COMMENT ='entrust and forward view conf table';
+    COMMENT ='entrust and forward view conf table' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- REMOVED: bpm_flowruninfo (migrated to JSON)
@@ -153,7 +153,7 @@ CREATE TABLE if not exists `t_bpmn_node_to`
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    COMMENT ='审批流节点走向表';
+    COMMENT ='审批流节点走向表' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- REMOVED: bpm_process_dept (dead table)
@@ -178,7 +178,7 @@ CREATE TABLE if not exists `bpm_process_forward`
     KEY `index_forward_user_id_is_read` (`forward_user_id`, `is_read`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    COMMENT ='process forward table';
+    COMMENT ='process forward table' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- REMOVED: bpm_process_node_overtime (migrated to JSON)
@@ -199,7 +199,7 @@ CREATE TABLE if not exists `bpm_process_node_submit`
     PRIMARY KEY (`id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    COMMENT ='process node submit';
+    COMMENT ='process node submit' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- REMOVED: bpm_process_notice (migrated to JSON)
 
@@ -217,7 +217,7 @@ CREATE TABLE if not exists `bpm_taskconfig`
     PRIMARY KEY (`id`) USING BTREE,
     KEY `BPM_IDX__TASK_CONFIG` (`proc_def_id_`, `task_def_key_`) USING BTREE
     ) ENGINE = InnoDB
-    COMMENT ='task config';
+    COMMENT ='task config' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 
@@ -242,7 +242,7 @@ CREATE TABLE if not exists `t_bpm_variable`
     KEY `index_process_num` (`process_num`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    COMMENT ='process variable table';
+    COMMENT ='process variable table' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- REMOVED: t_bpm_variable_approve_remind (migrated to JSON)
 
@@ -271,7 +271,7 @@ CREATE TABLE if not exists `t_bpm_variable_multiplayer`
     KEY `variable_id_element_id` (`variable_id`, `element_id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    COMMENT ='process multiplayer variable table';
+    COMMENT ='process multiplayer variable table' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 CREATE TABLE if not exists `t_bpm_variable_multiplayer_personnel`
 (
@@ -291,7 +291,7 @@ CREATE TABLE if not exists `t_bpm_variable_multiplayer_personnel`
     KEY `variable_multiplayer_id` (`variable_multiplayer_id`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    COMMENT ='multiplayer assignees variable table';
+    COMMENT ='multiplayer assignees variable table' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- REMOVED: t_bpm_variable_sequence_flow (dead table)
 
@@ -332,7 +332,7 @@ CREATE TABLE if not exists `bpm_verify_info`
     KEY `process_code_index` (`process_code`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    COMMENT ='verify info';
+    COMMENT ='verify info' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 
@@ -356,7 +356,7 @@ create table if not exists t_method_replay
     ALREADY_REPLAY_TIMES int          null,
     MAX_REPLAY_TIMES     int          null
     )ENGINE = InnoDB
-    comment 'method replay records';
+    comment 'method replay records' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 create index t_method_replay_NOW_TIME_index
     on t_method_replay (NOW_TIME);
@@ -381,7 +381,7 @@ CREATE TABLE if not exists `t_user_entrust`
     UNIQUE KEY `s_r_id` (`sender`, `receiver_id`, `power_id`) USING BTREE,
     KEY `user_id` (`sender`, `power_id`) USING BTREE
     ) ENGINE = InnoDB
-    COMMENT ='user entrust info';
+    COMMENT ='user entrust info' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 
@@ -406,7 +406,7 @@ CREATE TABLE if not exists `t_user_message_status`
     PRIMARY KEY (`id`) USING BTREE,
     KEY `user_id` (`user_id`) USING BTREE
     ) ENGINE = InnoDB
-    COMMENT ='user receive message table';
+    COMMENT ='user receive message table' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- REMOVED: t_bpmn_node_button_conf (migrated to JSON)
 
@@ -440,7 +440,7 @@ CREATE TABLE if not exists `bpm_business_process`
     KEY `process_state_index` (`process_state`) USING BTREE
     ) ENGINE = InnoDB
     AUTO_INCREMENT = 1
-    COMMENT ='process and business association table';
+    COMMENT ='process and business association table' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 
@@ -479,7 +479,7 @@ CREATE TABLE if not exists `t_user_message`
     update_user varchar(50)  null,
     app_url     varchar(255) null comment 'appurl',
     source      int          null
-    ) ENGINE = InnoDB
+    ) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
    ;
 
 CREATE TABLE IF NOT EXISTS `t_op_log`
@@ -553,7 +553,7 @@ CREATE TABLE IF NOT EXISTS  bpm_process_app_application
     state            tinyint  default 1                 null,
     sort             int                                null,
     source           varchar(255)                       null
-    )comment 'BPM Process Application Table';
+    )comment 'BPM Process Application Table' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 CREATE TABLE IF NOT EXISTS `bpm_process_app_data` (
@@ -669,7 +669,7 @@ CREATE TABLE IF NOT EXISTS  t_out_side_bpm_callback_url_conf
     is_del                tinyint     default 0 comment '0 for normal,1 for delete',
     create_time           timestamp DEFAULT CURRENT_TIMESTAMP comment 'as its name says',
     update_time           timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP comment 'as its name says'
-    ) comment 'business party callback url conf';
+    ) comment 'business party callback url conf' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ----------------------------
 -- Table structure for t_out_side_bpm_approve_template
@@ -799,7 +799,7 @@ create table t_department
     update_user varchar(255) null comment 'Update user',
     create_time datetime     null comment 'Creation time',
     update_time datetime     null comment 'Update time'
-) comment 'department info';
+) comment 'department info' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 
@@ -818,7 +818,7 @@ create table if not exists t_user
     path           varchar(1000)     null comment '员工组织线path,用于层层审批流程展示,有些公司的表员工的组织链并非这样的,这里只是展示用,具体根据公司业务而定只要能根据员工的id找到他的上级,上级的上线,上级的上级的上线的上线即可.当然如果没有这样的组织架构关系,不用这种审批规则即可',
     is_del         tinyint default 0 null comment '0,正常1,删除',
     head_img       varchar(3000)     null
-    );
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 
@@ -976,7 +976,7 @@ create table t_dict_data
     update_user varchar(255)                           null,
     update_time timestamp    default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
     remark      varchar(500)                           null comment '备注'
-) comment '字典表子表,用于存储字典值,一般现有系统都有自己的字典表,可以替换掉,给出sql能查出需要的数据就可以了';
+) comment '字典表子表,用于存储字典值,一般现有系统都有自己的字典表,可以替换掉,给出sql能查出需要的数据就可以了' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 ALTER TABLE bpm_process_node_submit ADD INDEX idx_processInstance_Id(processInstance_Id);
 
@@ -1053,7 +1053,7 @@ create table t_bpm_dynamic_condition_choosen
     constraint t_bpm_dynamic_condition_choosen_pk
         primary key (id)
 )
-    comment '流程动态条件选择条件记录表';
+    comment '流程动态条件选择条件记录表' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 create index indx_process_number
     on t_bpm_dynamic_condition_choosen (process_number);
 
@@ -1072,7 +1072,7 @@ create table bpm_af_deployment
     `update_user`         varchar(32)                  DEFAULT '' COMMENT '更新人',
     `update_time`         timestamp           DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'as its name says'
 
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 create table bpm_af_taskinst
@@ -1105,7 +1105,7 @@ create table bpm_af_taskinst
     tenant_id      varchar(255) default '' null,
     description    varchar(4000)           null,
     update_user       varchar(64)            null
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 create index AF_HI_TASK_INST_PROCINST
     on bpm_af_taskinst (proc_inst_id);
@@ -1141,7 +1141,7 @@ create table bpm_af_task
     tenant_id        varchar(255) default '' null,
     form_key         varchar(255)            null,
     description      varchar(4000)           null
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 create index AF_IDX_TASK_CREATE
     on bpm_af_task (CREATE_TIME);
@@ -1176,7 +1176,7 @@ create table bpm_af_execution
     task_count           int                     null,
     var_count            int                     null,
     sign_type            int                     null
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 create index AF_IDX_EXEC_PROCINSTID
     on bpm_af_execution (proc_inst_id);
@@ -1198,7 +1198,7 @@ CREATE TABLE if not exists `t_bpm_dynamic_condition_choosen`
     PRIMARY KEY (`id`) USING BTREE,
     KEY `bpm_dyn_cond_idx1` (`process_number`) USING BTREE
 ) ENGINE = InnoDB
-  COMMENT ='dynamic condition chosen record';
+  COMMENT ='dynamic condition chosen record' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 -- REMOVED: t_bpmn_node_customize_conf (migrated to JSON)
@@ -1304,7 +1304,7 @@ CREATE TABLE if not exists `bpm_business_draft`
     UNIQUE KEY `bpm_business_draft_unq1` (`bpmn_code`, `create_user`) USING BTREE,
     KEY `bpm_business_idx1` (`process_key`) USING BTREE
 ) ENGINE = InnoDB
-  COMMENT ='process draft';
+  COMMENT ='process draft' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
 
