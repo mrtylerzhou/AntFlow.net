@@ -81,10 +81,19 @@ public class ButtonOperationService : IButtonOperationService
                 {
                     eventName= ITaskListener.EVENTNAME_DELETE;
                 }
-                foreach (BpmAfTask bpmAfTask in bpmAfTasks)
+              
+                ThreadLocalContainer.Set(StringConstants.AF_RUNTIME_BUISINESS_INFO, vo);
+                try
                 {
-                    bpmAfTask.ProcessNumber = vo.ProcessNumber;
-                    _taskListener.Notify(bpmAfTask,eventName);
+                    foreach (BpmAfTask bpmAfTask in bpmAfTasks)
+                    {
+                        bpmAfTask.ProcessNumber = vo.ProcessNumber;
+                        _taskListener.Notify(bpmAfTask,eventName);
+                    }
+                }
+                finally
+                {
+                    ThreadLocalContainer.Remove(StringConstants.AF_RUNTIME_BUISINESS_INFO);
                 }
             }
            
