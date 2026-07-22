@@ -32,12 +32,28 @@ public interface IFormOperationAdaptor<in T> where T : BusinessDataVo
     void OnFinishData(BusinessDataVo vo);
 
     /// <summary>
-    /// 自动节点条件评估。
-    /// 返回 true=条件满足，false=不满足，null=无条件（直接执行动作）。
-    /// 默认实现返回 null（无条件执行）；用户可重写自定义逻辑。
-    /// 对应 Java FormOperationAdaptor.automaticCondition.
+    /// 用户自定义自动节点条件评估。
+    /// 返回非 null 值将覆盖默认的条件评估逻辑;返回 null 则走默认逻辑。
+    /// 对应 Java AbstractFormOperationAdaptor.autoCondition.
     /// </summary>
-    bool? AutomaticCondition(T vo) => null;
+    bool? AutoCondition(T vo) => null;
+
+    /// <summary>
+    /// 自动节点条件评估。
+    /// 先调用 <see cref="AutoCondition"/> 获取用户自定义结果;
+    /// 若为 null,则返回 null,由调用方(NextNodeLabelsProcessor)调用
+    /// <c>AutoNodeConditionEvaluator.Evaluate</c> 走默认的 DB 条件评估逻辑。
+    /// 对应 Java AbstractFormOperationAdaptor.automaticCondition.
+    /// </summary>
+    bool? AutomaticCondition(T vo)
+    {
+        bool? userResult = AutoCondition(vo);
+        if (userResult != null)
+        {
+            return userResult;
+        }
+        return null;
+    }
 
     /// <summary>
     /// 自动节点动作执行。

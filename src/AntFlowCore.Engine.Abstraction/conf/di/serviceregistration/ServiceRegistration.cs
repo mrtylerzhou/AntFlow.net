@@ -46,6 +46,8 @@ using AntFlowCore.Engine.service.formprocess;
 using AntFlowCore.Engine.service.org_dept;
 using AntFlowCore.Engine.service.processor;
 using AntFlowCore.Engine.service.processor.lowcodeflow;
+using AntFlowCore.Engine.service.processor.nextnode;
+using AntFlowCore.Bpmn.service.processor;
 using AntFlowCore.Persist.api.interf.biz;
 using AntFlowCore.Persist.api.interf.repository;
 using AntFlowCore.Persist.repository;
@@ -89,6 +91,14 @@ public static class ServiceRegistration
         services.AddSingleton<IAntFlowOrderPostProcessor<BusinessDataVo>, AntFlowButtonsOperationPostProcessor>();
         services.AddSingleton<LFFieldControlPostProcessor>();
         services.AddSingleton<NodeLabelsPostProcessor>();
+        // Next-node before-write post-processors (corresponds to Java AntFlowNextNodeBeforeWriteProcessor)
+        services.AddSingleton<AutoNodeConditionEvaluator>();
+        services.AddSingleton<INextNodeTaskProcessor, NextNodeLabelsProcessor>();
+        services.AddSingleton<INextNodeTaskProcessor, NextNodeForwardProcessor>();
+        services.AddSingleton<INextNodeTaskProcessor, NextNodeProcessNoticeSendProcessor>();
+        services.AddSingleton<NextNodeLabelsProcessor>();
+        services.AddSingleton<NextNodeForwardProcessor>();
+        services.AddSingleton<NextNodeProcessNoticeSendProcessor>();
         services.AddSingleton<ProcessApprovalService>();
         services.AddSingleton<IProcessApprovalService, ProcessApprovalService>();
         services.AddSingleton<IFormOperationAdaptor<ThirdPartyAccountApplyVo>, ThirdPartyAccountApplyFlowService>();

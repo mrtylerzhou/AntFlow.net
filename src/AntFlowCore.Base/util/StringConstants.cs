@@ -101,5 +101,9 @@ namespace AntFlowCore.Base.util
         public const string AF_SYSLABEL_APPOINT_NEXT_NODE_APPROVER = "af_syslabel_appoint_next_node_approver";
         // Thread-local key for passing nextNodeApprovers from ButtonOperationService to AFTaskService
         public const string NEXT_NODE_APPROVER = "nextNodeApprover";
+        // Thread-local key for runtime BusinessDataVo (set by BpmnSendMessageAspect, read by BpmnTaskListener)
+        public const string AF_RUNTIME_BUISINESS_INFO = "af_runtime_business_info";
+        // Thread-local key for runtime BpmnConf (set by BpmnSendMessageAspect)
+        public const string AF_RUNTIME_BPMN_CONF = "af_runtime_bpmn_conf";
     }
 }

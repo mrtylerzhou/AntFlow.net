@@ -5,6 +5,7 @@ using AntFlowCore.Base.adaptor.processoperation;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.exception;
+using AntFlowCore.Base.factory;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.adaptor;
@@ -76,39 +77,62 @@ public class BpmnSendMessageAspect<T> : DispatchProxy
         BpmVariableMessageVo vo;
         IBpmVariableMessageBizService bpmVariableMessageService = ServiceProviderUtils.GetService<IBpmVariableMessageBizService>();
 
-        //to check if it is a submit operation then execute aspect method first then assemble variable message vo
-        if (businessDataVo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_SUBMIT)
+        // cache bpmnConf in ThreadLocal so downstream code (e.g. BpmnTaskListener) can reuse it without re-querying DB
+        ThreadLocalContainer.Set(StringConstants.AF_RUNTIME_BPMN_CONF, bpmnConf);
+        try
         {
-            //do execute aspect method
-            DoMethod( bpmnConf,businessDataVo,outSideBpmBusinessParty,ProcessOperationEnum.BUTTON_TYPE_SUBMIT, targetMethod,args);
-
-            //get bpmn variable message vo
-            vo = bpmVariableMessageService.FromBusinessDataVo(businessDataVo);
-
-            /**
-             * 因为发起流程组装流程发送vo对象是一个后置操作，所以从流程引擎中查到的是发起节点的下一个节点
-             * 所以默认设置元素节点Id为"task1418018332271"
-             */
-            if (vo != null)
+            //to check if it is a submit operation then execute aspect method first then assemble variable message vo
+            if (businessDataVo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_SUBMIT)
             {
-                vo.ElementId = ProcessEnum.StartTaskKey.Desc;
-            }
-        }
-        else
-        {
-            //get bpmn variable message vo
-            vo = bpmVariableMessageService.FromBusinessDataVo(businessDataVo);
+                // set businessDataVo to ThreadLocal before DoMethod so BpmnTaskListener can read runtime data (lfFields etc.)
+                // 提交分支也需要设置,因为提交后可能立即到达自动节点/条件节点,需要 lfFields 进行条件评估
+                ThreadLocalContainer.Set(StringConstants.AF_RUNTIME_BUISINESS_INFO, businessDataVo);
+                try
+                {
+                    //do execute aspect method
+                    DoMethod( bpmnConf,businessDataVo,outSideBpmBusinessParty,ProcessOperationEnum.BUTTON_TYPE_SUBMIT, targetMethod,args);
+                }
+                finally
+                {
+                    ThreadLocalContainer.Remove(StringConstants.AF_RUNTIME_BUISINESS_INFO);
+                }
 
-            //get process operation enum by operation type
-            ProcessOperationEnum? processOperationEunm = ProcessOperationEnumExtensions.GetEnumByCode(businessDataVo.OperationType);
-            if (processOperationEunm == null)
-            {
-                throw new AFBizException(
-                    $"can not get processOperationEunm by by providing operationtype:{businessDataVo.OperationType}");
+                //get bpmn variable message vo
+                vo = bpmVariableMessageService.FromBusinessDataVo(businessDataVo);
+
+                /**
+                 * 因为发起流程组装流程发送vo对象是一个后置操作，所以从流程引擎中查到的是发起节点的下一个节点
+                 * 所以默认设置元素节点Id为"task1418018332271"
+                 */
+                if (vo != null)
+                {
+                    vo.ElementId = ProcessEnum.StartTaskKey.Desc;
+                }
             }
-            //do execute aspect method
-            DoMethod( bpmnConf,businessDataVo,outSideBpmBusinessParty, processOperationEunm.Value,targetMethod,args);
-        }
+            else
+            {
+                //get bpmn variable message vo
+                vo = bpmVariableMessageService.FromBusinessDataVo(businessDataVo);
+
+                //get process operation enum by operation type
+                ProcessOperationEnum? processOperationEunm = ProcessOperationEnumExtensions.GetEnumByCode(businessDataVo.OperationType);
+                if (processOperationEunm == null)
+                {
+                    throw new AFBizException(
+                        $"can not get processOperationEunm by by providing operationtype:{businessDataVo.OperationType}");
+                }
+                // set businessDataVo to ThreadLocal before DoMethod so BpmnTaskListener can read runtime data (lfFields etc.)
+                ThreadLocalContainer.Set(StringConstants.AF_RUNTIME_BUISINESS_INFO, businessDataVo);
+                try
+                {
+                    //do execute aspect method
+                    DoMethod( bpmnConf,businessDataVo,outSideBpmBusinessParty, processOperationEunm.Value,targetMethod,args);
+                }
+                finally
+                {
+                    ThreadLocalContainer.Remove(StringConstants.AF_RUNTIME_BUISINESS_INFO);
+                }
+            }
 
         string bpmnConfConfConfigJson = bpmnConf.ConfConfigJson;
         if (!string.IsNullOrEmpty(bpmnConfConfConfigJson))
@@ -137,6 +161,11 @@ public class BpmnSendMessageAspect<T> : DispatchProxy
         }
 
         return null;
+        }
+        finally
+        {
+            ThreadLocalContainer.Remove(StringConstants.AF_RUNTIME_BPMN_CONF);
+        }
     }
     
     /**

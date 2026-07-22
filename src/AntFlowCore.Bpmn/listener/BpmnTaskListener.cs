@@ -1,58 +1,47 @@
 using AntFlowCore.Abstraction.Orm.util;
-using AntFlowCore.Abstraction.formatter.filter;
-using AntFlowCore.Abstraction.service.biz;
-using AntFlowCore.Abstraction.service.repository;
-using AntFlowCore.Base.dto;
 using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
-using AntFlowCore.Base.entity.jsonconf;
-using AntFlowCore.Base.exception;
-using AntFlowCore.Base.extension;
 using AntFlowCore.Base.factory;
-using AntFlowCore.Base.interf;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
-using AntFlowCore.Bpmn.util;
+using AntFlowCore.Bpmn.service.processor;
 using AntFlowCore.Persist.api.interf.repository;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
+using AntFlowCore.Abstraction.service.repository;
+using AntFlowCore.Base.interf;
 
 namespace AntFlowCore.Bpmn.listener;
 
-public class BpmnTaskListener: ITaskListener
+/// <summary>
+/// 任务监听器:任务到达时构建 <see cref="BpmNextTaskDto"/> 并按 Order 顺序调用
+/// 所有 <see cref="INextNodeTaskProcessor"/> 实现.
+/// 对应 Java BpmnTaskListener,仅负责数据收集与分发,不再承载具体业务逻辑.
+/// </summary>
+public class BpmnTaskListener : ITaskListener
 {
     private readonly IBpmnConfService _bpmnConfService;
     private readonly IBpmBusinessProcessService _bpmBusinessProcessService;
     private readonly IBpmProcessForwardService _bpmProcessForwardService;
-    private readonly IUserEntrustService _userEntrustService;
-    private readonly IBpmVariableMessageListenerService _bpmVariableMessageListenerService;
-    private readonly IProcessBusinessContansService _processBusinessContansService;
-    private readonly IBpmVerifyInfoService _bpmVerifyInfoService;
     private readonly ILogger<BpmnTaskListener> _logger;
 
     public BpmnTaskListener(
         IBpmnConfService bpmnConfService,
-       IBpmBusinessProcessService bpmBusinessProcessService,
-       IBpmProcessForwardService bpmProcessForwardService,
-       IUserEntrustService userEntrustService,
-       IBpmVariableMessageListenerService bpmVariableMessageListenerService,
-       IProcessBusinessContansService processBusinessContansService,
-       IBpmVerifyInfoService bpmVerifyInfoService,
+        IBpmBusinessProcessService bpmBusinessProcessService,
+        IBpmProcessForwardService bpmProcessForwardService,
         ILogger<BpmnTaskListener> logger)
     {
         _bpmnConfService = bpmnConfService;
         _bpmBusinessProcessService = bpmBusinessProcessService;
         _bpmProcessForwardService = bpmProcessForwardService;
-        _userEntrustService = userEntrustService;
-        _bpmVariableMessageListenerService = bpmVariableMessageListenerService;
-        _processBusinessContansService = processBusinessContansService;
-        _bpmVerifyInfoService = bpmVerifyInfoService;
         _logger = logger;
     }
-   
-    public void Notify(BpmAfTask delegateTask,string eventName)
+
+    public void Notify(BpmAfTask delegateTask, string eventName)
     {
-        if(delegateTask.NodeType==(int)NodeTypeEnum.NODE_TYPE_COPY)
+        // v1 抄送节点:运行时通过 NodeType 判断,非标签驱动,保持原逻辑
+        if (delegateTask.NodeType == (int)NodeTypeEnum.NODE_TYPE_COPY)
         {
             BpmProcessForward bpmProcessForward = new BpmProcessForward()
             {
@@ -67,765 +56,127 @@ public class BpmnTaskListener: ITaskListener
             _bpmProcessForwardService.AddProcessForward(bpmProcessForward);
             delegateTask.Assignee = AFSpecialAssigneeEnum.COPY_NODE.Id;
             delegateTask.AssigneeName = AFSpecialAssigneeEnum.COPY_NODE.Desc;
-           var taskService = ServiceProviderUtils.GetService<ITaskService>();
-           taskService.Complete(delegateTask);
-           return;
-        }
-
-        // 抄送节点v2:节点以普通审批人身份进入引擎,通过标签识别后自动完成
-        if (ProcessCopyV2(delegateTask))
-        {
+            var taskService = ServiceProviderUtils.GetService<ITaskService>();
+            taskService.Complete(delegateTask);
             return;
         }
 
-        // 自动节点:识别 auto_node 标签后,评估条件、执行动作、自动完成
-        if (ProcessAutomaticNode(delegateTask))
+        // 构建下一节点任务上下文 DTO,交由后置处理器链按 Order 顺序处理
+        BpmNextTaskDto dto = BuildNextTaskDto(delegateTask);
+        var processors = ServiceProviderUtils.GetOrderedServices<INextNodeTaskProcessor>();
+        foreach (var processor in processors)
         {
-            return;
+            processor.PostProcess(dto);
         }
+    }
 
-        // 条件抄送节点:总是自动完成,仅条件满足时写抄送记录
-        if (ProcessConditionCopyNode(delegateTask))
-        {
-            return;
-        }
+    /// <summary>
+    /// 从 delegateTask 构建下一节点任务上下文 DTO.
+    /// 优先从 ThreadLocalContainer 取 BpmnSendMessageAspect 设置的 businessDataVo(包含运行时 lfFields 等),
+    /// 取不到则从 DB 构建基础信息(用于流程启动等场景).
+    /// </summary>
+    private BpmNextTaskDto BuildNextTaskDto(BpmAfTask delegateTask)
+    {
+        string processNumber = delegateTask.ProcessNumber;
 
-        // 条件审批节点:条件满足时自动通过,否则等人工审批
-        if (ProcessConditionApproveNode(delegateTask))
-        {
-            return;
-        }
+        // 解析 FormKey 中的节点标签
+        List<BpmnNodeLabelVO>? nodeLabels = ParseNodeLabels(delegateTask.FormKey);
 
-        // Adjacent deduplication auto-skip: check FormKey for skippedAssignees label
-        ProcessSkippedAssignee(delegateTask);
+        // 优先从 ThreadLocal 取 BpmnSendMessageAspect 设置的 businessDataVo (包含运行时 lfFields 等数据)
+        BusinessDataVo? businessDataVo = ThreadLocalContainer.Get(StringConstants.AF_RUNTIME_BUISINESS_INFO) as BusinessDataVo;
+        string formCode = string.Empty;
+        string bpmnCode = string.Empty;
+        string bpmnName = string.Empty;
+        bool? isOutSide = false;
 
-        BpmBusinessProcess bpmBusinessProcess = _bpmBusinessProcessService._repository
-            .Find(a=>a.BusinessNumber==delegateTask.ProcessNumber)
-            .First();
-        if (bpmBusinessProcess == null)
+        if (businessDataVo != null)
         {
-            _logger.LogError("流程实例不存在，流程号：{}", delegateTask.ProcessNumber);
-            throw new AFBizException($"流程实例不存在，流程号：{delegateTask.ProcessNumber}");
-        }
-        BpmnConf bpmnConf = _bpmnConfService._repository
-            .Find(a => a.BpmnCode == bpmBusinessProcess.Version)
-            .FirstOrDefault();
-        if (bpmnConf == null)
-        {
-            _logger.LogError("流程配置不存在，流程号：{}", delegateTask.ProcessNumber);
-            throw new AFBizException($"流程配置不存在，流程号：{delegateTask.ProcessNumber}");
-        }
-
-        string formCode = bpmBusinessProcess.ProcessinessKey;
-        bool isOutside=(bpmnConf.IsOutSideProcess??0)==1;
-        string processNumber = bpmBusinessProcess.BusinessNumber;
-        string bpmnCode = bpmnConf.BpmnCode;
-        BpmVariableMessageVo bpmVariableMessageVo = new BpmVariableMessageVo
-        {
-            ProcessNumber = processNumber,
-            FormCode = formCode,
-            EventType=(int)EventTypeEnum.PROCESS_FLOW,
-            MessageType = EventTypeEnum.PROCESS_FLOW.IsInNode()?2:1,
-            ElementId = delegateTask.TaskDefKey,
-            Assignee = delegateTask.Assignee,
-            EventTypeEnum = EventTypeEnum.PROCESS_FLOW,
-            Type = 2,
-        };
-
-        string bpmnConfConfConfigJson = bpmnConf.ConfConfigJson;
-        if (string.IsNullOrEmpty(bpmnConfConfConfigJson))
-        {
-            return;
-        }
-        BpmnConfConfigJson? bpmnConfConfigJson = JsonConfUtil.ParseConfConfig(bpmnConfConfConfigJson);
-        List<int>? noticeChannelTypes = bpmnConfConfigJson.NoticeChannelTypes;
-        if (noticeChannelTypes.IsEmpty())
-        {
-            return ;
-        }
-        bool sendByTemplate = _bpmVariableMessageListenerService.ListenerCheckIsSendByTemplate(bpmVariableMessageVo);
-        if (sendByTemplate)
-        {
-            //set is outside
-            bpmVariableMessageVo.IsOutside = isOutside;
-
-            //set template message
-            _bpmVariableMessageListenerService.ListenerSendTemplateMessages(bpmVariableMessageVo);
+            // ThreadLocal 中有完整的 businessDataVo, 补上当前任务的 TaskDefKey
+            businessDataVo.TaskDefKey = delegateTask.TaskDefKey;
+            formCode = businessDataVo.FormCode ?? string.Empty;
+            bpmnCode = businessDataVo.BpmnCode ?? string.Empty;
+            bpmnName = businessDataVo.BpmnName ?? string.Empty;
+            isOutSide = businessDataVo.IsOutSideAccessProc;
         }
         else
         {
-            ProcessInforVo processInforVo = new ProcessInforVo
+            // ThreadLocal 中没有(例如流程启动场景), 从 DB 构建基础信息
+            BpmBusinessProcess? bpmBusinessProcess = _bpmBusinessProcessService._repository
+                .Find(a => a.BusinessNumber == processNumber)
+                .FirstOrDefault();
+            if (bpmBusinessProcess != null)
             {
-                ProcessinessKey = bpmnCode,
-                BusinessNumber = processNumber,
-                FormCode = formCode,
-                Type = 2,
-            };
-            string emailUrl = _processBusinessContansService.GetRoute(ProcessNoticeEnum.EMAIL_TYPE.Code, processInforVo , isOutside);
-            string appUrl = _processBusinessContansService.GetRoute(ProcessNoticeEnum.APP_TYPE.Code, processInforVo , isOutside);
-            ActivitiBpmMsgVo activitiBpmMsgVo = new ActivitiBpmMsgVo
-            {
-                UserId = delegateTask.Assignee,
-                ProcessId = processNumber,
-                BpmnCode = bpmnCode,
-                FormCode = formCode,
-                ProcessName = bpmnConf.BpmnName,
-                EmailUrl = emailUrl,
-                Url = emailUrl,
-                AppPushUrl = appUrl,
-                TaskId = delegateTask.ProcInstId,
-            };
-            ActivitiTemplateMsgUtils.sendBpmApprovalMsg(activitiBpmMsgVo);
-        }
-    }
-
-    /// <summary>
-    /// 相邻节点去重自动跳过:检查任务的FormKey中是否包含skippedAssignees标签,
-    /// 如果当前任务审批人在标签的labelName(逗号分隔的审批人ID列表)中,
-    /// 则自动完成任务并记录审批信息.
-    /// </summary>
-    private void ProcessSkippedAssignee(BpmAfTask delegateTask)
-    {
-        string formKey = delegateTask.FormKey;
-        if (string.IsNullOrEmpty(formKey) || !formKey.StartsWith("{"))
-        {
-            return;
-        }
-
-        NodeExtraInfoDTO? extraInfoDTO = null;
-        try
-        {
-            extraInfoDTO = JsonSerializer.Deserialize<NodeExtraInfoDTO>(formKey);
-        }
-        catch
-        {
-            return;
-        }
-
-        if (extraInfoDTO?.NodeLabelVOS == null || extraInfoDTO.NodeLabelVOS.Count == 0)
-        {
-            return;
-        }
-
-        foreach (var nodeLabelVO in extraInfoDTO.NodeLabelVOS)
-        {
-            if (!StringConstants.SKIPPED_ASSIGNEE.Equals(nodeLabelVO.LabelValue))
-            {
-                continue;
-            }
-
-            string labelName = nodeLabelVO.LabelName;
-            if (string.IsNullOrEmpty(labelName))
-            {
-                continue;
-            }
-
-            var skippedAssigneeIds = labelName.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
-            var currentSkippedAssignee = skippedAssigneeIds.Where(a => a.Contains(delegateTask.Assignee)).ToList();
-            if (currentSkippedAssignee.Count > 0)
-            {
-                // auto-complete the task
-                var taskService = ServiceProviderUtils.GetService<ITaskService>();
-                taskService?.Complete(delegateTask);
-
-                // save verify info
-                BpmBusinessProcess? bpmBusinessProcess = _bpmBusinessProcessService._repository
-                    .Find(a => a.BusinessNumber == delegateTask.ProcessNumber)
+                BpmnConf? bpmnConf = _bpmnConfService._repository
+                    .Find(a => a.BpmnCode == bpmBusinessProcess.Version)
                     .FirstOrDefault();
-                if (bpmBusinessProcess != null)
+                if (bpmnConf != null)
                 {
-                    BpmVerifyInfo bpmVerifyInfo = new BpmVerifyInfo
+                    formCode = bpmBusinessProcess.ProcessinessKey;
+                    bpmnCode = bpmnConf.BpmnCode;
+                    bpmnName = bpmnConf.BpmnName;
+                    isOutSide = (bpmnConf.IsOutSideProcess ?? 0) == 1;
+
+                    businessDataVo = new BusinessDataVo
                     {
-                        VerifyDate = DateTime.Now,
-                        TaskName = delegateTask.Name,
-                        TaskId = delegateTask.Id,
-                        RunInfoId = bpmBusinessProcess.ProcInstId,
-                        VerifyUserId = delegateTask.Assignee,
-                        VerifyUserName = delegateTask.AssigneeName,
+                        FormCode = formCode,
+                        ProcessNumber = processNumber,
                         TaskDefKey = delegateTask.TaskDefKey,
-                        VerifyStatus = (int)ProcessSubmitStateEnum.PROCESS_AGRESS_TYPE,
-                        VerifyDesc = StringConstants.AF_AUTO_SKIP_COMMENT,
-                        ProcessCode = delegateTask.ProcessNumber,
-                        TenantId = MultiTenantUtil.GetCurrentTenantId(),
+                        BusinessId = bpmBusinessProcess.BusinessId,
+                        BpmnCode = bpmBusinessProcess.Version,
+                        IsOutSideAccessProc = isOutSide,
+                        IsLowCodeFlow = bpmnConf.IsLowCodeFlow,
+                        BpmnConfVo = null,
                     };
-                    _bpmVerifyInfoService.AddVerifyInfo(bpmVerifyInfo);
                 }
-                return;
+                else
+                {
+                    _logger.LogError("构建 BpmNextTaskDto 失败:流程配置不存在,流程号={}", processNumber);
+                }
             }
-        }
-    }
-
-    /// <summary>
-    /// 抄送节点v2运行时处理:当任务带有 copyNodeV2 标签时,将该任务标记为抄送,
-    /// 自动完成任务,并记录抄送信息和审批日志.
-    /// 对应 Java NextNodeLabelsProcessor.processCopyV2.
-    /// </summary>
-    /// <returns>true 表示任务是抄送节点v2并已自动完成;false 表示不是</returns>
-    private bool ProcessCopyV2(BpmAfTask delegateTask)
-    {
-        string formKey = delegateTask.FormKey;
-        if (string.IsNullOrEmpty(formKey) || !formKey.StartsWith("{"))
-        {
-            return false;
-        }
-
-        NodeExtraInfoDTO? extraInfoDTO = null;
-        try
-        {
-            extraInfoDTO = JsonSerializer.Deserialize<NodeExtraInfoDTO>(formKey);
-        }
-        catch
-        {
-            return false;
-        }
-
-        if (extraInfoDTO?.NodeLabelVOS == null || extraInfoDTO.NodeLabelVOS.Count == 0)
-        {
-            return false;
-        }
-
-        bool isCopyV2 = false;
-        foreach (var nodeLabelVO in extraInfoDTO.NodeLabelVOS)
-        {
-            if (StringConstants.COPY_NODEV2.Equals(nodeLabelVO.LabelValue))
+            else
             {
-                isCopyV2 = true;
-                break;
+                _logger.LogError("构建 BpmNextTaskDto 失败:流程实例不存在,流程号={}", processNumber);
             }
         }
 
-        if (!isCopyV2)
+        return new BpmNextTaskDto
         {
-            return false;
-        }
-
-        string procInstId = delegateTask.ProcInstId;
-        string processNumber = delegateTask.ProcessNumber;
-        string assignee = delegateTask.Assignee;
-        string assigneeName = delegateTask.AssigneeName;
-
-        // 检查是否已存在抄送记录,避免重复添加
-        var existingForwards = _bpmProcessForwardService._repository
-            .Find(a => a.ProcessInstanceId == procInstId && a.ForwardUserId == assignee);
-
-        // 设置任务审批人为抄送人特殊标记,并自动完成任务
-        delegateTask.Assignee = AFSpecialAssigneeEnum.CC_NODE.Id;
-        string ccAssigneeName = AFSpecialAssigneeEnum.CC_NODE.Desc + "(" + assigneeName + ")";
-        delegateTask.AssigneeName = ccAssigneeName;
-
-        var taskService = ServiceProviderUtils.GetService<ITaskService>();
-        taskService?.Complete(delegateTask);
-
-        // 若不存在抄送记录,则新增
-        if (existingForwards == null || existingForwards.Count == 0)
-        {
-            BpmProcessForward bpmProcessForward = new BpmProcessForward
-            {
-                CreateTime = DateTime.Now,
-                CreateUserId = assignee,
-                ForwardUserId = assignee,
-                ForwardUserName = assigneeName,
-                ProcessInstanceId = procInstId,
-                ProcessNumber = processNumber,
-                IsRead = 0,
-                IsDel = 0,
-                TenantId = MultiTenantUtil.GetCurrentTenantId(),
-            };
-            _bpmProcessForwardService.AddProcessForward(bpmProcessForward);
-        }
-
-        // 记录审批日志:(抄送给xxx)自动通过
-        BpmVerifyInfo bpmVerifyInfo = new BpmVerifyInfo
-        {
-            VerifyDate = DateTime.Now,
-            TaskName = delegateTask.Name,
             TaskId = delegateTask.Id,
-            RunInfoId = procInstId,
-            VerifyUserId = delegateTask.Assignee,
-            VerifyUserName = ccAssigneeName,
-            TaskDefKey = delegateTask.TaskDefKey,
-            VerifyStatus = (int)ProcessSubmitStateEnum.PROCESS_AGRESS_TYPE,
-            VerifyDesc = "(抄送给" + assigneeName + ")自动通过",
-            ProcessCode = processNumber,
-            TenantId = MultiTenantUtil.GetCurrentTenantId(),
-        };
-        _bpmVerifyInfoService.AddVerifyInfo(bpmVerifyInfo);
-
-        return true;
-    }
-
-    /// <summary>
-    /// 自动节点运行时处理:当任务带有 auto_node 标签时,
-    /// 评估条件、执行动作、无论结果如何都自动完成任务.
-    /// 对应 Java NextNodeLabelsProcessor.processAutomaticNode.
-    /// </summary>
-    /// <returns>true 表示是自动节点并已自动完成;false 表示不是</returns>
-    private bool ProcessAutomaticNode(BpmAfTask delegateTask)
-    {
-        string formKey = delegateTask.FormKey;
-        if (string.IsNullOrEmpty(formKey) || !formKey.StartsWith("{"))
-        {
-            return false;
-        }
-
-        NodeExtraInfoDTO? extraInfoDTO = null;
-        try
-        {
-            extraInfoDTO = JsonSerializer.Deserialize<NodeExtraInfoDTO>(formKey);
-        }
-        catch
-        {
-            return false;
-        }
-
-        if (extraInfoDTO?.NodeLabelVOS == null || extraInfoDTO.NodeLabelVOS.Count == 0)
-        {
-            return false;
-        }
-
-        bool isAutomaticNode = false;
-        foreach (var nodeLabelVO in extraInfoDTO.NodeLabelVOS)
-        {
-            if (StringConstants.AUTOMATIC_NODE.Equals(nodeLabelVO.LabelValue))
-            {
-                isAutomaticNode = true;
-                break;
-            }
-        }
-
-        if (!isAutomaticNode)
-        {
-            return false;
-        }
-
-        string processNumber = delegateTask.ProcessNumber;
-        string elementId = delegateTask.TaskDefKey;
-
-        // 构造 BusinessDataVo 用于条件评估和动作执行
-        BpmBusinessProcess? bpmBusinessProcess = _bpmBusinessProcessService._repository
-            .Find(a => a.BusinessNumber == processNumber)
-            .FirstOrDefault();
-        if (bpmBusinessProcess == null)
-        {
-            _logger.LogError("自动节点处理失败:流程实例不存在,流程号={}", processNumber);
-            return false;
-        }
-
-        BpmnConf? bpmnConf = _bpmnConfService._repository
-            .Find(a => a.BpmnCode == bpmBusinessProcess.Version)
-            .FirstOrDefault();
-        if (bpmnConf == null)
-        {
-            _logger.LogError("自动节点处理失败:流程配置不存在,流程号={}", processNumber);
-            return false;
-        }
-
-        string formCode = bpmBusinessProcess.ProcessinessKey;
-        bool isOutSide = (bpmnConf.IsOutSideProcess ?? 0) == 1;
-
-        BusinessDataVo businessDataVo = new BusinessDataVo
-        {
-            FormCode = formCode,
+            TaskName = delegateTask.Name,
+            Assignee = delegateTask.Assignee,
             ProcessNumber = processNumber,
-            TaskDefKey = elementId,
-            BusinessId = bpmBusinessProcess.BusinessId,
-            BpmnCode = bpmBusinessProcess.Version,
-            IsOutSideAccessProc = isOutSide,
-            IsLowCodeFlow = bpmnConf.IsLowCodeFlow,
-        };
-
-        string assigneeName = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Desc;
-        bool? conditionResult = null;
-
-        try
-        {
-            var formFactory = ServiceProviderUtils.GetService<IFormFactory>();
-            if (formFactory != null)
-            {
-                var formAdaptor = formFactory.GetFormAdaptor(businessDataVo);
-                if (formAdaptor != null)
-                {
-                    conditionResult = formAdaptor.AutomaticCondition(businessDataVo);
-                    formAdaptor.AutomaticAction(businessDataVo, conditionResult);
-                }
-            }
-
-            // 如果用户未重写 AutomaticCondition（默认返回 null），回退到内置条件评估逻辑
-            // 内置逻辑从 DB 读取 autoNodeConf 条件配置进行评估
-            if (conditionResult == null)
-            {
-                conditionResult = EvaluateCondition(delegateTask);
-            }
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "自动节点条件判断或动作执行异常, processNumber={}, elementId={}", processNumber, elementId);
-        }
-        finally
-        {
-            // 无论条件评估或动作执行是否异常,都自动完成任务
-            delegateTask.Assignee = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Id;
-            delegateTask.AssigneeName = assigneeName;
-
-            var taskService = ServiceProviderUtils.GetService<ITaskService>();
-            taskService?.Complete(delegateTask);
-
-            // 写审批日志
-            BpmVerifyInfo bpmVerifyInfo = new BpmVerifyInfo
-            {
-                VerifyDate = DateTime.Now,
-                TaskName = delegateTask.Name,
-                TaskId = delegateTask.Id,
-                RunInfoId = bpmBusinessProcess.ProcInstId,
-                VerifyUserId = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Id,
-                VerifyUserName = assigneeName,
-                TaskDefKey = delegateTask.TaskDefKey,
-                VerifyStatus = (int)ProcessSubmitStateEnum.PROCESS_AGRESS_TYPE,
-                VerifyDesc = string.Format(StringConstants.AF_AUTO_EVALUATE_SKIP_COMMENT, conditionResult),
-                ProcessCode = processNumber,
-                TenantId = MultiTenantUtil.GetCurrentTenantId(),
-            };
-            _bpmVerifyInfoService.AddVerifyInfo(bpmVerifyInfo);
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    /// 条件审批节点运行时处理:当任务带有 condition_approve_node 标签时,
-    /// 评估条件.条件为 true 则自动完成任务(写 verifyInfo);条件为 false/null 则不处理,
-    /// 让流程继续到正常的人工审批逻辑.
-    /// 对应 Java NextNodeLabelsProcessor.processConditionApproveNode.
-    /// </summary>
-    /// <returns>true 表示已自动完成;false 表示不是条件审批节点或条件未满足</returns>
-    private bool ProcessConditionApproveNode(BpmAfTask delegateTask)
-    {
-        string formKey = delegateTask.FormKey;
-        if (string.IsNullOrEmpty(formKey) || !formKey.StartsWith("{"))
-        {
-            return false;
-        }
-
-        NodeExtraInfoDTO? extraInfoDTO = null;
-        try
-        {
-            extraInfoDTO = JsonSerializer.Deserialize<NodeExtraInfoDTO>(formKey);
-        }
-        catch
-        {
-            return false;
-        }
-
-        if (extraInfoDTO?.NodeLabelVOS == null || extraInfoDTO.NodeLabelVOS.Count == 0)
-        {
-            return false;
-        }
-
-        bool isConditionApprove = false;
-        foreach (var nodeLabelVO in extraInfoDTO.NodeLabelVOS)
-        {
-            if (StringConstants.CONDITION_APPROVE_NODE.Equals(nodeLabelVO.LabelValue))
-            {
-                isConditionApprove = true;
-                break;
-            }
-        }
-
-        if (!isConditionApprove)
-        {
-            return false;
-        }
-
-        // 评估条件
-        bool? conditionResult = EvaluateCondition(delegateTask);
-
-        if (conditionResult != true)
-        {
-            // 条件未满足,等待人工审批,不写任何记录,让流程继续
-            _logger.LogInformation("条件审批节点条件未满足,等待人工审批. procInstId={}, taskId={}",
-                delegateTask.ProcInstId, delegateTask.Id);
-            return false;
-        }
-
-        // 条件满足,自动完成任务
-        var taskService = ServiceProviderUtils.GetService<ITaskService>();
-        taskService?.Complete(delegateTask);
-
-        // 写审批日志
-        BpmBusinessProcess? bpmBusinessProcess = _bpmBusinessProcessService._repository
-            .Find(a => a.BusinessNumber == delegateTask.ProcessNumber)
-            .FirstOrDefault();
-        if (bpmBusinessProcess != null)
-        {
-            BpmVerifyInfo bpmVerifyInfo = new BpmVerifyInfo
-            {
-                VerifyDate = DateTime.Now,
-                TaskName = delegateTask.Name,
-                TaskId = delegateTask.Id,
-                RunInfoId = bpmBusinessProcess.ProcInstId,
-                VerifyUserId = delegateTask.Assignee,
-                VerifyUserName = delegateTask.AssigneeName,
-                TaskDefKey = delegateTask.TaskDefKey,
-                VerifyStatus = (int)ProcessSubmitStateEnum.PROCESS_AGRESS_TYPE,
-                VerifyDesc = StringConstants.AF_CONDITION_APPROVE_AUTO_COMMENT,
-                ProcessCode = delegateTask.ProcessNumber,
-                TenantId = MultiTenantUtil.GetCurrentTenantId(),
-            };
-            _bpmVerifyInfoService.AddVerifyInfo(bpmVerifyInfo);
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    /// 条件抄送节点运行时处理:当任务带有 condition_copy_node 标签时,
-    /// 总是自动完成任务(设 CC_NODE 虚拟审批人);仅条件为 true 时写 BpmProcessForward 抄送记录.
-    /// 对应 Java NextNodeLabelsProcessor.processConditionCopyNode.
-    /// </summary>
-    /// <returns>true 表示是条件抄送节点并已自动完成;false 表示不是</returns>
-    private bool ProcessConditionCopyNode(BpmAfTask delegateTask)
-    {
-        string formKey = delegateTask.FormKey;
-        if (string.IsNullOrEmpty(formKey) || !formKey.StartsWith("{"))
-        {
-            return false;
-        }
-
-        NodeExtraInfoDTO? extraInfoDTO = null;
-        try
-        {
-            extraInfoDTO = JsonSerializer.Deserialize<NodeExtraInfoDTO>(formKey);
-        }
-        catch
-        {
-            return false;
-        }
-
-        if (extraInfoDTO?.NodeLabelVOS == null || extraInfoDTO.NodeLabelVOS.Count == 0)
-        {
-            return false;
-        }
-
-        bool isConditionCopy = false;
-        foreach (var nodeLabelVO in extraInfoDTO.NodeLabelVOS)
-        {
-            if (StringConstants.CONDITION_COPY_NODE.Equals(nodeLabelVO.LabelValue))
-            {
-                isConditionCopy = true;
-                break;
-            }
-        }
-
-        if (!isConditionCopy)
-        {
-            return false;
-        }
-
-        string procInstId = delegateTask.ProcInstId;
-        string processNumber = delegateTask.ProcessNumber;
-        string assignee = delegateTask.Assignee;
-        string assigneeName = delegateTask.AssigneeName;
-
-        // 评估条件
-        bool? conditionResult = EvaluateCondition(delegateTask);
-
-        // 设置任务审批人为抄送人特殊标记,并自动完成任务(无论条件如何)
-        delegateTask.Assignee = AFSpecialAssigneeEnum.CC_NODE.Id;
-        string ccAssigneeName = AFSpecialAssigneeEnum.CC_NODE.Desc + "(" + assigneeName + ")";
-        delegateTask.AssigneeName = ccAssigneeName;
-
-        var taskService = ServiceProviderUtils.GetService<ITaskService>();
-        taskService?.Complete(delegateTask);
-
-        // 仅条件满足时写抄送记录
-        if (conditionResult == true)
-        {
-            var existingForwards = _bpmProcessForwardService._repository
-                .Find(a => a.ProcessInstanceId == procInstId && a.ForwardUserId == assignee);
-            if (existingForwards == null || existingForwards.Count == 0)
-            {
-                BpmProcessForward bpmProcessForward = new BpmProcessForward
-                {
-                    CreateTime = DateTime.Now,
-                    CreateUserId = assignee,
-                    ForwardUserId = assignee,
-                    ForwardUserName = assigneeName,
-                    ProcessInstanceId = procInstId,
-                    ProcessNumber = processNumber,
-                    IsRead = 0,
-                    IsDel = 0,
-                    TenantId = MultiTenantUtil.GetCurrentTenantId(),
-                };
-                _bpmProcessForwardService.AddProcessForward(bpmProcessForward);
-            }
-        }
-
-        // 记录审批日志:条件满足时为"执行抄送",不满足时为"跳过抄送"
-        BpmVerifyInfo bpmVerifyInfo = new BpmVerifyInfo
-        {
-            VerifyDate = DateTime.Now,
-            TaskName = delegateTask.Name,
-            TaskId = delegateTask.Id,
-            RunInfoId = procInstId,
-            VerifyUserId = delegateTask.Assignee,
-            VerifyUserName = ccAssigneeName,
+            ProcessInstanceId = delegateTask.ProcInstId,
             TaskDefKey = delegateTask.TaskDefKey,
-            VerifyStatus = (int)ProcessSubmitStateEnum.PROCESS_AGRESS_TYPE,
-            VerifyDesc = conditionResult == true
-                ? StringConstants.AF_CONDITION_COPY_EXECUTE_COMMENT
-                : StringConstants.AF_CONDITION_COPY_SKIP_COMMENT,
-            ProcessCode = processNumber,
-            TenantId = MultiTenantUtil.GetCurrentTenantId(),
+            BpmnCode = bpmnCode,
+            BusinessId = businessDataVo?.BusinessId,
+            StartUser = businessDataVo?.StartUserId,
+            FormCode = formCode,
+            BpmnName = bpmnName,
+            IsOutSide = isOutSide,
+            NodeLabels = nodeLabels,
+            BusinessDataVo = businessDataVo,
+            DelegateTask = delegateTask,
         };
-        _bpmVerifyInfoService.AddVerifyInfo(bpmVerifyInfo);
-
-        return true;
     }
 
     /// <summary>
-    /// 条件评估辅助方法:从 delegateTask 找到对应的 BpmnNode 配置,
-    /// 取出 autoNodeConf 中的 conditionList,转成 BpmnNodeConditionsConfBaseVo,
-    /// 调用 IConditionService.CheckMatchCondition 进行评估.
+    /// 从 FormKey(JSON) 中解析节点标签列表.
+    /// FormKey 可能是纯 formCode(无标签),也可能是 NodeExtraInfoDTO 的 JSON.
     /// </summary>
-    /// <returns>true=条件满足;false=条件不满足;null=评估失败(找不到节点或配置)</returns>
-    private bool? EvaluateCondition(BpmAfTask delegateTask)
+    private List<BpmnNodeLabelVO>? ParseNodeLabels(string? formKey)
     {
-        // 按需解析依赖,避免构造期循环依赖
-        var conditionService = ServiceProviderUtils.GetService<IConditionService>();
-        var formFactory = ServiceProviderUtils.GetService<IFormFactory>();
-        var bpmVariableBizService = ServiceProviderUtils.GetService<IBpmvariableBizService>();
-        var bpmnNodeService = ServiceProviderUtils.GetService<IBpmnNodeService>();
-
-        if (conditionService == null || formFactory == null || bpmVariableBizService == null || bpmnNodeService == null)
+        if (string.IsNullOrEmpty(formKey) || !formKey.StartsWith("{"))
         {
-            _logger.LogError("条件评估失败:必要服务未注册");
             return null;
         }
 
         try
         {
-            // 1. 通过 processNumber 找到 BpmBusinessProcess
-            BpmBusinessProcess? bpmBusinessProcess = _bpmBusinessProcessService._repository
-                .Find(a => a.BusinessNumber == delegateTask.ProcessNumber)
-                .FirstOrDefault();
-            if (bpmBusinessProcess == null)
-            {
-                _logger.LogError("条件评估失败:流程实例不存在,流程号={}", delegateTask.ProcessNumber);
-                return null;
-            }
-
-            // 2. 通过 bpmnCode 找到 BpmnConf
-            BpmnConf? bpmnConf = _bpmnConfService._repository
-                .Find(a => a.BpmnCode == bpmBusinessProcess.Version)
-                .FirstOrDefault();
-            if (bpmnConf == null)
-            {
-                _logger.LogError("条件评估失败:流程配置不存在,流程号={}", delegateTask.ProcessNumber);
-                return null;
-            }
-
-            // 3. 通过 elementId 找到 nodeId,再找到 BpmnNode
-            string elementId = delegateTask.TaskDefKey;
-            NodeElementDto? nodeElementDto = bpmVariableBizService.GetNodeIdByElementId(delegateTask.ProcessNumber, elementId);
-            if (nodeElementDto == null || string.IsNullOrEmpty(nodeElementDto.NodeId))
-            {
-                _logger.LogError("条件评估失败:无法根据 elementId 找到 nodeId,processNumber={}, elementId={}",
-                    delegateTask.ProcessNumber, elementId);
-                return null;
-            }
-
-            BpmnNode? bpmnNode = bpmnNodeService._repository
-                .Find(a => a.ConfId == bpmnConf.Id && a.NodeId == nodeElementDto.NodeId)
-                .FirstOrDefault();
-            if (bpmnNode == null)
-            {
-                _logger.LogError("条件评估失败:找不到 BpmnNode,confId={}, nodeId={}", bpmnConf.Id, nodeElementDto.NodeId);
-                return null;
-            }
-
-            // 4. 解析 NodeConfigJson,取出 autoNodeConf
-            BpmnNodeConfigJson? nodeConfig = JsonConfUtil.ParseNodeConfig(bpmnNode.NodeConfigJson);
-            if (nodeConfig?.AutoNodeConf == null)
-            {
-                _logger.LogWarning("条件评估失败:节点未配置 autoNodeConf,nodeId={}", nodeElementDto.NodeId);
-                return null;
-            }
-
-            // 5. 把 autoNodeConf.ConditionList 转换为 BpmnNodeConditionsConfBaseVo
-            //    复用 BpmnConfNodePropertyConverter.FromVue3Model,需要构造 BpmnNodePropertysVo
-            BpmnNodePropertysVo propertysVo = new BpmnNodePropertysVo
-            {
-                ConditionList = nodeConfig.AutoNodeConf.ConditionList?
-                    .Select(group => group?
-                        .Select(item => item.ValueKind == JsonValueKind.Null
-                            ? null
-                            : JsonSerializer.Deserialize<BpmnNodeConditionsConfVueVo>(item.GetRawText()))
-                        .Where(x => x != null)
-                        .Select(x => x!)
-                        .ToList() ?? new List<BpmnNodeConditionsConfVueVo>())
-                    .ToList() ?? new List<List<BpmnNodeConditionsConfVueVo>>(),
-                GroupRelation = nodeConfig.AutoNodeConf.GroupRelation ?? false,
-            };
-
-            BpmnNodeConditionsConfBaseVo conditionsConf;
-            try
-            {
-                conditionsConf = BpmnConfNodePropertyConverter.FromVue3Model(propertysVo);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "条件评估失败:conditionList 转换失败,nodeId={}", nodeElementDto.NodeId);
-                return null;
-            }
-
-            // 6. 构造 BpmnNodeVo(只填必要字段)
-            BpmnNodeVo nodeVo = new BpmnNodeVo
-            {
-                NodeId = nodeElementDto.NodeId,
-                NodeType = (int)NodeTypeEnum.NODE_TYPE_APPROVER,
-            };
-
-            // 7. 构造 BusinessDataVo,加载业务数据,得到 BpmnStartConditionsVo
-            string formCode = bpmBusinessProcess.ProcessinessKey;
-            BusinessDataVo businessDataVo = new BusinessDataVo
-            {
-                FormCode = formCode,
-                ProcessNumber = delegateTask.ProcessNumber,
-                BusinessId = bpmBusinessProcess.BusinessId,
-                BpmnCode = bpmBusinessProcess.Version,
-            };
-
-            try
-            {
-                var formAdaptor = formFactory.GetFormAdaptor(businessDataVo);
-                formAdaptor.OnQueryData(businessDataVo);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "条件评估失败:加载业务数据失败,formCode={}", formCode);
-                return null;
-            }
-
-            BpmnStartConditionsVo? bpmnStartConditionsVo;
-            try
-            {
-                var formAdaptor = formFactory.GetFormAdaptor(businessDataVo);
-                bpmnStartConditionsVo = formAdaptor.PreviewSetCondition(businessDataVo);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "条件评估失败:构造 BpmnStartConditionsVo 失败");
-                return null;
-            }
-
-            // 8. 调用 IConditionService.CheckMatchCondition
-            bool result = conditionService.CheckMatchCondition(nodeVo, conditionsConf, bpmnStartConditionsVo, false);
-            _logger.LogInformation("条件评估结果:{}, nodeId={}, procInstId={}", result, nodeElementDto.NodeId, delegateTask.ProcInstId);
-            return result;
+            NodeExtraInfoDTO? extraInfoDTO = JsonSerializer.Deserialize<NodeExtraInfoDTO>(formKey);
+            return extraInfoDTO?.NodeLabelVOS;
         }
-        catch (Exception ex)
+        catch
         {
-            _logger.LogError(ex, "条件评估异常,procInstId={}, taskId={}", delegateTask.ProcInstId, delegateTask.Id);
             return null;
         }
     }
