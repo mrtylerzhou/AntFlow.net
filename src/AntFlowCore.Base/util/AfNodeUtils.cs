@@ -41,6 +41,26 @@ public class AfNodeUtils
             bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_APPROVER;
             bpmnNodeVo.IsCarbonCopyNode = true;
         }
+        // 自动节点:设计期 nodeType=9,运行期转为 nodeType=4,标记 isAutomaticNode
+        // 设置虚拟审批人 AUTO_NODE_SKIP(-3)
+        else if (nodeType == (int)NodeTypeEnum.NODE_TYPE_AUTO_NODE)
+        {
+            bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_APPROVER;
+            bpmnNodeVo.IsAutomaticNode = true;
+            bpmnNodeVo.NodeProperty = (int)NodePropertyEnum.NODE_PROPERTY_PERSONNEL;
+            // 设置虚拟审批人 AUTO_NODE_SKIP(-3)
+            AddOrEditProperty(bpmnNodeVo, prop =>
+            {
+                prop.SignType ??= 1;
+                if (prop.EmplIds == null || prop.EmplIds.Count == 0)
+                    prop.EmplIds = new List<string> { AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Id };
+                if (prop.EmplList == null || prop.EmplList.Count == 0)
+                    prop.EmplList = new List<BaseIdTranStruVo>
+                    {
+                        new BaseIdTranStruVo(AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Id, AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Desc)
+                    };
+            });
+        }
         // 条件审批节点:设计期 nodeType=12,运行期转为 nodeType=4,标记 isConditionApproveNode
         // 保留真实审批人(不替换为虚拟审批人),仅条件满足时自动 complete
         else if (nodeType == (int)NodeTypeEnum.NODE_TYPE_CONDITION_APPROVE)
@@ -84,6 +104,10 @@ public class AfNodeUtils
             else if (NodeLabelConstants.ConditionCopyNode.LabelValue.Equals(nodeLabelVO.LabelValue))
             {
                 bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_CONDITION_COPY;
+            }
+            else if (NodeLabelConstants.AutomaticNode.LabelValue.Equals(nodeLabelVO.LabelValue))
+            {
+                bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_AUTO_NODE;
             }
             else if (NodeLabelConstants.PrevNodeAppointed.LabelValue.Equals(nodeLabelVO.LabelValue))
             {

@@ -134,6 +134,12 @@ public class BpmnConfCommonService : IBpmnConfCommonService
 
     private BpmnConfVo GetBpmnConfVo(BpmnStartConditionsVo bpmnStartConditions, BpmnConfVo bpmnConfVo)
     {
+        //0. 将特殊节点类型转为运行期 nodeType=4(如自动节点 9→4),对应 Java NodeUtil.nodeSpecialProcess
+        foreach (var node in bpmnConfVo.Nodes)
+        {
+            AfNodeUtils.NodeSpecialProcess(node);
+        }
+
         //1. Format the process,filter it by condition
         _bpmnStartFormatFactory.formatBpmnConf(bpmnConfVo, bpmnStartConditions);
 

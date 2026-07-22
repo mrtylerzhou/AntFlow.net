@@ -78,6 +78,12 @@ public class BpmnTaskListener: ITaskListener
             return;
         }
 
+        // 自动节点:识别 auto_node 标签后,评估条件、执行动作、自动完成
+        if (ProcessAutomaticNode(delegateTask))
+        {
+            return;
+        }
+
         // 条件抄送节点:总是自动完成,仅条件满足时写抄送记录
         if (ProcessConditionCopyNode(delegateTask))
         {
@@ -344,6 +350,143 @@ public class BpmnTaskListener: ITaskListener
             TenantId = MultiTenantUtil.GetCurrentTenantId(),
         };
         _bpmVerifyInfoService.AddVerifyInfo(bpmVerifyInfo);
+
+        return true;
+    }
+
+    /// <summary>
+    /// 自动节点运行时处理:当任务带有 auto_node 标签时,
+    /// 评估条件、执行动作、无论结果如何都自动完成任务.
+    /// 对应 Java NextNodeLabelsProcessor.processAutomaticNode.
+    /// </summary>
+    /// <returns>true 表示是自动节点并已自动完成;false 表示不是</returns>
+    private bool ProcessAutomaticNode(BpmAfTask delegateTask)
+    {
+        string formKey = delegateTask.FormKey;
+        if (string.IsNullOrEmpty(formKey) || !formKey.StartsWith("{"))
+        {
+            return false;
+        }
+
+        NodeExtraInfoDTO? extraInfoDTO = null;
+        try
+        {
+            extraInfoDTO = JsonSerializer.Deserialize<NodeExtraInfoDTO>(formKey);
+        }
+        catch
+        {
+            return false;
+        }
+
+        if (extraInfoDTO?.NodeLabelVOS == null || extraInfoDTO.NodeLabelVOS.Count == 0)
+        {
+            return false;
+        }
+
+        bool isAutomaticNode = false;
+        foreach (var nodeLabelVO in extraInfoDTO.NodeLabelVOS)
+        {
+            if (StringConstants.AUTOMATIC_NODE.Equals(nodeLabelVO.LabelValue))
+            {
+                isAutomaticNode = true;
+                break;
+            }
+        }
+
+        if (!isAutomaticNode)
+        {
+            return false;
+        }
+
+        string processNumber = delegateTask.ProcessNumber;
+        string elementId = delegateTask.TaskDefKey;
+
+        // 构造 BusinessDataVo 用于条件评估和动作执行
+        BpmBusinessProcess? bpmBusinessProcess = _bpmBusinessProcessService._repository
+            .Find(a => a.BusinessNumber == processNumber)
+            .FirstOrDefault();
+        if (bpmBusinessProcess == null)
+        {
+            _logger.LogError("自动节点处理失败:流程实例不存在,流程号={}", processNumber);
+            return false;
+        }
+
+        BpmnConf? bpmnConf = _bpmnConfService._repository
+            .Find(a => a.BpmnCode == bpmBusinessProcess.Version)
+            .FirstOrDefault();
+        if (bpmnConf == null)
+        {
+            _logger.LogError("自动节点处理失败:流程配置不存在,流程号={}", processNumber);
+            return false;
+        }
+
+        string formCode = bpmBusinessProcess.ProcessinessKey;
+        bool isOutSide = (bpmnConf.IsOutSideProcess ?? 0) == 1;
+
+        BusinessDataVo businessDataVo = new BusinessDataVo
+        {
+            FormCode = formCode,
+            ProcessNumber = processNumber,
+            TaskDefKey = elementId,
+            BusinessId = bpmBusinessProcess.BusinessId,
+            BpmnCode = bpmBusinessProcess.Version,
+            IsOutSideAccessProc = isOutSide,
+            IsLowCodeFlow = bpmnConf.IsLowCodeFlow,
+        };
+
+        string assigneeName = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Desc;
+        bool? conditionResult = null;
+
+        try
+        {
+            var formFactory = ServiceProviderUtils.GetService<IFormFactory>();
+            if (formFactory != null)
+            {
+                var formAdaptor = formFactory.GetFormAdaptor(businessDataVo);
+                if (formAdaptor != null)
+                {
+                    conditionResult = formAdaptor.AutomaticCondition(businessDataVo);
+                    formAdaptor.AutomaticAction(businessDataVo, conditionResult);
+                }
+            }
+
+            // 如果用户未重写 AutomaticCondition（默认返回 null），回退到内置条件评估逻辑
+            // 内置逻辑从 DB 读取 autoNodeConf 条件配置进行评估
+            if (conditionResult == null)
+            {
+                conditionResult = EvaluateCondition(delegateTask);
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "自动节点条件判断或动作执行异常, processNumber={}, elementId={}", processNumber, elementId);
+        }
+        finally
+        {
+            // 无论条件评估或动作执行是否异常,都自动完成任务
+            delegateTask.Assignee = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Id;
+            delegateTask.AssigneeName = assigneeName;
+
+            var taskService = ServiceProviderUtils.GetService<ITaskService>();
+            taskService?.Complete(delegateTask);
+
+            // 写审批日志
+            BpmVerifyInfo bpmVerifyInfo = new BpmVerifyInfo
+            {
+                VerifyDate = DateTime.Now,
+                TaskName = delegateTask.Name,
+                TaskId = delegateTask.Id,
+                RunInfoId = bpmBusinessProcess.ProcInstId,
+                VerifyUserId = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Id,
+                VerifyUserName = assigneeName,
+                TaskDefKey = delegateTask.TaskDefKey,
+                VerifyStatus = (int)ProcessSubmitStateEnum.PROCESS_AGRESS_TYPE,
+                VerifyDesc = string.Format(StringConstants.AF_AUTO_EVALUATE_SKIP_COMMENT, conditionResult),
+                ProcessCode = processNumber,
+                TenantId = MultiTenantUtil.GetCurrentTenantId(),
+            };
+            _bpmVerifyInfoService.AddVerifyInfo(bpmVerifyInfo);
+        }
 
         return true;
     }

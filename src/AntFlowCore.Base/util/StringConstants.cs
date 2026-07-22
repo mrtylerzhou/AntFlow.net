@@ -74,6 +74,9 @@ namespace AntFlowCore.Base.util
         public const string AF_CONDITION_COPY_EXECUTE_COMMENT = "条件抄送执行,条件评估结果:True";
         public const string AF_CONDITION_COPY_SKIP_COMMENT = "条件抄送跳过,条件评估结果:False";
 
+        // 自动节点运行时 verifyInfo 备注
+        public const string AF_AUTO_EVALUATE_SKIP_COMMENT = "自动节点自动跳过,条件评估结果:{0}";
+
         // Dynamic condition related constants
         public const string CONDITION_CHANGED = "condition_changed";
         public const string CURRENT_USER_ALREADY_PROCESSED = "currentUserAlreadyProcessed";

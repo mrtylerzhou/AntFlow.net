@@ -154,6 +154,14 @@ namespace AntFlowCore.Base.vo;
         public bool? IsConditionCopyNode { get; set; }
 
         /// <summary>
+        /// Whether this node is an automatic node (nodeType=9 at design time,
+        /// converted to nodeType=4 at runtime by AfNodeUtils.NodeSpecialProcess).
+        /// Automatic node always completes after evaluating conditions and executing actions.
+        /// </summary>
+        [JsonPropertyName("isAutomaticNode")]
+        public bool? IsAutomaticNode { get; set; }
+
+        /// <summary>
         /// Auto-node style condition configuration. Used by condition-approve (12)
         /// and condition-copy (13) nodes to store conditionList + groupRelation.
         /// Front-end submits under JSON key "autoNodeConf" (shared with Java version).

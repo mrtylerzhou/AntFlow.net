@@ -131,6 +131,10 @@ public class BpmnConfBizService : IBpmnConfBizService
                 {
                     nodeLabelVO = NodeLabelConstants.CopyNodeV2;
                 }
+                else if (bpmnNodeVo.IsAutomaticNode == true)
+                {
+                    nodeLabelVO = NodeLabelConstants.AutomaticNode;
+                }
                 else if (bpmnNodeVo.IsConditionApproveNode == true)
                 {
                     nodeLabelVO = NodeLabelConstants.ConditionApproveNode;
