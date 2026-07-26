@@ -31,7 +31,8 @@ namespace AntFlowCore.Base.constant.enums
         BUTTON_TYPE_REMOVE_FUTURE_NODE=35,//删除未来节点
         BUTTON_TYPE_INSERT_AFTER_CURRENT_NODE=36,//当前节点后添加节点 当前任务后面添加节点.不管当前任务是会签/或答,都会变成顺序会签
         BUTTON_TYPE_INSERT_AFTER_FUTURE_NODE=37, //未来节点后添加节点 未来任务后面添加节点.不管当前任务是会签/或答,都会变成顺序会签
-        BUTTON_TYPE_APPOINT_NEXT_NODE_APPROVER=38 //指定下一节点审批人,上一节点审批人在审批时指定下一节点的实际审批人
+        BUTTON_TYPE_APPOINT_NEXT_NODE_APPROVER=38, //指定下一节点审批人,上一节点审批人在审批时指定下一节点的实际审批人
+        BUTTON_TYPE_OPPOSE=39                      //反对(仲裁签专用)
     }
 
     public static class ProcessOperationEnumExtensions
@@ -101,6 +102,8 @@ namespace AntFlowCore.Base.constant.enums
                     return "未来节点后添加节点";
                 case ProcessOperationEnum.BUTTON_TYPE_APPOINT_NEXT_NODE_APPROVER:
                     return "指定下一节点审批人";
+                case ProcessOperationEnum.BUTTON_TYPE_OPPOSE:
+                    return "反对";
                 default:
                     return null;
             }

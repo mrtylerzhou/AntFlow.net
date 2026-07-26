@@ -119,6 +119,9 @@ public class ApproverPersonnelConf
     [JsonPropertyName("signType")]
     public int? SignType { get; set; }
 
+    [JsonPropertyName("arbitrationRatio")]
+    public int? ArbitrationRatio { get; set; }
+
     [JsonPropertyName("employees")]
     public List<ApproverEmployeeInfo>? Employees { get; set; }
 }
@@ -142,6 +145,9 @@ public class ApproverRoleConf
 
     [JsonPropertyName("signType")]
     public int? SignType { get; set; }
+
+    [JsonPropertyName("arbitrationRatio")]
+    public int? ArbitrationRatio { get; set; }
 
     [JsonPropertyName("outsideEmployees")]
     public List<ApproverEmployeeInfo>? OutsideEmployees { get; set; }
@@ -184,6 +190,9 @@ public class ApproverCustomizeConf
 {
     [JsonPropertyName("signType")]
     public int? SignType { get; set; }
+
+    [JsonPropertyName("arbitrationRatio")]
+    public int? ArbitrationRatio { get; set; }
 }
 
 public class ApproverUDRConf
@@ -193,6 +202,9 @@ public class ApproverUDRConf
 
     [JsonPropertyName("signType")]
     public int? SignType { get; set; }
+
+    [JsonPropertyName("arbitrationRatio")]
+    public int? ArbitrationRatio { get; set; }
 
     [JsonPropertyName("udrProperty")]
     public string? UdrProperty { get; set; }
@@ -221,6 +233,9 @@ public class ApproverFormRelatedUserConf
     [JsonPropertyName("signType")]
     public int? SignType { get; set; }
 
+    [JsonPropertyName("arbitrationRatio")]
+    public int? ArbitrationRatio { get; set; }
+
     [JsonPropertyName("valueType")]
     public int? ValueType { get; set; }
 
@@ -232,6 +247,9 @@ public class ApproverPrevNodeRelatedUserConf
 {
     [JsonPropertyName("signType")]
     public int? SignType { get; set; }
+
+    [JsonPropertyName("arbitrationRatio")]
+    public int? ArbitrationRatio { get; set; }
 
     [JsonPropertyName("valueType")]
     public int? ValueType { get; set; }
@@ -247,6 +265,9 @@ public class ApproverOutSideAccessConf
 
     [JsonPropertyName("signType")]
     public int? SignType { get; set; }
+
+    [JsonPropertyName("arbitrationRatio")]
+    public int? ArbitrationRatio { get; set; }
 }
 
 public class ApproverBusinessTableConf
@@ -259,6 +280,9 @@ public class ApproverBusinessTableConf
 
     [JsonPropertyName("signType")]
     public int? SignType { get; set; }
+
+    [JsonPropertyName("arbitrationRatio")]
+    public int? ArbitrationRatio { get; set; }
 }
 
 /// <summary>
@@ -330,6 +354,9 @@ public class ButtonSignAdditionalSignConf
 
     [JsonPropertyName("signType")]
     public int? SignType { get; set; }
+
+    [JsonPropertyName("arbitrationRatio")]
+    public int? ArbitrationRatio { get; set; }
 }
 
 /// <summary>

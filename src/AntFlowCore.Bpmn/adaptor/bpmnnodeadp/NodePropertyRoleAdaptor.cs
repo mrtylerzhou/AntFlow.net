@@ -34,6 +34,7 @@ public class NodePropertyRoleAdaptor : AbstractAdditionSignNodeAdaptor
                 p.RoleIds = roles.Select(r => r.Id).ToList();
                 p.RoleList = roles;
                 p.SignType = roleConfs[0].SignType;
+                p.ArbitrationRatio = roleConfs[0].ArbitrationRatio;
             });
 
             // Outside employees for role

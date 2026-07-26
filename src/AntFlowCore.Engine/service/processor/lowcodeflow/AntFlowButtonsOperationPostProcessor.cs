@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.evt;
 
@@ -103,6 +103,9 @@ namespace AntFlowCore.Engine.service.processor.lowcodeflow;
                     break;
                 case ProcessOperationEnum.BUTTON_TYPE_PROCESS_MOVE_AHEAD:
                     //_workflowButtonHandler.onProcessMoveAhead(vo);
+                    break;
+                case ProcessOperationEnum.BUTTON_TYPE_OPPOSE:
+                    _workflowButtonHandler.onOppose(vo);
                     break;
                 default:
                     throw new NotSupportedException("不支持的操作类型: " + poEnum);

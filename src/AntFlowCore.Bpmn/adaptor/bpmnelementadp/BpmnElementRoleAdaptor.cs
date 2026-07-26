@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.adaptor;
+using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.util;
@@ -27,6 +27,10 @@ public class BpmnElementRoleAdaptor : BpmnElementAdaptor
         if (property.SignType == (int)SignTypeEnum.SIGN_TYPE_SIGN)
         {
             return BpmnElementUtils.GetMultiplayerSignElement(elementId, elementName, elementCodeStr, assigneeMap.Keys.ToList(), assigneeMap);
+        }
+        else if (property.SignType == (int)SignTypeEnum.SIGN_TYPE_ARBITRATION)
+        {
+            return BpmnElementUtils.GetMultiplayerArbitrationElement(elementId, elementName, elementCodeStr, assigneeMap.Keys.ToList(), assigneeMap, property?.ArbitrationRatio);
         }
         else
         {

@@ -312,6 +312,7 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmnAddFlowElementAdaptor, BpmnAddFlowElementMultOrSignAaptor>();
         services.AddSingleton<IBpmnAddFlowElementAdaptor, BpmnAddFlowElementSignUpSerialAdaptor>();
         services.AddSingleton<IBpmnAddFlowElementAdaptor, BpmnAddFlowElementMultSignAdaptor>();
+        services.AddSingleton<IBpmnAddFlowElementAdaptor, BpmnAddFlowElementMultArbitrationAdaptor>();
 
         services.AddSingleton<BpmnNodeFormatService>();
         services.AddSingleton<IBpmnNodeFormatService, BpmnNodeFormatService>();
@@ -331,10 +332,12 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmnInsertVariableSubs, BpmnInsertVariableSubsMultiplayerOrSignAdaptor>();
         services.AddSingleton<IBpmnInsertVariableSubs, BpmnInsertVariableSubsMultiplayerSignAdaptor>();
         services.AddSingleton<IBpmnInsertVariableSubs, BpmnInsertVariableSubsSingleAdaptor>();
+        services.AddSingleton<IBpmnInsertVariableSubs, BpmnInsertVariableSubsMultiplayerArbitrationAdaptor>();
 
 
 
         services.AddSingleton<IProcessOperationAdaptor,EndProcessService>();
+        services.AddSingleton<IProcessOperationAdaptor, OpposeProcessService>();
         services.AddSingleton<IProcessOperationAdaptorProxyFactory, ProcessOperationAdaptorProxyFactory>();
         services.AddSingleton<IProcessOperationAdaptor,SubmitProcessService>();
         services.AddSingleton<IProcessOperationAdaptor, ResubmitProcessService>();
@@ -357,6 +360,7 @@ public static class ServiceRegistration
         services.AddSingleton<IProcessOperationAdaptor, SaveDraftProcessService>();
         services.AddSingleton<AddAssigneeProcessService>();
         services.AddSingleton<RemoveAssigneeProcessService>();
+        services.AddSingleton<EndProcessService>();
 
         services.AddSingleton<AFDeploymentService>();
         services.AddSingleton<IAFDeploymentService, AFDeploymentService>();

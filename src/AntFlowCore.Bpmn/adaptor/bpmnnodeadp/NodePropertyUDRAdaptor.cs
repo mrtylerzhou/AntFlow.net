@@ -33,6 +33,7 @@ public class NodePropertyUDRAdaptor : AbstractAdditionSignNodeAdaptor
             AfNodeUtils.AddOrEditProperty(bpmnNodeVo, p =>
             {
                 p.SignType = udr.SignType;
+                p.ArbitrationRatio = udr.ArbitrationRatio;
                 p.UdrAssigneeProperty = new BaseIdTranStruVo
                 {
                     Id = udr.UdrProperty,

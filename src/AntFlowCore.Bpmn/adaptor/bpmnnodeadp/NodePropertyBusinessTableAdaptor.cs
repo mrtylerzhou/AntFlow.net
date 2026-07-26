@@ -36,6 +36,7 @@ public class NodePropertyBusinessTableAdaptor : AbstractAdditionSignNodeAdaptor
                 p.ConfigurationTableType = btc.ConfigurationTableType;
                 p.TableFieldType = btc.TableFieldType;
                 p.SignType = btc.SignType;
+                p.ArbitrationRatio = btc.ArbitrationRatio;
             });
             return;
         }

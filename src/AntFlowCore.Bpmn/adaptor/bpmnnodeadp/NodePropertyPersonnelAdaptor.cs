@@ -47,6 +47,7 @@ public class NodePropertyPersonnelAdaptor : AbstractAdditionSignNodeAdaptor
             AfNodeUtils.AddOrEditProperty(bpmnNodeVo, p =>
             {
                 p.SignType = pc.SignType;
+                p.ArbitrationRatio = pc.ArbitrationRatio;
                 p.EmplIds = emplIds;
                 p.EmplList = GetEmplList(emplIds, emplNames);
             });

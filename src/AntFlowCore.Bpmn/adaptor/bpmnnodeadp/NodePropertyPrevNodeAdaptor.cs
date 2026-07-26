@@ -32,6 +32,7 @@ public class NodePropertyPrevNodeAdaptor : AbstractAdditionSignNodeAdaptor
             AfNodeUtils.AddOrEditProperty(bpmnNodeVo, p =>
             {
                 p.SignType = conf.SignType;
+                p.ArbitrationRatio = conf.ArbitrationRatio;
                 p.FormAssigneeProperty = conf.ValueType;
             });
         }

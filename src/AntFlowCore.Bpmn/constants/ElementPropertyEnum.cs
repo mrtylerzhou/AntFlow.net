@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using AntFlowCore.Bpmn.adaptor.bpmnelementadp;
 using AntFlowCore.Bpmn.adaptor.variable;
 
@@ -31,6 +31,8 @@ namespace AntFlowCore.Bpmn.constants;
             new ElementPropertyEnum(11, "加批并行或签-或签", typeof(BpmnAddFlowElementMultOrSignAaptor), null);
         public static readonly ElementPropertyEnum ELEMENT_PROPERTY_MULTIPLAYER_SIGN_IN_ORDER =
             new ElementPropertyEnum(21, "多人顺序会签节点", typeof(BpmnAddFlowElementSignUpSerialAdaptor), typeof(BpmnInsertVariableSubsMultiplayerSignAdaptor));
+        public static readonly ElementPropertyEnum ELEMENT_PROPERTY_MULTIPLAYER_ARBITRATION =
+            new ElementPropertyEnum(22, "多人仲裁签节点", typeof(BpmnAddFlowElementMultArbitrationAdaptor), typeof(BpmnInsertVariableSubsMultiplayerArbitrationAdaptor));
 
         // 属性定义
         public int Code { get; private set; }

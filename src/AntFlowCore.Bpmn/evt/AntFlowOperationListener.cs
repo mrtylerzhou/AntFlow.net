@@ -176,4 +176,10 @@ namespace AntFlowCore.Bpmn.evt;
         {
             // 注意: 流程完成通知消息并不在这里,实际上已经有了,请勿要在这里写
         }
+
+        /// <summary>
+        /// 反对(仲裁签专用). 和 onDisAgree 一致,这里不做第三方回调.
+        /// 实际的反对处理(删任务/记verifyinfo/阈值判断/终止流程)在 OpposeProcessService 中完成.
+        /// </summary>
+        public void onOppose(BusinessDataVo businessData) { }
     }

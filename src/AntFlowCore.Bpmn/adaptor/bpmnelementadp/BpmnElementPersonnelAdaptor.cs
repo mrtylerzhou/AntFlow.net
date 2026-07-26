@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.util;
+using AntFlowCore.Abstraction.util;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.factory;
@@ -44,6 +44,10 @@ namespace AntFlowCore.Bpmn.adaptor.bpmnelementadp;
             else if (signType == (int)SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER)
             {
                 return BpmnElementUtils.GetMultiplayerSignInOrderElement(elementId, elementName, elementCodeStr, assigneeMap.Keys.ToList(), assigneeMap);
+            }
+            else if (signType == (int)SignTypeEnum.SIGN_TYPE_ARBITRATION)
+            {
+                return BpmnElementUtils.GetMultiplayerArbitrationElement(elementId, elementName, elementCodeStr, assigneeMap.Keys.ToList(), assigneeMap, property?.ArbitrationRatio);
             }
             else
             {

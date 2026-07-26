@@ -44,6 +44,12 @@ namespace AntFlowCore.Base.vo
         [JsonPropertyName("signType")]
         public int? SignType { get; set; }
 
+        /// <summary>
+        /// arbitration sign pass ratio (1-100), only used when signType=4
+        /// </summary>
+        [JsonPropertyName("arbitrationRatio")]
+        public int? ArbitrationRatio { get; set; }
+
         [JsonPropertyName("conditionsConf")]
         public BpmnNodeConditionsConfBaseVo ConditionsConf { get; set; }
 

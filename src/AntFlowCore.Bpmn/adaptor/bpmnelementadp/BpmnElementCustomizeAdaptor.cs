@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.adaptor;
+using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.util;
@@ -55,6 +55,17 @@ public class BpmnElementCustomizeAdaptor : BpmnElementAdaptor
                     joinedCollectionName,
                     assigneeMap.Keys.ToList(),
                     assigneeMap
+                );
+            }
+            else if ((int)SignTypeEnum.SIGN_TYPE_ARBITRATION == signType)
+            {
+                return BpmnElementUtils.GetMultiplayerArbitrationElement(
+                    elementId,
+                    elementName,
+                    joinedCollectionName,
+                    assigneeMap.Keys.ToList(),
+                    assigneeMap,
+                    property?.ArbitrationRatio
                 );
             }
             else

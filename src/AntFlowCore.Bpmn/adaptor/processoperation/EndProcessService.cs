@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.Orm.util;
+using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.adaptor.processoperation;
@@ -135,6 +135,37 @@ namespace AntFlowCore.Bpmn.adaptor.processoperation;
                 StringConstants.outSideAccessmarker,
                 ProcessOperationEnum.BUTTON_TYPE_DIS_AGREE,
                 ProcessOperationEnum.BUTTON_TYPE_ABANDON);
+        }
+
+        /// <summary>
+        /// Terminate the process WITHOUT recording a new verifyinfo entry.
+        /// Used by OpposeProcessService when the oppose threshold M is reached:
+        /// the oppose action already records its own verifyinfo (verify_status=7),
+        /// so we only need to flip the process state and delete the process instance.
+        /// Mirrors Java EndProcessImpl.endProcessWithoutVerify.
+        /// </summary>
+        /// <param name="vo">Business data carrying processNumber and (optionally) businessId.</param>
+        public void EndProcessWithoutVerify(BusinessDataVo vo)
+        {
+            var bpmBusinessProcess = _bpmBusinessProcessService.GetBpmBusinessProcess(vo.ProcessNumber);
+            if (bpmBusinessProcess == null)
+            {
+                throw new AFBizException($"根据流程编号[{vo.ProcessNumber}]未找到流程实例");
+            }
+
+            // Mark process as rejected (REJECT_STATE=6) to reflect oppose-driven termination
+            bpmBusinessProcess.ProcessState = (int)ProcessStateEnum.REJECT_STATE;
+            _bpmBusinessProcessService._repository.Update(bpmBusinessProcess);
+
+            string processInstanceId = bpmBusinessProcess.ProcInstId;
+            _businessConstants.DeleteProcessInstance(processInstanceId);
+
+            vo.BusinessId = bpmBusinessProcess.BusinessId;
+
+            if (vo.IsOutSideAccessProc != null && vo.IsOutSideAccessProc.Value)
+            {
+                _formFactory.GetFormAdaptor(vo).OnCancellationData(vo);
+            }
         }
         
     }

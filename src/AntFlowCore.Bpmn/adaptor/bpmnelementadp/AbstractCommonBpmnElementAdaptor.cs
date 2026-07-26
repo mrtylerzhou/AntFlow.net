@@ -88,6 +88,11 @@ public abstract class AbstractCommonBpmnElementAdaptor : BpmnElementAdaptor
                 return BpmnElementUtils.GetMultiplayerSignInOrderElement(elementId, elementName,
                     elementCodeStr, assigneeMap.Keys.ToList(), assigneeMap);
             }
+            else if ((int)SignTypeEnum.SIGN_TYPE_ARBITRATION == signType)
+            {
+                return BpmnElementUtils.GetMultiplayerArbitrationElement(elementId, elementName,
+                    elementCodeStr, assigneeMap.Keys.ToList(), assigneeMap, property?.ArbitrationRatio);
+            }
             else
             {
                 return BpmnElementUtils.GetMultiplayerOrSignElement(elementId, elementName,

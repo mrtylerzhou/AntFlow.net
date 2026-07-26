@@ -35,6 +35,7 @@ public class NodePropertyOutSideAccessAdaptor : IBpmnNodeAdaptor
             bpmnNodeVo.Property = new BpmnNodePropertysVo
             {
                 SignType = osac.SignType,
+                ArbitrationRatio = osac.ArbitrationRatio,
                 NodeMark = osac.NodeMark
             };
             bpmnNodeVo.OrderedNodeType = (int)OrderNodeTypeEnum.OUT_SIDE_NODE;

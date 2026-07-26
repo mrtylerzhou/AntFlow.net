@@ -49,6 +49,7 @@ public static class BpmnNodeConfigHolder
         approverConf.PersonnelConf = new ApproverPersonnelConf
         {
             SignType = prop.SignType,
+            ArbitrationRatio = prop.ArbitrationRatio,
             Employees = employees
         };
     }
@@ -70,7 +71,8 @@ public static class BpmnNodeConfigHolder
             {
                 RoleId = role.Id,
                 RoleName = role.Name,
-                SignType = prop.SignType
+                SignType = prop.SignType,
+                ArbitrationRatio = prop.ArbitrationRatio
             };
 
             if (vo.IsOutSideProcess != null && vo.IsOutSideProcess == 1
@@ -150,7 +152,8 @@ public static class BpmnNodeConfigHolder
         var approverConf = GetOrCreateApproverConf(vo);
         approverConf.CustomizeConf = new ApproverCustomizeConf
         {
-            SignType = prop.SignType
+            SignType = prop.SignType,
+            ArbitrationRatio = prop.ArbitrationRatio
         };
     }
 
@@ -166,7 +169,8 @@ public static class BpmnNodeConfigHolder
         approverConf.OutSideAccessConf = new ApproverOutSideAccessConf
         {
             NodeMark = prop.NodeMark,
-            SignType = prop.SignType
+            SignType = prop.SignType,
+            ArbitrationRatio = prop.ArbitrationRatio
         };
     }
 
@@ -183,7 +187,8 @@ public static class BpmnNodeConfigHolder
         {
             ConfigurationTableType = prop.ConfigurationTableType,
             TableFieldType = prop.TableFieldType,
-            SignType = prop.SignType
+            SignType = prop.SignType,
+            ArbitrationRatio = prop.ArbitrationRatio
         };
     }
 
@@ -390,6 +395,7 @@ public static class BpmnNodeConfigHolder
         {
             ValueJson = prop.UdrValueJson,
             SignType = prop.SignType,
+            ArbitrationRatio = prop.ArbitrationRatio,
             UdrProperty = prop.UdrAssigneeProperty.Id,
             UdrPropertyName = prop.UdrAssigneeProperty.Name,
             Ext1 = prop.Ext1,
@@ -413,6 +419,7 @@ public static class BpmnNodeConfigHolder
         {
             ValueJson = JsonConfUtil.ToJsonString(prop.FormInfos),
             SignType = prop.SignType,
+            ArbitrationRatio = prop.ArbitrationRatio,
             ValueType = prop.FormAssigneeProperty,
             ValueTypeName = prop.FormAssigneeProperty != null
                 ? NodeFormAssigneePropertyEnumExtensions.GetDescByCode(prop.FormAssigneeProperty.Value)
@@ -434,6 +441,7 @@ public static class BpmnNodeConfigHolder
         approverConf.PrevNodeRelatedUserConfList.Add(new ApproverPrevNodeRelatedUserConf
         {
             SignType = prop.SignType,
+            ArbitrationRatio = prop.ArbitrationRatio,
             ValueType = prop.FormAssigneeProperty,
             ValueTypeName = NodePrevNodeAssigneePropertyEnumExtensions.GetDescByCode(prop.FormAssigneeProperty.Value)
         });

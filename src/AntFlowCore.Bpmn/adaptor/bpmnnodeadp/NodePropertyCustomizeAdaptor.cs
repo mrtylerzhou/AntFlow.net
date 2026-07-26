@@ -30,7 +30,11 @@ public class NodePropertyCustomizeAdaptor : AbstractAdditionSignNodeAdaptor
         var nodeConfig = bpmnNodeVo.NodeConfigJsonObj;
         if (nodeConfig?.ApproverConf?.CustomizeConf != null)
         {
-            AfNodeUtils.AddOrEditProperty(bpmnNodeVo, p => p.SignType = nodeConfig.ApproverConf.CustomizeConf.SignType);
+            AfNodeUtils.AddOrEditProperty(bpmnNodeVo, p =>
+            {
+                p.SignType = nodeConfig.ApproverConf.CustomizeConf.SignType;
+                p.ArbitrationRatio = nodeConfig.ApproverConf.CustomizeConf.ArbitrationRatio;
+            });
             return;
         }
 
