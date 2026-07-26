@@ -188,6 +188,7 @@ ClientBin/
 *.dbproj.schemaview
 *.publishsettings
 node_modules/
+.vitepress/
 orleans.codegen.cs
 
 # RIA/Silverlight projects
