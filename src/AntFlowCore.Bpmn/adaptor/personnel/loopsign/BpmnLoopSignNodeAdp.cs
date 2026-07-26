@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.adaptor;
+using AntFlowCore.Abstraction.adaptor;
 using AntFlowCore.Abstraction.util;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.constant.enums;
@@ -10,17 +10,28 @@ namespace AntFlowCore.Bpmn.adaptor.personnel.loopsign;
 
 
 
+    /// <summary>
+    /// 层层审批找人适配器。
+    ///
+    /// <para>当前为 demo 实现:底层 <see cref="IUserService.QueryLeadersByEmployeeIdAndTier"/> /
+    /// <see cref="IUserService.QueryLeadersByEmployeeIdAndGrade"/> 仍返回扁平 <c>List&lt;BaseIdTranStruVo&gt;</c>,
+    /// 每层只有 1 个领导。这里把它包装成 <c>[[a],[b],[c]]</c>(每层 1 人),
+    /// 行为与改造前一致。</para>
+    ///
+    /// <para>真正业务侧需要"每层多人"时,重写本类,返回 <c>List&lt;List&lt;string&gt;&gt;</c>,
+    /// 外层=层,内层=层内多人。框架层已支持多层多人。</para>
+    /// </summary>
     public class BpmnLoopSignNodeAdp : AbstractOrderedSignNodeAdp
     {
         private readonly IUserService userService;
-        
-        
+
+
         public BpmnLoopSignNodeAdp(IUserService userService,AssigneeVoBuildUtils assigneeVoBuildUtils) : base(assigneeVoBuildUtils)
         {
             this.userService = userService;
         }
 
-        public override List<string> GetAssigneeIds(BpmnNodeVo nodeVo, BpmnStartConditionsVo bpmnStartConditions)
+        public override List<List<string>> GetAssigneeIds(BpmnNodeVo nodeVo, BpmnStartConditionsVo bpmnStartConditions)
         {
             var propertysVo = nodeVo.Property;
             if (propertysVo == null)
@@ -76,18 +87,24 @@ namespace AntFlowCore.Bpmn.adaptor.personnel.loopsign;
                 throw new AFBizException("未能根据发起人找到审批人信息");
             }
 
-            var approverIds = baseIdTranStruVos.Select(vo => vo.Id).ToList();
+            //loopEndPersonList 跳过"人",不跳过"层":遇到 endPerson 就跳过他本人,层里其他人继续
             var finalApproverIds = new List<string>();
-
-            foreach (var approverId in approverIds)
+            foreach (var vo in baseIdTranStruVos)
             {
-                if (!loopEndPersonList.Contains(approverId))
+                if (!loopEndPersonList.Contains(vo.Id))
                 {
-                    finalApproverIds.Add(approverId);
+                    finalApproverIds.Add(vo.Id);
                 }
             }
 
-            return finalApproverIds;
+            //扁平 list 包装成 [[a],[b],[c]]:每层 1 人,行为与改造前一致
+            var result = new List<List<string>>();
+            foreach (var approverId in finalApproverIds)
+            {
+                result.Add(new List<string> { approverId });
+            }
+
+            return result;
         }
 
         public override void SetSupportBusinessObjects()
@@ -95,4 +112,3 @@ namespace AntFlowCore.Bpmn.adaptor.personnel.loopsign;
             ((IAdaptorService)this).AddSupportBusinessObjects(OrderNodeTypeEnum.LOOP_NODE);
         }
     }
-
