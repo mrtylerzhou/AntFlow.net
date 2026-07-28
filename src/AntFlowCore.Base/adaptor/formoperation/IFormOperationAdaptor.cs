@@ -22,6 +22,9 @@ public interface IFormOperationAdaptor<in T> where T : BusinessDataVo
     // 同意审批时的回调
     void OnConsentData(T vo);
 
+    // 不同意审批时的回调
+    void OnDisagreeData(T vo);
+
     // 驳回到修改时的回调
     void OnBackToModifyData(T vo);
 

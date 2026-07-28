@@ -122,6 +122,13 @@ namespace AntFlowCore.Bpmn.adaptor.processoperation;
             {
                 _formFactory.GetFormAdaptor(vo).OnCancellationData(vo);
             }
+            else
+            {
+                if (vo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_DIS_AGREE)
+                {
+                    _formFactory.GetFormAdaptor(vo).OnDisagreeData(vo);
+                }
+            }
         }
 
         public void SetSupportBusinessObjects()

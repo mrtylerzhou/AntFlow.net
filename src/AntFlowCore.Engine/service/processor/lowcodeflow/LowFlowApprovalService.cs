@@ -410,6 +410,20 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         }
     }
 
+    public void OnDisagreeData(UDLFApplyVo vo)
+    {
+        IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
+        foreach (ILFFormOperationAdaptor o in lfFormOperationAdaptors)
+        {
+            LFFormServiceAnnoAttribute? lfFormServiceAnnoAttribute = o.GetType().GetCustomAttribute<LFFormServiceAnnoAttribute>();
+           
+            if (lfFormServiceAnnoAttribute != null && lfFormServiceAnnoAttribute.SvcName.Equals(vo.FormCode))
+            {
+                o.OnDisagreeData(vo);
+            }
+        }
+    }
+
     public void OnBackToModifyData(UDLFApplyVo vo)
     {
         IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
