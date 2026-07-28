@@ -70,6 +70,11 @@ public class ThirdPartyAccountApplyFlowService : AbstractLowFlowSpyFormOperation
         }
     }
 
+    public override void OnDisagreeData(ThirdPartyAccountApplyVo vo)
+    {
+        
+    }
+
     public override void OnBackToModifyData(ThirdPartyAccountApplyVo vo)
     {
        
