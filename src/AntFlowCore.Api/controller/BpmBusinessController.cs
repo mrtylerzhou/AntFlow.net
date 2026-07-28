@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction;
+using AntFlowCore.Abstraction;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Abstraction.util;
 using AntFlowCore.Base.constant.enums;
@@ -6,6 +6,7 @@ using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.vo;
+using AntFlowCore.Engine.service.biz;
 using AntFlowCore.Persist.api.interf.repository;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,14 +18,17 @@ public class BpmBusinessController
     private readonly ITaskMgmtService _taskMgmtService;
     private readonly IUserEntrustService _userEntrustService;
     private readonly IBpmnNodeService _bpmnNodeService;
+    private readonly BatchApprovalService _batchApprovalService;
 
    public BpmBusinessController(ITaskMgmtService taskMgmtService,
         IUserEntrustService userEntrustService,
-        IBpmnNodeService bpmnNodeService)
+        IBpmnNodeService bpmnNodeService,
+        BatchApprovalService batchApprovalService)
     {
         _taskMgmtService = taskMgmtService;
         _userEntrustService = userEntrustService;
         _bpmnNodeService = bpmnNodeService;
+        _batchApprovalService = batchApprovalService;
     }
     
     /// <summary>
@@ -97,5 +101,19 @@ public class BpmBusinessController
         }).ToList();
 
         return ResultHelper.Success(nodeVos);
+    }
+
+    /// <summary>
+    /// 批量同意
+    /// </summary>
+    [HttpPost("batchAgree")]
+    public Result<BatchAgreeResultVo> BatchAgree([FromBody] BatchAgreeVo vo)
+    {
+        if (vo == null || vo.TaskIds == null || vo.TaskIds.Count == 0)
+        {
+            throw new AFBizException("请选择要审批的任务");
+        }
+        BatchAgreeResultVo result = _batchApprovalService.BatchAgree(vo);
+        return ResultHelper.Success(result);
     }
 }

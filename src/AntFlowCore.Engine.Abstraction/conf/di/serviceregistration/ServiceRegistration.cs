@@ -111,6 +111,7 @@ public static class ServiceRegistration
         services.AddSingleton<ThirdPartyAccountApplyFlowService>();
         services.AddSingleton<ButtonOperationService>();
         services.AddSingleton<IButtonOperationService, ButtonOperationService>();
+        services.AddSingleton<BatchApprovalService>();
         services.AddSingleton<OutSideBpmBusinessPartyService>();
         services.AddSingleton<IOutSideBpmBusinessPartyService, OutSideBpmBusinessPartyService>();
         services.AddSingleton<OutSideBpmCallbackUrlConfService>();
@@ -444,3 +445,4 @@ public static class ServiceRegistration
         services.AddHttpClient();
     }
 }
+
