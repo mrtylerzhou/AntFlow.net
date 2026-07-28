@@ -787,6 +787,28 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.ProcessNumber).Name("process_number");
                 a.Property(b => b.NodeId).Name("node_id");
                 a.Property(b => b.NodeFrom).Name("node_from");
+            }).ConfigEntity<BpmProcessEfficiency>(a =>
+            {
+                a.Name("bpm_process_efficiency");
+                a.Property(b => b.Id).IsPrimary(true).IsIdentity(true).Name("id");
+                a.Property(b => b.FormCode).Name("form_code");
+                a.Property(b => b.ProcessNumber).Name("process_number");
+                a.Property(b => b.ProcInstId).Name("proc_inst_id");
+                a.Property(b => b.ExecutionId).Name("execution_id");
+                a.Property(b => b.TaskDefKey).Name("task_def_key");
+                a.Property(b => b.NodeName).Name("node_name");
+                a.Property(b => b.Assignee).Name("assignee");
+                a.Property(b => b.AssigneeName).Name("assignee_name");
+                a.Property(b => b.StaticType).Name("static_type");
+                a.Property(b => b.StartTime).Name("start_time");
+                a.Property(b => b.EndTime).Name("end_time");
+                a.Property(b => b.Duration).Name("duration");
+                a.Property(b => b.ProcessState).Name("process_state");
+                a.Property(b => b.ProcessCreateTime).Name("process_create_time");
+                a.Property(b => b.TenantId).Name("tenant_id");
+                a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.CreateTime).Name("create_time");
+                a.Property(b => b.UpdateTime).Name("update_time");
             });
     }
 }

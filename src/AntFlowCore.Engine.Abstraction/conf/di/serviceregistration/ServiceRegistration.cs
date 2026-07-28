@@ -434,6 +434,8 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmVariableMultiplayerPersonnelRepository, FsBpmVariableMultiplayerPersonnelRepository>();
         services.AddSingleton<IBpmVariableMultiplayerRepository, FsBpmVariableMultiplayerRepository>();
         services.AddSingleton<IBpmAfExecutionRepository, FsBpmAfExecutionRepository>();
+        services.AddSingleton<IBpmProcessEfficiencyRepository, FsBpmProcessEfficiencyRepository>();
+        services.AddSingleton<ProcessEfficiencyService>();
         services.AddSingleton<IDepartmentRepository, FsDepartmentRepository>();
         services.AddSingleton<IThirdPartyAccountApplyRepository, FsThirdPartyAccountApplyRepository>();
         //=================================不可越过的三八线==============================
