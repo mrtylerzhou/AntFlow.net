@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.Orm.util;
+using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.adaptor.processoperation;
@@ -121,6 +121,13 @@ namespace AntFlowCore.Bpmn.adaptor.processoperation;
             if (vo.IsOutSideAccessProc!=null&&vo.IsOutSideAccessProc.Value)
             {
                 _formFactory.GetFormAdaptor(vo).OnCancellationData(vo);
+            }
+            else
+            {
+                if (vo.OperationType == (int)ProcessOperationEnum.BUTTON_TYPE_DIS_AGREE)
+                {
+                    _formFactory.GetFormAdaptor(vo).OnDisagreeData(vo);
+                }
             }
         }
 

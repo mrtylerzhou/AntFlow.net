@@ -33,6 +33,8 @@ public abstract class AbstractLowFlowSpyFormOperationAdaptor<T> : IFormOperation
 
     public abstract void OnConsentData(T vo);
 
+    public abstract void OnDisagreeData(T vo);
+
     public abstract void OnBackToModifyData(T vo);
 
     public abstract void OnCancellationData(T vo);
