@@ -1,4 +1,5 @@
-using AntFlowCore.Abstraction;
+﻿using AntFlowCore.Abstraction;
+using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Abstraction.util;
 using AntFlowCore.Base.constant.enums;
@@ -6,6 +7,7 @@ using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.vo;
+using AntFlowCore.Core.vo;
 using AntFlowCore.Engine.service.biz;
 using AntFlowCore.Persist.api.interf.repository;
 using Microsoft.AspNetCore.Mvc;
@@ -19,14 +21,20 @@ public class BpmBusinessController
     private readonly IUserEntrustService _userEntrustService;
     private readonly IBpmnNodeService _bpmnNodeService;
     private readonly BatchApprovalService _batchApprovalService;
+    private readonly IDictService _dictService;
+    private readonly IOutSideBpmAccessBusinessService _outSideBpmAccessBusinessService;
 
    public BpmBusinessController(ITaskMgmtService taskMgmtService,
         IUserEntrustService userEntrustService,
         IBpmnNodeService bpmnNodeService,
-        BatchApprovalService batchApprovalService)
+        BatchApprovalService batchApprovalService,
+        IDictService dictService,
+        IOutSideBpmAccessBusinessService outSideBpmAccessBusinessService)
     {
         _taskMgmtService = taskMgmtService;
         _userEntrustService = userEntrustService;
+        _dictService = dictService;
+        _outSideBpmAccessBusinessService = outSideBpmAccessBusinessService;
         _bpmnNodeService = bpmnNodeService;
         _batchApprovalService = batchApprovalService;
     }
@@ -116,4 +124,71 @@ public class BpmBusinessController
         BatchAgreeResultVo result = _batchApprovalService.BatchAgree(vo);
         return ResultHelper.Success(result);
     }
+
+    /// <summary>
+    /// 获取全部流程列表(DIY/LF/SaaS合并)
+    /// </summary>
+    [HttpPost("getAllFormCodeList")]
+    public Result<List<DIYProcessInfoDTO>> GetAllFormCodeList([FromQuery] string desc)
+    {
+        var result = new List<DIYProcessInfoDTO>();
+
+        // DIY流程
+        var diyList = _taskMgmtService.ViewProcessInfo(desc ?? "");
+        if (diyList != null)
+        {
+            foreach (var item in diyList)
+            {
+                item.Type = "DIY";
+                result.Add(item);
+            }
+        }
+
+        // LF低代码流程
+        var lfList = _dictService.GetLowCodeFlowFormCodes();
+        if (lfList != null)
+        {
+            foreach (var item in lfList)
+            {
+                result.Add(new DIYProcessInfoDTO
+                {
+                    Key = item.Key,
+                    Value = item.Value,
+                    Type = "LF",
+                    Remark = item.Remark
+                });
+            }
+        }
+
+        // 第三方流程
+        var outsideResult = _outSideBpmAccessBusinessService.SelectOutSideFormCodePageList(
+            new PageDto { Page = 1, PageSize = 9999 }, new BpmnConfVo());
+        if (outsideResult?.Data != null)
+        {
+            foreach (var item in outsideResult.Data)
+            {
+                result.Add(new DIYProcessInfoDTO
+                {
+                    Key = item.FormCode,
+                    Value = item.BpmnName ?? item.FormCode,
+                    Type = "OUTSIDE"
+                });
+            }
+        }
+
+        // 按desc过滤
+        if (!string.IsNullOrWhiteSpace(desc))
+        {
+            string lowerDesc = desc.ToLower();
+            result = result.Where(r =>
+                (r.Value != null && r.Value.ToLower().Contains(lowerDesc))
+                || (r.Key != null && r.Key.ToLower().Contains(lowerDesc))
+            ).ToList();
+        }
+
+        return ResultHelper.Success(result);
+    }
 }
+
+
+

@@ -1,4 +1,4 @@
-using AntFlowCore.Abstraction.adaptor;
+﻿using AntFlowCore.Abstraction.adaptor;
 using AntFlowCore.Abstraction.factory;
 using AntFlowCore.Abstraction.formatter;
 using AntFlowCore.Abstraction.formatter.filter;
@@ -437,6 +437,7 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmAfExecutionRepository, FsBpmAfExecutionRepository>();
         services.AddSingleton<IBpmProcessEfficiencyRepository, FsBpmProcessEfficiencyRepository>();
         services.AddSingleton<ProcessEfficiencyService>();
+        services.AddSingleton<ProcessPerspectiveService>();
         services.AddSingleton<IDepartmentRepository, FsDepartmentRepository>();
         services.AddSingleton<IThirdPartyAccountApplyRepository, FsThirdPartyAccountApplyRepository>();
         //=================================不可越过的三八线==============================
@@ -445,4 +446,5 @@ public static class ServiceRegistration
         services.AddHttpClient();
     }
 }
+
 
