@@ -95,7 +95,7 @@ public class ProcessApprovalService : IProcessApprovalService
 
         BusinessDataVo dataVo = null;
         _freeSql.Ado.Transaction(() => { dataVo = _buttonOperationService.ButtonsOperationTransactional(vo); });
-
+      
         return dataVo;
 
     }
@@ -534,6 +534,7 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
                 ProcessInstanceId = a.t1.ProcInstId,
                 ProcessKey = a.t2.ProcessinessKey,
                 UserId = a.t2.CreateUser,
+                UserName = a.t2.UserName,
                 CreateTime = a.t2.CreateTime,
                 BusinessId= a.t2.BusinessId,
                 Description = a.t2.Description,
