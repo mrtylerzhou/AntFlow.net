@@ -1,4 +1,4 @@
-using AntFlowCore.Base.entity.jsonconf;
+﻿using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.util;
 using AntFlowCore.Core.vo;
 using System.Text.Json.Serialization;
@@ -178,6 +178,14 @@ namespace AntFlowCore.Base.vo;
         /// </summary>
         [JsonPropertyName("isPrevNodeAppointed")]
         public bool? IsPrevNodeAppointed { get; set; }
+
+        /// <summary>
+        /// 标识当前节点为"选择条件"审批人类型.
+        /// 前端传入,后端在 BpmnConfBizService.Edit 中据此验证子节点包含动态条件网关并贴标签.
+        /// 对应 Java BpmnNodeVo.isPickCondition.
+        /// </summary>
+        [JsonPropertyName("isPickCondition")]
+        public bool? IsPickCondition { get; set; }
 
         /// <summary>
         /// 添加标签到 LabelList, 若 LabelList 为空则初始化.

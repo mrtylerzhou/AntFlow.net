@@ -1,4 +1,4 @@
-using AntFlowCore.Abstraction.Orm.util;
+﻿using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.factory;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
@@ -99,6 +99,15 @@ public class BpmnConfBizService : IBpmnConfBizService
         ProcessorFactory.ExecutePreWriteProcessors(bpmnConfVo);
         
         List<BpmnNodeVo> confNodes = bpmnConfVo.Nodes;
+        // 构建nodeId->BpmnNodeVo映射,供选择条件贴标签时查找子节点
+        Dictionary<string, BpmnNodeVo> nodeIdMap = new Dictionary<string, BpmnNodeVo>();
+        foreach (var n in confNodes)
+        {
+            if (!string.IsNullOrEmpty(n.NodeId) && !nodeIdMap.ContainsKey(n.NodeId))
+            {
+                nodeIdMap[n.NodeId] = n;
+            }
+        }
         int hasStartUserChooseModules=0;
         int hasCopy=0;
         int hasLastNodeCopy=0;
@@ -146,6 +155,20 @@ public class BpmnConfBizService : IBpmnConfBizService
                 if (nodeLabelVO != null)
                 {
                     bpmnNodeVo.SetOrAddLabelList(nodeLabelVO);
+                }
+
+                // 选择条件:验证子节点包含动态条件网关,满足则贴标签
+                if (bpmnNodeVo.IsPickCondition == true)
+                {
+                    bool hasDynamicGatewayChild = bpmnNodeVo.NodeTo != null && bpmnNodeVo.NodeTo.Any(childId =>
+                    {
+                        nodeIdMap.TryGetValue(childId, out var child);
+                        return child != null && (int)NodeTypeEnum.NODE_TYPE_GATEWAY == child.NodeType;
+                    });
+                    if (hasDynamicGatewayChild)
+                    {
+                        bpmnNodeVo.SetOrAddLabelList(NodeLabelConstants.PickCondition);
+                    }
                 }
             }
 

@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using AntFlowCore.Base.conf.json;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Core.vo;
@@ -214,5 +214,29 @@ namespace AntFlowCore.Base.vo
         /// </summary>
         [JsonPropertyName("node2formRelatedAssignees")]
         public Dictionary<string, List<string>> Node2formRelatedAssignees { get; set; }
+
+        /// <summary>
+        /// 选择条件:用户选定的条件分支节点ID列表.
+        /// </summary>
+        [JsonPropertyName("pickConditionNodeIds")]
+        public List<string> PickConditionNodeIds { get; set; }
+
+        /// <summary>
+        /// 选择条件:可选分支列表(由getBusinessInfo返回给前端).
+        /// </summary>
+        [JsonPropertyName("pickConditionBranches")]
+        public List<PickConditionBranchVo> PickConditionBranches { get; set; }
     }
 }
+
+    /// <summary>
+    /// 选择条件可选分支VO.
+    /// </summary>
+    public class PickConditionBranchVo
+    {
+        [JsonPropertyName("id")]
+        public string Id { get; set; }
+
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+    }

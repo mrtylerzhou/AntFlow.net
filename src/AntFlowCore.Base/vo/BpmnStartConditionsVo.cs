@@ -233,5 +233,12 @@ namespace AntFlowCore.Base.vo
         /// </summary>
         [JsonPropertyName("businessDataVo")]
         public BusinessDataVo BusinessDataVo { get; set; }
+
+        /// <summary>
+        /// 选择条件:用户强制指定的条件分支节点ID列表.
+        /// 非空时ConditionService跳过自然评估,匹配则true不匹配则false.
+        /// </summary>
+        [JsonPropertyName("forcedConditionNodeIds")]
+        public List<string> ForcedConditionNodeIds { get; set; }
     }
 }

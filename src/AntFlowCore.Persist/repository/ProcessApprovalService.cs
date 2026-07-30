@@ -278,6 +278,185 @@ public class ProcessApprovalService : IProcessApprovalService
         }
     }
 
+    /// <summary>
+    /// 检查当前节点是否贴有选择条件标签.
+    /// 从 ProcessRecordInfoVo.FormKey 读取 NodeExtraInfoDTO, 检查是否包含
+    /// af_syslabel_pick_condition 标签.
+    /// 对应 Java ProcessApprovalServiceImpl.hasPickConditionLabel.
+    /// </summary>
+    private bool HasPickConditionLabel(BusinessDataVo businessDataVo)
+    {
+        try
+        {
+            if (businessDataVo?.ProcessRecordInfo == null)
+            {
+                return false;
+            }
+            string formKey = businessDataVo.ProcessRecordInfo.FormKey;
+            if (string.IsNullOrEmpty(formKey) || !formKey.StartsWith("{"))
+            {
+                return false;
+            }
+            NodeExtraInfoDTO? extraInfoDTO = System.Text.Json.JsonSerializer.Deserialize<NodeExtraInfoDTO>(formKey);
+            if (extraInfoDTO?.NodeLabelVOS == null || extraInfoDTO.NodeLabelVOS.Count == 0)
+            {
+                return false;
+            }
+            return NodeLabelConstants.NodeLabelContainsAny(
+                extraInfoDTO.NodeLabelVOS,
+                StringConstants.AF_SYSLABEL_PICK_CONDITION);
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(e, "HasPickConditionLabel check failed");
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 添加[选择分支]按钮并查询可选分支列表.
+    /// 查找当前审批人节点下级的动态条件网关,再查网关下级的条件节点(排除默认条件).
+    /// 对应 Java ProcessApprovalServiceImpl.addPickConditionButtonAndBranches.
+    /// </summary>
+    private void AddPickConditionButtonAndBranches(BusinessDataVo businessDataVo, BpmBusinessProcess bpmBusinessProcess)
+    {
+        // 添加选择分支按钮
+        ProcessActionButtonVo button = new ProcessActionButtonVo
+        {
+            ButtonType = (int)ButtonTypeEnum.BUTTON_TYPE_PICK_CONDITION,
+            Name = ButtonTypeEnumExtensions.GetDescByCode((int)ButtonTypeEnum.BUTTON_TYPE_PICK_CONDITION)
+        };
+
+        var pcButtons = businessDataVo.ProcessRecordInfo.PcButtons;
+        if (pcButtons == null)
+        {
+            return;
+        }
+        if (!pcButtons.TryGetValue(ButtonPageTypeEnumExtensions.GetName(ButtonPageTypeEnum.AUDIT),
+                out var pcProcButtons))
+        {
+            pcProcButtons = new List<ProcessActionButtonVo>();
+            pcButtons[ButtonPageTypeEnumExtensions.GetName(ButtonPageTypeEnum.AUDIT)] = pcProcButtons;
+        }
+
+        int buttonTypeCode = (int)ButtonTypeEnum.BUTTON_TYPE_PICK_CONDITION;
+        if (pcProcButtons != null && !pcProcButtons.Any(a => buttonTypeCode.Equals(a.ButtonType)))
+        {
+            pcProcButtons.Add(button);
+        }
+
+        // 查询可选分支列表
+        try
+        {
+            string elementId = businessDataVo.ProcessRecordInfo.NodeId;
+            string processKey = bpmBusinessProcess.ProcessinessKey;
+
+            // 获取流程配置confId
+            var bpmnConf = _bpmnConfCommonService.GetBpmnConfByFormCode(processKey);
+            if (bpmnConf == null || bpmnConf.Id == 0)
+            {
+                return;
+            }
+            long confId = bpmnConf.Id;
+
+            // elementId(taskDefKey)转换为bpmn_node表的node_id(UUID):
+            // 先通过BpmVariableMultiplayer拿到bpmn_node主键id,再查bpmn_node获取node_id
+            string currentNodeId = null;
+            var multiplayer = _freeSql.Select<BpmVariableMultiplayer, BpmVariable>()
+                .InnerJoin((a, b) => a.VariableId == b.Id)
+                .Where((a, b) => a.ElementId == elementId && b.ProcessNum == bpmBusinessProcess.BusinessNumber)
+                .First();
+            if (multiplayer != null && !string.IsNullOrEmpty(multiplayer.NodeId))
+            {
+                var currentNode = _freeSql.Select<BpmnNode>()
+                    .Where(a => a.Id == long.Parse(multiplayer.NodeId))
+                    .First();
+                if (currentNode != null)
+                {
+                    currentNodeId = currentNode.NodeId;
+                }
+            }
+            if (currentNodeId == null) return;
+
+            // 查找当前审批人节点下级的动态条件网关
+            var gateways = _freeSql.Select<BpmnNode>()
+                .Where(a => a.ConfId == confId
+                    && a.NodeFrom == currentNodeId
+                    && a.IsDynamicCondition == true
+                    && a.IsDel == 0)
+                .ToList();
+
+            if (gateways == null || gateways.Count == 0)
+            {
+                return;
+            }
+
+            string gatewayNodeId = gateways[0].NodeId;
+
+            // 查找网关下级的条件节点(nodeType=3)
+            var conditionNodes = _freeSql.Select<BpmnNode>()
+                .Where(a => a.ConfId == confId
+                    && a.NodeFrom == gatewayNodeId
+                    && a.NodeType == (int)NodeTypeEnum.NODE_TYPE_CONDITIONS
+                    && a.IsDel == 0)
+                .ToList();
+
+            if (conditionNodes == null || conditionNodes.Count == 0)
+            {
+                return;
+            }
+
+            // 过滤默认条件节点,构建分支列表
+            var branches = new List<PickConditionBranchVo>();
+            foreach (var node in conditionNodes)
+            {
+                if (!IsDefaultConditionNode(node))
+                {
+                    branches.Add(new PickConditionBranchVo
+                    {
+                        Id = node.NodeId,
+                        Name = node.NodeName ?? node.NodeId
+                    });
+                }
+            }
+
+            if (branches.Count > 0)
+            {
+                businessDataVo.PickConditionBranches = branches;
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(e, "AddPickConditionButtonAndBranches query failed");
+        }
+    }
+
+    /// <summary>
+    /// 判断条件节点是否为默认条件.
+    /// 解析 nodeConfigJson.conditionsConf.conditionGroups[0].isDefault.
+    /// </summary>
+    private bool IsDefaultConditionNode(BpmnNode node)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(node.NodeConfigJson))
+            {
+                return false;
+            }
+            var configJson = JsonConfUtil.ParseNodeConfig(node.NodeConfigJson);
+            var groups = configJson?.ConditionsConf?.ConditionGroups;
+            if (groups == null || groups.Count == 0)
+            {
+                return false;
+            }
+            return groups[0].IsDefault == 1;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     public ResultAndPage<TaskMgmtVO> FindPcProcessList(PageDto pageDto, TaskMgmtVO vo)
     {
         SortedDictionary<String, SortTypeEnum> orderFieldMap = new SortedDictionary<string, SortTypeEnum>();

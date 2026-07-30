@@ -1,4 +1,4 @@
-
+﻿
 namespace AntFlowCore.Base.util
 {
     public interface StringConstants
@@ -95,6 +95,9 @@ namespace AntFlowCore.Base.util
 
         // Thread-local key for duplication process strategy (used by element adaptors)
         public const string DUPLICATION_PROCESS_STRATEGY = "duplicationProcessStrategy";
+
+        // 选择条件节点标签 (对等 Java StringConstants.AF_SYSLABEL_PICK_CONDITION)
+        public const string AF_SYSLABEL_PICK_CONDITION = "af_syslabel_pick_condition";
 
         // 上一节点指定审批人相关常量 (对等 Java StringConstants)
         public const string AF_SYSLABEL_PREV_NODE_APPOINTED = "af_syslabel_prev_node_appointed";

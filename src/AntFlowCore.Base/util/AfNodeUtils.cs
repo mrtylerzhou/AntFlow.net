@@ -1,4 +1,4 @@
-using AntFlowCore.Base.constant.enums;
+﻿using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 
@@ -112,6 +112,10 @@ public class AfNodeUtils
             else if (NodeLabelConstants.PrevNodeAppointed.LabelValue.Equals(nodeLabelVO.LabelValue))
             {
                 bpmnNodeVo.IsPrevNodeAppointed = true;
+            }
+            else if (NodeLabelConstants.PickCondition.LabelValue.Equals(nodeLabelVO.LabelValue))
+            {
+                bpmnNodeVo.IsPickCondition = true;
             }
         }
     }

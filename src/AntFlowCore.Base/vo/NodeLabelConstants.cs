@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using AntFlowCore.Base.util;
 
 namespace AntFlowCore.Base.vo
@@ -30,6 +30,12 @@ namespace AntFlowCore.Base.vo
         /// 对应 Java NodeLabelConstants.conditionCopyNode.
         /// </summary>
         public static readonly BpmnNodeLabelVO ConditionCopyNode = new BpmnNodeLabelVO(StringConstants.CONDITION_COPY_NODE, "条件抄送节点");
+
+        /// <summary>
+        /// 选择条件节点:审批人节点+动态条件网关组合,运行时审批人选择后续条件分支.
+        /// 对应 Java NodeLabelConstants.pickCondition.
+        /// </summary>
+        public static readonly BpmnNodeLabelVO PickCondition = new BpmnNodeLabelVO(StringConstants.AF_SYSLABEL_PICK_CONDITION, "选择条件节点");
 
         /// <summary>
         /// 上一节点指定审批人: 当前节点使用虚拟审批人 PREV_NODE_APPOINTED("-4"),
