@@ -121,6 +121,10 @@ public class BpmBusinessController
         {
             throw new AFBizException("请选择要审批的任务");
         }
+        if (vo.TaskIds.Count > 20)
+        {
+            throw new AFBizException("单次最多审批20个任务");
+        }
         BatchAgreeResultVo result = _batchApprovalService.BatchAgree(vo);
         return ResultHelper.Success(result);
     }

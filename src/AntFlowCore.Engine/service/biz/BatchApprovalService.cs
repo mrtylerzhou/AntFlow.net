@@ -1,12 +1,13 @@
-using System.Text.Json;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
+using AntFlowCore.Base.factory;
 using AntFlowCore.Base.interf;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Persist.api.interf.repository;
 using Microsoft.Extensions.Logging;
+using System.Text.Json;
 
 namespace AntFlowCore.Engine.service.biz;
 
@@ -15,17 +16,20 @@ namespace AntFlowCore.Engine.service.biz;
 /// </summary>
 public class BatchApprovalService
 {
+    private readonly IFormFactory _formFactory;
     private readonly ITaskService _taskService;
     private readonly IBpmBusinessProcessService _bpmBusinessProcessService;
     private readonly IProcessApprovalService _processApprovalService;
     private readonly ILogger<BatchApprovalService> _logger;
 
     public BatchApprovalService(
+        IFormFactory formFactory,
         ITaskService taskService,
         IBpmBusinessProcessService bpmBusinessProcessService,
         IProcessApprovalService processApprovalService,
         ILogger<BatchApprovalService> logger)
     {
+        _formFactory = formFactory;
         _taskService = taskService;
         _bpmBusinessProcessService = bpmBusinessProcessService;
         _processApprovalService = processApprovalService;
@@ -126,6 +130,14 @@ public class BatchApprovalService
         };
 
         // 5. 执行审批操作（内部含事务）
+        string parameters = JsonSerializer.Serialize(businessDataVo);
+        if (businessDataVo.IsOutSideAccessProc == null || !businessDataVo.IsOutSideAccessProc.Value || businessDataVo.IsLowCodeFlow == 1)
+        {
+            var vo = _formFactory.DataFormConversion(parameters, bpmBusinessProcess.ProcessinessKey);
+            var formAdaptor = _formFactory.GetFormAdaptor(vo);
+            formAdaptor.OnQueryData(vo);
+            businessDataVo = vo;
+        }
         string json = JsonSerializer.Serialize(businessDataVo);
         _processApprovalService.ButtonsOperation(json, bpmBusinessProcess.ProcessinessKey);
     }
