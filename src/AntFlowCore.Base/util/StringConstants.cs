@@ -1,4 +1,4 @@
-
+﻿
 namespace AntFlowCore.Base.util
 {
     public interface StringConstants
@@ -67,6 +67,9 @@ namespace AntFlowCore.Base.util
         // 条件审批节点 / 条件抄送节点 (对等 Java 版 nodeType=12/13)
         public const string CONDITION_APPROVE_NODE = "condition_approve_node";
         public const string CONDITION_COPY_NODE = "condition_copy_node";
+
+        // 协助节点 (对等 Java 版 nodeType=17)
+        public const string ASSIST_NODE = "assist_node";
 
         // 条件审批/条件抄送运行时 verifyInfo 备注
         public const string AF_CONDITION_APPROVE_AUTO_COMMENT = "条件审批自动通过,条件评估结果:True";

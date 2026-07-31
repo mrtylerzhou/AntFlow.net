@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using AntFlowCore.Base.util;
 
 namespace AntFlowCore.Base.vo
@@ -56,6 +56,12 @@ namespace AntFlowCore.Base.vo
         /// 对应 Java NodeLabelConstants.disagreeBack.
         /// </summary>
         public static readonly BpmnNodeLabelVO DisagreeBack = new BpmnNodeLabelVO(StringConstants.AF_SYSLABEL_DISAGREE_BACK, "不同意退回");
+
+        /// <summary>
+        /// 协助节点:本质是审批人节点,语义为"办理"而非"审批",不代表同意/不同意,但流程仍需向下流转.
+        /// 对应 Java NodeLabelConstants.assistNode.
+        /// </summary>
+        public static readonly BpmnNodeLabelVO AssistNode = new BpmnNodeLabelVO(StringConstants.ASSIST_NODE, "协助节点");
 
         /// <summary>
         /// 不可操作节点,存在于引擎中,但是不可退回到的节点.

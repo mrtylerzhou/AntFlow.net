@@ -1,4 +1,4 @@
-using AntFlowCore.Abstraction.Orm.util;
+﻿using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.factory;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
@@ -151,6 +151,10 @@ public class BpmnConfBizService : IBpmnConfBizService
                 else if (bpmnNodeVo.IsConditionCopyNode == true)
                 {
                     nodeLabelVO = NodeLabelConstants.ConditionCopyNode;
+                }
+                else if (bpmnNodeVo.IsAssistNode == true)
+                {
+                    nodeLabelVO = NodeLabelConstants.AssistNode;
                 }
                 if (nodeLabelVO != null)
                 {

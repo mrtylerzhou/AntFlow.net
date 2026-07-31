@@ -1,4 +1,4 @@
-using AntFlowCore.Base.entity.jsonconf;
+﻿using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.util;
 using AntFlowCore.Core.vo;
 using System.Text.Json.Serialization;
@@ -160,6 +160,14 @@ namespace AntFlowCore.Base.vo;
         /// </summary>
         [JsonPropertyName("isAutomaticNode")]
         public bool? IsAutomaticNode { get; set; }
+
+        /// <summary>
+        /// Whether this node is an assist node (nodeType=17 at design time,
+        /// converted to nodeType=4 at runtime by AfNodeUtils.NodeSpecialProcess).
+        /// Assist node means 'handle' not 'approve', delegates to agree logic for flow progression.
+        /// </summary>
+        [JsonPropertyName("isAssistNode")]
+        public bool? IsAssistNode { get; set; }
 
         /// <summary>
         /// Auto-node style condition configuration. Used by condition-approve (12)

@@ -12,7 +12,8 @@ public enum NodeTypeEnum
         NODE_TYPE_COPY_V2 = 8,         // 抄送节点v2
         NODE_TYPE_AUTO_NODE = 9,        // 自动节点
         NODE_TYPE_CONDITION_APPROVE = 12, // 条件审批节点
-        NODE_TYPE_CONDITION_COPY = 13   // 条件抄送节点
+        NODE_TYPE_CONDITION_COPY = 13,  // 条件抄送节点
+        NODE_TYPE_ASSIST = 17           // 协助节点
     }
 
     public class NodeTypeEnumExtensions
@@ -33,6 +34,7 @@ public enum NodeTypeEnum
                 case NodeTypeEnum.NODE_TYPE_AUTO_NODE: return "自动节点";
                 case NodeTypeEnum.NODE_TYPE_CONDITION_APPROVE: return "条件审批节点";
                 case NodeTypeEnum.NODE_TYPE_CONDITION_COPY: return "条件抄送节点";
+                case NodeTypeEnum.NODE_TYPE_ASSIST: return "协助节点";
                 default: return string.Empty;
             }
         }

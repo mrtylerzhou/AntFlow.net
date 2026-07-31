@@ -37,12 +37,13 @@ public class ConfigFlowButtonSortEnum
     public static readonly ConfigFlowButtonSortEnum RECOVER_TO_HIS= new ConfigFlowButtonSortEnum(31, "恢复已结束流程", 31);
     public static readonly ConfigFlowButtonSortEnum DRAW_BACK_AGREE= new ConfigFlowButtonSortEnum(32, "撤销同意", 32);
     public static readonly ConfigFlowButtonSortEnum PROCESS_MOVE_AHEAD= new ConfigFlowButtonSortEnum(33, "流程推进", 33);
+    public static readonly ConfigFlowButtonSortEnum ASSIST = new ConfigFlowButtonSortEnum(41, "协助", 41);
     // Static list of all instances for easy lookup
     private static readonly List<ConfigFlowButtonSortEnum> AllValues = new List<ConfigFlowButtonSortEnum>
     {
         SUBMIT, AGAIN_SUBMIT, AGREED, NO_AGREED, BACK_NODE_EDIT, ABANDONED, PRINT,
         UNDERTAKE, CHANGE_TYPE, END_TYPE, ADD_APPROVAL_PEOPLE, FORWARDING, BACK_EDIT,
-        BUTTON_TYPE_JP, SCAN_HELP, ZB, CHOOSE_ASSIGNEE, BACK_TO_ANY_NODE
+        BUTTON_TYPE_JP, SCAN_HELP, ZB, CHOOSE_ASSIGNEE, BACK_TO_ANY_NODE, ASSIST
     };
 
     public static ConfigFlowButtonSortEnum GetEnumByCode(int? code)

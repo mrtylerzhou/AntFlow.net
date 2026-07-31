@@ -1,4 +1,4 @@
-using AntFlowCore.Base.constant.enums;
+﻿using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 
@@ -75,6 +75,13 @@ public class AfNodeUtils
             bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_APPROVER;
             bpmnNodeVo.IsConditionCopyNode = true;
         }
+        // 协助节点:设计期 nodeType=17,运行期转为 nodeType=4,标记 isAssistNode
+        // 语义为"办理"而非"审批",保留真实办理人,不塞虚拟审批人
+        else if (nodeType == (int)NodeTypeEnum.NODE_TYPE_ASSIST)
+        {
+            bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_APPROVER;
+            bpmnNodeVo.IsAssistNode = true;
+        }
     }
 
     /// <summary>
@@ -116,6 +123,10 @@ public class AfNodeUtils
             else if (NodeLabelConstants.PickCondition.LabelValue.Equals(nodeLabelVO.LabelValue))
             {
                 bpmnNodeVo.IsPickCondition = true;
+            }
+            else if (NodeLabelConstants.AssistNode.LabelValue.Equals(nodeLabelVO.LabelValue))
+            {
+                bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_ASSIST;
             }
         }
     }
