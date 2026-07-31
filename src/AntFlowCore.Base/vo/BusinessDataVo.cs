@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using AntFlowCore.Base.conf.json;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Core.vo;
@@ -226,6 +226,12 @@ namespace AntFlowCore.Base.vo
         /// </summary>
         [JsonPropertyName("pickConditionBranches")]
         public List<PickConditionBranchVo> PickConditionBranches { get; set; }
+
+        /// <summary>
+        /// 选择条件分支是否支持多选(动态条件并行网关时为true).
+        /// </summary>
+        [JsonPropertyName("pickConditionMultiSelect")]
+        public bool? PickConditionMultiSelect { get; set; }
     }
 }
 

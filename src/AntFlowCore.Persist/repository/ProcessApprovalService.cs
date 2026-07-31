@@ -391,6 +391,12 @@ public class ProcessApprovalService : IProcessApprovalService
                 return;
             }
 
+            //动态条件并行网关:设置多选标识
+            if (gateways[0].IsParallel == true)
+            {
+                businessDataVo.PickConditionMultiSelect = true;
+            }
+
             string gatewayNodeId = gateways[0].NodeId;
 
             // 查找网关下级的条件节点(nodeType=3)

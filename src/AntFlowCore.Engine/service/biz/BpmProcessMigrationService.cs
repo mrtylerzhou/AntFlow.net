@@ -43,6 +43,12 @@ public class BpmProcessMigrationService : IBpmProcessMigrationService
     public void MigrateAndJumpToCurrent(BpmAfTask currentTask, BpmBusinessProcess bpmBusinessProcess,
         BusinessDataVo vo, Action<BusinessDataVo, BpmAfTask, BpmBusinessProcess> taskCompletionAction)
     {
+        MigrateAndJumpToCurrent(currentTask, bpmBusinessProcess, vo, taskCompletionAction, false);
+    }
+
+    public void MigrateAndJumpToCurrent(BpmAfTask currentTask, BpmBusinessProcess bpmBusinessProcess,
+        BusinessDataVo vo, Action<BusinessDataVo, BpmAfTask, BpmBusinessProcess> taskCompletionAction, bool stopAtParallelFork)
+    {
         string currentTaskDefKey = currentTask.TaskDefKey;
         string currentComment = vo.ApprovalComment;
 
@@ -66,6 +72,13 @@ public class BpmProcessMigrationService : IBpmProcessMigrationService
         if (bpmBusinessProcess == null)
         {
             throw new AFBizException("迁移后未能找到业务流程信息!");
+        }
+
+        // 动态条件并行:自动推进到并行网关分叉点即停止
+        if (stopAtParallelFork)
+        {
+            AutoCompleteToParallelFork(bpmBusinessProcess, vo, taskCompletionAction);
+            return;
         }
 
         // Get all tasks for the new process instance
@@ -139,6 +152,39 @@ public class BpmProcessMigrationService : IBpmProcessMigrationService
                 currentExecuted = true;
             }
             index++;
+        }
+    }
+
+    /// <summary>
+    /// 自动完成任务直到并行网关分叉(多个任务同时存在).
+    /// 用于动态条件并行场景:迁移后不需要回放到某个特定taskDefKey,
+    /// 而是推进到网关分叉产生多个并行任务时停止.
+    /// </summary>
+    private void AutoCompleteToParallelFork(BpmBusinessProcess bpmBusinessProcess,
+        BusinessDataVo vo, Action<BusinessDataVo, BpmAfTask, BpmBusinessProcess> taskCompletionAction)
+    {
+        int maxIterations = 50;
+        for (int i = 0; i < maxIterations; i++)
+        {
+            List<BpmAfTask> tasks = _taskService.CreateTaskQuery(t =>
+                t.ProcInstId == bpmBusinessProcess.ProcInstId);
+
+            if (tasks == null || tasks.Count == 0)
+            {
+                break; // 流程已结束
+            }
+
+            if (tasks.Count > 1)
+            {
+                break; // 网关已分叉,多个并行任务产生
+            }
+
+            // 只有1个任务,自动完成它
+            BpmAfTask task = tasks[0];
+            vo.StartUserId = task.Assignee;
+            vo.StartUserName = task.AssigneeName;
+            vo.ApprovalComment = StringConstants.CURRENT_USER_ALREADY_PROCESSED;
+            taskCompletionAction(vo, task, bpmBusinessProcess);
         }
     }
 }

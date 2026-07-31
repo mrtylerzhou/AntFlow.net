@@ -20,4 +20,15 @@ public interface IBpmProcessMigrationService
     /// <param name="taskCompletionAction">callback to complete each replayed task</param>
     void MigrateAndJumpToCurrent(BpmAfTask currentTask, BpmBusinessProcess bpmBusinessProcess,
         BusinessDataVo vo, Action<BusinessDataVo, BpmAfTask, BpmBusinessProcess> taskCompletionAction);
+
+    /// <summary>
+    /// 迁移流程并在并行网关分叉点停止(用于动态条件并行).
+    /// </summary>
+    /// <param name="currentTask">当前正在审批的任务</param>
+    /// <param name="bpmBusinessProcess">当前业务流程</param>
+    /// <param name="vo">业务数据VO</param>
+    /// <param name="taskCompletionAction">完成每个回放任务的回调</param>
+    /// <param name="stopAtParallelFork">是否在并行分叉点停止</param>
+    void MigrateAndJumpToCurrent(BpmAfTask currentTask, BpmBusinessProcess bpmBusinessProcess,
+        BusinessDataVo vo, Action<BusinessDataVo, BpmAfTask, BpmBusinessProcess> taskCompletionAction, bool stopAtParallelFork);
 }
