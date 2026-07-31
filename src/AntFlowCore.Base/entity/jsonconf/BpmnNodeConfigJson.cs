@@ -48,6 +48,13 @@ public class BpmnNodeConfigJson
     public int? BackType { get; set; }
 
     /// <summary>
+    /// Target node ID (design-time UUID) for disagree-back behavior.
+    /// Used when backType is 4 or 5 to specify which node to return to.
+    /// </summary>
+    [JsonPropertyName("backToNodeId")]
+    public string? BackToNodeId { get; set; }
+
+    /// <summary>
     /// Auto-node style condition configuration. Used by condition-approve (nodeType=12)
     /// and condition-copy (nodeType=13) nodes. Persisted under JSON key "autoNodeConf"
     /// to align with the front-end (shared with Java version).

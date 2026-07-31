@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using AntFlowCore.Base.util;
 
 namespace AntFlowCore.Base.vo
@@ -50,6 +50,12 @@ namespace AntFlowCore.Base.vo
         /// 对应 Java NodeLabelConstants.appointNextNodeApprover.
         /// </summary>
         public static readonly BpmnNodeLabelVO AppointNextNodeApprover = new BpmnNodeLabelVO(StringConstants.AF_SYSLABEL_APPOINT_NEXT_NODE_APPROVER, "指定下一节点审批人");
+
+        /// <summary>
+        /// 不同意退回: 运行时EndProcessService据此标签判断是否转发BackToModifyService.
+        /// 对应 Java NodeLabelConstants.disagreeBack.
+        /// </summary>
+        public static readonly BpmnNodeLabelVO DisagreeBack = new BpmnNodeLabelVO(StringConstants.AF_SYSLABEL_DISAGREE_BACK, "不同意退回");
 
         /// <summary>
         /// 不可操作节点,存在于引擎中,但是不可退回到的节点.

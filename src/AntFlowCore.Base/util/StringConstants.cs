@@ -1,4 +1,4 @@
-﻿
+
 namespace AntFlowCore.Base.util
 {
     public interface StringConstants
@@ -102,6 +102,8 @@ namespace AntFlowCore.Base.util
         // 上一节点指定审批人相关常量 (对等 Java StringConstants)
         public const string AF_SYSLABEL_PREV_NODE_APPOINTED = "af_syslabel_prev_node_appointed";
         public const string AF_SYSLABEL_APPOINT_NEXT_NODE_APPROVER = "af_syslabel_appoint_next_node_approver";
+        /// <summary>不同意按钮配置了退回行为时贴此标签,运行时EndProcessService据此转发BackToModifyService</summary>
+        public const string AF_SYSLABEL_DISAGREE_BACK = "af_syslabel_disagree_back";
         // Thread-local key for passing nextNodeApprovers from ButtonOperationService to AFTaskService
         public const string NEXT_NODE_APPROVER = "nextNodeApprover";
         // Thread-local key for runtime BusinessDataVo (set by BpmnSendMessageAspect, read by BpmnTaskListener)

@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.entity.jsonconf;
+using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.util;
 using AntFlowCore.Core.vo;
 using System.Text.Json.Serialization;

@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.adaptor;
+using AntFlowCore.Abstraction.adaptor;
 using AntFlowCore.Abstraction.factory;
 using AntFlowCore.Abstraction.formatter;
 using AntFlowCore.Abstraction.formatter.filter;
@@ -347,6 +347,7 @@ public static class ServiceRegistration
         services.AddSingleton<IProcessOperationAdaptor,TransferAssigneeProcessService>();
         services.AddSingleton<IProcessOperationAdaptor, UndertakeProcessService>();
         services.AddSingleton<IProcessOperationAdaptor, BackToModifyService>();
+            services.AddSingleton<BackToModifyService>();
         services.AddSingleton<IProcessOperationAdaptor, ProcessForwardService>();
         services.AddSingleton<IProcessOperationAdaptor, RemoveAssigneeProcessService>();
         services.AddSingleton<IProcessOperationAdaptor, AddAssigneeProcessService>();
