@@ -1282,7 +1282,7 @@ CREATE TABLE [dbo].[bpm_af_taskinst]
     [delete_reason]          NVARCHAR(4000)NULL,
     [priority]               INT           NULL,
     [due_date]               DATETIME2(3)  NULL,
-    [form_key]               NVARCHAR(255) NULL,
+    [form_key]               NVARCHAR(MAX) NULL,
     [category]               NVARCHAR(255) NULL,
     [tenant_id]              NVARCHAR(255) NULL     DEFAULT N'',
     [description]            NVARCHAR(4000)NULL,
@@ -1322,7 +1322,7 @@ CREATE TABLE [dbo].[bpm_af_task]
     [category]         NVARCHAR(255) NULL,
     [suspension_state] INT           NULL,
     [tenant_id]        NVARCHAR(255) NULL     DEFAULT N'',
-    [form_key]         NVARCHAR(255) NULL,
+    [form_key]         NVARCHAR(MAX) NULL,
     [description]      NVARCHAR(4000)NULL,
     CONSTRAINT [PK_bpm_af_task] PRIMARY KEY ([id])
 );

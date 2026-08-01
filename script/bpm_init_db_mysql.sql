@@ -1100,7 +1100,7 @@ create table bpm_af_taskinst
     delete_reason  varchar(4000)           null,
     priority       int                     null,
     due_date       datetime(3)             null,
-    form_key       varchar(255)            null,
+    form_key       text            null,
     category       varchar(255)            null,
     tenant_id      varchar(255) default '' null,
     description    varchar(4000)           null,
@@ -1139,7 +1139,7 @@ create table bpm_af_task
     category         varchar(255)            null,
     suspension_state int                     null,
     tenant_id        varchar(255) default '' null,
-    form_key         varchar(255)            null,
+    form_key         text            null,
     description      varchar(4000)           null
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
