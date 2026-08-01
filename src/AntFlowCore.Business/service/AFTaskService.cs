@@ -54,7 +54,7 @@ public class AFTaskService: IAFTaskService
                     Original = assignee,
                     OriginalName = assigneeName,
                     IsRead = 2,
-                    ProcDefId = bpmAfTask.FormKey,
+                    ProcDefId = bpmAfTask.ProcDefId,
                     RunInfoId = bpmAfTask.ProcInstId,
                 };
                 BpmFlowrunEntrustService bpmFlowrunEntrustService = ServiceProviderUtils.GetService<BpmFlowrunEntrustService>();
@@ -152,7 +152,7 @@ public class AFTaskService: IAFTaskService
             Original = oldUserId,
             OriginalName = oldUserName,
             IsRead = 2,
-            ProcDefId = bpmAfTask.FormKey,
+            ProcDefId = bpmAfTask.ProcDefId,
             RunInfoId = bpmAfTask.ProcInstId,
         };
         BpmFlowrunEntrustService bpmFlowrunEntrustService = ServiceProviderUtils.GetService<BpmFlowrunEntrustService>();

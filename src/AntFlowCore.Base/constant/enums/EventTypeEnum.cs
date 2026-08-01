@@ -13,7 +13,8 @@ namespace AntFlowCore.Base.constant.enums
         PROCESS_REPULSE = 7,          // 打回修改操作
         PROCESS_FORWARD = 8,        // 转发操作
         PROCESS_END = 9,             // 流程结束
-        PROCESS_RESUBMIT = 10             // 流程结束
+        PROCESS_RESUBMIT = 10,             // 重新提交
+        PROCESS_DRAW_BACK = 11,         // 流程撤回
     }
 
     public static class EventTypeEnumExtensions
@@ -24,7 +25,7 @@ namespace AntFlowCore.Base.constant.enums
             { EventTypeEnum.PROCESS_CANCELLATION, new EventTypeProperties(false, "作废操作", (int)ProcessOperationEnum.BUTTON_TYPE_ABANDON, 0, new List<int> { (int)InformEnum.APPLICANT }) },
             { EventTypeEnum.PROCESS_FLOW, new EventTypeProperties(true, "流程流转至当前节点", 0, 4, new List<int> { (int)InformEnum.AT_APPROVER }) },
             { EventTypeEnum.PROCESS_CONSENT, new EventTypeProperties(true, "同意操作", (int) ProcessOperationEnum.BUTTON_TYPE_AGREE, 4, new List<int>()) },
-           // { EventTypeEnum.PROCESS_RESUBMIT, new EventTypeProperties(true, "重新提交", (int) ProcessOperationEnum.BUTTON_TYPE_RESUBMIT, 4, new List<int>()) },
+            { EventTypeEnum.PROCESS_DRAW_BACK, new EventTypeProperties(true, "撤回", (int) ProcessOperationEnum.BUTTON_TYPE_PROCESS_DRAW_BACK, 4, new List<int>()) },
             { EventTypeEnum.PROCESS_RESUBMIT, new EventTypeProperties(true, "重新提交", (int) ProcessOperationEnum.BUTTON_TYPE_RESUBMIT, 4, new List<int>()) },
             { EventTypeEnum.PROCESS_DISAGREE, new EventTypeProperties(true, "不同意操作", (int)ProcessOperationEnum.BUTTON_TYPE_DIS_AGREE, 4, new List<int> { (int)InformEnum.APPLICANT }) },
             { EventTypeEnum.PROCESS_ADDAPPROVE, new EventTypeProperties(true, "加批操作", (int) ProcessOperationEnum.BUTTON_TYPE_JP, 4, new List<int>()) },
