@@ -71,6 +71,9 @@ namespace AntFlowCore.Base.util
         // 条件推进节点:条件审批(nodeType=12)子类型,自动勾选推进按钮(42,别名同意).满足条件自动推进到固定目标,不满足留给真实审批人.强制 forwardType=2 (对等 Java 版 condition_advance_node)
         public const string CONDITION_ADVANCE_NODE = "condition_advance_node";
 
+        // 条件完成节点:条件推进(nodeType=12)子类型,目标设计时自动算最后一个审批人,不可编辑.运行时复用条件推进处理器.强制 forwardType=2 (对等 Java 版 condition_finish_node)
+        public const string CONDITION_FINISH_NODE = "condition_finish_node";
+
         // 协助节点 (对等 Java 版 nodeType=17)
         public const string ASSIST_NODE = "assist_node";
 

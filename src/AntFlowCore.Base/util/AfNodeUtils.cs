@@ -168,6 +168,13 @@ public class AfNodeUtils
                 bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_CONDITION_APPROVE;
                 bpmnNodeVo.IsConditionAdvanceNode = true;
             }
+            else if (NodeLabelConstants.ConditionFinishNode.LabelValue.Equals(nodeLabelVO.LabelValue))
+            {
+                // 条件完成节点:条件推进(nodeType=12)子类型,目标自动算最后一个审批人,不可编辑
+                // 还原 nodeType=12 并标记 IsConditionFinishNode, 供前端反显
+                bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_CONDITION_APPROVE;
+                bpmnNodeVo.IsConditionFinishNode = true;
+            }
             else if (NodeLabelConstants.ConditionCopyNode.LabelValue.Equals(nodeLabelVO.LabelValue))
             {
                 bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_CONDITION_COPY;

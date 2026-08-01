@@ -153,6 +153,13 @@ namespace AntFlowCore.Base.vo;
         public bool? IsConditionAdvanceNode { get; set; }
 
         /// <summary>
+        /// 条件完成节点标记:条件推进(nodeType=12)子类型,目标设计时自动算最后一个审批人节点(不可编辑).
+        /// 运行时复用条件推进处理器.满足条件自动推进到最后一个审批人,不满足留给真实审批人.
+        /// </summary>
+        [JsonPropertyName("isConditionFinishNode")]
+        public bool? IsConditionFinishNode { get; set; }
+
+        /// <summary>
         /// Whether this node is a condition-copy node (nodeType=13 at design time,
         /// converted to nodeType=4 at runtime by AfNodeUtils.NodeSpecialProcess).
         /// Condition-copy node always completes; only writes BpmProcessForward

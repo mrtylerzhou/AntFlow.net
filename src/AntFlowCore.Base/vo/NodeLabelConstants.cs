@@ -32,6 +32,12 @@ namespace AntFlowCore.Base.vo
         public static readonly BpmnNodeLabelVO ConditionAdvanceNode = new BpmnNodeLabelVO(StringConstants.CONDITION_ADVANCE_NODE, "条件推进节点");
 
         /// <summary>
+        /// 条件完成节点:条件推进(nodeType=12)子类型,目标设计时自动算最后一个审批人节点,不可编辑.
+        /// 运行时复用条件推进处理器.对应 Java NodeLabelConstants.conditionFinishNode.
+        /// </summary>
+        public static readonly BpmnNodeLabelVO ConditionFinishNode = new BpmnNodeLabelVO(StringConstants.CONDITION_FINISH_NODE, "条件完成节点");
+
+        /// <summary>
         /// 条件抄送节点:本质是抄送V2节点 + 条件配置,总是自动完成,仅条件满足时写抄送记录.
         /// 对应 Java NodeLabelConstants.conditionCopyNode.
         /// </summary>

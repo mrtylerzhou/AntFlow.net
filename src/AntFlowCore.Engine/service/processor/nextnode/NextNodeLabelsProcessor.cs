@@ -446,7 +446,9 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
     private void ProcessConditionAdvanceNode(BpmnNodeLabelVO nodeLabelVO, string processNumber, string elementId,
         string formCode, BusinessDataVo? businessDataVo, bool isOutSide, string procInstId, BpmAfTask delegateTask)
     {
-        if (!StringConstants.CONDITION_ADVANCE_NODE.Equals(nodeLabelVO.LabelValue))
+        // 条件完成节点复用此处理器(与条件推进运行时逻辑完全一致, 仅设计时目标来源不同)
+        if (!StringConstants.CONDITION_ADVANCE_NODE.Equals(nodeLabelVO.LabelValue)
+            && !StringConstants.CONDITION_FINISH_NODE.Equals(nodeLabelVO.LabelValue))
         {
             return;
         }
