@@ -145,6 +145,14 @@ namespace AntFlowCore.Base.vo;
         public bool? IsConditionApproveNode { get; set; }
 
         /// <summary>
+        /// 条件推进节点标记:条件审批(nodeType=12)子类型,自动勾选推进按钮(42,别名同意),强制 forwardType=2.
+        /// 满足条件时自动推进到固定目标(虚拟人),不满足时留给真实审批人(可手动推进).
+        /// 前端提交该字段,AfNodeUtils.NodeSpecialProcess 据此贴 condition_advance_node 标签.
+        /// </summary>
+        [JsonPropertyName("isConditionAdvanceNode")]
+        public bool? IsConditionAdvanceNode { get; set; }
+
+        /// <summary>
         /// Whether this node is a condition-copy node (nodeType=13 at design time,
         /// converted to nodeType=4 at runtime by AfNodeUtils.NodeSpecialProcess).
         /// Condition-copy node always completes; only writes BpmProcessForward

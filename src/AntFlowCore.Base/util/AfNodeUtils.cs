@@ -161,6 +161,13 @@ public class AfNodeUtils
             {
                 bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_CONDITION_APPROVE;
             }
+            else if (NodeLabelConstants.ConditionAdvanceNode.LabelValue.Equals(nodeLabelVO.LabelValue))
+            {
+                // 条件推进节点:条件审批(nodeType=12)子类型,自动勾选推进按钮(42,别名同意),强制 forwardType=2
+                // 还原 nodeType=12 并标记 IsConditionAdvanceNode, 供前端反显推进设置tab/图标/颜色
+                bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_CONDITION_APPROVE;
+                bpmnNodeVo.IsConditionAdvanceNode = true;
+            }
             else if (NodeLabelConstants.ConditionCopyNode.LabelValue.Equals(nodeLabelVO.LabelValue))
             {
                 bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_CONDITION_COPY;

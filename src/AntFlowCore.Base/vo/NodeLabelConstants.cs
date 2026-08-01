@@ -26,6 +26,12 @@ namespace AntFlowCore.Base.vo
         public static readonly BpmnNodeLabelVO ConditionApproveNode = new BpmnNodeLabelVO(StringConstants.CONDITION_APPROVE_NODE, "条件审批节点");
 
         /// <summary>
+        /// 条件推进节点:条件审批(nodeType=12)子类型,自动勾选推进按钮(42,别名同意),强制 forwardType=2.
+        /// 满足条件时自动推进到固定目标,不满足时留给真实审批人(点"同意"=推进到固定目标).对应 Java NodeLabelConstants.conditionAdvanceNode.
+        /// </summary>
+        public static readonly BpmnNodeLabelVO ConditionAdvanceNode = new BpmnNodeLabelVO(StringConstants.CONDITION_ADVANCE_NODE, "条件推进节点");
+
+        /// <summary>
         /// 条件抄送节点:本质是抄送V2节点 + 条件配置,总是自动完成,仅条件满足时写抄送记录.
         /// 对应 Java NodeLabelConstants.conditionCopyNode.
         /// </summary>

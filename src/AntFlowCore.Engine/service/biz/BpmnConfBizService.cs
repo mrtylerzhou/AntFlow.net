@@ -144,6 +144,12 @@ public class BpmnConfBizService : IBpmnConfBizService
                 {
                     nodeLabelVO = NodeLabelConstants.AutomaticNode;
                 }
+                else if (bpmnNodeVo.IsConditionAdvanceNode == true)
+                {
+                    // 条件推进节点:条件审批(nodeType=12)子类型,自动勾选推进按钮(42,别名同意),满足条件自动推进到固定目标
+                    // 必须先于 IsConditionApproveNode 判断(条件推进节点两者都为 true),否则会误贴 condition_approve_node 标签导致运行时走条件审批
+                    nodeLabelVO = NodeLabelConstants.ConditionAdvanceNode;
+                }
                 else if (bpmnNodeVo.IsConditionApproveNode == true)
                 {
                     nodeLabelVO = NodeLabelConstants.ConditionApproveNode;
@@ -917,6 +923,11 @@ public class BpmnConfBizService : IBpmnConfBizService
             if (NodeLabelConstants.NodeLabelContainsAny(labelVOList, NodeLabelConstants.ConditionApproveNode.LabelValue))
             {
                 bpmnNodeVo.IsConditionApproveNode = true;
+            }
+            // 条件推进节点:标签匹配时设置标记位,前端据此反显为条件推进(推进设置tab/图标/颜色)
+            if (NodeLabelConstants.NodeLabelContainsAny(labelVOList, NodeLabelConstants.ConditionAdvanceNode.LabelValue))
+            {
+                bpmnNodeVo.IsConditionAdvanceNode = true;
             }
             // 条件抄送节点:标签匹配时设置标记位
             if (NodeLabelConstants.NodeLabelContainsAny(labelVOList, NodeLabelConstants.ConditionCopyNode.LabelValue))
