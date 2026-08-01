@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.dto;
@@ -33,6 +33,7 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
     private readonly AutoNodeConditionEvaluator _conditionEvaluator;
     private readonly IBpmnNodeService _bpmnNodeService;
     private readonly ForwardToNodeService _forwardToNodeService;
+    private readonly BackToModifyService _backToModifyService;
     private readonly ILogger<NextNodeLabelsProcessor> _logger;
 
     public NextNodeLabelsProcessor(
@@ -44,6 +45,7 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
         AutoNodeConditionEvaluator conditionEvaluator,
         IBpmnNodeService bpmnNodeService,
         ForwardToNodeService forwardToNodeService,
+        BackToModifyService backToModifyService,
         ILogger<NextNodeLabelsProcessor> logger)
     {
         _bpmProcessForwardService = bpmProcessForwardService;
@@ -54,6 +56,7 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
         _conditionEvaluator = conditionEvaluator;
         _bpmnNodeService = bpmnNodeService;
         _forwardToNodeService = forwardToNodeService;
+        _backToModifyService = backToModifyService;
         _logger = logger;
     }
 
@@ -89,6 +92,7 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
             ProcessCopyV2(nodeLabelVO, procInstId, assignee, assigneeName, processNumber, delegateTask);
             ProcessAutomaticNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, delegateTask);
             ProcessAutoAdvanceNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, procInstId, delegateTask);
+            ProcessAutoReturnNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, procInstId, delegateTask);
             ProcessAutoSkipNode(nodeLabelVO, assignee, procInstId, assigneeName, processNumber, delegateTask);
             ProcessConditionApproveNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, delegateTask);
             ProcessConditionAdvanceNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, procInstId, delegateTask);
@@ -372,6 +376,141 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
         {
             // 跳过路径:和自动节点一样 complete(不跳跃)
             _logger.LogInformation("自动推进:条件不满足,执行自动跳过, processNumber={}, elementId={}", processNumber, elementId);
+            delegateTask.Assignee = assigneeId;
+            delegateTask.AssigneeName = assigneeName;
+            var taskService = ServiceProviderUtils.GetService<ITaskService>();
+            taskService?.Complete(delegateTask);
+
+            BpmVerifyInfo verifyInfo = new BpmVerifyInfo
+            {
+                VerifyDate = DateTime.Now,
+                TaskName = delegateTask.Name,
+                TaskId = delegateTask.Id,
+                RunInfoId = procInstId,
+                VerifyUserId = assigneeId,
+                VerifyUserName = assigneeName,
+                TaskDefKey = delegateTask.TaskDefKey,
+                VerifyStatus = (int)ProcessSubmitStateEnum.PROCESS_AGRESS_TYPE,
+                VerifyDesc = string.Format(StringConstants.AF_AUTO_EVALUATE_SKIP_COMMENT, conditionResult),
+                ProcessCode = processNumber,
+                TenantId = MultiTenantUtil.GetCurrentTenantId(),
+            };
+            _bpmVerifyInfoService.AddVerifyInfo(verifyInfo);
+        }
+    }
+
+    /// <summary>
+    /// 自动退回节点处理:与 ProcessAutoAdvanceNode 对称, 但方向相反(向后退回).
+    /// 满足条件 → 退回到 drawBackNodeIds 指定的目标节点(FOUR_DISAGREE)
+    /// 不满足条件 → 和自动节点一样 complete(不跳跃)
+    /// UUID → 主键 → elementId 转换链路与自动推进一致
+    /// </summary>
+    private void ProcessAutoReturnNode(BpmnNodeLabelVO nodeLabelVO, string processNumber, string elementId,
+        string formCode, BusinessDataVo? businessDataVo, bool isOutSide, string procInstId, BpmAfTask delegateTask)
+    {
+        if (!StringConstants.AUTO_RETURN_NODE.Equals(nodeLabelVO.LabelValue)) return;
+        if (businessDataVo == null)
+        {
+            _logger.LogError("自动退回节点处理失败:businessDataVo 为空,processNumber={}", processNumber);
+            return;
+        }
+
+        _logger.LogInformation("自动退回节点处理开始, processNumber={}, elementId={}", processNumber, elementId);
+
+        businessDataVo.ProcessNumber = processNumber;
+        businessDataVo.TaskDefKey = elementId;
+        businessDataVo.FormCode = formCode;
+        businessDataVo.IsOutSideAccessProc = isOutSide;
+
+        var formAdaptor = _formFactory.GetFormAdaptor(businessDataVo);
+        if (formAdaptor == null)
+            throw new AFBizException($"未能根据流程formcode找到流程适配器信息! formCode={formCode}");
+
+        if ((businessDataVo.LfConditions == null || businessDataVo.LfConditions.Count == 0)
+            && businessDataVo.IsLowCodeFlow == 1)
+            businessDataVo.LfConditions = businessDataVo.LfFields;
+
+        string assigneeName = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Desc;
+        string assigneeId = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Id;
+
+        bool? conditionResult = null;
+        try
+        {
+            conditionResult = formAdaptor.AutomaticCondition(businessDataVo);
+            if (conditionResult == null)
+                conditionResult = _conditionEvaluator.Evaluate(businessDataVo);
+            formAdaptor.AutomaticAction(businessDataVo, conditionResult);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "自动退回条件评估或动作执行异常,视为条件不满足, processNumber={}, elementId={}", processNumber, elementId);
+            conditionResult = false;
+        }
+
+        if (conditionResult == true)
+        {
+            // === 退回路径: 退回到指定目标节点 ===
+            BpmnConfVo? bpmnConfVo = businessDataVo.BpmnConfVo;
+            if (bpmnConfVo == null || bpmnConfVo.Id == 0)
+                throw new AFBizException($"自动退回节点配置读取失败: bpmnConfVo 为空, processNumber={processNumber}, elementId={elementId}");
+            long confId = bpmnConfVo.Id;
+
+            // 从 BpmnNode.NodeConfigJson 读 drawBackType + drawBackNodeIds
+            NodeElementDto? nodeElementDto = _bpmVariableService.GetNodeIdByElementId(processNumber, elementId);
+            if (nodeElementDto == null || string.IsNullOrEmpty(nodeElementDto.NodeId))
+                throw new AFBizException($"自动退回:无法根据 elementId 找到 nodeId, processNumber={processNumber}, elementId={elementId}");
+            long nodePrimaryKey = Convert.ToInt64(nodeElementDto.NodeId);
+
+            BpmnNode? bpmnNode = _bpmnNodeService._repository
+                .FirstOrDefault(a => a.ConfId == confId && a.Id == nodePrimaryKey && a.IsDel == 0);
+            if (bpmnNode == null || string.IsNullOrEmpty(bpmnNode.NodeConfigJson))
+                throw new AFBizException($"自动退回节点配置读取失败: BpmnNode 不存在或 NodeConfigJson 为空, confId={confId}, nodePrimaryKey={nodePrimaryKey}");
+
+            BpmnNodeConfigJson? configJson = JsonConfUtil.ParseNodeConfig(bpmnNode.NodeConfigJson);
+            if (configJson == null)
+                throw new AFBizException($"自动退回节点配置解析失败, processNumber={processNumber}, elementId={elementId}");
+
+            int? drawBackType = configJson.DrawBackType;
+            List<string>? drawBackNodeIds = configJson.DrawBackNodeIds;
+            if (drawBackType == null || (drawBackType != 4 && drawBackType != 2) || drawBackNodeIds == null || drawBackNodeIds.Count == 0)
+                throw new AFBizException($"自动退回节点配置异常: 未配置退回目标节点, processNumber={processNumber}, elementId={elementId}");
+
+            string targetNodeUuid = drawBackNodeIds[0];
+
+            // UUID → 主键
+            BpmnNode? targetNode = _bpmnNodeService._repository
+                .FirstOrDefault(a => a.ConfId == confId && a.NodeId == targetNodeUuid && a.IsDel == 0);
+            if (targetNode == null)
+                throw new AFBizException($"自动退回目标节点不存在, confId={confId}, nodeUuid={targetNodeUuid}");
+            string targetNodeName = targetNode.NodeName ?? "";
+            string targetPrimaryKey = targetNode.Id.ToString();
+
+            // 主键 → elementId(taskDefKey)
+            List<string> targetElementIds = _bpmVariableService.GetElementIdsdByNodeId(processNumber, targetPrimaryKey);
+            if (targetElementIds == null || targetElementIds.Count == 0)
+                throw new AFBizException($"自动退回:未能根据nodeId获取目标节点taskDefKey, processNumber={processNumber}, targetNodeId={targetPrimaryKey}");
+            string targetElementId = targetElementIds[0];
+
+            _logger.LogInformation("自动退回:条件满足,开始退回, processNumber={}, elementId={}, targetElementId={}, targetNodeName={}",
+                processNumber, elementId, targetElementId, targetNodeName);
+
+            try
+            {
+                _backToModifyService.ReturnToTargetNode(delegateTask, procInstId, processNumber,
+                    delegateTask.TaskDefKey, targetElementId, targetNodeName,
+                    assigneeId, "自动退回节点自动退回");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "自动退回失败, processNumber={}, elementId={}, targetElementId={}, targetNodeName={}",
+                    processNumber, elementId, targetElementId, targetNodeName);
+                throw new AFBizException($"自动退回失败, processNumber={processNumber}, elementId={elementId}, targetNodeId={targetElementId}, targetNodeName={targetNodeName}", e);
+            }
+        }
+        else
+        {
+            // === 跳过路径: 和自动节点一样 complete(不跳跃) ===
+            _logger.LogInformation("自动退回:条件不满足,执行自动跳过, processNumber={}, elementId={}", processNumber, elementId);
             delegateTask.Assignee = assigneeId;
             delegateTask.AssigneeName = assigneeName;
             var taskService = ServiceProviderUtils.GetService<ITaskService>();

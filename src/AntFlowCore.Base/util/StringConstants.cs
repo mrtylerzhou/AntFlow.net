@@ -1,4 +1,4 @@
-
+﻿
 namespace AntFlowCore.Base.util
 {
     public interface StringConstants
@@ -82,6 +82,9 @@ namespace AntFlowCore.Base.util
 
         // 自动完成节点:自动推进(nodeType=18)子类型,目标自动为最后一个审批人节点.仅前端反显区分+颜色区分,运行时复用 auto_advance_node 处理器 (对等 Java 版 auto_complete_node)
         public const string AUTO_COMPLETE_NODE = "auto_complete_node";
+
+        // 自动退回节点:满足条件时退回到指定目标节点(FOUR_DISAGREE),不满足时和自动节点一样 complete (对等 Java 版 auto_return_node)
+        public const string AUTO_RETURN_NODE = "auto_return_node";
 
         // 完成审批节点:审批人节点+推进按钮,目标自动填充为流程最后一个审批人节点 (对等 Java 版 finish_approve_node)
         public const string FINISH_APPROVE_NODE = "finish_approve_node";

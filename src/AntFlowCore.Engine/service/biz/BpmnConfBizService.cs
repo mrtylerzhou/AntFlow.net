@@ -1,4 +1,4 @@
-using AntFlowCore.Abstraction.Orm.util;
+﻿using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.factory;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
@@ -171,6 +171,10 @@ public class BpmnConfBizService : IBpmnConfBizService
                 else if (bpmnNodeVo.IsAutoAdvanceNode == true)
                 {
                     nodeLabelVO = NodeLabelConstants.AutoAdvanceNode;
+                }
+                else if (bpmnNodeVo.IsAutoReturnNode == true)
+                {
+                    nodeLabelVO = NodeLabelConstants.AutoReturnNode;
                 }
                 if (nodeLabelVO != null)
                 {
@@ -380,7 +384,7 @@ public class BpmnConfBizService : IBpmnConfBizService
         {
             var nodeCfgJson = bpmnNodeVo.GetOrCreateNodeConfigJson();
             nodeCfgJson.DrawBackType = drawBackType;
-            if (drawBackType == 4 || drawBackType == 5)
+            if (drawBackType == 4 || drawBackType == 5 || drawBackType == 2)
             {
                 var drawBackNodeIds = bpmnNodeVo.DrawBackNodeIds;
                 if (drawBackNodeIds == null || drawBackNodeIds.Count == 0)
@@ -388,6 +392,18 @@ public class BpmnConfBizService : IBpmnConfBizService
                     throw new AFBizException($"节点[{bpmnNodeVo.NodeName}]配置了退回指定节点但未选择目标节点!");
                 }
                 nodeCfgJson.DrawBackNodeIds = drawBackNodeIds;
+            }
+        }
+
+        // 自动退回节点(nodeType=19)发布校验: 必须配置恰好1个退回目标节点
+        if (bpmnNodeVo.IsAutoReturnNode == true)
+        {
+            var nodeCfgJson2 = bpmnNodeVo.GetOrCreateNodeConfigJson();
+            var drawBackNodeIds2 = nodeCfgJson2.DrawBackNodeIds;
+            if (nodeCfgJson2.DrawBackType == null || (nodeCfgJson2.DrawBackType != 4 && nodeCfgJson2.DrawBackType != 2)
+                || drawBackNodeIds2 == null || drawBackNodeIds2.Count != 1)
+            {
+                throw new AFBizException($"节点[{bpmnNodeVo.NodeName}]为自动退回节点,必须配置恰好1个退回目标节点!");
             }
         }
 

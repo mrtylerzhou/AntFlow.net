@@ -1201,6 +1201,75 @@ CREATE TABLE if not exists `t_bpm_dynamic_condition_choosen`
   COMMENT ='dynamic condition chosen record' DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 
+
+
+
+-- 流程效能统计表
+CREATE TABLE `bpm_process_efficiency`
+(
+    `id`                  bigint       NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `form_code`           varchar(64)  DEFAULT NULL COMMENT '流程类型编码',
+    `process_number`      varchar(64)  DEFAULT NULL COMMENT '流程编号',
+    `proc_inst_id`        varchar(64)  DEFAULT NULL COMMENT '流程实例ID',
+    `execution_id`        varchar(64)  DEFAULT NULL COMMENT '执行ID',
+    `task_def_key`        varchar(255) DEFAULT NULL COMMENT '任务定义Key',
+    `node_name`           varchar(255) DEFAULT NULL COMMENT '节点名称',
+    `assignee`            varchar(500) DEFAULT NULL COMMENT '审批人ID(节点级逗号分隔,流程级null)',
+    `assignee_name`       varchar(500) DEFAULT NULL COMMENT '审批人姓名(节点级逗号分隔,流程级null)',
+    `static_type`         tinyint      NOT NULL COMMENT '统计类型:1=任务,2=节点,3=流程',
+    `start_time`          datetime     DEFAULT NULL COMMENT '开始时间',
+    `end_time`            datetime     DEFAULT NULL COMMENT '结束时间(未完成存null)',
+    `duration`            bigint       DEFAULT NULL COMMENT '耗时(毫秒)',
+    `process_state`       int          DEFAULT NULL COMMENT '流程状态(冗余)',
+    `process_create_time` datetime     DEFAULT NULL COMMENT '流程创建时间(冗余,用于筛选)',
+    `tenant_id`           varchar(255) NOT NULL DEFAULT '' COMMENT '租户ID',
+    `is_del`              tinyint      DEFAULT '0' COMMENT '删除标记:0否1是',
+    `create_time`         datetime     DEFAULT CURRENT_TIMESTAMP COMMENT '记录创建时间',
+    `update_time`         datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '记录更新时间',
+    PRIMARY KEY (`id`) USING BTREE,
+    KEY `idx_form_code` (`form_code`) USING BTREE,
+    KEY `idx_process_number` (`process_number`) USING BTREE,
+    KEY `idx_proc_inst_id` (`proc_inst_id`) USING BTREE,
+    KEY `idx_static_type` (`static_type`) USING BTREE,
+    KEY `idx_start_time` (`start_time`) USING BTREE
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  COMMENT = '流程效能统计表';
+
+
+
+-- =====================================================================
+-- Multi-form support for low-code flow
+-- 支持低代码流程绑定多个外部表单
+-- =====================================================================
+
+-- 1. t_bpmn_conf_lf_formdata: 扩展为同时承载"独立表单模板"和"内联设计表单"
+--    bpmn_conf_id 为 NULL => 独立表单(由表单管理模块管理); 非 NULL => 内联表单(向后兼容)
+ALTER TABLE `t_bpmn_conf_lf_formdata`
+    ADD COLUMN `form_code` varchar(100) NULL DEFAULT NULL COMMENT '独立表单家族标识(同族各版本共享;内联表单为NULL)' AFTER `bpmn_conf_id`,
+    ADD COLUMN `form_name` varchar(255) NULL DEFAULT NULL COMMENT '独立表单显示名(内联表单为NULL)' AFTER `form_code`,
+    ADD COLUMN `effective_status` tinyint NOT NULL DEFAULT 0 COMMENT '是否当前生效版本 0否 1是(仅独立表单使用;内联表单恒为0)' AFTER `form_name`,
+    MODIFY COLUMN `bpmn_conf_id` bigint NULL DEFAULT NULL COMMENT '流程配置ID(独立表单为NULL)';
+-- 独立表单查询索引(按家族列出生效版本)
+ALTER TABLE `t_bpmn_conf_lf_formdata`
+    ADD KEY `idx_lf_formdata_form_code_eff` (`form_code`, `effective_status`),
+    ADD KEY `idx_lf_formdata_bpmn_conf_id` (`bpmn_conf_id`);
+
+-- 2. t_bpmn_conf: 外部表单模式所需的引用列表
+--    lf_formdata_ids: CSV of t_bpmn_conf_lf_formdata.id (版本id), 顺序即 tab 顺序
+--    模式标记复用 extra_flags 位掩码(BpmnConfFlagsEnum.USE_EXTERNAL_FORM=0b1000000), 无需新增列
+ALTER TABLE `t_bpmn_conf`
+    ADD COLUMN `lf_formdata_ids` varchar(500) NULL DEFAULT NULL COMMENT '外部表单引用的表单版本id列表(CSV),仅外部表单模式使用' AFTER `is_lowcode_flow`;
+
+-- 3. t_lf_main_field: 多表单已填数据按表单版本区分
+--    formdata_id 指向 t_bpmn_conf_lf_formdata.id; 旧数据为NULL => 内联模式回退
+ALTER TABLE `t_lf_main_field`
+    ADD COLUMN `formdata_id` bigint NULL DEFAULT NULL COMMENT '表单版本ID(t_bpmn_conf_lf_formdata.id);内联模式旧数据为NULL' AFTER `form_code`;
+ALTER TABLE `t_lf_main_field`
+    ADD KEY `idx_lf_main_field_formdata_id` (`formdata_id`);
+
+
+
 -- REMOVED: t_bpmn_node_customize_conf (migrated to JSON)
 
 

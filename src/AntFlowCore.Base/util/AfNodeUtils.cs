@@ -1,4 +1,4 @@
-using AntFlowCore.Base.constant.enums;
+﻿using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 
@@ -135,6 +135,26 @@ public class AfNodeUtils
                     };
             });
         }
+        // 自动退回节点:设计期 nodeType=19,运行期转为 nodeType=4,标记 isAutoReturnNode
+        // 与自动推进(18)同构:强制指定人员 + 塞虚拟审批人 -3
+        // 差异:满足条件时退回到指定目标节点(FOUR_DISAGREE),不满足时和自动节点一样 complete
+        else if (nodeType == (int)NodeTypeEnum.NODE_TYPE_AUTO_RETURN)
+        {
+            bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_APPROVER;
+            bpmnNodeVo.IsAutoReturnNode = true;
+            bpmnNodeVo.NodeProperty = (int)NodePropertyEnum.NODE_PROPERTY_PERSONNEL;
+            AddOrEditProperty(bpmnNodeVo, prop =>
+            {
+                prop.SignType ??= 1;
+                if (prop.EmplIds == null || prop.EmplIds.Count == 0)
+                    prop.EmplIds = new List<string> { AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Id };
+                if (prop.EmplList == null || prop.EmplList.Count == 0)
+                    prop.EmplList = new List<BaseIdTranStruVo>
+                    {
+                        new BaseIdTranStruVo(AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Id, AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Desc)
+                    };
+            });
+        }
     }
 
     /// <summary>
@@ -198,6 +218,10 @@ public class AfNodeUtils
             else if (NodeLabelConstants.AutoAdvanceNode.LabelValue.Equals(nodeLabelVO.LabelValue))
             {
                 bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_AUTO_ADVANCE;
+            }
+            else if (NodeLabelConstants.AutoReturnNode.LabelValue.Equals(nodeLabelVO.LabelValue))
+            {
+                bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_AUTO_RETURN;
             }
             else if (NodeLabelConstants.AutoCompleteNode.LabelValue.Equals(nodeLabelVO.LabelValue))
             {

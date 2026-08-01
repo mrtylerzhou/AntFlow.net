@@ -1,4 +1,4 @@
-using AntFlowCore.Base.entity.jsonconf;
+﻿using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.util;
 using AntFlowCore.Core.vo;
 using System.Text.Json.Serialization;
@@ -187,6 +187,10 @@ namespace AntFlowCore.Base.vo;
         /// <summary>Whether this node is an auto-advance node (nodeType=18 at design time, converted to nodeType=4 at runtime by AfNodeUtils.NodeSpecialProcess). Auto-advance node advances to a specified target node when condition is true, otherwise auto-completes like automatic node.</summary>
         [JsonPropertyName("isAutoAdvanceNode")]
         public bool? IsAutoAdvanceNode { get; set; }
+
+        /// <summary>Whether this node is an auto-return node (nodeType=19 at design time, converted to nodeType=4 at runtime). Auto-return node returns to a specified target node when condition is true (FOUR_DISAGREE), otherwise auto-completes like automatic node.</summary>
+        [JsonPropertyName("isAutoReturnNode")]
+        public bool? IsAutoReturnNode { get; set; }
 
         /// <summary>完成审批节点标记:审批人节点(nodeType=4)+推进按钮(42)+finish_approve_node标签,目标自动填充为流程最后一个审批人节点.前端提交该字段,AfNodeUtils.NodeSpecialProcess 据此贴标签.</summary>
         [JsonPropertyName("isFinishApproveNode")]

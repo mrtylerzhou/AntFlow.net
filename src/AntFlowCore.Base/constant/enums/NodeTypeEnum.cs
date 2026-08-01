@@ -1,4 +1,4 @@
-namespace AntFlowCore.Base.constant.enums;
+﻿namespace AntFlowCore.Base.constant.enums;
 
 public enum NodeTypeEnum
     {
@@ -14,7 +14,8 @@ public enum NodeTypeEnum
         NODE_TYPE_CONDITION_APPROVE = 12, // 条件审批节点
         NODE_TYPE_CONDITION_COPY = 13,  // 条件抄送节点
         NODE_TYPE_ASSIST = 17,          // 协助节点
-        NODE_TYPE_AUTO_ADVANCE = 18     // 自动推进节点
+        NODE_TYPE_AUTO_ADVANCE = 18,    // 自动推进节点
+        NODE_TYPE_AUTO_RETURN = 19      // 自动退回节点
     }
 
     public class NodeTypeEnumExtensions
@@ -37,6 +38,7 @@ public enum NodeTypeEnum
                 case NodeTypeEnum.NODE_TYPE_CONDITION_COPY: return "条件抄送节点";
                 case NodeTypeEnum.NODE_TYPE_ASSIST: return "协助节点";
                 case NodeTypeEnum.NODE_TYPE_AUTO_ADVANCE: return "自动推进节点";
+                case NodeTypeEnum.NODE_TYPE_AUTO_RETURN: return "自动退回节点";
                 default: return string.Empty;
             }
         }
