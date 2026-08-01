@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.adaptor;
+using AntFlowCore.Abstraction.adaptor;
 using AntFlowCore.Abstraction.factory;
 using AntFlowCore.Abstraction.formatter;
 using AntFlowCore.Abstraction.formatter.filter;
@@ -441,6 +441,7 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmAfExecutionRepository, FsBpmAfExecutionRepository>();
         services.AddSingleton<IBpmProcessEfficiencyRepository, FsBpmProcessEfficiencyRepository>();
         services.AddSingleton<ProcessEfficiencyService>();
+        services.AddSingleton<ProcessInstanceEfficiencyService>();
         services.AddSingleton<ProcessPerspectiveService>();
         services.AddSingleton<FlowClairvoyanceService>();
         services.AddSingleton<IDepartmentRepository, FsDepartmentRepository>();
