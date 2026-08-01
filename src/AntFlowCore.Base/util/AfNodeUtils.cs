@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 
@@ -46,6 +46,13 @@ public class AfNodeUtils
             {
                 bpmnNodeVo.SetOrAddLabelList(NodeLabelConstants.BackSpecified);
             }
+        }
+
+        // 完成审批节点:根据前端传入的 IsFinishApproveNode 标识自动贴标签
+        // 完成审批本质是审批人节点+推进按钮,但目标自动填充为最后一个审批人节点
+        if (bpmnNodeVo.IsFinishApproveNode == true)
+        {
+            bpmnNodeVo.SetOrAddLabelList(NodeLabelConstants.FinishApproveNode);
         }
 
         int? nodeType = bpmnNodeVo.NodeType == 0 ? null : (int?)bpmnNodeVo.NodeType;
@@ -100,6 +107,26 @@ public class AfNodeUtils
             bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_APPROVER;
             bpmnNodeVo.IsAssistNode = true;
         }
+        // 自动推进节点:设计期 nodeType=18,运行期转为 nodeType=4,标记 isAutoAdvanceNode
+        // 与自动节点(9)同构:强制指定人员 + 塞虚拟审批人 -3
+        // 差异:满足条件时推进到指定目标节点,不满足时和自动节点一样 complete
+        else if (nodeType == (int)NodeTypeEnum.NODE_TYPE_AUTO_ADVANCE)
+        {
+            bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_APPROVER;
+            bpmnNodeVo.IsAutoAdvanceNode = true;
+            bpmnNodeVo.NodeProperty = (int)NodePropertyEnum.NODE_PROPERTY_PERSONNEL;
+            AddOrEditProperty(bpmnNodeVo, prop =>
+            {
+                prop.SignType ??= 1;
+                if (prop.EmplIds == null || prop.EmplIds.Count == 0)
+                    prop.EmplIds = new List<string> { AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Id };
+                if (prop.EmplList == null || prop.EmplList.Count == 0)
+                    prop.EmplList = new List<BaseIdTranStruVo>
+                    {
+                        new BaseIdTranStruVo(AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Id, AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Desc)
+                    };
+            });
+        }
     }
 
     /// <summary>
@@ -145,6 +172,10 @@ public class AfNodeUtils
             else if (NodeLabelConstants.AssistNode.LabelValue.Equals(nodeLabelVO.LabelValue))
             {
                 bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_ASSIST;
+            }
+            else if (NodeLabelConstants.AutoAdvanceNode.LabelValue.Equals(nodeLabelVO.LabelValue))
+            {
+                bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_AUTO_ADVANCE;
             }
         }
     }

@@ -11,6 +11,9 @@ using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.service.processor;
 using AntFlowCore.Bpmn.util;
 using AntFlowCore.Persist.api.interf.repository;
+using AntFlowCore.Bpmn.adaptor.processoperation;
+using AntFlowCore.Base.entity.jsonconf;
+using AntFlowCore.Core.vo;
 using Microsoft.Extensions.Logging;
 
 namespace AntFlowCore.Engine.service.processor.nextnode;
@@ -28,6 +31,8 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
     private readonly IBpmVerifyInfoService _bpmVerifyInfoService;
     private readonly IBpmFlowrunEntrustService _bpmFlowrunEntrustService;
     private readonly AutoNodeConditionEvaluator _conditionEvaluator;
+    private readonly IBpmnNodeService _bpmnNodeService;
+    private readonly ForwardToNodeService _forwardToNodeService;
     private readonly ILogger<NextNodeLabelsProcessor> _logger;
 
     public NextNodeLabelsProcessor(
@@ -37,6 +42,8 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
         IBpmVerifyInfoService bpmVerifyInfoService,
         IBpmFlowrunEntrustService bpmFlowrunEntrustService,
         AutoNodeConditionEvaluator conditionEvaluator,
+        IBpmnNodeService bpmnNodeService,
+        ForwardToNodeService forwardToNodeService,
         ILogger<NextNodeLabelsProcessor> logger)
     {
         _bpmProcessForwardService = bpmProcessForwardService;
@@ -45,6 +52,8 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
         _bpmVerifyInfoService = bpmVerifyInfoService;
         _bpmFlowrunEntrustService = bpmFlowrunEntrustService;
         _conditionEvaluator = conditionEvaluator;
+        _bpmnNodeService = bpmnNodeService;
+        _forwardToNodeService = forwardToNodeService;
         _logger = logger;
     }
 
@@ -79,6 +88,7 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
             ProcessCopy(elementId, processNumber, procInstId, nodeLabelVO);
             ProcessCopyV2(nodeLabelVO, procInstId, assignee, assigneeName, processNumber, delegateTask);
             ProcessAutomaticNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, delegateTask);
+            ProcessAutoAdvanceNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, procInstId, delegateTask);
             ProcessAutoSkipNode(nodeLabelVO, assignee, procInstId, assigneeName, processNumber, delegateTask);
             ProcessConditionApproveNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, delegateTask);
             ProcessConditionCopyNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, procInstId, delegateTask);
@@ -248,6 +258,139 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
                 TenantId = MultiTenantUtil.GetCurrentTenantId(),
             };
             _bpmVerifyInfoService.AddVerifyInfo(bpmVerifyInfo);
+        }
+    }
+
+    /// <summary>
+    /// 自动推进节点处理:复用自动节点条件评估;条件满足时推进到指定目标节点,
+    /// 不满足时和自动节点一样 complete(不跳跃).保留 automaticAction 钩子.
+    /// </summary>
+    private void ProcessAutoAdvanceNode(BpmnNodeLabelVO nodeLabelVO, string processNumber, string elementId,
+        string formCode, BusinessDataVo? businessDataVo, bool isOutSide, string procInstId, BpmAfTask delegateTask)
+    {
+        if (!StringConstants.AUTO_ADVANCE_NODE.Equals(nodeLabelVO.LabelValue)) return;
+        if (businessDataVo == null)
+        {
+            _logger.LogError("自动推进节点处理失败:businessDataVo 为空,processNumber={}", processNumber);
+            return;
+        }
+
+        businessDataVo.ProcessNumber = processNumber;
+        businessDataVo.TaskDefKey = elementId;
+        businessDataVo.FormCode = formCode;
+        businessDataVo.IsOutSideAccessProc = isOutSide;
+
+        var formAdaptor = _formFactory.GetFormAdaptor(businessDataVo);
+        if (formAdaptor == null)
+            throw new AFBizException($"未能根据流程formcode找到流程适配器信息! formCode={formCode}");
+
+        if ((businessDataVo.LfConditions == null || businessDataVo.LfConditions.Count == 0)
+            && businessDataVo.IsLowCodeFlow == 1)
+            businessDataVo.LfConditions = businessDataVo.LfFields;
+
+        string assigneeName = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Desc;
+        string assigneeId = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Id;
+
+        bool? conditionResult = null;
+        try
+        {
+            conditionResult = formAdaptor.AutomaticCondition(businessDataVo);
+            if (conditionResult == null)
+                conditionResult = _conditionEvaluator.Evaluate(businessDataVo);
+            formAdaptor.AutomaticAction(businessDataVo, conditionResult);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "自动推进条件评估或动作执行异常,视为条件不满足, processNumber={}, elementId={}", processNumber, elementId);
+            conditionResult = false;
+        }
+
+        if (conditionResult == true)
+        {
+            // 推进路径:读 forwardNodeIds → UUID 转主键 → 主键转 elementId → 调 AdvanceToTargetNode
+            // 1. 获取 confId
+            BpmnConfVo? bpmnConfVo = businessDataVo.BpmnConfVo;
+            if (bpmnConfVo == null || bpmnConfVo.Id == 0)
+                throw new AFBizException($"自动推进节点配置读取失败: bpmnConfVo 为空, processNumber={processNumber}, elementId={elementId}");
+            long confId = bpmnConfVo.Id;
+
+            // 2. 从 BpmnNode.NodeConfigJson 读 forwardType + forwardNodeIds
+            // 通过 elementId 找 nodeId(主键), 再找 BpmnNode
+            NodeElementDto? nodeElementDto = _bpmVariableService.GetNodeIdByElementId(processNumber, elementId);
+            if (nodeElementDto == null || string.IsNullOrEmpty(nodeElementDto.NodeId))
+                throw new AFBizException($"自动推进:无法根据 elementId 找到 nodeId, processNumber={processNumber}, elementId={elementId}");
+            long nodePrimaryKey = Convert.ToInt64(nodeElementDto.NodeId);
+
+            // 查 BpmnNode(confId + 主键)
+            BpmnNode? bpmnNode = _bpmnNodeService._repository
+                .FirstOrDefault(a => a.ConfId == confId && a.Id == nodePrimaryKey && a.IsDel == 0);
+            if (bpmnNode == null || string.IsNullOrEmpty(bpmnNode.NodeConfigJson))
+                throw new AFBizException($"自动推进节点配置读取失败: BpmnNode 不存在或 NodeConfigJson 为空, confId={confId}, nodePrimaryKey={nodePrimaryKey}");
+
+            BpmnNodeConfigJson? configJson = JsonConfUtil.ParseNodeConfig(bpmnNode.NodeConfigJson);
+            if (configJson == null)
+                throw new AFBizException($"自动推进节点配置解析失败, processNumber={processNumber}, elementId={elementId}");
+
+            int? forwardType = configJson.ForwardType;
+            List<string>? forwardNodeIds = configJson.ForwardNodeIds;
+            if (forwardType == null || forwardType != 2 || forwardNodeIds == null || forwardNodeIds.Count == 0)
+                throw new AFBizException($"自动推进节点配置异常: 未配置固定目标节点, processNumber={processNumber}, elementId={elementId}");
+
+            string targetNodeUuid = forwardNodeIds[0];
+
+            // 3. UUID → 主键: 用 confId + node_id(UUID) 查 t_bpmn_node 主键 id
+            BpmnNode? targetNode = _bpmnNodeService._repository
+                .FirstOrDefault(a => a.ConfId == confId && a.NodeId == targetNodeUuid && a.IsDel == 0);
+            if (targetNode == null)
+                throw new AFBizException($"自动推进目标节点不存在, confId={confId}, nodeUuid={targetNodeUuid}");
+            string targetNodeName = targetNode.NodeName ?? "";
+            string targetPrimaryKey = targetNode.Id.ToString();
+
+            // 4. 主键 → elementId(taskDefKey)
+            List<string> targetElementIds = _bpmVariableService.GetElementIdsdByNodeId(processNumber, targetPrimaryKey);
+            if (targetElementIds == null || targetElementIds.Count == 0)
+                throw new AFBizException($"自动推进:未能根据nodeId获取目标节点taskDefKey, processNumber={processNumber}, targetNodeId={targetPrimaryKey}");
+            string targetElementId = targetElementIds[0];
+
+            _logger.LogInformation("自动推进:条件满足,开始推进, processNumber={}, elementId={}, targetElementId={}, targetNodeName={}",
+                processNumber, elementId, targetElementId, targetNodeName);
+
+            try
+            {
+                _forwardToNodeService.AdvanceToTargetNode(delegateTask, procInstId,
+                    delegateTask.TaskDefKey, targetElementId, targetNodeName, assigneeId, assigneeName, processNumber);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "自动推进失败, processNumber={}, elementId={}, targetElementId={}, targetNodeName={}",
+                    processNumber, elementId, targetElementId, targetNodeName);
+                throw new AFBizException($"自动推进失败, processNumber={processNumber}, elementId={elementId}, targetNodeId={targetElementId}, targetNodeName={targetNodeName}", e);
+            }
+        }
+        else
+        {
+            // 跳过路径:和自动节点一样 complete(不跳跃)
+            _logger.LogInformation("自动推进:条件不满足,执行自动跳过, processNumber={}, elementId={}", processNumber, elementId);
+            delegateTask.Assignee = assigneeId;
+            delegateTask.AssigneeName = assigneeName;
+            var taskService = ServiceProviderUtils.GetService<ITaskService>();
+            taskService?.Complete(delegateTask);
+
+            BpmVerifyInfo verifyInfo = new BpmVerifyInfo
+            {
+                VerifyDate = DateTime.Now,
+                TaskName = delegateTask.Name,
+                TaskId = delegateTask.Id,
+                RunInfoId = procInstId,
+                VerifyUserId = assigneeId,
+                VerifyUserName = assigneeName,
+                TaskDefKey = delegateTask.TaskDefKey,
+                VerifyStatus = (int)ProcessSubmitStateEnum.PROCESS_AGRESS_TYPE,
+                VerifyDesc = string.Format(StringConstants.AF_AUTO_EVALUATE_SKIP_COMMENT, conditionResult),
+                ProcessCode = processNumber,
+                TenantId = MultiTenantUtil.GetCurrentTenantId(),
+            };
+            _bpmVerifyInfoService.AddVerifyInfo(verifyInfo);
         }
     }
 

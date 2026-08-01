@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.Orm.util;
+using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.factory;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
@@ -155,6 +155,10 @@ public class BpmnConfBizService : IBpmnConfBizService
                 else if (bpmnNodeVo.IsAssistNode == true)
                 {
                     nodeLabelVO = NodeLabelConstants.AssistNode;
+                }
+                else if (bpmnNodeVo.IsAutoAdvanceNode == true)
+                {
+                    nodeLabelVO = NodeLabelConstants.AutoAdvanceNode;
                 }
                 if (nodeLabelVO != null)
                 {

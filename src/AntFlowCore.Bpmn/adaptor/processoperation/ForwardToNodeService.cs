@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.service.biz;
+using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.adaptor.processoperation;
 using AntFlowCore.Base.constant.enums;
@@ -147,6 +147,81 @@ public class ForwardToNodeService : IProcessOperationAdaptor
             // 并行流(多个taskDefKey): 使用递归complete方式推进
             RecursiveCompleteToTarget(newTasks, procInstId, targetTaskDefKey,
                 processNumber, comment, bpmBusinessProcess.ProcessinessKey);
+        }
+    }
+
+    /// <summary>
+    /// 自动推进节点专用:complete 当前任务后推进到指定目标 elementId.
+    /// 与人工推进 DoProcessButton 的差异:
+    /// - 入参为 delegateTask(由 NextNodeLabelsProcessor.PostProcess 直接提供),无需再查当前任务列表
+    /// - 目标节点已转换为 elementId(taskDefKey),由调用方负责 UUID→主键→elementId 两步转换
+    /// - verifyUserId/verifyUserName 由调用方传入(自动推进用虚拟人 -3)
+    ///
+    /// .NET 版直接同步执行 complete + TurnTransition(不需要 Java 版的 afterCommit 延迟,
+    /// 因为 .NET 的 TaskService.Complete 是直接 DB 操作,无 Activiti CommandContext 缓冲)。
+    /// </summary>
+    public void AdvanceToTargetNode(BpmAfTask delegateTask, string procInstId,
+        string currentTaskDefKey, string targetElementId, string targetNodeName,
+        string verifyUserId, string verifyUserName, string processNumber)
+    {
+        // 1. 设置审批人为虚拟人
+        delegateTask.Assignee = verifyUserId;
+        delegateTask.AssigneeName = verifyUserName;
+
+        // 2. complete 当前任务
+        _taskService.Complete(delegateTask);
+
+        // 3. 记录审批日志
+        BpmVerifyInfo verifyInfo = new BpmVerifyInfo
+        {
+            VerifyDate = DateTime.Now,
+            TaskName = delegateTask.Name,
+            TaskId = delegateTask.Id,
+            RunInfoId = procInstId,
+            VerifyUserId = verifyUserId,
+            VerifyUserName = verifyUserName,
+            TaskDefKey = delegateTask.TaskDefKey,
+            VerifyStatus = (int)ProcessSubmitStateEnum.PROCESS_AGRESS_TYPE,
+            VerifyDesc = $"自动推进:条件满足,推进至节点[{targetNodeName}]",
+            ProcessCode = processNumber,
+        };
+        _bpmVerifyInfoService.AddVerifyInfo(verifyInfo);
+
+        // 4. 查 complete 后的新任务
+        List<BpmAfTask> newTasks = _afTaskInstService._repository
+            .Find(a => a.ProcInstId == procInstId);
+
+        // 5. 如果空(流程已结束)return
+        if (newTasks.IsEmpty())
+        {
+            return;
+        }
+
+        // 6. 取 newTaskDefKeys
+        var newTaskDefKeys = newTasks.Select(t => t.TaskDefKey).Distinct().ToList();
+
+        // 7. 如果 newTaskDefKeys.Count==1 且 == targetElementId,return(目标已是下一节点)
+        if (newTaskDefKeys.Count == 1 && newTaskDefKeys[0] == targetElementId)
+        {
+            return;
+        }
+
+        // 8. 否则推进
+        if (newTaskDefKeys.Count == 1)
+        {
+            // 顺序流: 使用 TurnTransition 直接跳转
+            BpmAfTask newCurrentTask = newTasks[0];
+            var variables = new Dictionary<string, object>
+            {
+                { StringConstants.VERIFY_COMMENT, "推进跳转" }
+            };
+            _processNodeJump.TurnTransition(newCurrentTask, targetElementId, null, variables);
+        }
+        else
+        {
+            // 并行流(多个taskDefKey): 使用递归 complete 方式推进
+            RecursiveCompleteToTarget(newTasks, procInstId, targetElementId,
+                processNumber, null, delegateTask.ProcDefId);
         }
     }
 

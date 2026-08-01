@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using AntFlowCore.Base.util;
 
 namespace AntFlowCore.Base.vo
@@ -70,6 +70,12 @@ namespace AntFlowCore.Base.vo
         /// </summary>
         public static readonly BpmnNodeLabelVO AssistNode = new BpmnNodeLabelVO(StringConstants.ASSIST_NODE, "协助节点");
 
+        /// <summary>自动推进节点:满足条件时推进到指定目标节点,不满足时和自动节点一样 complete.对应 Java NodeLabelConstants.autoAdvanceNode.</summary>
+        public static readonly BpmnNodeLabelVO AutoAdvanceNode = new BpmnNodeLabelVO(StringConstants.AUTO_ADVANCE_NODE, "自动推进节点");
+
+        /// <summary>完成审批节点:审批人节点+推进按钮,目标自动填充为流程最后一个审批人节点.对应 Java NodeLabelConstants.finishApproveNode.</summary>
+        public static readonly BpmnNodeLabelVO FinishApproveNode = new BpmnNodeLabelVO(StringConstants.FINISH_APPROVE_NODE, "完成审批节点");
+
         /// <summary>
         /// 不可操作节点,存在于引擎中,但是不可退回到的节点.
         /// 动态条件和抄送节点v1版本虽然也不可退回到,但是他们本身不会进入引擎.
@@ -79,7 +85,8 @@ namespace AntFlowCore.Base.vo
         {
             CopyNodeV2,
             AutomaticNode,
-            ConditionCopyNode
+            ConditionCopyNode,
+            AutoAdvanceNode
         };
 
         /// <summary>
