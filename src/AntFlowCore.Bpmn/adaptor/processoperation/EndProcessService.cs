@@ -200,15 +200,30 @@ namespace AntFlowCore.Bpmn.adaptor.processoperation;
 
             var configJson = JsonConfUtil.ParseNodeConfig(bpmnNode.NodeConfigJson);
             int? backType = configJson?.BackType;
-            string backToNodeId = configJson?.BackToNodeId;
+            // backToNodeId 是设计时节点的 node_id(UUID), 而 BackToModifyService 通过 GetElementIdsdByNodeId 需要 bpmn_node 表的主键 id
+            // 故先根据 confId + nodeId(UUID) 查出目标节点的主键 id
+            string backToNodeUuid = configJson?.BackToNodeId;
             if (backType == null || (backType != 4 && backType != 5))
             {
                 return false;
             }
-            if (string.IsNullOrEmpty(backToNodeId))
+            if (string.IsNullOrEmpty(backToNodeUuid))
             {
                 _logger.LogError("不同意退回配置缺少目标节点! nodeId={NodeId}, backType={BackType}", nodeId, backType);
                 throw new AFBizException("不同意退回配置缺少目标节点,请联系流程管理员!");
+            }
+            // 根据 confId + nodeId(UUID) 查目标节点主键 id (若已是主键 id 则直接用)
+            string backToNodeId;
+            var backToNode = _bpmnNodeService._repository.FirstOrDefault(
+                a => a.ConfId == bpmnNode.ConfId && a.NodeId == backToNodeUuid && a.IsDel == 0);
+            if (backToNode == null)
+            {
+                // 兼容配置直接存主键 id 的情况
+                backToNodeId = backToNodeUuid;
+            }
+            else
+            {
+                backToNodeId = backToNode.Id.ToString();
             }
 
             // 转发给BackToModifyService
