@@ -349,6 +349,23 @@ public class BpmnConfBizService : IBpmnConfBizService
         // Set back type for all nodes (migrated from bpm_process_node_back)
         BpmnNodeConfigHolder.SetBackType(bpmnNodeVo);
 
+        // Transfer draw-back button config from VO to node config JSON
+        int? drawBackType = bpmnNodeVo.DrawBackType;
+        if (drawBackType != null && drawBackType != 0)
+        {
+            var nodeCfgJson = bpmnNodeVo.GetOrCreateNodeConfigJson();
+            nodeCfgJson.DrawBackType = drawBackType;
+            if (drawBackType == 4 || drawBackType == 5)
+            {
+                var drawBackNodeIds = bpmnNodeVo.DrawBackNodeIds;
+                if (drawBackNodeIds == null || drawBackNodeIds.Count == 0)
+                {
+                    throw new AFBizException($"节点[{bpmnNodeVo.NodeName}]配置了退回指定节点但未选择目标节点!");
+                }
+                nodeCfgJson.DrawBackNodeIds = drawBackNodeIds;
+            }
+        }
+
         // Node type-based adaptors
         if (nodeType != null)
         {
@@ -913,6 +930,13 @@ public class BpmnConfBizService : IBpmnConfBizService
                         .ToList() ?? new List<BpmnNodeConditionsConfVueVo>())
                     .ToList() ?? new List<List<BpmnNodeConditionsConfVueVo>>()
             };
+        }
+
+        // set draw-back config from node config JSON (for display)
+        if (nodeConfig.DrawBackType != null && nodeConfig.DrawBackType != 0)
+        {
+            bpmnNodeVo.DrawBackType = nodeConfig.DrawBackType;
+            bpmnNodeVo.DrawBackNodeIds = nodeConfig.DrawBackNodeIds;
         }
 
         return bpmnNodeVo;

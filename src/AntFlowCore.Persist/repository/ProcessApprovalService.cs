@@ -1,4 +1,4 @@
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using AntFlowCore.Abstraction.Orm.ext;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
@@ -157,6 +157,12 @@ public class ProcessApprovalService : IProcessApprovalService
             AddAppointNextNodeApproverButton(businessDataVo);
         }
 
+        // 退回按钮行为配置: 检查当前节点formKey中是否含有退回行为标签, 如有则填充drawBackType/drawBackNodes
+        PopulateDrawBackConf(businessDataVo, bpmBusinessProcess);
+
+        // 推进按钮行为配置: 检查当前节点formKey中是否含有推进标签, 如有则填充forwardType/forwardNodes
+        PopulateForwardConf(businessDataVo, bpmBusinessProcess);
+
         // 检查当前节点是否为报名节点，并设置属性
         string nodeId = businessDataVo.ProcessRecordInfo.NodeId;
         businessDataVo.IsSignUpNode = false;
@@ -275,6 +281,126 @@ public class ProcessApprovalService : IProcessApprovalService
         if (pcProcButtons != null && !pcProcButtons.Any(a => buttonTypeCode.Equals(a.ButtonType)))
         {
             pcProcButtons.Add(button);
+        }
+    }
+
+    /// <summary>
+    /// 退回按钮行为配置: 检查当前节点formKey中是否含有退回行为标签,
+    /// 如有则从 nodeConfigJson 读取 DrawBackType 和 DrawBackNodeIds 并返回给前端.
+    /// 对应 Java ProcessApprovalServiceImpl.populateDrawBackConf.
+    /// </summary>
+    private void PopulateDrawBackConf(BusinessDataVo vo, BpmBusinessProcess bpmBusinessProcess)
+    {
+        try
+        {
+            if (vo?.ProcessRecordInfo == null) return;
+            string formKey = vo.ProcessRecordInfo.FormKey;
+            if (string.IsNullOrEmpty(formKey) || !formKey.StartsWith("{")) return;
+            var extraInfoDTO = System.Text.Json.JsonSerializer.Deserialize<NodeExtraInfoDTO>(formKey);
+            if (extraInfoDTO?.NodeLabelVOS == null || extraInfoDTO.NodeLabelVOS.Count == 0) return;
+            bool hasDrawBackLabel =
+                NodeLabelConstants.NodeLabelContainsAny(extraInfoDTO.NodeLabelVOS, StringConstants.AF_SYSLABEL_BACK_INITIATOR) ||
+                NodeLabelConstants.NodeLabelContainsAny(extraInfoDTO.NodeLabelVOS, StringConstants.AF_SYSLABEL_BACK_PREV) ||
+                NodeLabelConstants.NodeLabelContainsAny(extraInfoDTO.NodeLabelVOS, StringConstants.AF_SYSLABEL_BACK_SPECIFIED);
+            if (!hasDrawBackLabel) return;
+
+            // 获取当前节点的BpmnNode记录
+            string elementId = vo.ProcessRecordInfo.NodeId;
+            var multiplayer = _freeSql.Select<BpmVariable, BpmVariableMultiplayer>()
+                .InnerJoin((a, b) => a.Id == b.VariableId)
+                .Where((a, b) => a.ProcessNum == vo.ProcessNumber && b.ElementId == elementId)
+                .First((a, b) => b);
+            if (multiplayer == null || string.IsNullOrEmpty(multiplayer.NodeId)) return;
+            var bpmnNode = _freeSql.Select<BpmnNode>()
+                .Where(a => a.Id == long.Parse(multiplayer.NodeId))
+                .First();
+            if (bpmnNode == null || string.IsNullOrEmpty(bpmnNode.NodeConfigJson)) return;
+            var configJson = System.Text.Json.JsonSerializer.Deserialize<BpmnNodeConfigJson>(bpmnNode.NodeConfigJson);
+            if (configJson?.DrawBackType == null || configJson.DrawBackType == 0) return;
+            vo.DrawBackType = configJson.DrawBackType;
+
+            // 对于指定节点(4/5),解析节点名称
+            if ((configJson.DrawBackType == 4 || configJson.DrawBackType == 5)
+                && configJson.DrawBackNodeIds != null && configJson.DrawBackNodeIds.Count > 0)
+            {
+                long confId = bpmnNode.ConfId;
+                var drawBackNodes = new List<BaseIdTranStruVo>();
+                foreach (string nodeUuid in configJson.DrawBackNodeIds)
+                {
+                    var targetNode = _freeSql.Select<BpmnNode>()
+                        .Where(a => a.ConfId == confId && a.NodeId == nodeUuid && a.IsDel == 0)
+                        .First();
+                    if (targetNode != null)
+                    {
+                        // 返回主键id(非UUID), 因为 BackToModifyImpl 通过 getElementIdsdByNodeId 需要主键
+                        drawBackNodes.Add(new BaseIdTranStruVo
+                        {
+                            Id = targetNode.Id.ToString(),
+                            Name = targetNode.NodeName
+                        });
+                    }
+                }
+                vo.DrawBackNodes = drawBackNodes;
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(e, "PopulateDrawBackConf failed");
+        }
+    }
+
+    /// <summary>
+    /// 推进按钮行为配置: 检查当前节点formKey中是否含有推进标签,
+    /// 如有则从 nodeConfigJson 读取 ForwardType 和 ForwardNodeIds 并返回给前端.
+    /// 对应 Java ProcessApprovalServiceImpl.populateForwardConf.
+    /// </summary>
+    private void PopulateForwardConf(BusinessDataVo vo, BpmBusinessProcess bpmBusinessProcess)
+    {
+        try
+        {
+            if (vo?.ProcessRecordInfo == null) return;
+            // 直接从当前节点的 nodeConfigJson 读取推进配置,不依赖 formKey 标签
+            string elementId = vo.ProcessRecordInfo.NodeId;
+            if (string.IsNullOrEmpty(elementId)) return;
+            var multiplayer = _freeSql.Select<BpmVariable, BpmVariableMultiplayer>()
+                .InnerJoin((a, b) => a.Id == b.VariableId)
+                .Where((a, b) => a.ProcessNum == vo.ProcessNumber && b.ElementId == elementId)
+                .First((a, b) => b);
+            if (multiplayer == null || string.IsNullOrEmpty(multiplayer.NodeId)) return;
+            var bpmnNode = _freeSql.Select<BpmnNode>()
+                .Where(a => a.Id == long.Parse(multiplayer.NodeId))
+                .First();
+            if (bpmnNode == null || string.IsNullOrEmpty(bpmnNode.NodeConfigJson)) return;
+            var configJson = System.Text.Json.JsonSerializer.Deserialize<BpmnNodeConfigJson>(bpmnNode.NodeConfigJson);
+            if (configJson?.ForwardType == null) return;
+            vo.ForwardType = configJson.ForwardType;
+
+            // 对于指定节点(1),解析节点名称
+            if (configJson.ForwardType == 1
+                && configJson.ForwardNodeIds != null && configJson.ForwardNodeIds.Count > 0)
+            {
+                long confId = bpmnNode.ConfId;
+                var forwardNodes = new List<BaseIdTranStruVo>();
+                foreach (string nodeUuid in configJson.ForwardNodeIds)
+                {
+                    var targetNode = _freeSql.Select<BpmnNode>()
+                        .Where(a => a.ConfId == confId && a.NodeId == nodeUuid && a.IsDel == 0)
+                        .First();
+                    if (targetNode != null)
+                    {
+                        forwardNodes.Add(new BaseIdTranStruVo
+                        {
+                            Id = targetNode.Id.ToString(),
+                            Name = targetNode.NodeName
+                        });
+                    }
+                }
+                vo.ForwardNodes = forwardNodes;
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(e, "PopulateForwardConf failed");
         }
     }
 

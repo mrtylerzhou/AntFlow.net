@@ -107,6 +107,14 @@ namespace AntFlowCore.Base.util
         public const string AF_SYSLABEL_APPOINT_NEXT_NODE_APPROVER = "af_syslabel_appoint_next_node_approver";
         /// <summary>不同意按钮配置了退回行为时贴此标签,运行时EndProcessService据此转发BackToModifyService</summary>
         public const string AF_SYSLABEL_DISAGREE_BACK = "af_syslabel_disagree_back";
+        /// <summary>退回按钮行为:退回发起人</summary>
+        public const string AF_SYSLABEL_BACK_INITIATOR = "af_syslabel_back_initiator";
+        /// <summary>退回按钮行为:退回上一节点</summary>
+        public const string AF_SYSLABEL_BACK_PREV = "af_syslabel_back_prev";
+        /// <summary>退回按钮行为:退回指定节点</summary>
+        public const string AF_SYSLABEL_BACK_SPECIFIED = "af_syslabel_back_specified";
+        /// <summary>推进按钮行为标签</summary>
+        public const string AF_SYSLABEL_FORWARD = "af_syslabel_forward";
         // Thread-local key for passing nextNodeApprovers from ButtonOperationService to AFTaskService
         public const string NEXT_NODE_APPROVER = "nextNodeApprover";
         // Thread-local key for runtime BusinessDataVo (set by BpmnSendMessageAspect, read by BpmnTaskListener)

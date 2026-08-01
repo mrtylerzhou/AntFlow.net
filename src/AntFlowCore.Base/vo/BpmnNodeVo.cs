@@ -196,6 +196,19 @@ namespace AntFlowCore.Base.vo;
         public bool? IsPickCondition { get; set; }
 
         /// <summary>
+        /// 退回按钮行为类型(0=无限制, 1=上一节点, 2=发起人(不回), 3=发起人(回), 4=指定节点(不回), 5=指定节点(回))
+        /// 前端传入,后端在 AfNodeUtils.NodeSpecialProcess 中据此自动贴退回行为标签.
+        /// </summary>
+        [JsonPropertyName("drawBackType")]
+        public int? DrawBackType { get; set; }
+
+        /// <summary>
+        /// 退回按钮允许退回的节点ID列表(设计态nodeId UUID). 仅 drawBackType=4/5 时有值.
+        /// </summary>
+        [JsonPropertyName("drawBackNodeIds")]
+        public List<string>? DrawBackNodeIds { get; set; }
+
+        /// <summary>
         /// 添加标签到 LabelList, 若 LabelList 为空则初始化.
         /// 对应 Java BpmnNodeVo.setOrAddLabelList.
         /// </summary>

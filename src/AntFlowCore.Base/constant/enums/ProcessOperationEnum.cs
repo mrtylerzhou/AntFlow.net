@@ -34,7 +34,8 @@
         BUTTON_TYPE_APPOINT_NEXT_NODE_APPROVER=38, //指定下一节点审批人,上一节点审批人在审批时指定下一节点的实际审批人
         BUTTON_TYPE_OPPOSE=39,                     //反对(仲裁签专用)
         BUTTON_TYPE_PICK_CONDITION=40,             //选择分支(选择条件节点专用)
-        BUTTON_TYPE_ASSIST=41                  //协助(协助节点办理)
+        BUTTON_TYPE_ASSIST=41,                 //协助(协助节点办理)
+        BUTTON_TYPE_FORWARD_TO_NODE=42           //推进到指定节点(审批人操作)
     }
 
     public static class ProcessOperationEnumExtensions

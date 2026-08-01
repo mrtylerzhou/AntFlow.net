@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 using AntFlowCore.Base.vo;
 
@@ -61,6 +61,36 @@ public class BpmnNodeConfigJson
     /// </summary>
     [JsonPropertyName("autoNodeConf")]
     public AutoNodeConfJson? AutoNodeConf { get; set; }
+
+    /// <summary>
+    /// Draw-back button behavior type.
+    /// 0=unrestricted(default), 1=back to prev node, 2=back to initiator(no return),
+    /// 3=back to initiator(return to sender), 4=back to specified nodes(no return),
+    /// 5=back to specified nodes(return to sender)
+    /// </summary>
+    [JsonPropertyName("drawBackType")]
+    public int? DrawBackType { get; set; }
+
+    /// <summary>
+    /// Target node IDs (design-time UUIDs) for draw-back behavior.
+    /// Used when drawBackType is 4 or 5.
+    /// </summary>
+    [JsonPropertyName("drawBackNodeIds")]
+    public List<string>? DrawBackNodeIds { get; set; }
+
+    /// <summary>
+    /// Forward button behavior type.
+    /// 0=forward to any future node, 1=forward to specified nodes
+    /// </summary>
+    [JsonPropertyName("forwardType")]
+    public int? ForwardType { get; set; }
+
+    /// <summary>
+    /// Target node IDs (design-time UUIDs) for forward behavior.
+    /// Used when forwardType is 1.
+    /// </summary>
+    [JsonPropertyName("forwardNodeIds")]
+    public List<string>? ForwardNodeIds { get; set; }
 }
 
 /// <summary>

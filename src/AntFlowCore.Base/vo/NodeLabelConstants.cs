@@ -57,6 +57,13 @@ namespace AntFlowCore.Base.vo
         /// </summary>
         public static readonly BpmnNodeLabelVO DisagreeBack = new BpmnNodeLabelVO(StringConstants.AF_SYSLABEL_DISAGREE_BACK, "不同意退回");
 
+        /// <summary>退回按钮行为:退回发起人. 对应 Java NodeLabelConstants.backInitiator.</summary>
+        public static readonly BpmnNodeLabelVO BackInitiator = new BpmnNodeLabelVO(StringConstants.AF_SYSLABEL_BACK_INITIATOR, "退回发起人");
+        /// <summary>退回按钮行为:退回上一节点. 对应 Java NodeLabelConstants.backPrev.</summary>
+        public static readonly BpmnNodeLabelVO BackPrev = new BpmnNodeLabelVO(StringConstants.AF_SYSLABEL_BACK_PREV, "退回上一节点");
+        /// <summary>退回按钮行为:退回指定节点. 对应 Java NodeLabelConstants.backSpecified.</summary>
+        public static readonly BpmnNodeLabelVO BackSpecified = new BpmnNodeLabelVO(StringConstants.AF_SYSLABEL_BACK_SPECIFIED, "退回指定节点");
+
         /// <summary>
         /// 协助节点:本质是审批人节点,语义为"办理"而非"审批",不代表同意/不同意,但流程仍需向下流转.
         /// 对应 Java NodeLabelConstants.assistNode.

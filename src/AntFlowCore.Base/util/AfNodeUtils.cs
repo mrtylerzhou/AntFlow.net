@@ -30,6 +30,24 @@ public class AfNodeUtils
             bpmnNodeVo.SetOrAddLabelList(NodeLabelConstants.PrevNodeAppointed);
         }
 
+        // 退回按钮行为: 根据前端传入的 DrawBackType 自动贴对应标签
+        int? drawBackType = bpmnNodeVo.DrawBackType;
+        if (drawBackType != null && drawBackType != 0)
+        {
+            if (drawBackType == 2 || drawBackType == 3)
+            {
+                bpmnNodeVo.SetOrAddLabelList(NodeLabelConstants.BackInitiator);
+            }
+            else if (drawBackType == 1)
+            {
+                bpmnNodeVo.SetOrAddLabelList(NodeLabelConstants.BackPrev);
+            }
+            else if (drawBackType == 4 || drawBackType == 5)
+            {
+                bpmnNodeVo.SetOrAddLabelList(NodeLabelConstants.BackSpecified);
+            }
+        }
+
         int? nodeType = bpmnNodeVo.NodeType == 0 ? null : (int?)bpmnNodeVo.NodeType;
         if (nodeType == null)
         {

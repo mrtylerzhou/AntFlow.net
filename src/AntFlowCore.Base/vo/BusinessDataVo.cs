@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using AntFlowCore.Base.conf.json;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Core.vo;
@@ -119,6 +119,25 @@ namespace AntFlowCore.Base.vo
         public int? BackToModifyType { get; set; }
         [JsonPropertyName("backToNodeId"),JsonConverter(typeof(IntToStringConverter))]
         public String BackToNodeId { get; set; }
+        /// <summary>
+        /// 退回按钮行为配置(运行时返回给前端)
+        /// </summary>
+        [JsonPropertyName("drawBackType")]
+        public int? DrawBackType { get; set; }
+        /// <summary>退回可选目标节点列表(运行时, id为主键)</summary>
+        [JsonPropertyName("drawBackNodes")]
+        public List<BaseIdTranStruVo> DrawBackNodes { get; set; }
+        /// <summary>
+        /// 推进按钮行为配置(运行时返回给前端)
+        /// </summary>
+        [JsonPropertyName("forwardType")]
+        public int? ForwardType { get; set; }
+        /// <summary>推进可选目标节点列表(运行时, id为主键)</summary>
+        [JsonPropertyName("forwardNodes")]
+        public List<BaseIdTranStruVo> ForwardNodes { get; set; }
+        /// <summary>推进目标节点nodeId(前端提交时传入)</summary>
+        [JsonPropertyName("forwardToNodeId")]
+        public string ForwardToNodeId { get; set; }
         // Third party process
         [JsonPropertyName("formData")]
         public string FormData { get; set; }
