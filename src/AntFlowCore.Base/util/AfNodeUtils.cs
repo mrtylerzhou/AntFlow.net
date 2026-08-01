@@ -55,6 +55,14 @@ public class AfNodeUtils
             bpmnNodeVo.SetOrAddLabelList(NodeLabelConstants.FinishApproveNode);
         }
 
+        // 自动完成节点:根据前端传入的 IsAutoCompleteNode 标识自动贴标签
+        // 自动完成本质是自动推进(nodeType=18)子类型,目标自动为最后一个审批人,运行时复用 auto_advance_node 处理器
+        // 此标签仅用于前端反显区分+颜色区分
+        if (bpmnNodeVo.IsAutoCompleteNode == true)
+        {
+            bpmnNodeVo.SetOrAddLabelList(NodeLabelConstants.AutoCompleteNode);
+        }
+
         int? nodeType = bpmnNodeVo.NodeType == 0 ? null : (int?)bpmnNodeVo.NodeType;
         if (nodeType == null)
         {
@@ -176,6 +184,13 @@ public class AfNodeUtils
             else if (NodeLabelConstants.AutoAdvanceNode.LabelValue.Equals(nodeLabelVO.LabelValue))
             {
                 bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_AUTO_ADVANCE;
+            }
+            else if (NodeLabelConstants.AutoCompleteNode.LabelValue.Equals(nodeLabelVO.LabelValue))
+            {
+                // 自动完成节点:本质是自动推进(18)子类型,带 auto_complete_node 标签,目标自动为最后一个审批人
+                // 还原 nodeType=18, 标记 IsAutoCompleteNode 供前端反显区分+颜色区分
+                bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_AUTO_ADVANCE;
+                bpmnNodeVo.IsAutoCompleteNode = true;
             }
         }
     }

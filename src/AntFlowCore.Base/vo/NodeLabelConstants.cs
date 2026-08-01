@@ -73,6 +73,12 @@ namespace AntFlowCore.Base.vo
         /// <summary>自动推进节点:满足条件时推进到指定目标节点,不满足时和自动节点一样 complete.对应 Java NodeLabelConstants.autoAdvanceNode.</summary>
         public static readonly BpmnNodeLabelVO AutoAdvanceNode = new BpmnNodeLabelVO(StringConstants.AUTO_ADVANCE_NODE, "自动推进节点");
 
+        /// <summary>
+        /// 自动完成节点:自动推进(nodeType=18)子类型,目标自动为最后一个审批人节点,不可编辑.
+        /// 仅前端反显区分+颜色区分用,运行时复用 auto_advance_node 处理器.对应 Java NodeLabelConstants.autoCompleteNode.
+        /// </summary>
+        public static readonly BpmnNodeLabelVO AutoCompleteNode = new BpmnNodeLabelVO(StringConstants.AUTO_COMPLETE_NODE, "自动完成节点");
+
         /// <summary>完成审批节点:审批人节点+推进按钮,目标自动填充为流程最后一个审批人节点.对应 Java NodeLabelConstants.finishApproveNode.</summary>
         public static readonly BpmnNodeLabelVO FinishApproveNode = new BpmnNodeLabelVO(StringConstants.FINISH_APPROVE_NODE, "完成审批节点");
 
@@ -86,7 +92,8 @@ namespace AntFlowCore.Base.vo
             CopyNodeV2,
             AutomaticNode,
             ConditionCopyNode,
-            AutoAdvanceNode
+            AutoAdvanceNode,
+            AutoCompleteNode
         };
 
         /// <summary>

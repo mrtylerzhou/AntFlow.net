@@ -165,6 +165,12 @@ public class BpmnConfBizService : IBpmnConfBizService
                     bpmnNodeVo.SetOrAddLabelList(nodeLabelVO);
                 }
 
+                // 自动完成节点:自动推进(18)子类型,额外贴 auto_complete_node 标签(仅前端反显区分+颜色区分,运行时复用 auto_advance_node 处理器)
+                if (bpmnNodeVo.IsAutoCompleteNode == true)
+                {
+                    bpmnNodeVo.SetOrAddLabelList(NodeLabelConstants.AutoCompleteNode);
+                }
+
                 // 选择条件:验证子节点包含动态条件网关,满足则贴标签
                 if (bpmnNodeVo.IsPickCondition == true)
                 {
@@ -352,6 +358,9 @@ public class BpmnConfBizService : IBpmnConfBizService
 
         // Set back type for all nodes (migrated from bpm_process_node_back)
         BpmnNodeConfigHolder.SetBackType(bpmnNodeVo);
+
+        // 推进配置(forwardType/forwardNodeIds):自动推进(18)/自动完成(18子类型)节点持久化到 node_config_json
+        BpmnNodeConfigHolder.SetForwardConf(bpmnNodeVo);
 
         // Transfer draw-back button config from VO to node config JSON
         int? drawBackType = bpmnNodeVo.DrawBackType;
@@ -809,6 +818,11 @@ public class BpmnConfBizService : IBpmnConfBizService
         }
         bpmnNodeVo.NodeConfigJsonObj = nodeConfig;
 
+        // 推进配置反显: 从 node_config_json 读回 forwardType/forwardNodeIds(自动推进18/自动完成18子类型)
+        // 自动完成节点的目标由前端在提交时 refill 填充, 反显时需读回给前端只读展示
+        bpmnNodeVo.ForwardType = nodeConfig.ForwardType;
+        bpmnNodeVo.ForwardNodeIds = nodeConfig.ForwardNodeIds;
+
         //set buttons from buttonSignConf
         BpmnNodeButtonSignConfJson? bsConf = nodeConfig.ButtonSignConf;
         if (bsConf?.ButtonConfList != null && bsConf.ButtonConfList.Count > 0)
@@ -913,6 +927,11 @@ public class BpmnConfBizService : IBpmnConfBizService
             if (NodeLabelConstants.NodeLabelContainsAny(labelVOList, NodeLabelConstants.PrevNodeAppointed.LabelValue))
             {
                 bpmnNodeVo.IsPrevNodeAppointed = true;
+            }
+            // 自动完成节点:标签匹配时设置标记位,前端据此反显为自动完成(颜色/图标/只读目标)
+            if (NodeLabelConstants.NodeLabelContainsAny(labelVOList, NodeLabelConstants.AutoCompleteNode.LabelValue))
+            {
+                bpmnNodeVo.IsAutoCompleteNode = true;
             }
             bpmnNodeVo.LabelList = labelVOList;
         }

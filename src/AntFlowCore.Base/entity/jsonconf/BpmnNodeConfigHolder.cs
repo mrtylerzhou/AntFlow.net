@@ -233,6 +233,26 @@ public static class BpmnNodeConfigHolder
     }
 
     /// <summary>
+    /// Persists forward config (forwardType + forwardNodeIds) from BpmnNodeVo
+    /// into node_config_json.forwardType/forwardNodeIds.
+    /// Used by auto-advance (18) and auto-complete (18 sub-type) nodes.
+    /// Mirrors Java BpmnNodeConfigHolder.setForwardConf (equivalent).
+    /// 补全了此前缺失的 forward 持久化链路:
+    /// 运行时 ProcessAutoAdvanceNode 从 NodeConfigJson.ForwardNodeIds 读目标节点,
+    /// 反显时 PopulateForwardConf 也从 NodeConfigJson 读回 forward 给前端.
+    /// </summary>
+    public static void SetForwardConf(BpmnNodeVo vo)
+    {
+        if (vo.ForwardType == null || vo.ForwardType == 0)
+        {
+            return;
+        }
+        BpmnNodeConfigJson config = vo.GetOrCreateNodeConfigJson();
+        config.ForwardType = vo.ForwardType;
+        config.ForwardNodeIds = vo.ForwardNodeIds ?? new List<string>();
+    }
+
+    /// <summary>
     /// Build button/sign config from node VO
     /// </summary>
     public static void SetButtonSignConf(BpmnNodeVo vo)

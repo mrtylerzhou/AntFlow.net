@@ -178,6 +178,28 @@ namespace AntFlowCore.Base.vo;
         public bool? IsFinishApproveNode { get; set; }
 
         /// <summary>
+        /// 自动完成节点标记:自动推进(nodeType=18)子类型,目标自动为最后一个审批人节点,不可编辑.
+        /// 仅前端反显区分+颜色区分用,运行时复用 auto_advance_node 处理器.
+        /// 前端提交该字段,AfNodeUtils.NodeSpecialProcess 据此贴 auto_complete_node 标签.
+        /// </summary>
+        [JsonPropertyName("isAutoCompleteNode")]
+        public bool? IsAutoCompleteNode { get; set; }
+
+        /// <summary>
+        /// 推进行为类型: 2=固定节点(指定目标节点,运行时自动推进). 对应 Java BpmnNodeVo.forwardType.
+        /// 前端提交,保存时持久化到 node_config_json.forwardType,反显时读回.
+        /// </summary>
+        [JsonPropertyName("forwardType")]
+        public int? ForwardType { get; set; }
+
+        /// <summary>
+        /// 推进目标节点UUID列表(仅固定节点模式有效). 对应 Java BpmnNodeVo.forwardNodeIds.
+        /// 前端提交,保存时持久化到 node_config_json.forwardNodeIds,反显时读回.
+        /// </summary>
+        [JsonPropertyName("forwardNodeIds")]
+        public List<string>? ForwardNodeIds { get; set; }
+
+        /// <summary>
         /// Auto-node style condition configuration. Used by condition-approve (12)
         /// and condition-copy (13) nodes to store conditionList + groupRelation.
         /// Front-end submits under JSON key "autoNodeConf" (shared with Java version).
