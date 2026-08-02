@@ -96,6 +96,8 @@ namespace AntFlowCore.Base.vo
 
         /// <summary>条件退回节点:满足条件时自动退回到不同意按钮配置的目标节点,不满足时留给真实审批人.</summary>
         public static readonly BpmnNodeLabelVO ConditionReturnNode = new BpmnNodeLabelVO(StringConstants.CONDITION_RETURN_NODE, "条件退回节点");
+        /// <summary>条件退回发起人节点:满足条件时自动退回发起人节点,不满足时留给真实审批人.</summary>
+        public static readonly BpmnNodeLabelVO ConditionReturnStarterNode = new BpmnNodeLabelVO(StringConstants.CONDITION_RETURN_STARTER_NODE, "条件退回发起人节点");
 
         /// <summary>完成审批节点:审批人节点+推进按钮,目标自动填充为流程最后一个审批人节点.对应 Java NodeLabelConstants.finishApproveNode.</summary>
         public static readonly BpmnNodeLabelVO FinishApproveNode = new BpmnNodeLabelVO(StringConstants.FINISH_APPROVE_NODE, "完成审批节点");

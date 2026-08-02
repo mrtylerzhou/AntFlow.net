@@ -16,7 +16,8 @@ public enum NodeTypeEnum
         NODE_TYPE_ASSIST = 17,          // 协助节点
         NODE_TYPE_AUTO_ADVANCE = 18,    // 自动推进节点
         NODE_TYPE_AUTO_RETURN = 19,     // 自动退回节点
-        NODE_TYPE_CONDITION_RETURN = 20 // 条件退回节点
+        NODE_TYPE_CONDITION_RETURN = 20, // 条件退回节点
+        NODE_TYPE_CONDITION_RETURN_STARTER = 21 // 条件退回发起人节点
     }
 
     public class NodeTypeEnumExtensions
@@ -41,6 +42,7 @@ public enum NodeTypeEnum
                 case NodeTypeEnum.NODE_TYPE_AUTO_ADVANCE: return "自动推进节点";
                 case NodeTypeEnum.NODE_TYPE_AUTO_RETURN: return "自动退回节点";
                 case NodeTypeEnum.NODE_TYPE_CONDITION_RETURN: return "条件退回节点";
+                case NodeTypeEnum.NODE_TYPE_CONDITION_RETURN_STARTER: return "条件退回发起人节点";
                 default: return string.Empty;
             }
         }
