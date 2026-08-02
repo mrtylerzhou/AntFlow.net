@@ -176,6 +176,10 @@ public class BpmnConfBizService : IBpmnConfBizService
                 {
                     nodeLabelVO = NodeLabelConstants.AutoReturnNode;
                 }
+                else if (bpmnNodeVo.IsConditionReturnNode == true)
+                {
+                    nodeLabelVO = NodeLabelConstants.ConditionReturnNode;
+                }
                 if (nodeLabelVO != null)
                 {
                     bpmnNodeVo.SetOrAddLabelList(nodeLabelVO);

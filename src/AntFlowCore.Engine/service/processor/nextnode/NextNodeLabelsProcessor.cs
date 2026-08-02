@@ -93,6 +93,7 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
             ProcessAutomaticNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, delegateTask);
             ProcessAutoAdvanceNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, procInstId, delegateTask);
             ProcessAutoReturnNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, procInstId, delegateTask);
+            ProcessConditionReturnNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, procInstId, delegateTask);
             ProcessAutoSkipNode(nodeLabelVO, assignee, procInstId, assigneeName, processNumber, delegateTask);
             ProcessConditionApproveNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, delegateTask);
             ProcessConditionAdvanceNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, procInstId, delegateTask);
@@ -689,6 +690,83 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
             }
         }
         // conditionResult == false 或 null: 不 complete, 留给真实审批人(点"同意"=推进按钮, 推进到配置的固定目标)
+    }
+
+    /// <summary>
+    /// 条件退回节点处理:满足条件时自动退回到不同意按钮配置的目标节点,不满足时留给真实审批人.
+    /// </summary>
+    private void ProcessConditionReturnNode(BpmnNodeLabelVO nodeLabelVO, string processNumber, string elementId,
+        string formCode, BusinessDataVo? businessDataVo, bool isOutSide, string procInstId, BpmAfTask delegateTask)
+    {
+        if (!StringConstants.CONDITION_RETURN_NODE.Equals(nodeLabelVO.LabelValue)) return;
+        _logger.LogInformation("条件退回节点处理开始, processNumber={PN}, elementId={E}", processNumber, elementId);
+        businessDataVo.ProcessNumber = processNumber;
+        businessDataVo.TaskDefKey = elementId;
+        businessDataVo.FormCode = formCode;
+        businessDataVo.IsOutSideAccessProc = isOutSide;
+        var formAdaptor = _formFactory.GetFormAdaptor(businessDataVo);
+        if (formAdaptor == null) throw new AFBizException("未能根据流程formcode找到流程适配器信息!");
+        bool? conditionResult = null;
+        try { conditionResult = formAdaptor.AutomaticCondition(businessDataVo); }
+        catch (Exception e) { _logger.LogError(e, "条件退回条件评估异常"); conditionResult = false; }
+        if (conditionResult == true)
+        {
+            BpmnConfVo? bpmnConfVo = businessDataVo.BpmnConfVo;
+            if (bpmnConfVo == null || bpmnConfVo.Id == 0)
+                throw new AFBizException($"条件退回节点配置读取失败: bpmnConfVo 为空, processNumber={processNumber}, elementId={elementId}");
+            long confId = bpmnConfVo.Id;
+
+            // 从 BpmnNode.NodeConfigJson 读取 backType + backToNodeId
+            NodeElementDto? nodeElementDto = _bpmVariableService.GetNodeIdByElementId(processNumber, elementId);
+            if (nodeElementDto == null || string.IsNullOrEmpty(nodeElementDto.NodeId))
+                throw new AFBizException($"条件退回: 无法根据 elementId 找到 nodeId, processNumber={processNumber}, elementId={elementId}");
+            long nodePrimaryKey = Convert.ToInt64(nodeElementDto.NodeId);
+
+            BpmnNode? bpmnNode = _bpmnNodeService._repository
+                .FirstOrDefault(a => a.ConfId == confId && a.Id == nodePrimaryKey && a.IsDel == 0);
+            if (bpmnNode == null || string.IsNullOrEmpty(bpmnNode.NodeConfigJson))
+                throw new AFBizException($"条件退回节点配置读取失败: BpmnNode 不存在或 NodeConfigJson 为空, confId={confId}, nodePrimaryKey={nodePrimaryKey}");
+
+            BpmnNodeConfigJson? configJson = JsonConfUtil.ParseNodeConfig(bpmnNode.NodeConfigJson);
+            if (configJson == null)
+                throw new AFBizException($"条件退回节点配置解析失败, processNumber={processNumber}, elementId={elementId}");
+
+            int? backType = configJson.BackType;
+            string? backToNodeId = configJson.BackToNodeId;
+            if (backType == null || (backType != 4 && backType != 5) || string.IsNullOrEmpty(backToNodeId))
+                throw new AFBizException($"条件退回节点配置异常: 未配置退回目标节点, processNumber={processNumber}, elementId={elementId}");
+
+            // UUID → 主键
+            BpmnNode? targetNode = _bpmnNodeService._repository
+                .FirstOrDefault(a => a.ConfId == confId && a.NodeId == backToNodeId && a.IsDel == 0);
+            if (targetNode == null)
+                throw new AFBizException($"条件退回目标节点不存在, confId={confId}, nodeUuid={backToNodeId}");
+            string targetNodeName = targetNode.NodeName ?? "";
+            string targetPrimaryKey = targetNode.Id.ToString();
+
+            // 主键 → elementId(taskDefKey)
+            List<string> targetElementIds = _bpmVariableService.GetElementIdsdByNodeId(processNumber, targetPrimaryKey);
+            if (targetElementIds == null || targetElementIds.Count == 0)
+                throw new AFBizException($"条件退回: 未能根据nodeId获取目标节点taskDefKey, processNumber={processNumber}, targetNodeId={targetPrimaryKey}");
+            string targetElementId = targetElementIds[0];
+
+            _logger.LogInformation("条件退回: 条件满足, 开始退回, processNumber={PN}, elementId={E}, target={T}, backType={B}",
+                processNumber, elementId, targetElementId, backType);
+
+            try
+            {
+                _backToModifyService.ReturnToTargetNode(delegateTask, procInstId, processNumber,
+                    delegateTask.TaskDefKey, targetElementId, targetNodeName,
+                    AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Id, "条件退回节点自动退回", backType.Value);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "条件退回失败, processNumber={PN}, elementId={E}, target={T}",
+                    processNumber, elementId, targetElementId);
+                throw new AFBizException($"条件退回失败, processNumber={processNumber}, elementId={elementId}, targetNodeId={targetElementId}", e);
+            }
+        }
+        // conditionResult == false 或 null: 不操作, 留给真实审批人人工处理
     }
 
     /// <summary>

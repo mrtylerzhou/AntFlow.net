@@ -192,6 +192,10 @@ namespace AntFlowCore.Base.vo;
         [JsonPropertyName("isAutoReturnNode")]
         public bool? IsAutoReturnNode { get; set; }
 
+        /// <summary>条件退回节点标记:设计期 nodeType=20,运行期转为4,保留真实审批人.</summary>
+        [JsonPropertyName("isConditionReturnNode")]
+        public bool? IsConditionReturnNode { get; set; }
+
         /// <summary>完成审批节点标记:审批人节点(nodeType=4)+推进按钮(42)+finish_approve_node标签,目标自动填充为流程最后一个审批人节点.前端提交该字段,AfNodeUtils.NodeSpecialProcess 据此贴标签.</summary>
         [JsonPropertyName("isFinishApproveNode")]
         public bool? IsFinishApproveNode { get; set; }

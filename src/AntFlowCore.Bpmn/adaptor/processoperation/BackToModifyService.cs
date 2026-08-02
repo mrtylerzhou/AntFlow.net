@@ -293,6 +293,16 @@ public class BackToModifyService : IProcessOperationAdaptor
             string currentTaskDefKey, string targetElementId, string targetNodeName,
             string verifyUserId, string verifyUserName)
         {
+            ReturnToTargetNode(delegateTask, procInstId, processNumber, currentTaskDefKey, targetElementId, targetNodeName, verifyUserId, verifyUserName, ProcessDisagreeTypeEnum.FOUR_DISAGREE.Code);
+        }
+
+        /// <summary>
+        /// 自动退回/条件退回 统一跳转方法(带 backType 参数).
+        /// </summary>
+        public void ReturnToTargetNode(BpmAfTask delegateTask, string procInstId, string processNumber,
+            string currentTaskDefKey, string targetElementId, string targetNodeName,
+            string verifyUserId, string verifyUserName, int backType)
+        {
             // Step 1: 设置审批人为虚拟人
             delegateTask.Assignee = verifyUserId;
             delegateTask.AssigneeName = verifyUserName;
@@ -327,7 +337,7 @@ public class BackToModifyService : IProcessOperationAdaptor
                 State = 1,
                 NodeKey = targetElementId,
                 ProcessInstanceId = procInstId,
-                BackType = ProcessDisagreeTypeEnum.FOUR_DISAGREE.Code,
+                BackType = backType,
                 CreateUser = verifyUserId,
                 CreateTime = DateTime.Now,
                 TenantId = MultiTenantUtil.GetCurrentTenantId(),

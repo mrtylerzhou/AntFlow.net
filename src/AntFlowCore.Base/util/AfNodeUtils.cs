@@ -155,6 +155,14 @@ public class AfNodeUtils
                     };
             });
         }
+        // 条件退回节点:设计期 nodeType=20,运行期转为 nodeType=4,保留真实审批人
+        // 与条件审批(12)类似:不强制 nodeProperty,不塞虚拟审批人
+        // 差异:满足条件时自动退回到不同意按钮配置的目标节点,不满足时留给审批人
+        else if (nodeType == (int)NodeTypeEnum.NODE_TYPE_CONDITION_RETURN)
+        {
+            bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_APPROVER;
+            bpmnNodeVo.IsConditionReturnNode = true;
+        }
     }
 
     /// <summary>
@@ -222,6 +230,10 @@ public class AfNodeUtils
             else if (NodeLabelConstants.AutoReturnNode.LabelValue.Equals(nodeLabelVO.LabelValue))
             {
                 bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_AUTO_RETURN;
+            }
+            else if (NodeLabelConstants.ConditionReturnNode.LabelValue.Equals(nodeLabelVO.LabelValue))
+            {
+                bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_CONDITION_RETURN;
             }
             else if (NodeLabelConstants.AutoCompleteNode.LabelValue.Equals(nodeLabelVO.LabelValue))
             {

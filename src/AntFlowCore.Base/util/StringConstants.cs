@@ -86,6 +86,9 @@ namespace AntFlowCore.Base.util
         // 自动退回节点:满足条件时退回到指定目标节点(FOUR_DISAGREE),不满足时和自动节点一样 complete (对等 Java 版 auto_return_node)
         public const string AUTO_RETURN_NODE = "auto_return_node";
 
+        // 条件退回节点:满足条件时自动退回到不同意按钮配置的目标节点,不满足时留给真实审批人 (对等 Java 版 condition_return_node)
+        public const string CONDITION_RETURN_NODE = "condition_return_node";
+
         // 完成审批节点:审批人节点+推进按钮,目标自动填充为流程最后一个审批人节点 (对等 Java 版 finish_approve_node)
         public const string FINISH_APPROVE_NODE = "finish_approve_node";
 
