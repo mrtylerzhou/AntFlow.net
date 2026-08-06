@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Reflection;
 using AntFlowCore.Abstraction.Orm.util;
+using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Abstraction.service.repository;
 using AntFlowCore.Base.adaptor.formoperation;
@@ -85,6 +86,20 @@ public class TaskMgmtService : ITaskMgmtService
     public List<DIYProcessInfoDTO> ViewProcessInfo(string desc = "")
     {
         List<DIYProcessInfoDTO> diyProcessInfoDTOS = BaseFormInfo(desc);
+        // 合并 page-added DIY(DB, dict_type=diylowcodeflow, 有效版本): 无 DIYFormServiceAnno bean,扫描不到
+        IDictService dictService = _serviceProvider.GetRequiredService<IDictService>();
+        List<DIYProcessInfoDTO> pageAdded = dictService.GetDIYActiveFormCodes();
+        if (pageAdded != null && pageAdded.Count > 0)
+        {
+            var existKeys = new HashSet<string>(diyProcessInfoDTOS.Select(d => d.Key), StringComparer.Ordinal);
+            foreach (var dto in pageAdded)
+            {
+                if (!existKeys.Contains(dto.Key))
+                {
+                    diyProcessInfoDTOS.Add(dto);
+                }
+            }
+        }
         if (diyProcessInfoDTOS == null || diyProcessInfoDTOS.Count == 0)
         {
             return new List<DIYProcessInfoDTO>();

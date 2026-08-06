@@ -9,10 +9,11 @@
         public static readonly BpmnConfFlagsEnum HAS_COPY = new BpmnConfFlagsEnum(0b1000, "是否包含抄送");
         public static readonly BpmnConfFlagsEnum HAS_LAST_NODE_COPY = new BpmnConfFlagsEnum(0b10000, "最后一个节点是否包含抄送");
         public static readonly BpmnConfFlagsEnum HAS_FORM_RELATED_ASSIGNEES = new BpmnConfFlagsEnum(0b100000, "包含表单中选取人员");
+        public static readonly BpmnConfFlagsEnum USE_AUXILIARY_FORM = new BpmnConfFlagsEnum(0b10000000, "使用辅助表单(page-added DIY)");
 
         private static readonly List<BpmnConfFlagsEnum> _allFlags = new List<BpmnConfFlagsEnum>
         {
-            NOTHING, HAS_NODE_LABELS, HAS_STARTUSER_CHOOSE_MODULES, HAS_DYNAMIC_CONDITIONS, HAS_COPY, HAS_LAST_NODE_COPY, HAS_FORM_RELATED_ASSIGNEES
+            NOTHING, HAS_NODE_LABELS, HAS_STARTUSER_CHOOSE_MODULES, HAS_DYNAMIC_CONDITIONS, HAS_COPY, HAS_LAST_NODE_COPY, HAS_FORM_RELATED_ASSIGNEES, USE_AUXILIARY_FORM
         };
 
         public int Code { get; }

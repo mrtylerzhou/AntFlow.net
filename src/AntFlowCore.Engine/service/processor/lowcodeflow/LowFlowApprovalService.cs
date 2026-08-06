@@ -309,6 +309,23 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
             throw new AFBizException($"confId {confId}, formCode:{vo.FormCode} does not have a field config");
         }
 
+        // page-added DIY 字段契约校验: lfFields 的 key 必须在辅助 vform 字段配置中声明,否则抛错。
+        // 仅对 USE_AUXILIARY_FORM 命中且 lfFields 非空时校验; 纯 LF 静默跳过; 外部表单模式 lfFields 为 null 跳过(用 lfFieldsMulti)。
+        if (vo.BpmnConfVo?.ExtraFlags != null
+            && BpmnConfFlagsEnum.HasFlag(vo.BpmnConfVo.ExtraFlags, BpmnConfFlagsEnum.USE_AUXILIARY_FORM)
+            && lfFields != null)
+        {
+            var undeclared = new HashSet<string>(lfFields.Keys, StringComparer.Ordinal);
+            foreach (var declared in fieldConfMap.Keys)
+            {
+                undeclared.Remove(declared);
+            }
+            if (undeclared.Count > 0)
+            {
+                throw new AFBizException($"表单字段 [{string.Join(",", undeclared)}] 未在辅助表单中定义,请在辅助 vform 中声明这些字段");
+            }
+        }
+
         var mainFields = LFMainField.ParseFromMap(lfFields, fieldConfMap, mainId,formCode);
         _lfMainFieldService._repository.AddRange(mainFields);
 
