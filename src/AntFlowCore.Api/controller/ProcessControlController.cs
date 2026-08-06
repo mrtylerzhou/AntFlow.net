@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace AntFlowCore.Api.controller;
 
 /// <summary>
-/// Process control controller (equivalent to Java BpmProcessControlController).
 /// Provides task management configuration endpoints like saving process notices,
 /// retrieving form-related options, and UDR options.
 /// </summary>

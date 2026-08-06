@@ -266,6 +266,14 @@ public class BpmnConfCommonService : IBpmnConfCommonService
             bpmnStartConditionsVo = _formFactory.GetFormAdaptor(vo).PreviewSetCondition(vo);
         }
 
+        // DIY流程的适配器通常只设置具体类型字段(如 accountType),未填充通用 lfConditions;
+        // 若前端传入了 lfConditions(调试页按条件字段提交),在此兜底合并,使条件评估(AbstractLFConditionJudge)能按 columnDbname 命中
+        // LF流程适配器已设置 lfConditions,此处不会覆盖;不影响既有行为
+        if (!bpmnStartConditionsVo.LfConditions.IsEmpty()
+            && !vo.LfConditions.IsEmpty()) {
+            bpmnStartConditionsVo.LfConditions=vo.LfConditions;
+        }
+        
         bpmnStartConditionsVo.ApproversList = dataVo.ApproversList;
         bpmnStartConditionsVo.StartUserId = vo.StartUserId;
         bpmnStartConditionsVo.IsPreview = true;
@@ -499,7 +507,7 @@ public class BpmnConfCommonService : IBpmnConfCommonService
 
         if (string.IsNullOrEmpty(processNumber))
         {
-            throw new ArgumentException("processNumber cannot be null or empty");
+            return GetPreviewNode(paramsJson, false);
         }
 
      

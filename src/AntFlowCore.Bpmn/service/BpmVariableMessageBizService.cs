@@ -23,7 +23,6 @@ namespace AntFlowCore.Bpmn.service;
 /// read from <c>t_bpm_variable.variable_config_json</c> (field <c>messages[]</c>) instead of
 /// the dropped <c>t_bpm_variable_message</c> table, and notice channel types are read from
 /// <c>t_bpmn_conf.conf_config_json</c> (field <c>noticeChannelTypes</c>) instead of the dropped
-/// <c>bpm_process_notice</c> table. Behaviour mirrors the Java
 /// <c>BpmVariableMessageBizServiceImpl</c>.
 /// </summary>
 public class BpmVariableMessageBizService : IBpmVariableMessageBizService

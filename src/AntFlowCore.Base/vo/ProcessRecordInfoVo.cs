@@ -83,5 +83,13 @@ namespace AntFlowCore.Base.vo
 
         [JsonPropertyName("lfFieldControlVOs")]
         public List<LFFieldControlVO> LfFieldControlVOs { get; set; }
+
+        /// <summary>
+        /// 外部表单模式: 节点级整表隐藏标记
+        /// Key = formdataId, Value = true 表示该表单在此节点不展示
+        /// 仅外部表单模式使用; 内联模式为 null
+        /// </summary>
+        [JsonPropertyName("formHidden")]
+        public Dictionary<string, bool> FormHidden { get; set; }
     }
 }

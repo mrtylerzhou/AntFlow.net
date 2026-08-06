@@ -1,4 +1,3 @@
-using System.Text.Json;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Abstraction.service.repository;
 using AntFlowCore.Base.dto;
@@ -55,7 +54,7 @@ public class AutoNodeConditionEvaluator
             }
 
             // 从 DB 加载节点配置 autoNodeConf
-            AutoNodeConfJson? autoNodeConf = LoadAutoNodeConf(vo);
+            BpmnNodeAutoNodeConfJson? autoNodeConf = LoadAutoNodeConf(vo);
             if (autoNodeConf == null || autoNodeConf.ConditionList == null || autoNodeConf.ConditionList.Count == 0)
             {
                 return null;
@@ -87,7 +86,7 @@ public class AutoNodeConditionEvaluator
     /// 从 DB 加载节点配置 autoNodeConf.
     /// 对应 Java AbstractFormOperationAdaptor.loadAutoNodeConf.
     /// </summary>
-    private AutoNodeConfJson? LoadAutoNodeConf(BusinessDataVo vo)
+    private BpmnNodeAutoNodeConfJson? LoadAutoNodeConf(BusinessDataVo vo)
     {
         string processNumber = vo.ProcessNumber;
         string taskDefKey = vo.TaskDefKey;
@@ -131,9 +130,9 @@ public class AutoNodeConditionEvaluator
     /// 对应 Java AbstractFormOperationAdaptor.evaluateConditions.
     /// 直接对 BpmnNodeConditionsConfVueVo (前端原始格式) 评估, 不转换为 BpmnNodeConditionsConfBaseVo.
     /// </summary>
-    private bool EvaluateConditions(AutoNodeConfJson autoNodeConf, Dictionary<string, object> formFields)
+    private bool EvaluateConditions(BpmnNodeAutoNodeConfJson autoNodeConf, Dictionary<string, object> formFields)
     {
-        List<List<JsonElement>>? conditionList = autoNodeConf.ConditionList;
+        List<List<BpmnNodeConditionsConfVueVo>>? conditionList = autoNodeConf.ConditionList;
         if (conditionList == null || conditionList.Count == 0)
         {
             return false;
@@ -149,12 +148,8 @@ public class AutoNodeConditionEvaluator
                 continue;
             }
 
-            // 反序列化一组条件
             List<BpmnNodeConditionsConfVueVo> groupItems = group
-                .Where(item => item.ValueKind != JsonValueKind.Null)
-                .Select(item => JsonSerializer.Deserialize<BpmnNodeConditionsConfVueVo>(item.GetRawText()))
                 .Where(x => x != null)
-                .Select(x => x!)
                 .ToList();
 
             if (groupItems.Count == 0)

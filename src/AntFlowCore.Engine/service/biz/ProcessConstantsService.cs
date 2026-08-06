@@ -2,8 +2,10 @@ using AntFlowCore.Abstraction;
 using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
+using AntFlowCore.Abstraction.service.repository;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
+using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.extension;
 using AntFlowCore.Base.util;
@@ -147,7 +149,49 @@ public class ProcessConstantsService : IProcessConstantsService
 
         if (!string.IsNullOrEmpty(taskDefKey) && bpmBusinessProcess.IsLowCodeFlow == 1)
         {
-            // IBpmnNodeLfFormdataFieldControlService has been removed; LF field control query is no longer supported
+            // 读取节点级低代码表单配置: 整表隐藏(formHidden) + 字段级权限(fieldControls)
+            // taskDefKey 是 ACT 任务定义 key,需经 BpmVariableMultiplayer 解析为 BpmnNode 主键 id 后再读取节点配置
+            try
+            {
+                var bpmVariableMultiplayerService = ServiceProviderUtils.GetService<IBpmVariableMultiplayerService>();
+                var bpmnNodeService = ServiceProviderUtils.GetService<IBpmnNodeService>();
+                if (bpmVariableMultiplayerService != null && bpmnNodeService != null)
+                {
+                    List<BpmVariableMultiplayer> multiplayers =
+                        bpmVariableMultiplayerService._repository.QueryMultiplayersByProcessNumAndElementId(
+                            bpmBusinessProcess.BusinessNumber, taskDefKey) ?? new List<BpmVariableMultiplayer>();
+                    long nodeId = multiplayers
+                        .Where(a => !string.IsNullOrEmpty(a.NodeId) && long.TryParse(a.NodeId, out _))
+                        .Select(a => long.Parse(a.NodeId!))
+                        .FirstOrDefault();
+                    if (nodeId > 0)
+                    {
+                        BpmnNode? node = bpmnNodeService._repository
+                            .FirstOrDefault(a => a.Id == nodeId && a.IsDel == 0);
+                        if (node != null && !string.IsNullOrEmpty(node.NodeConfigJson))
+                        {
+                            BpmnNodeConfigJson? nodeConfig = JsonConfUtil.ParseNodeConfig(node.NodeConfigJson);
+                            BpmnNodeLowCodeConfJson? lowCodeConf = nodeConfig?.LowCodeConf;
+                            if (lowCodeConf != null)
+                            {
+                                if (lowCodeConf.FormHidden != null && lowCodeConf.FormHidden.Count > 0)
+                                {
+                                    processInfoVo.FormHidden = lowCodeConf.FormHidden;
+                                }
+                                if (lowCodeConf.FieldControls != null && lowCodeConf.FieldControls.Count > 0)
+                                {
+                                    processInfoVo.LfFieldControlVOs = lowCodeConf.FieldControls;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to load low-code form config for process:{BusinessNumber}, node:{TaskDefKey}",
+                    bpmBusinessProcess.BusinessNumber, taskDefKey);
+            }
         }
 
         return processInfoVo;

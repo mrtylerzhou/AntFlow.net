@@ -72,6 +72,8 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmnConfCommonService, BpmnConfCommonService>();
         services.AddSingleton<IBpmnConfBizService, BpmnConfBizService>();
         services.AddSingleton<BpmnConfBizService>();
+        services.AddSingleton<ILfFormManageBizService, LfFormManageBizService>();
+        services.AddSingleton<LfFormManageBizService>();
         services.AddSingleton<BpmnNodeService>();
         services.AddSingleton<IBpmnNodeService, BpmnNodeService>();
         services.AddSingleton<BpmnNodeToService>();

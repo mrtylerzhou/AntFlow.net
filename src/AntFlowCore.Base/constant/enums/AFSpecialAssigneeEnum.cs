@@ -1,3 +1,5 @@
+using AntFlowCore.Base.vo;
+
 namespace AntFlowCore.Base.constant.enums;
 
 public class AFSpecialAssigneeEnum
@@ -36,5 +38,33 @@ public class AFSpecialAssigneeEnum
             yield return AUTO_NODE_SKIP;
             yield return PREV_NODE_APPOINTED;
         }
+    }
+
+    /// <summary>
+    /// 返回所有特殊指派人列表
+    /// </summary>
+    public static List<BaseIdTranStruVo> GetAllSpecialAssignees()
+    {
+        var result = new List<BaseIdTranStruVo>();
+        foreach (var value in Values)
+        {
+            result.Add(new BaseIdTranStruVo(value.Id, value.Desc));
+        }
+        return result;
+    }
+
+    /// <summary>
+    /// 根据 id 查找特殊指派人
+    /// </summary>
+    public static BaseIdTranStruVo GetSpecialAssignee(string id)
+    {
+        foreach (var value in Values)
+        {
+            if (value.Id.Equals(id))
+            {
+                return new BaseIdTranStruVo(value.Id, value.Desc);
+            }
+        }
+        return null;
     }
 }

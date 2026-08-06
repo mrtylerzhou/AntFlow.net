@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
+using AntFlowCore.Base.entity;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 
@@ -145,6 +146,20 @@ namespace AntFlowCore.Core.vo;
 
         [JsonPropertyName("lfFormDataId")]
         public long? LfFormDataId { get; set; }
+
+        /// <summary>
+        /// 外部表单模式: 引用的表单版本id列表(CSV), 仅外部表单模式使用
+        /// </summary>
+        [JsonPropertyName("lfFormdataIds")]
+        public string LfFormdataIds { get; set; }
+
+        /// <summary>
+        /// 归一化后的表单列表(外部模式多个,内联模式单个),供前端统一渲染多tab表单视图
+        /// 由 PreReadProcess 填充
+        /// </summary>
+        [JsonPropertyName("lfFormdataList")]
+        public List<BpmnConfLfFormdata> LfFormdataList { get; set; }
+
         [JsonPropertyName("formCodeDisplayName")]
         public String FormCodeDisplayName { get; set; }
         [JsonPropertyName("extraFlags")]
