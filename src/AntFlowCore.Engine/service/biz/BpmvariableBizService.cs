@@ -12,19 +12,16 @@ namespace AntFlowCore.Engine.service.biz;
 public class BpmvariableBizService: IBpmvariableBizService
 {
     private readonly IBpmVariableService _bpmVariableService;
-    private readonly IBpmVariableSingleService _bpmVariableSingleService;
     private readonly IBpmVariableMultiplayerService _multiplayerService;
     private readonly IBpmVariableMultiplayerPersonnelService _bpmVariableMultiplayerPersonnelService;
     private readonly ILogger<BpmvariableBizService> _logger;
 
     public BpmvariableBizService(IBpmVariableService bpmVariableService,
-        IBpmVariableSingleService bpmVariableSingleService,
         IBpmVariableMultiplayerService multiplayerService,
         IBpmVariableMultiplayerPersonnelService bpmVariableMultiplayerPersonnelService,
         ILogger<BpmvariableBizService> logger)
     {
         _bpmVariableService = bpmVariableService;
-        _bpmVariableSingleService = bpmVariableSingleService;
         _multiplayerService = multiplayerService;
         _bpmVariableMultiplayerPersonnelService = bpmVariableMultiplayerPersonnelService;
         _logger = logger;
@@ -89,6 +86,26 @@ public class BpmvariableBizService: IBpmvariableBizService
         return _bpmVariableService.GetCurrentMultiPlayerNode(processNumber, elementId, nodeId);
     }
 
+    /// <summary>
+    /// 判断是否为或签多人节点且尚未被承
+    /// 1. 查询 multiplayer LEFT JOIN personnel(每条 personnel 一行,UnderTakeStatus 承载 undertake_status)
+    /// 2. 过滤出 underTakeStatus==0 的记录(未被承办)
+    /// 3. 未被承办的人数 > 1 且 signType==2(或签)时返回 true
+    /// </summary>
+    public bool IsMoreNode(string processNum, string elementId)
+    {
+        List<BpmVariableMultiplayer> list = _multiplayerService._repository.IsMoreNode(processNum, elementId);
+        if (list == null || list.Count == 0)
+        {
+            return false;
+        }
+        // 过滤出未被承办的记录(undertake_status==0)
+        List<BpmVariableMultiplayer> notUndertaken = list
+            .Where(a => a.UnderTakeStatus.HasValue && a.UnderTakeStatus.Value == 0)
+            .ToList();
+        return notUndertaken.Count > 1 && notUndertaken[0].SignType == 2;
+    }
+
     public void ChangeVariableAssignees(IDictionary<BaseInfoTranStructVo,BaseIdTranStruVo> changedAssignees,bool isSingle)
     {
         if (changedAssignees.IsEmpty())
@@ -100,7 +117,7 @@ public class BpmvariableBizService: IBpmvariableBizService
         {
             if (isSingle)
             {
-                _bpmVariableSingleService._repository.UpdateAssignee(long.Parse(old.VariableId), changed.Id, changed.Name, $"管理员变更{old.Id}:{old.Name}=>{changed.Id}:{changed.Name}");
+                // BpmVariableSingle has been removed; single assignee update is no longer supported
             }
             else
             {

@@ -54,7 +54,8 @@ public class FsBpmVerifyInfoRepository : RepositoryBase<BpmVerifyInfo>, IBpmVeri
                 VerifyDate = w.VerifyDate,
                 VerifyDesc = w.VerifyDesc,
                 OriginalId = w.OriginalId,
-                ElementId = w.TaskDefKey
+                ElementId = w.TaskDefKey,
+                AttachmentsJson = w.AttachmentsJson
             }).OrderByDescending(a => a.VerifyDate)
             .ToList();
         return bpmVerifyInfoVos;

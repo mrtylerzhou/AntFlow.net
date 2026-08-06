@@ -29,6 +29,15 @@ namespace AntFlowCore.Base.vo
         [JsonPropertyName("taskId")]
         public string TaskId { get; set; }
 
+        /// <summary>
+        /// 当前任务 FormKey, 存放 NodeExtraInfoDTO 序列化 JSON (包含节点标签).
+        /// ProcessApprovalService.GetBusinessInfo 据此判断当前节点是否需要渲染
+        /// [指定下一节点审批人] 按钮 (af_syslabel_appoint_next_node_approver 标签).
+        /// 对应 Java ProcessRecordInfoVo.formKey.
+        /// </summary>
+        [JsonPropertyName("formKey")]
+        public string FormKey { get; set; }
+
         [JsonPropertyName("options")]
         public List<ProcessActionButtonVo> Options { get; set; }
 

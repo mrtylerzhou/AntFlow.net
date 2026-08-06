@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using System.Text.Json;
 using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.extension;
@@ -164,10 +165,9 @@ public class TaskService : ITaskService
             IDictionary<string, string> assigneeMap = elementToDeal.AssigneeMap;
             if (elementToDeal.IsSignUpSubElement == 1)
             {
-                
-                List<KeyValuePair<string, string>> signupNodeAssigneeMap = this._signUpPersonnelService._repository
+                List<KeyValuePair<string, string>> signupNodeAssigneeMap = _signUpPersonnelService
                     .GetSignUpNodeAssigneeMap(procInstId, elementToDeal.ElementId);
-                if (signupNodeAssigneeMap.Count <= 0&& elementToDeal.IsBackSignUp!=1)
+                if (signupNodeAssigneeMap.Count <= 0 && elementToDeal.IsBackSignUp != 1)
                 {
                     var (nextUserElement, nextFlowElement) = GetNextAssigneeNodeRecursively(elements, elementToDeal);
                     if (nextUserElement == null)
@@ -192,12 +192,12 @@ public class TaskService : ITaskService
                     if (elementToDeal.IsBackSignUp == 1)
                     {
                         BpmnConfCommonElementVo? confCommonElementVo = elements
-                            .FirstOrDefault(a => a.CollectionName==elementToDeal.CollectionName&&a.ElementId!=elementToDeal.ElementId);
+                            .FirstOrDefault(a => a.CollectionName == elementToDeal.CollectionName && a.ElementId != elementToDeal.ElementId);
                         if (confCommonElementVo == null)
                         {
-                            throw new AFBizException(BusinessError.DATA_NOT_FOUND, "未能找到加批原节点,请联系管理员");
-                        } 
-                        assigneeMap=confCommonElementVo.AssigneeMap;
+                            throw new AFBizException("未能找到加批原节点,请联系管理员");
+                        }
+                        assigneeMap = confCommonElementVo.AssigneeMap;
                     }
                     else
                     {
@@ -241,6 +241,11 @@ public class TaskService : ITaskService
             List<BpmAfTaskInst> historyTaskInsts = new List<BpmAfTaskInst>();
             List<BpmAfTask> tasks = new List<BpmAfTask>();
 
+            // serialize node labels into FormKey for BpmnTaskListener to read
+            string extraInfoJson = elementToDeal.LabelList != null && elementToDeal.LabelList.Count > 0
+                ? System.Text.Json.JsonSerializer.Serialize(new NodeExtraInfoDTO { NodeLabelVOS = elementToDeal.LabelList })
+                : bpmAfTask.FormKey;
+
             foreach (var (key, value) in assigneeMap)
             {
                 if (verifyUserIds.Contains(key))
@@ -262,7 +267,7 @@ public class TaskService : ITaskService
                     Assignee = key,
                     AssigneeName = value,
                     CreateTime = nowTime,
-                    FormKey = bpmAfTask.FormKey,
+                    FormKey = extraInfoJson,
                     TenantId = MultiTenantUtil.GetCurrentTenantId(),
                 };
                 tasks.Add(newTask);

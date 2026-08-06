@@ -8,7 +8,7 @@ public interface IInformationTemplateService : IAntFlowRepositoryMix<Information
 {
     ResultAndPage<InformationTemplateVo> List(PageDto pageDto, InformationTemplateVo informationTemplateVo);
     long Edit(InformationTemplateVo informationTemplateVo);
-    List<DefaultTemplateVo> GetList();
-    void SetList(List<DefaultTemplateVo> vos);
+    List<InformationTemplateVo> GetList();
+    void SetList(List<InformationTemplateVo> vos);
     InformationTemplateVo GetInformationTemplateById(long id);
 }

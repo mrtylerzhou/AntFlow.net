@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.constants;
 
@@ -92,6 +92,33 @@ public static class BpmnElementUtils
             CollectionName = collectionName,
             CollectionValue = collectionValue,
             AssigneeMap = assigneeMap
+        };
+    }
+
+    // Get multiplayer arbitration-sign node element
+    // N = ceil(size * ratio / 100), min 1, max size
+    public static BpmnConfCommonElementVo GetMultiplayerArbitrationElement(string elementId, string elementName,
+        string collectionName, List<string> collectionValue, IDictionary<string, string> assigneeMap, int? ratio)
+    {
+        if (ratio == null)
+        {
+            throw new ArgumentException("仲裁签未配置通过比例");
+        }
+        int size = collectionValue.Count;
+        int requiredCount = (int)Math.Ceiling(size * ratio.Value / 100.0);
+        requiredCount = Math.Max(1, Math.Min(requiredCount, size));
+        return new BpmnConfCommonElementVo
+        {
+            ElementId = elementId,
+            ElementName = elementName,
+            ElementType = ElementTypeEnum.ELEMENT_TYPE_USER_TASK.Code,
+            ElementProperty = ElementPropertyEnum.ELEMENT_PROPERTY_MULTIPLAYER_ARBITRATION.Code,
+            CollectionName = collectionName,
+            CollectionValue = collectionValue,
+            AssigneeMap = assigneeMap,
+            SignType = (int)SignTypeEnum.SIGN_TYPE_ARBITRATION,
+            RequiredCount = requiredCount,
+            ArbitrationRatio = ratio
         };
     }
 

@@ -1,14 +1,17 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using AntFlowCore.Abstraction.Orm.util;
+using AntFlowCore.Abstraction.service.repository;
 using AntFlowCore.Base.adaptor.formoperation;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
+using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.factory;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
+using AntFlowCore.Core.vo;
 using AntFlowCore.Engine.factory;
 using AntFlowCore.Persist.api.interf.repository;
 using Microsoft.Extensions.Logging;
@@ -26,7 +29,8 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
     private readonly ILFMainFieldService _lfMainFieldService;
     private readonly IBpmnConfLfFormdataService _lfformdataService;
     private readonly IBpmnConfLfFormdataFieldService _lfformdataFieldService;
-    private readonly IBpmnNodeLfFormdataFieldControlService _bpmnNodeLfFormdataFieldControlService;
+    private readonly IBpmnConfService _bpmnConfService;
+    private readonly IBpmnNodeService _bpmnNodeService;
 
     private static Dictionary<long, List<String>> conditionFieldNameMap = new Dictionary<long, List<string>>();
 
@@ -38,14 +42,16 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         ILFMainFieldService lfMainFieldService,
         IBpmnConfLfFormdataService lfformdataService,
         IBpmnConfLfFormdataFieldService lfformdataFieldService,
-        IBpmnNodeLfFormdataFieldControlService _bpmnNodeLfFormdataFieldControlService)
+        IBpmnConfService bpmnConfService,
+        IBpmnNodeService bpmnNodeService)
     {
         _logger = logger;
         _mainService = mainService;
         _lfMainFieldService = lfMainFieldService;
         _lfformdataService = lfformdataService;
         _lfformdataFieldService = lfformdataFieldService;
-        this._bpmnNodeLfFormdataFieldControlService = _bpmnNodeLfFormdataFieldControlService;
+        _bpmnConfService = bpmnConfService;
+        _bpmnNodeService = bpmnNodeService;
     }
 
     public BpmnStartConditionsVo PreviewSetCondition(UDLFApplyVo vo)
@@ -65,6 +71,10 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         {
             startConditionsVo.LfConditions = vo.LfFields;
         }
+
+        BpmnConfVo bpmnConfVo = vo.BpmnConfVo;
+        ProcessFormRelatedUserConf(bpmnConfVo, vo);
+        startConditionsVo.BusinessDataVo = vo;
 
         return startConditionsVo;
     }
@@ -240,15 +250,20 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
 
         vo.LfFields = fieldVoMap;
 
-        List<BpmnConfLfFormdata> bpmnConfLfFormdataList =
-            _lfformdataService._repository.Find(x => x.BpmnConfId == confId);
-        if (bpmnConfLfFormdataList == null || !bpmnConfLfFormdataList.Any())
+        string? lfFormData = GetLfFormDataFromJson(confId);
+        if (string.IsNullOrWhiteSpace(lfFormData))
         {
-            throw new AFBizException($"can not get lowcode flow formdata by confId:{confId}");
+            List<BpmnConfLfFormdata> bpmnConfLfFormdataList =
+                _lfformdataService._repository.Find(x => x.BpmnConfId == confId);
+            if (bpmnConfLfFormdataList == null || !bpmnConfLfFormdataList.Any())
+            {
+                throw new AFBizException($"can not get lowcode flow formdata by confId:{confId}");
+            }
+
+            lfFormData = bpmnConfLfFormdataList.First().Formdata;
         }
 
-        var lfFormdata = bpmnConfLfFormdataList.First();
-        vo.LfFormData = lfFormdata.Formdata;
+        vo.LfFormData = lfFormData;
         IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
         foreach (var o in lfFormOperationAdaptors)
         {
@@ -294,12 +309,30 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
             throw new AFBizException($"confId {confId}, formCode:{vo.FormCode} does not have a field config");
         }
 
+        // page-added DIY 字段契约校验: lfFields 的 key 必须在辅助 vform 字段配置中声明,否则抛错。
+        // 仅对 USE_AUXILIARY_FORM 命中且 lfFields 非空时校验; 纯 LF 静默跳过; 外部表单模式 lfFields 为 null 跳过(用 lfFieldsMulti)。
+        if (vo.BpmnConfVo?.ExtraFlags != null
+            && BpmnConfFlagsEnum.HasFlag(vo.BpmnConfVo.ExtraFlags, BpmnConfFlagsEnum.USE_AUXILIARY_FORM)
+            && lfFields != null)
+        {
+            var undeclared = new HashSet<string>(lfFields.Keys, StringComparer.Ordinal);
+            foreach (var declared in fieldConfMap.Keys)
+            {
+                undeclared.Remove(declared);
+            }
+            if (undeclared.Count > 0)
+            {
+                throw new AFBizException($"表单字段 [{string.Join(",", undeclared)}] 未在辅助表单中定义,请在辅助 vform 中声明这些字段");
+            }
+        }
+
         var mainFields = LFMainField.ParseFromMap(lfFields, fieldConfMap, mainId,formCode);
         _lfMainFieldService._repository.AddRange(mainFields);
 
         vo.BusinessId = mainId.ToString();
         vo.ProcessDigest = vo.Remark;
         vo.EntityName = nameof(LowFlowApprovalService);
+        ProcessFormRelatedUserConf(vo.BpmnConfVo, vo);
         IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
         foreach (var o in lfFormOperationAdaptors)
         {
@@ -371,16 +404,9 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
                 throw new AFBizException($"confId {confId}, formCode:{vo.FormCode} does not have a field config");
             }
         }
-        List<LFFieldControlVO> currentFieldControls = _bpmnNodeLfFormdataFieldControlService
-            .GetFieldControlByProcessNumberAndElementId(vo.ProcessNumber, vo.TaskDefKey);
+        // IBpmnNodeLfFormdataFieldControlService has been removed; field control check is no longer supported
         foreach (LFMainField field in lfMainFields)
         {
-            LFFieldControlVO? lfFieldControlVo = currentFieldControls.FirstOrDefault(a=>a.FieldId==field.FieldId);
-            if (lfFieldControlVo != null && (StringConstants.HIDDEN_FIELD_PERMISSION.Equals(lfFieldControlVo.Perm) ||
-                                             StringConstants.READ_ONLY_FIELD_PERMISSION.Equals(lfFieldControlVo.Perm)))
-            {
-                continue;
-            }
             string fValue = lfFields[field.FieldId]?.ToString()??null;
             if (!StringConstants.HIDDEN_FIELD_VALUE.Equals(fValue))//如果是******,实际上是隐藏字段,不更新
             {
@@ -397,6 +423,20 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
             if (lfFormServiceAnnoAttribute != null && lfFormServiceAnnoAttribute.SvcName.Equals(vo.FormCode))
             {
                 o.OnConsentData(vo);
+            }
+        }
+    }
+
+    public void OnDisagreeData(UDLFApplyVo vo)
+    {
+        IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
+        foreach (ILFFormOperationAdaptor o in lfFormOperationAdaptors)
+        {
+            LFFormServiceAnnoAttribute? lfFormServiceAnnoAttribute = o.GetType().GetCustomAttribute<LFFormServiceAnnoAttribute>();
+           
+            if (lfFormServiceAnnoAttribute != null && lfFormServiceAnnoAttribute.SvcName.Equals(vo.FormCode))
+            {
+                o.OnDisagreeData(vo);
             }
         }
     }
@@ -442,5 +482,110 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
                 o.OnFinishData(vo);
             }
         }
+    }
+
+    /// <summary>
+    /// Extracts form-related assignee ids from the submitted form data for all nodes
+    /// whose nodeProperty is NODE_PROPERTY_FORM_RELATED (16).
+    /// For each such node, reads the FormRelatedUserConfList from its node config JSON,
+    /// parses the valueJson (array of {id,name} form element descriptors), looks up each
+    /// form element's value in vo.LfFields, and collects the values (which are user ids
+    /// or role ids) into a map keyed by node id. The map is stored on vo.Node2formRelatedAssignees
+    /// and later consumed by FormRelatedPersonnelProvider at runtime.
+    /// </summary>
+    private void ProcessFormRelatedUserConf(BpmnConfVo bpmnConfVo, UDLFApplyVo vo)
+    {
+        if (bpmnConfVo == null)
+        {
+            return;
+        }
+
+        long confId = bpmnConfVo.Id;
+        Dictionary<string, object> lfFields = vo.LfFields;
+        int? extraFlags = bpmnConfVo.ExtraFlags;
+
+        if (extraFlags != null && BpmnConfFlagsEnum.HasFlag(extraFlags, BpmnConfFlagsEnum.HAS_FORM_RELATED_ASSIGNEES))
+        {
+            List<BpmnNode> formRelatedNodes = _bpmnNodeService._repository
+                .Find(a => a.ConfId == confId && a.NodeProperty == (int)NodePropertyEnum.NODE_PROPERTY_FORM_RELATED)
+                .ToList();
+
+            Dictionary<string, List<string>> node2formRelatedAssignees = new Dictionary<string, List<string>>();
+
+            if (formRelatedNodes != null && formRelatedNodes.Count > 0)
+            {
+                foreach (BpmnNode node in formRelatedNodes)
+                {
+                    List<ApproverFormRelatedUserConf> formRelatedConfs = GetFormRelatedConfsFromNode(node);
+                    foreach (ApproverFormRelatedUserConf formRelatedConf in formRelatedConfs)
+                    {
+                        string valueJson = formRelatedConf.ValueJson;
+                        if (string.IsNullOrEmpty(valueJson))
+                        {
+                            throw new AFBizException("表单中选取人员配置的valueJson不能为空!");
+                        }
+
+                        List<BaseIdTranStruVo> formInfos = JsonSerializer.Deserialize<List<BaseIdTranStruVo>>(valueJson) ?? new List<BaseIdTranStruVo>();
+                        List<string> formValues = new List<string>();
+
+                        foreach (BaseIdTranStruVo formInfo in formInfos)
+                        {
+                            string formName = formInfo.Id;
+                            if (formName == null || lfFields == null || !lfFields.TryGetValue(formName, out var formVal) || formVal == null)
+                            {
+                                continue;
+                            }
+
+                            if (formVal is System.Collections.IEnumerable iterable && !(formVal is string))
+                            {
+                                foreach (var bValue in iterable)
+                                {
+                                    formValues.Add(bValue?.ToString());
+                                }
+                            }
+                            else
+                            {
+                                formValues.Add(formVal.ToString());
+                            }
+                        }
+
+                        node2formRelatedAssignees[node.Id.ToString()] = formValues;
+                    }
+                }
+            }
+
+            if (node2formRelatedAssignees.Count == 0)
+            {
+                throw new AFBizException("migration error,please contact the author");
+            }
+
+            vo.Node2formRelatedAssignees = node2formRelatedAssignees;
+        }
+    }
+
+    /// <summary>
+    /// Extracts the FormRelatedUserConfList from a node's node config JSON.
+    /// </summary>
+    private List<ApproverFormRelatedUserConf> GetFormRelatedConfsFromNode(BpmnNode node)
+    {
+        if (string.IsNullOrEmpty(node.NodeConfigJson))
+        {
+            return new List<ApproverFormRelatedUserConf>();
+        }
+
+        BpmnNodeConfigJson nodeConfig = JsonConfUtil.ParseNodeConfig(node.NodeConfigJson);
+        if (nodeConfig?.ApproverConf?.FormRelatedUserConfList == null)
+        {
+            return new List<ApproverFormRelatedUserConf>();
+        }
+
+        return nodeConfig.ApproverConf.FormRelatedUserConfList;
+    }
+
+    private string? GetLfFormDataFromJson(long confId)
+    {
+        BpmnConf? bpmnConf = _bpmnConfService._repository.FirstOrDefault(a => a.Id == confId);
+        BpmnConfConfigJson? confConfig = JsonConfUtil.ParseConfConfig(bpmnConf?.ConfConfigJson);
+        return confConfig?.LowCodeFormConfig?.Formdata;
     }
 }

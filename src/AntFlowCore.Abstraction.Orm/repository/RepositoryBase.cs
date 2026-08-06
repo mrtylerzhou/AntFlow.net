@@ -48,9 +48,9 @@ public class RepositoryBase<TEntity> : IBaseRepository<TEntity>
         return _ormContext.FreeSql.GetRepository<TEntity>().Select.First();
     }
 
-    public virtual void Add(TEntity entity)
+    public virtual TEntity Add(TEntity entity)
     {
-        _ormContext.FreeSql.GetRepository<TEntity>().Insert(entity);
+       return _ormContext.FreeSql.GetRepository<TEntity>().Insert(entity);
     }
 
     public virtual void AddRange(IEnumerable<TEntity> entities)
@@ -130,7 +130,10 @@ public class RepositoryBase<TEntity> : IBaseRepository<TEntity>
 
     public virtual void UpdateRange(IEnumerable<TEntity> entities)
     {
-        _ormContext.FreeSql.GetRepository<TEntity>().Update(entities);
+        if (entities.Any())
+        {
+            _ormContext.FreeSql.Update<TEntity>().SetSource(entities).ExecuteAffrows();
+        }
     }
 
     public virtual Task<int> RemoveAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)

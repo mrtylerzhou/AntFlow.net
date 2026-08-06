@@ -66,4 +66,9 @@ public class BpmVariable
     /// Update time.
     /// </summary>
     public DateTime? UpdateTime { get; set; }=DateTime.Now;
+
+    /// <summary>
+    /// Consolidated runtime variable JSON configuration.
+    /// </summary>
+    public string VariableConfigJson { get; set; }
 }

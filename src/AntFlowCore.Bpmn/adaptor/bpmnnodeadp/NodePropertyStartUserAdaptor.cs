@@ -1,30 +1,36 @@
-﻿using AntFlowCore.Base.adaptor;
+using AntFlowCore.Base.adaptor;
+using AntFlowCore.Base.adaptor.bpmnnodeadp;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.vo;
-using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Bpmn.adaptor.bpmnnodeadp;
 
-public class NodePropertyStartUserAdaptor: AbstractAdditionSignNodeAdaptor
+/// <summary>
+/// Start user adaptor - directly implements IBpmnNodeAdaptor (not AbstractAdditionSignNodeAdaptor)
+/// to match Java version which does not inherit addition sign logic.
+/// </summary>
+public class NodePropertyStartUserAdaptor : IBpmnNodeAdaptor
 {
-    public NodePropertyStartUserAdaptor(IBpmnNodeAdditionalSignConfService bpmnNodeAdditionalSignConfService,
-        IRoleService roleService) : base(bpmnNodeAdditionalSignConfService, roleService)
+    public void FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
     {
-        
-    }
-    public override void FormatToBpmnNodeVo(BpmnNodeVo bpmnNodeVo)
-    {
-        base.FormatToBpmnNodeVo(bpmnNodeVo);
         bpmnNodeVo.DeduplicationExclude = true;
-       
     }
 
-    public override void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
+    public void EditBpmnNode(BpmnNodeVo bpmnNodeVo)
     {
-        base.EditBpmnNode(bpmnNodeVo);
+        // Write path is now handled by BpmnNodeConfigHolder
     }
 
-    public override void SetSupportBusinessObjects()
+    public PersonnelRuleVo FormaFieldAttributeInfoVO()
+    {
+        var vo = new PersonnelRuleVo();
+        var nodePropertyStartUser = NodePropertyEnum.NODE_PROPERTY_START_USER;
+        vo.NodeProperty = (int)nodePropertyStartUser;
+        vo.NodePropertyName = nodePropertyStartUser.GetDesc();
+        return vo;
+    }
+
+    public void SetSupportBusinessObjects()
     {
         ((IAdaptorService)this).AddSupportBusinessObjects(BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_START_USER);
     }

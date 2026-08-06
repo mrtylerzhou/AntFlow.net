@@ -1,12 +1,15 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using AntFlowCore.Abstraction.Orm.util;
+using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Abstraction.service.repository;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
+using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.extension;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
+using AntFlowCore.Core.vo;
 using AntFlowCore.Persist.api.interf.biz;
 using AntFlowCore.Persist.api.interf.repository;
 
@@ -15,20 +18,18 @@ namespace AntFlowCore.Business.service.biz;
 public class DicDataBizService :  IDicDataBizSerivce
 {
     private readonly IDicDataSerivce _dicDataSerivce;
-    private readonly IBpmProcessNoticeService _bpmProcessNoticeService;
 
 
-    public DicDataBizService(IDicDataSerivce dicDataSerivce, IBpmProcessNoticeService bpmProcessNoticeService)
+    public DicDataBizService(IDicDataSerivce dicDataSerivce)
     {
         _dicDataSerivce = dicDataSerivce;
-        _bpmProcessNoticeService = bpmProcessNoticeService;
     }
 
     public ResultAndPage<BaseKeyValueStruVo> SelectLFActiveFormCodePageList(PageDto pageDto, TaskMgmtVO taskMgmtVO)
     {
         Page<BaseKeyValueStruVo> page = PageUtils.GetPageByPageDto<BaseKeyValueStruVo>(pageDto);
         List<DictData> dictDataList = this.SelectLFActiveFormCodePageList(page, taskMgmtVO);
-        return HandleLFFormCodePageList(page, dictDataList);
+        return HandleFormCodePageList(page, dictDataList, "LF");
     }
 
     private List<DictData> SelectLFActiveFormCodePageList(Page<BaseKeyValueStruVo> page, TaskMgmtVO taskMgmtVO)
@@ -51,15 +52,25 @@ public class DicDataBizService :  IDicDataBizSerivce
         page.Total = (int)pagingInfo.Count;
         return dictDataList;
     }
-    
+
       public ResultAndPage<BaseKeyValueStruVo> SelectLFFormCodePageList(PageDto pageDto, TaskMgmtVO taskMgmtVo)
         {
             Page<BaseKeyValueStruVo> page = PageUtils.GetPageByPageDto<BaseKeyValueStruVo>(pageDto);
             List<DictData> dictDataList = this.SelectLFFormCodePageList(page,taskMgmtVo);
-            return HandleLFFormCodePageList(page, dictDataList);
+            return HandleFormCodePageList(page, dictDataList, "LF");
         }
 
-       
+        /// <summary>
+        /// 获取 page-added DIY FormCode Page List 模板列表使用(dict_type=diylowcodeflow)
+        /// </summary>
+        public ResultAndPage<BaseKeyValueStruVo> SelectDIYFormCodePageList(PageDto pageDto, TaskMgmtVO taskMgmtVo)
+        {
+            Page<BaseKeyValueStruVo> page = PageUtils.GetPageByPageDto<BaseKeyValueStruVo>(pageDto);
+            List<DictData> dictDataList = this.SelectDIYFormCodePageList(page, taskMgmtVo);
+            return HandleFormCodePageList(page, dictDataList, "DIY");
+        }
+
+
 
         List<DictData> SelectLFFormCodePageList(Page<BaseKeyValueStruVo> page, TaskMgmtVO taskMgmtVO)
         {
@@ -77,7 +88,26 @@ public class DicDataBizService :  IDicDataBizSerivce
             page.Total = (int)pagingInfo.Count;
             return dictDatas;
         }
-        private ResultAndPage<BaseKeyValueStruVo> HandleLFFormCodePageList(Page<BaseKeyValueStruVo> page, List<DictData> dictlist)
+
+        List<DictData> SelectDIYFormCodePageList(Page<BaseKeyValueStruVo> page, TaskMgmtVO taskMgmtVO)
+        {
+            Expression<Func<DictData,bool>> expression = a => a.DictType == "diylowcodeflow";
+
+            if (!string.IsNullOrEmpty(taskMgmtVO.Description))
+            {
+               expression= LinqExtensions.And(expression, a =>
+                    a.Label.Contains(taskMgmtVO.Description) || a.Value.Contains(taskMgmtVO.Description));
+            }
+
+            PagingInfo pagingInfo = page.ToPagingInfo();
+            List<DictData> dictDatas = this._dicDataSerivce
+                ._repository.QueryDictDataListByExpression(expression, pagingInfo);
+            page.Total = (int)pagingInfo.Count;
+            return dictDatas;
+        }
+
+        /// <summary>私有方法: type 传入 "LF" 或 "DIY"</summary>
+        private ResultAndPage<BaseKeyValueStruVo> HandleFormCodePageList(Page<BaseKeyValueStruVo> page, List<DictData> dictlist, string type)
         {
             if (dictlist == null)
             {
@@ -92,14 +122,14 @@ public class DicDataBizService :  IDicDataBizSerivce
                     Key = item.Value,
                     Value = item.Label,
                     CreateTime = item.CreateTime ?? DateTime.Now,
-                    Type = "LF",
+                    Type = type,
                     Remark = item.Remark
                 });
             }
 
             var formCodes = results.Select(r => r.Key).ToList();
 
-           
+
             if (formCodes.Any())
             {
                 IBpmnConfService bpmnConfService = ServiceProviderUtils.GetService<IBpmnConfService>();
@@ -113,36 +143,49 @@ public class DicDataBizService :  IDicDataBizSerivce
                         b => b.FormCode,
                         b => b.ExtraFlags
                     );
-                    IDictionary<string,List<BpmProcessNotice>> processNoticeMap= _bpmProcessNoticeService.ProcessNoticeMap(formCodes);
+
+                    // 解析每个流程配置的通知渠道类型
+                    Dictionary<string, List<int>> formCode2NoticeTypes = new Dictionary<string, List<int>>(StringComparer.Ordinal);
+                    foreach (var conf in bpmnConfs)
+                    {
+                        BpmnConfConfigJson? confConfig = JsonConfUtil.ParseConfConfig(conf.ConfConfigJson);
+                        if (confConfig?.NoticeChannelTypes != null && confConfig.NoticeChannelTypes.Count > 0)
+                        {
+                            formCode2NoticeTypes[conf.FormCode] = confConfig.NoticeChannelTypes;
+                        }
+                    }
+
                     foreach (var lfDto in results)
                     {
-                        if (formCode2Flags.TryGetValue(lfDto.Key, out var flags))
+                        string formCode = lfDto.Key;
+
+                        if (formCode2Flags.TryGetValue(formCode, out var flags))
                         {
                             var hasStartUserChooseModules = BpmnConfFlagsEnum.HasFlag(flags, BpmnConfFlagsEnum.HAS_STARTUSER_CHOOSE_MODULES);
                             lfDto.HasStarUserChooseModule = hasStartUserChooseModules;
                         }
-                        String formCode = lfDto.Key;
-                        if (processNoticeMap.TryGetValue(formCode, out var bpmProcessNotices) && bpmProcessNotices.Any())
+
+                        // 构建流程通知渠道列表(遍历所有渠道,active 标记是否启用)
+                        if (formCode2NoticeTypes.TryGetValue(formCode, out List<int> noticeChannelTypes) && noticeChannelTypes.Any())
                         {
-                            var processNotices = new List<BaseNumIdStruVo>();
-                            foreach (ProcessNoticeEnum processNoticeEnum in ProcessNoticeEnum.Values)
+                            List<BaseNumIdStruVo> processNotices = new List<BaseNumIdStruVo>();
+                            foreach (var noticeEnum in ProcessNoticeEnum.Values)
                             {
-                                var type = processNoticeEnum.Code;
-                                var descByCode = processNoticeEnum.Desc;
-
-                                var struVo = new BaseNumIdStruVo
+                                processNotices.Add(new BaseNumIdStruVo
                                 {
-                                    Id = type,
-                                    Name = descByCode,
-                                    Active = bpmProcessNotices.Any(n => n.Type == type)
-                                };
-
-                                processNotices.Add(struVo);
+                                    Id = noticeEnum.Code,
+                                    Name = noticeEnum.Desc,
+                                    Active = noticeChannelTypes.Contains(noticeEnum.Code)
+                                });
                             }
-                           
                             lfDto.ProcessNotices = processNotices;
                         }
 
+                        // 填充通知模板配置列表
+                        IBpmnConfBizService bpmnConfBizService = ServiceProviderUtils.GetService<IBpmnConfBizService>();
+                        BpmnConfVo confVo = new BpmnConfVo { FormCode = formCode };
+                        bpmnConfBizService.SetBpmnTemplateVos(confVo);
+                        lfDto.TemplateVos = confVo.TemplateVos;
                     }
                 }
             }
@@ -150,5 +193,5 @@ public class DicDataBizService :  IDicDataBizSerivce
             page.Records = results;
             return PageUtils.GetResultAndPage(page);
         }
-   
+
 }

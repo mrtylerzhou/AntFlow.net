@@ -7,4 +7,5 @@ public interface IDicDataBizSerivce
 {
     ResultAndPage<BaseKeyValueStruVo> SelectLFFormCodePageList(PageDto pageDto, TaskMgmtVO taskMgmtVo);
     ResultAndPage<BaseKeyValueStruVo> SelectLFActiveFormCodePageList(PageDto pageDto, TaskMgmtVO taskMgmtVO);
+    ResultAndPage<BaseKeyValueStruVo> SelectDIYFormCodePageList(PageDto pageDto, TaskMgmtVO taskMgmtVo);
 }

@@ -1,4 +1,5 @@
 ﻿using AntFlowCore.Abstraction.service;
+using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
@@ -128,5 +129,40 @@ public class AssigneeVoBuildUtils
             Assignee = "0",
             IsDeduplication = 0
         };
+    }
+
+    /// <summary>
+    /// Deal with multiplayer node duplication.
+    /// Returns a map of assigneeId → assigneeName.
+    /// When DuplicationProcessStrategy is SKIP, deduplicated assignees (IsDeduplication=1)
+    /// are included (they will be auto-skipped at runtime via skippedAssignees label).
+    /// Otherwise, deduplicated assignees are excluded.
+    /// </summary>
+    public static Dictionary<string, string> DealingWithMultiPlayerNodeDuplication(
+        BpmnNodeParamsVo paramsVo, BpmnStartConditionsVo startConditions)
+    {
+        var assigneeMap = new Dictionary<string, string>();
+        List<BpmnNodeParamsAssigneeVo> assigneeList = paramsVo.AssigneeList;
+        if (assigneeList == null)
+        {
+            return assigneeMap;
+        }
+
+        foreach (var assigneeVo in assigneeList)
+        {
+            if (assigneeVo.IsDeduplication == 0)
+            {
+                assigneeMap[assigneeVo.Assignee] = assigneeVo.AssigneeName;
+            }
+            else if (assigneeVo.IsDeduplication == 1)
+            {
+                if (startConditions?.DuplicationProcessStrategy != null
+                    && startConditions.DuplicationProcessStrategy == DuplicationProcessStrategyEnum.SKIP.Code)
+                {
+                    assigneeMap[assigneeVo.Assignee] = assigneeVo.AssigneeName;
+                }
+            }
+        }
+        return assigneeMap;
     }
 }

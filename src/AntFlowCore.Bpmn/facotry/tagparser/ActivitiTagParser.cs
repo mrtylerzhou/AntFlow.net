@@ -119,6 +119,16 @@ public class ActivitiTagParser<T>: TagParser<IFormOperationAdaptor<T>,BusinessDa
             throw new ArgumentException($"The provided argument is not of the expected type {typeof(TSubClass).Name}.");
         }
 
+        public void OnDisagreeData(T vo)
+        {
+            if (vo is TSubClass subClassVo)
+            {
+                _inner.OnDisagreeData(subClassVo);
+                return;
+            }
+            throw new ArgumentException($"The provided argument is not of the expected type {typeof(TSubClass).Name}.");
+        }
+
         public void OnBackToModifyData(T vo)
         {
             if (vo is TSubClass subClassVo)

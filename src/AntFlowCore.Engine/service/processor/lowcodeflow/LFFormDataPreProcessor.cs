@@ -2,6 +2,7 @@
 using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
+using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
@@ -69,6 +70,13 @@ public class LFFormDataPreProcessor : IAntFlowOrderPreProcessor<BpmnConfVo>
 
             var confId = confVo.Id;
 
+            BpmnConfConfigJson? confConfig = JsonConfUtil.ParseConfConfig(confVo.ConfConfigJson);
+            if (!string.IsNullOrWhiteSpace(confConfig?.LowCodeFormConfig?.Formdata))
+            {
+                confVo.LfFormData = confConfig.LowCodeFormConfig.Formdata;
+                return;
+            }
+
             var bpmnConfLfFormdataList = _lfFormdataService.ListByConfId(confId);
 
             if (bpmnConfLfFormdataList == null || !bpmnConfLfFormdataList.Any())
@@ -96,7 +104,7 @@ public class LFFormDataPreProcessor : IAntFlowOrderPreProcessor<BpmnConfVo>
                     {
                         BpmnConfId = confId,
                         FormDataId = formDataId,
-                        FieldType = lfOption.FieldType,
+                        FieldType = GetFieldTypeByTypeString(lfOption.Type),
                         FieldId = lfOption.Name,
                         FieldName = lfOption.Label,
                         TenantId = MultiTenantUtil.GetCurrentTenantId(),
@@ -147,7 +155,46 @@ public class LFFormDataPreProcessor : IAntFlowOrderPreProcessor<BpmnConfVo>
                 }
             }
         }
-
+        private int  GetFieldTypeByTypeString(String typeString) {
+            switch (typeString) {
+                // NUMBER
+                case "number":
+                case "slider":
+                    return LFFieldTypeEnum.NUMBER.Type;
+                // DATE
+                case "date":
+                    return LFFieldTypeEnum.DATE.Type;
+                // DATE_TIME
+                case "date-range":
+                case "time":
+                case "time-range":
+                    return LFFieldTypeEnum.DATE_TIME.Type;
+                // BOOLEAN
+                case "switch":
+                    return LFFieldTypeEnum.BOOLEAN.Type;
+                // TEXT (long text)
+                case "textarea":
+                case "richtext-editor":
+                    return LFFieldTypeEnum.TEXT.Type;
+                // STRING (short text) - default for most form fields
+                case "select":
+                case "radio":
+                case "checkbox":
+                case "cascader":
+                case "tree-select":
+                case "color-picker":
+                case "rate":
+                case "input":
+                case "number-range":
+                case "picture-upload":
+                case "file-upload":
+                case "icon-picker":
+                case "transfer":
+                    return LFFieldTypeEnum.STRING.Type;
+                default:
+                    return LFFieldTypeEnum.STRING.Type;
+            }
+        }
         public int Order()
         {
             return 0;

@@ -14,7 +14,7 @@ public interface IBaseRepository<TEntity> where TEntity : class
     List<TEntity> Find(Expression<Func<TEntity, bool>> predicate);
     TEntity? FirstOrDefault(Expression<Func<TEntity, bool>> predicate);
     TEntity? FirstOrDefault();
-    void Add(TEntity entity);
+    TEntity Add(TEntity entity);
     void AddRange(IEnumerable<TEntity> entities);
     void Update(TEntity entity);
     void UpdateRange(IEnumerable<TEntity> entities);

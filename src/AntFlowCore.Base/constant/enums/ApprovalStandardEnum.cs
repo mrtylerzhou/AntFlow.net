@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Base.constant.enums;
+namespace AntFlowCore.Base.constant.enums;
 
 /// <summary>
 /// 审批标准枚举（富枚举实现）
@@ -24,7 +24,7 @@ public sealed class ApprovalStandardEnum
     {
         START_USER,
         APPROVAL,
-        APPROVAL
+        FROM_PREV_NODE
     }.ToList();
 
     /// <summary>

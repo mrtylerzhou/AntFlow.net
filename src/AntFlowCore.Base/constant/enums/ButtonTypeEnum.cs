@@ -26,6 +26,9 @@ public enum ButtonTypeEnum
     BUTTON_TYPE_RECOVER_TO_HIS=31,//恢复已结束流程
     BUTTON_TYPE_DRAW_BACK_AGREE=32,//撤销同意
     BUTTON_TYPE_PROCESS_MOVE_AHEAD=33,//流程推进,
+    BUTTON_TYPE_APPOINT_NEXT_NODE_APPROVER=38,//指定下一节点审批人,上一节点审批人在审批时指定下一节点的实际审批人
+    BUTTON_TYPE_OPPOSE=39,           // 反对(仲裁签专用)
+    BUTTON_TYPE_PICK_CONDITION=40,   // 选择分支(选择条件节点专用)
 }
 
 
@@ -81,6 +84,12 @@ public static class ButtonTypeEnumExtensions
                     return "撤销同意";
                 case (int)ButtonTypeEnum.BUTTON_TYPE_PROCESS_MOVE_AHEAD:
                     return "流程推进";
+                case (int)ButtonTypeEnum.BUTTON_TYPE_APPOINT_NEXT_NODE_APPROVER:
+                    return "指定下一节点审批人";
+                case (int)ButtonTypeEnum.BUTTON_TYPE_OPPOSE:
+                    return "反对";
+                case (int)ButtonTypeEnum.BUTTON_TYPE_PICK_CONDITION:
+                    return "选择分支";
                 default:
                     return null;
             }

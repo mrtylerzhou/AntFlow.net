@@ -34,6 +34,15 @@ public class FsBpmBusinessProcessRepository: RepositoryBase<BpmBusinessProcess>,
             .ExecuteAffrows();
     }
 
+    public void UpdateProcInstId(long id, string procInstId, string businessId)
+    {
+        _ormContext.FreeSql.Update<BpmBusinessProcess>()
+            .Set(a => a.ProcInstId, procInstId)
+            .Set(a => a.BusinessId, businessId)
+            .Where(a => a.Id == id)
+            .ExecuteAffrows();
+    }
+
     public void UpdateDto(BpmBusinessProcess bpmBusinessProcess)
     {
         _ormContext.FreeSql.Update<BpmBusinessProcess>()

@@ -141,7 +141,7 @@ public enum ConditionTypeEnum
     [ConditionType("无代码数字流程条件",
         FieldName = LOWFLOW_CONDITION_CONTAINER_FIELD_NAME,
         FieldType = 2,
-        FieldClass = typeof(double),
+        FieldClass = typeof(string),
         AdaptorClass = typeof(BpmnNodeConditionsEmptyAdaptor),
         AlignmentClass = typeof(BpmnStartConditionsVo),
         AlignmentFieldName = LOWFLOW_CONDITION_CONTAINER_FIELD_NAME,

@@ -1,5 +1,5 @@
-﻿using System.Text.Json.Serialization;
-using AntFlowCore.Base.entity;
+using System.Text.Json.Serialization;
+using AntFlowCore.Base.entity.jsonconf;
 
 namespace AntFlowCore.Base.vo
 {
@@ -33,7 +33,7 @@ namespace AntFlowCore.Base.vo
         public string EntryId { get; set; }
 
         [JsonPropertyName("bpmVariableApproveReminds")]
-        public List<BpmVariableApproveRemind> BpmVariableApproveReminds { get; set; }
+        public List<VariableApproveRemindItem> BpmVariableApproveReminds { get; set; }
 
         [JsonPropertyName("bpmnName")]
         public string BpmnName { get; set; }

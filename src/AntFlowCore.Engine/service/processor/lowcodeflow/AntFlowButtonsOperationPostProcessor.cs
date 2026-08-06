@@ -104,6 +104,9 @@ namespace AntFlowCore.Engine.service.processor.lowcodeflow;
                 case ProcessOperationEnum.BUTTON_TYPE_PROCESS_MOVE_AHEAD:
                     //_workflowButtonHandler.onProcessMoveAhead(vo);
                     break;
+                case ProcessOperationEnum.BUTTON_TYPE_OPPOSE:
+                    _workflowButtonHandler.onOppose(vo);
+                    break;
                 default:
                     throw new NotSupportedException("不支持的操作类型: " + poEnum);
             }

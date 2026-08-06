@@ -12,8 +12,7 @@ public class ThirdPartyAccountApplyFlowService : AbstractLowFlowSpyFormOperation
 {
     private readonly IThirdPartyAccountApplyService _thirdPartyAccountApplyService;
 
-    public ThirdPartyAccountApplyFlowService(IThirdPartyAccountApplyService thirdPartyAccountApplyService,
-        IBpmnNodeConditionsConfService bpmnNodeConditionsConfService) : base(bpmnNodeConditionsConfService)
+    public ThirdPartyAccountApplyFlowService(IThirdPartyAccountApplyService thirdPartyAccountApplyService)
     {
         _thirdPartyAccountApplyService = thirdPartyAccountApplyService;
     }
@@ -21,13 +20,17 @@ public class ThirdPartyAccountApplyFlowService : AbstractLowFlowSpyFormOperation
 
     public override void PreviewSetCondition(BpmnStartConditionsVo conditionsVo, ThirdPartyAccountApplyVo businessDataVo)
     {
+        
+        conditionsVo.AccountType=businessDataVo.AccountType;
+        conditionsVo.StartUserId=businessDataVo.StartUserId;
        
     }
     
 
     public override void LaunchParameters(BpmnStartConditionsVo conditionsVo, ThirdPartyAccountApplyVo businessDataVo)
     {
-       
+        conditionsVo.AccountType=businessDataVo.AccountType;
+        conditionsVo.StartUserId=businessDataVo.StartUserId;
     }
     
     
@@ -65,6 +68,11 @@ public class ThirdPartyAccountApplyFlowService : AbstractLowFlowSpyFormOperation
             thirdPartyAccountApply.Id=id;
             _thirdPartyAccountApplyService._repository.Update(thirdPartyAccountApply);
         }
+    }
+
+    public override void OnDisagreeData(ThirdPartyAccountApplyVo vo)
+    {
+        
     }
 
     public override void OnBackToModifyData(ThirdPartyAccountApplyVo vo)

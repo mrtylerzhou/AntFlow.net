@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.Orm.util;
+using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.constant.enums;
@@ -74,16 +74,18 @@ namespace AntFlowCore.Abstraction.adaptor;
 
             paramsVo.ParamType = (int)nodeParamTypeEnum;
             int approvalStandard = nodeVo.ApprovalStandard;
-            if (ApprovalStandardEnum.FROM_PREV_NODE.Code == approvalStandard)
+            if (ApprovalStandardEnum.FROM_PREV_NODE.Code == approvalStandard
+                || (nodeVo.NodeProperty.HasValue
+                    && nodeVo.NodeProperty.Value == (int)NodePropertyEnum.NODE_PROPERTY_PREV_NODE_RELATED))
             {
                 BpmnNodePropertysVo property = nodeVo.Property;
                 if(property==null){
-                    
+
                 }else
                 {
                     BpmnNodeVo bpmnNodeVo = mapPreNodes[nodeVo.NodeId];
                     if(bpmnNodeVo==null){
-                       
+
                     }else
                     {
                         List<BaseIdTranStruVo> emplList = bpmnNodeVo.Property.EmplList;
@@ -91,7 +93,29 @@ namespace AntFlowCore.Abstraction.adaptor;
                     }
                 }
             }
-            
+
+            // 上一节点指定审批人: 当前节点有 prev_node_appointed 标签时, 给上一节点贴 appoint_next_node_approver 标签
+            // 上一节点审批页根据该标签渲染[指定下一节点审批人]按钮
+            List<BpmnNodeLabelVO> currentLabels = nodeVo.LabelList;
+            if (currentLabels != null && currentLabels.Count > 0)
+            {
+                bool hasPrevNodeAppointedLabel = currentLabels
+                    .Any(l => StringConstants.AF_SYSLABEL_PREV_NODE_APPOINTED.Equals(l.LabelValue));
+                if (hasPrevNodeAppointedLabel)
+                {
+                    if (mapPreNodes != null && mapPreNodes.TryGetValue(nodeVo.NodeId, out var prevNode) && prevNode != null)
+                    {
+                        List<BpmnNodeLabelVO> prevLabels = prevNode.LabelList;
+                        bool prevHasLabel = prevLabels != null && prevLabels.Count > 0
+                            && prevLabels.Any(l => StringConstants.AF_SYSLABEL_APPOINT_NEXT_NODE_APPROVER.Equals(l.LabelValue));
+                        if (!prevHasLabel)
+                        {
+                            prevNode.SetOrAddLabelList(NodeLabelConstants.AppointNextNodeApprover);
+                        }
+                    }
+                }
+            }
+
             List<BpmnNodeParamsAssigneeVo> assigneeList = AssigneeListUniq(
                 _bpmnPersonnelProviderService.GetAssigneeList(nodeVo, startConditionsVo));
             SetAssigneeOrList(paramsVo, assigneeList, nodeParamTypeEnum);

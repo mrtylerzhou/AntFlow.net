@@ -6,4 +6,5 @@ namespace AntFlowCore.Persist.api.interf.repository;
 public interface IBpmVariableMultiplayerRepository : IBaseRepository<BpmVariableMultiplayer>
 {
     List<BpmVariableMultiplayer> QueryMultiplayersByProcessNumAndElementId(string processNum, string elementId);
+    List<BpmVariableMultiplayer> IsMoreNode(string processNum, string elementId);
 }

@@ -1,29 +1,16 @@
-﻿using System.Reflection;
 using AntFlowCore.Base.adaptor.formoperation;
-using AntFlowCore.Base.extension;
 using AntFlowCore.Base.vo;
-using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Bpmn.adaptor.formoperation;
 
 public abstract class AbstractLowFlowSpyFormOperationAdaptor<T> : IFormOperationAdaptor<T> where T : BusinessDataVo
 {
-    private readonly IBpmnNodeConditionsConfService _bpmnNodeConditionsConfService;
-
-    public AbstractLowFlowSpyFormOperationAdaptor(IBpmnNodeConditionsConfService bpmnNodeConditionsConfService)
-    {
-        _bpmnNodeConditionsConfService = bpmnNodeConditionsConfService;
-    }
-
     public abstract void PreviewSetCondition(BpmnStartConditionsVo conditionsVo,T businessDataVo);
     public BpmnStartConditionsVo PreviewSetCondition(T vo)
     {
         BpmnStartConditionsVo conditionsVo = new BpmnStartConditionsVo();
         conditionsVo.StartUserId = vo.StartUserId;
         conditionsVo.StartUserName = vo.StartUserName;
-        List<String> fieldNames = _bpmnNodeConditionsConfService.QueryConditionParamNameByProcessNumber(vo);
-        IDictionary<string,object> formLfLikeConditions = FormLFLikeConditions(vo,fieldNames);
-        conditionsVo.LfConditions = formLfLikeConditions;
         PreviewSetCondition(conditionsVo, vo);
         return conditionsVo;
     }
@@ -34,9 +21,6 @@ public abstract class AbstractLowFlowSpyFormOperationAdaptor<T> : IFormOperation
         BpmnStartConditionsVo conditionsVo = new BpmnStartConditionsVo();
         conditionsVo.StartUserId = vo.StartUserId;
         conditionsVo.StartUserName = vo.StartUserName;
-        List<String> fieldNames = _bpmnNodeConditionsConfService.QueryConditionParamNameByProcessNumber(vo);
-        IDictionary<string,object> formLfLikeConditions = FormLFLikeConditions(vo,fieldNames);
-        conditionsVo.LfConditions = formLfLikeConditions;
         LaunchParameters(conditionsVo, vo);
         return conditionsVo;
     }
@@ -49,31 +33,10 @@ public abstract class AbstractLowFlowSpyFormOperationAdaptor<T> : IFormOperation
 
     public abstract void OnConsentData(T vo);
 
+    public abstract void OnDisagreeData(T vo);
+
     public abstract void OnBackToModifyData(T vo);
 
     public abstract void OnCancellationData(T vo);
     public abstract void OnFinishData(BusinessDataVo vo);
-
-    private IDictionary<String, Object> FormLFLikeConditions(BusinessDataVo businessDataVo, List<String> fieldNames)
-    {
-        if (fieldNames.IsEmpty())
-        {
-            return null;
-        }
-
-        IDictionary<String, Object> conditions = new Dictionary<string, object>();
-        foreach (string fieldName in fieldNames)
-        {
-            PropertyInfo? prop = businessDataVo.GetType().GetProperty(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.IgnoreCase);
-            if (prop != null)
-            {
-                object? value = prop.GetValue(businessDataVo);
-                if (value != null)
-                {
-                    conditions.Add(fieldName, value);
-                }
-            }
-        }
-        return conditions;
-    }
 }

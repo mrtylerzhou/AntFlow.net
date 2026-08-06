@@ -1,8 +1,7 @@
-using AntFlowCore.Abstraction.service.biz;
+﻿using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
-using AntFlowCore.Bpmn.listener;
 
 namespace AntFlowCore.Bpmn.evt;
 
@@ -14,17 +13,11 @@ namespace AntFlowCore.Bpmn.evt;
     public class AntFlowOperationListener : IWorkflowButtonOperationHandler
     {
         private readonly IThirdPartyCallBackService _thirdPartyCallBackService;
-        private readonly IBpmVariableMessageBizService _variableMessageBizService;
-        private readonly IBpmVariableMessageListenerService _bpmVariableMessageListenerService;
 
         public AntFlowOperationListener(
-            IThirdPartyCallBackService thirdPartyCallBackService,
-            IBpmVariableMessageBizService variableMessageBizService,
-            IBpmVariableMessageListenerService bpmVariableMessageListenerService)
+            IThirdPartyCallBackService thirdPartyCallBackService)
         {
             _thirdPartyCallBackService = thirdPartyCallBackService;
-            _variableMessageBizService = variableMessageBizService;
-            _bpmVariableMessageListenerService = bpmVariableMessageListenerService;
         }
 
         /// <summary>
@@ -108,7 +101,6 @@ namespace AntFlowCore.Bpmn.evt;
         /// </summary>
         public void onStop(BusinessDataVo businessData)
         {
-            _bpmVariableMessageListenerService.SendProcessMessages(EventTypeEnum.PROCESS_CANCELLATION, businessData);
         }
 
         /// <summary>
@@ -116,7 +108,6 @@ namespace AntFlowCore.Bpmn.evt;
         /// </summary>
         public void onForward(BusinessDataVo businessData)
         {
-            _bpmVariableMessageListenerService.SendProcessMessages(EventTypeEnum.PROCESS_FORWARD, businessData);
         }
 
         /// <summary>
@@ -124,7 +115,6 @@ namespace AntFlowCore.Bpmn.evt;
         /// </summary>
         public void onBackToModify(BusinessDataVo businessData)
         {
-            _variableMessageBizService.SendTemplateMessages(businessData);
         }
 
         /// <summary>
@@ -132,7 +122,6 @@ namespace AntFlowCore.Bpmn.evt;
         /// </summary>
         public void onJp(BusinessDataVo businessData)
         {
-            _variableMessageBizService.SendTemplateMessages(businessData);
         }
 
         /// <summary>
@@ -187,4 +176,10 @@ namespace AntFlowCore.Bpmn.evt;
         {
             // 注意: 流程完成通知消息并不在这里,实际上已经有了,请勿要在这里写
         }
+
+        /// <summary>
+        /// 反对(仲裁签专用). 和 onDisAgree 一致,这里不做第三方回调.
+        /// 实际的反对处理(删任务/记verifyinfo/阈值判断/终止流程)在 OpposeProcessService 中完成.
+        /// </summary>
+        public void onOppose(BusinessDataVo businessData) { }
     }

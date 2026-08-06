@@ -2,6 +2,7 @@ using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.adaptor.processoperation;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
+using AntFlowCore.Base.factory;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.adaptor;
@@ -32,11 +33,17 @@ public class ButtonOperationService : IButtonOperationService
 
     public BusinessDataVo ButtonsOperationTransactional(BusinessDataVo vo)
     {
-        
+
         //Do button operations
         IProcessOperationAdaptor processOperation = _adaptorFactory.GetProcessOperation(vo);
         try
         {
+            // 将下一节点审批人写入 ThreadLocalContainer, 供 AFTaskService.InsertTasks 读取并替换虚拟审批人 -4
+            // (上一节点指定审批人功能). 调用前设置, 内部使用后会被清空.
+            if (vo.NextNodeApprovers != null && vo.NextNodeApprovers.Count > 0)
+            {
+                ThreadLocalContainer.Set(StringConstants.NEXT_NODE_APPROVER, vo.NextNodeApprovers);
+            }
             processOperation.DoProcessButton(vo);
            
             if (vo.IsOutSideAccessProc == true)
@@ -74,10 +81,19 @@ public class ButtonOperationService : IButtonOperationService
                 {
                     eventName= ITaskListener.EVENTNAME_DELETE;
                 }
-                foreach (BpmAfTask bpmAfTask in bpmAfTasks)
+              
+                ThreadLocalContainer.Set(StringConstants.AF_RUNTIME_BUISINESS_INFO, vo);
+                try
                 {
-                    bpmAfTask.ProcessNumber = vo.ProcessNumber;
-                    _taskListener.Notify(bpmAfTask,eventName);
+                    foreach (BpmAfTask bpmAfTask in bpmAfTasks)
+                    {
+                        bpmAfTask.ProcessNumber = vo.ProcessNumber;
+                        _taskListener.Notify(bpmAfTask,eventName);
+                    }
+                }
+                finally
+                {
+                    ThreadLocalContainer.Remove(StringConstants.AF_RUNTIME_BUISINESS_INFO);
                 }
             }
            

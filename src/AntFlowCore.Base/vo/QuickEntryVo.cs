@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace AntFlowCore.Base.vo
 {
@@ -87,5 +87,11 @@ namespace AntFlowCore.Base.vo
         /// </summary>
         [JsonPropertyName("variableUrlFlag")]
         public int VariableUrlFlag { get; set; }
+
+        /// <summary>
+        /// Type config JSON
+        /// </summary>
+        [JsonPropertyName("typeConfigJson")]
+        public string? TypeConfigJson { get; set; }
     }
 }

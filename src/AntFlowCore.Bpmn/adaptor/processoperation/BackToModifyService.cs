@@ -1,4 +1,4 @@
-using AntFlowCore.Abstraction.Orm.util;
+﻿using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.adaptor.processoperation;
@@ -283,6 +283,66 @@ public class BackToModifyService : IProcessOperationAdaptor
             }
         }
 
+        /// <summary>
+        /// 自动退回节点专用: 直接跳转到目标节点(FOUR_DISAGREE语义).
+        /// 不能先 complete 再跳转, 因为自动退回可能是最后一个节点, complete 后流程结束无法跳转.
+        /// 正确做法: 直接用 CommitProcess 操作当前任务(内部处理任务结束+跳转).
+        /// .NET 版直接同步执行(不需要 Java 版的 afterCommit 延迟).
+        /// </summary>
+        public void ReturnToTargetNode(BpmAfTask delegateTask, string procInstId, string processNumber,
+            string currentTaskDefKey, string targetElementId, string targetNodeName,
+            string verifyUserId, string verifyUserName)
+        {
+            ReturnToTargetNode(delegateTask, procInstId, processNumber, currentTaskDefKey, targetElementId, targetNodeName, verifyUserId, verifyUserName, ProcessDisagreeTypeEnum.FOUR_DISAGREE.Code);
+        }
+
+        /// <summary>
+        /// 自动退回/条件退回 统一跳转方法(带 backType 参数).
+        /// </summary>
+        public void ReturnToTargetNode(BpmAfTask delegateTask, string procInstId, string processNumber,
+            string currentTaskDefKey, string targetElementId, string targetNodeName,
+            string verifyUserId, string verifyUserName, int backType)
+        {
+            // Step 1: 设置审批人为虚拟人
+            delegateTask.Assignee = verifyUserId;
+            delegateTask.AssigneeName = verifyUserName;
+
+            // Step 2: 记录审批日志
+            _verifyInfoService.AddVerifyInfo(new BpmVerifyInfo
+            {
+                VerifyDate = DateTime.Now,
+                TaskName = delegateTask.Name,
+                TaskId = delegateTask.Id,
+                RunInfoId = procInstId,
+                VerifyUserId = verifyUserId,
+                VerifyUserName = verifyUserName,
+                TaskDefKey = currentTaskDefKey,
+                VerifyStatus = (int)ProcessSubmitStateEnum.PROCESS_UPDATE_TYPE,
+                VerifyDesc = $"自动退回至[{targetNodeName}]",
+                ProcessCode = processNumber,
+                TenantId = MultiTenantUtil.GetCurrentTenantId(),
+            });
+
+            // Step 3: 执行退回跳转 - 直接操作当前任务, 不先 complete
+            var varMap = new Dictionary<string, object>
+            {
+                { StringConstants.TASK_ASSIGNEE_NAME, verifyUserName },
+                { StringConstants.VERIFY_COMMENT, $"自动退回至[{targetNodeName}]" },
+            };
+            _processNodeJump.CommitProcess(delegateTask, varMap, targetElementId);
+
+            // Step 4: 写 BpmProcessNodeSubmit(控制目标节点完成后的跳转)
+            _processNodeSubmitService.AddProcessNode(new BpmProcessNodeSubmit
+            {
+                State = 1,
+                NodeKey = targetElementId,
+                ProcessInstanceId = procInstId,
+                BackType = backType,
+                CreateUser = verifyUserId,
+                CreateTime = DateTime.Now,
+                TenantId = MultiTenantUtil.GetCurrentTenantId(),
+            });
+        }
         public void SetSupportBusinessObjects()
         {
             ((IAdaptorService)this).AddSupportBusinessObjects(ProcessOperationEnum.BUTTON_TYPE_BACK_TO_MODIFY);

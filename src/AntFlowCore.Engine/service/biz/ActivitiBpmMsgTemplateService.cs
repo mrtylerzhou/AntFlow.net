@@ -1,7 +1,9 @@
-﻿using AntFlowCore.Abstraction.Orm.util;
+using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.service.biz;
+using AntFlowCore.Abstraction.service.repository;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
+using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn;
@@ -15,21 +17,21 @@ namespace AntFlowCore.Engine.service.biz;
 public class ActivitiBpmMsgTemplateService : IActivitiBpmMsgTemplateService
 {
     private readonly IUserService _userService;
-    private readonly IBpmProcessNoticeService _bpmProcessNoticeService;
     private readonly IConfiguration _configuration;
-    private readonly IBpmnConfNoticeTemplateService _bpmnConfNoticeTemplateService;
+    private readonly IBpmnConfService _bpmnConfService;
+    private readonly IBpmVariableService _bpmVariableService;
     private readonly ILogger<ActivitiBpmMsgTemplateService> _logger;
 
     public ActivitiBpmMsgTemplateService(IUserService userService,
-        IBpmProcessNoticeService bpmProcessNoticeService,
         IConfiguration configuration,
-        IBpmnConfNoticeTemplateService bpmnConfNoticeTemplateService,
+        IBpmnConfService bpmnConfService,
+        IBpmVariableService bpmVariableService,
         ILogger<ActivitiBpmMsgTemplateService> logger)
     {
         _userService = userService;
-        _bpmProcessNoticeService = bpmProcessNoticeService;
         _configuration = configuration;
-        _bpmnConfNoticeTemplateService = bpmnConfNoticeTemplateService;
+        _bpmnConfService = bpmnConfService;
+        _bpmVariableService = bpmVariableService;
         _logger = logger;
     }
     private const  String baseTitle = "工作流通知";
@@ -333,26 +335,25 @@ public class ActivitiBpmMsgTemplateService : IActivitiBpmMsgTemplateService
 
     private string GetContent(ActivitiBpmMsgVo activitiBpmMsgVo, int msgNoticeType)
     {
-        _logger.LogInformation("content数据转换, activitiBpmMsgVo: {ActivitiBpmMsgVo}, msgNoticeType: {MsgNoticeType}", 
+        _logger.LogInformation("content数据转换, activitiBpmMsgVo: {ActivitiBpmMsgVo}, msgNoticeType: {MsgNoticeType}",
             System.Text.Json.JsonSerializer.Serialize(activitiBpmMsgVo), msgNoticeType);
 
-        BpmnConfNoticeTemplateDetail bpmnConfNoticeTemplateDetail = null;
+        NoticeTemplateDetailItem? templateDetail = null;
 
         if (!string.IsNullOrWhiteSpace(activitiBpmMsgVo.BpmnCode))
         {
-            bpmnConfNoticeTemplateDetail = 
-                _bpmnConfNoticeTemplateService.GetDetailByCodeAndType(activitiBpmMsgVo.BpmnCode, msgNoticeType);
+            templateDetail = GetDetailByCodeAndType(activitiBpmMsgVo.BpmnCode, msgNoticeType);
         }
 
         string content;
-        if (bpmnConfNoticeTemplateDetail == null)
+        if (templateDetail == null || string.IsNullOrEmpty(templateDetail.NoticeTemplateDetailContent))
         {
             _logger.LogInformation("模板内容为空, bpmnCode: {BpmnCode}", activitiBpmMsgVo.BpmnCode);
             content = MsgNoticeTypeEnumExtensions.GetDefaultValueByCode(msgNoticeType);
         }
         else
         {
-            content = bpmnConfNoticeTemplateDetail.NoticeTemplateDetail;
+            content = templateDetail.NoticeTemplateDetailContent;
         }
 
         string result = ReplaceTemplateDetail(activitiBpmMsgVo, content);
@@ -360,6 +361,29 @@ public class ActivitiBpmMsgTemplateService : IActivitiBpmMsgTemplateService
         _logger.LogInformation("转换后数据content: {Result}", result);
 
         return result;
+    }
+
+    private NoticeTemplateDetailItem? GetDetailByCodeAndType(string bpmnCode, int noticeType)
+    {
+        var bpmnConf = _bpmnConfService._repository.GetQueryable()
+            .Where(a => a.BpmnCode == bpmnCode && a.EffectiveStatus == 1 && a.ConfConfigJson != null)
+            .First();
+
+        if (bpmnConf == null || string.IsNullOrEmpty(bpmnConf.ConfConfigJson))
+        {
+            return null;
+        }
+
+        var confConfig = JsonConfUtil.ParseConfConfig(bpmnConf.ConfConfigJson);
+        if (confConfig?.NoticeTemplateConfig?.Details == null || !confConfig.NoticeTemplateConfig.Details.Any())
+        {
+            return null;
+        }
+
+        var detail = confConfig.NoticeTemplateConfig.Details
+            .FirstOrDefault(d => d.NoticeTemplateType == noticeType);
+
+        return detail;
     }
 
     private void DoUserMsgSend(ActivitiBpmMsgVo activitiBpmMsgVo, string content)
@@ -397,31 +421,28 @@ public class ActivitiBpmMsgTemplateService : IActivitiBpmMsgTemplateService
     }
     private MessageSendTypeEnum[] GetMessageSendTypeEnums(string processId, string formCode, int selectMack)
     {
-        if (selectMack == 1)
+        // Read notice channel types from conf_config_json (migrated from bpm_process_notice)
+        if (!string.IsNullOrEmpty(formCode))
         {
-            var bpmProcessNotices = _bpmProcessNoticeService.ProcessNoticeList(formCode);
-            if (bpmProcessNotices != null && bpmProcessNotices.Any())
+            var bpmnConf = _bpmnConfService._repository.GetQueryable()
+                .Where(a => a.FormCode == formCode && a.EffectiveStatus == 1 && a.ConfConfigJson != null)
+                .First();
+
+            if (bpmnConf != null && !string.IsNullOrEmpty(bpmnConf.ConfConfigJson))
             {
-                return bpmProcessNotices
-                    .Select(o => MessageSendTypeEnum.GetEnumByCode(o.Type))
-                    .ToArray();
+                var confConfig = JsonConfUtil.ParseConfConfig(bpmnConf.ConfConfigJson);
+                if (confConfig?.NoticeChannelTypes != null && confConfig.NoticeChannelTypes.Count > 0)
+                {
+                    var types = confConfig.NoticeChannelTypes
+                        .Select(type => MessageSendTypeEnum.GetEnumByCode(type))
+                        .Where(e => e != null)
+                        .ToList();
+                    if (types.Count > 0)
+                    {
+                        return types.ToArray()!;
+                    }
+                }
             }
-        }
-        else if (selectMack == 2)
-        {
-            IBpmBusinessProcessService bpmBusinessProcessService = ServiceProviderUtils.GetService<IBpmBusinessProcessService>();
-            var bpmBusinessProcess = bpmBusinessProcessService.GetBpmBusinessProcess(processId) 
-                                     ?? new BpmBusinessProcess();
-
-            var processKey = bpmBusinessProcess.ProcessinessKey ?? processId;
-
-            /*var bpmProcessNodeOvertimeVos = processNodeOvertimeService.SelectNoticeNodeName(processKey);
-            if (bpmProcessNodeOvertimeVos != null && bpmProcessNodeOvertimeVos.Any())
-            {
-                return bpmProcessNodeOvertimeVos
-                    .Select(o => MessageSendTypeEnum.GetEnumByCode(o.NoticeType))
-                    .ToArray();
-            }*/
         }
 
         return Array.Empty<MessageSendTypeEnum>();

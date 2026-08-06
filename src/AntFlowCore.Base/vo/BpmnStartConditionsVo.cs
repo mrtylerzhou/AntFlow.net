@@ -202,8 +202,43 @@ namespace AntFlowCore.Base.vo
         public List<string> TemplateMarkIds { get; set; }
         [JsonPropertyName("isPreview")]
         public bool IsPreview { get; set; }
+
+        /// <summary>
+        /// Whether this is a migration (re-evaluation) of a running process.
+        /// Set to true when checking if dynamic conditions have changed during resubmit.
+        /// </summary>
+        [JsonPropertyName("isMigration")]
+        public bool? IsMigration { get; set; }
+
+        /// <summary>
+        /// Deduplication type (1=none, 2=forward, 3=backward, 4=skip_next/adjacent).
+        /// Copied from BpmnConfVo.DeduplicationType during process start.
+        /// </summary>
+        [JsonPropertyName("deduplicationType")]
+        public int? DeduplicationType { get; set; }
+
+        /// <summary>
+        /// Duplication process strategy (1=remove, 2=skip).
+        /// When SKIP, deduplicated assignees still get tasks but are auto-completed.
+        /// </summary>
+        [JsonPropertyName("duplicationProcessStrategy")]
+        public int? DuplicationProcessStrategy { get; set; }
         
         [JsonPropertyName("approvalEmpls")]
         public List<BaseIdTranStruVo> ApprovalEmpls { get; set; }
+
+        /// <summary>
+        /// Carries the full business data vo (including form fields and form-related assignee map)
+        /// so that personnel providers like FormRelatedPersonnelProvider can access form data at runtime.
+        /// </summary>
+        [JsonPropertyName("businessDataVo")]
+        public BusinessDataVo BusinessDataVo { get; set; }
+
+        /// <summary>
+        /// 选择条件:用户强制指定的条件分支节点ID列表.
+        /// 非空时ConditionService跳过自然评估,匹配则true不匹配则false.
+        /// </summary>
+        [JsonPropertyName("forcedConditionNodeIds")]
+        public List<string> ForcedConditionNodeIds { get; set; }
     }
 }

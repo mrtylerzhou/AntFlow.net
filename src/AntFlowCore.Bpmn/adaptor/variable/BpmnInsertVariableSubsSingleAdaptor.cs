@@ -1,6 +1,3 @@
-using AntFlowCore.Abstraction.Orm.util;
-using AntFlowCore.Base.entity;
-using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Persist.api.interf.repository;
 
@@ -8,32 +5,8 @@ namespace AntFlowCore.Bpmn.adaptor.variable;
 
 public class BpmnInsertVariableSubsSingleAdaptor: IBpmnInsertVariableSubs
 {
-    private readonly IBpmVariableSingleService _bpmVariableSingleService;
-
-    public BpmnInsertVariableSubsSingleAdaptor(IBpmVariableSingleService bpmVariableSingleService)
-    {
-        _bpmVariableSingleService = bpmVariableSingleService;
-    }
     public void InsertVariableSubs(BpmnConfCommonElementVo elementVo, long variableId)
     {
-        var assigneeMap = elementVo.AssigneeMap;
-
-        var variableSingle = new BpmVariableSingle
-        {
-            VariableId = variableId,
-            ElementId = elementVo.ElementId,
-            ElementName = elementVo.ElementName,
-            NodeId = elementVo.NodeId,
-            AssigneeParamName = elementVo.AssigneeParamName,
-            Assignee = elementVo.AssigneeParamValue,
-            AssigneeName = assigneeMap != null && assigneeMap.ContainsKey(elementVo.AssigneeParamValue)
-                ? assigneeMap[elementVo.AssigneeParamValue]??""
-                : "",
-            CreateTime = DateTime.Now,
-            TenantId = MultiTenantUtil.GetCurrentTenantId(),
-        };
-
-        _bpmVariableSingleService._repository.Add(variableSingle);
+        // BpmVariableSingle entity has been removed; single assignee variable insertion is no longer supported
     }
-
 }

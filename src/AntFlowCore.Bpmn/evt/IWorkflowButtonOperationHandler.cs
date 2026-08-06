@@ -117,4 +117,9 @@ namespace AntFlowCore.Bpmn.evt;
         /// 完成数据
         /// </summary>
         void onFinishData(BusinessDataVo vo);
+
+        /// <summary>
+        /// 反对(仲裁签专用)
+        /// </summary>
+        void onOppose(BusinessDataVo businessData);
     }

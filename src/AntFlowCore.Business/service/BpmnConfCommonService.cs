@@ -134,6 +134,12 @@ public class BpmnConfCommonService : IBpmnConfCommonService
 
     private BpmnConfVo GetBpmnConfVo(BpmnStartConditionsVo bpmnStartConditions, BpmnConfVo bpmnConfVo)
     {
+        //0. 将特殊节点类型转为运行期 nodeType=4(如自动节点 9→4),对应 Java NodeUtil.nodeSpecialProcess
+        foreach (var node in bpmnConfVo.Nodes)
+        {
+            AfNodeUtils.NodeSpecialProcess(node);
+        }
+
         //1. Format the process,filter it by condition
         _bpmnStartFormatFactory.formatBpmnConf(bpmnConfVo, bpmnStartConditions);
 
@@ -153,7 +159,20 @@ public class BpmnConfCommonService : IBpmnConfCommonService
                 //deduplication backword
                 _deduplicationFormat.BackwardDeduplication(bpmnConfVo, bpmnStartConditions);
             }
+            else if (bpmnConfVo.DeduplicationType == (int)DeduplicationTypeEnum.DEDUPLICATION_TYPE_SKIP_NEXT)
+            {
+                // adjacent deduplication: use backward dedup logic but with SKIP_NEXT type
+                bpmnStartConditions.DeduplicationType = (int)DeduplicationTypeEnum.DEDUPLICATION_TYPE_SKIP_NEXT;
+                _deduplicationFormat.BackwardDeduplication(bpmnConfVo, bpmnStartConditions);
+            }
+            // set duplication process strategy to SKIP (generate tasks but auto-complete)
+            bpmnStartConditions.DuplicationProcessStrategy = DuplicationProcessStrategyEnum.SKIP.Code;
         }
+
+        // Store duplication process strategy in thread-local for element adaptors to read
+        // (element adaptor's GetElementVo doesn't receive BpmnStartConditionsVo directly)
+        ThreadLocalContainer.Set(StringConstants.DUPLICATION_PROCESS_STRATEGY,
+            bpmnStartConditions.DuplicationProcessStrategy ?? DuplicationProcessStrategyEnum.REMOVE.Code);
 
         _optionalDuplicatesAdaptor.OptionalDuplicate(bpmnConfVo, bpmnStartConditions);
         //4、format the nodes by pipelines

@@ -5,6 +5,7 @@ using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
+using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.extension;
 using AntFlowCore.Base.factory;
@@ -22,14 +23,11 @@ public class ProcessApprovalService : IProcessApprovalService
     private readonly IFormFactory _formFactory;
     private readonly IButtonOperationService _buttonOperationService;
     private readonly IBpmBusinessProcessService _bpmBusinessProcessService;
-    private readonly IBpmVariableSignUpService _bpmVariableSignUpService;
     private readonly IProcessConstantsService _processConstantsService;
     private readonly IConfigFlowButtonContantService _configFlowButtonContantService;
     private readonly IBpmVariableMultiplayerService _bpmVariableMultiplayerService;
-    private readonly IBpmProcessNameRelevancyService _processNameRelevancyService;
     private readonly IBpmProcessForwardService _bpmProcessForwardService;
     private readonly IFreeSql _freeSql;
-    private readonly IBpmProcessNameService _bpmProcessNameService;
     private readonly IBpmnConfCommonService _bpmnConfCommonService;
     private readonly IAFTaskService _taskService;
     private readonly IAfTaskInstService _afTaskInstService;
@@ -39,14 +37,11 @@ public class ProcessApprovalService : IProcessApprovalService
         IFormFactory formFactory,
         IButtonOperationService buttonOperationService,
         IBpmBusinessProcessService bpmBusinessProcessService,
-        IBpmVariableSignUpService bpmVariableSignUpService,
         IProcessConstantsService processConstantsService,
         IConfigFlowButtonContantService configFlowButtonContantService,
         IBpmVariableMultiplayerService bpmVariableMultiplayerService,
-        IBpmProcessNameRelevancyService processNameRelevancyService,
         IBpmProcessForwardService bpmProcessForwardService,
         IFreeSql freeSql,
-        IBpmProcessNameService bpmProcessNameService,
         IBpmnConfCommonService bpmnConfCommonService,
         IAFTaskService taskService,
         IAfTaskInstService afTaskInstService,
@@ -56,14 +51,11 @@ public class ProcessApprovalService : IProcessApprovalService
         _formFactory = formFactory;
         _buttonOperationService = buttonOperationService;
         _bpmBusinessProcessService = bpmBusinessProcessService;
-        _bpmVariableSignUpService = bpmVariableSignUpService;
         _processConstantsService = processConstantsService;
         _configFlowButtonContantService = configFlowButtonContantService;
         _bpmVariableMultiplayerService = bpmVariableMultiplayerService;
-        _processNameRelevancyService = processNameRelevancyService;
         _bpmProcessForwardService = bpmProcessForwardService;
         _freeSql = freeSql;
-        _bpmProcessNameService = bpmProcessNameService;
         _bpmnConfCommonService = bpmnConfCommonService;
         _taskService = taskService;
         _afTaskInstService = afTaskInstService;
@@ -103,7 +95,7 @@ public class ProcessApprovalService : IProcessApprovalService
 
         BusinessDataVo dataVo = null;
         _freeSql.Ado.Transaction(() => { dataVo = _buttonOperationService.ButtonsOperationTransactional(vo); });
-
+      
         return dataVo;
 
     }
@@ -158,16 +150,22 @@ public class ProcessApprovalService : IProcessApprovalService
             flag
         );
 
+        // 上一节点指定审批人: 当前节点贴有 appoint_next_node_approver 标签时,
+        // 渲染[指定下一节点审批人]按钮. 标签从 ProcessRecordInfo.FormKey (NodeExtraInfoDTO JSON) 中读取.
+        if (HasAppointNextNodeApproverLabel(businessDataVo))
+        {
+            AddAppointNextNodeApproverButton(businessDataVo);
+        }
+
+        // 退回按钮行为配置: 检查当前节点formKey中是否含有退回行为标签, 如有则填充drawBackType/drawBackNodes
+        PopulateDrawBackConf(businessDataVo, bpmBusinessProcess);
+
+        // 推进按钮行为配置: 检查当前节点formKey中是否含有推进标签, 如有则填充forwardType/forwardNodes
+        PopulateForwardConf(businessDataVo, bpmBusinessProcess);
+
         // 检查当前节点是否为报名节点，并设置属性
         string nodeId = businessDataVo.ProcessRecordInfo.NodeId;
-        bool nodeIsSignUp = _bpmVariableSignUpService.CheckNodeIsSignUp(vo.ProcessNumber, nodeId);
-        businessDataVo.IsSignUpNode = nodeIsSignUp;
-
-        // 如果是报名节点，则添加“选择审核人”按钮
-        if (nodeIsSignUp)
-        {
-            AddApproverButton(businessDataVo);
-        }
+        businessDataVo.IsSignUpNode = false;
 
         if ((vo.IsOutSideAccessProc == null || !vo.IsOutSideAccessProc.Value) && vo.IsLowCodeFlow == 1)
         {
@@ -220,6 +218,377 @@ public class ProcessApprovalService : IProcessApprovalService
 
     }
 
+    /// <summary>
+    /// 检查当前节点是否需要渲染[指定下一节点审批人]按钮.
+    /// 从 ProcessRecordInfoVo.FormKey 读取 NodeExtraInfoDTO, 检查是否包含
+    /// af_syslabel_appoint_next_node_approver 标签.
+    /// 对应 Java ProcessApprovalServiceImpl.hasAppointNextNodeApproverLabel.
+    /// </summary>
+    private bool HasAppointNextNodeApproverLabel(BusinessDataVo businessDataVo)
+    {
+        try
+        {
+            if (businessDataVo?.ProcessRecordInfo == null)
+            {
+                return false;
+            }
+            string formKey = businessDataVo.ProcessRecordInfo.FormKey;
+            if (string.IsNullOrEmpty(formKey) || !formKey.StartsWith("{"))
+            {
+                return false;
+            }
+            NodeExtraInfoDTO? extraInfoDTO = System.Text.Json.JsonSerializer.Deserialize<NodeExtraInfoDTO>(formKey);
+            if (extraInfoDTO?.NodeLabelVOS == null || extraInfoDTO.NodeLabelVOS.Count == 0)
+            {
+                return false;
+            }
+            return NodeLabelConstants.NodeLabelContainsAny(
+                extraInfoDTO.NodeLabelVOS,
+                StringConstants.AF_SYSLABEL_APPOINT_NEXT_NODE_APPROVER);
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(e, "HasAppointNextNodeApproverLabel check failed");
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 添加[指定下一节点审批人]按钮到 PC 审批页按钮列表.
+    /// 对应 Java ProcessApprovalServiceImpl.addAppointNextNodeApproverButton.
+    /// </summary>
+    private void AddAppointNextNodeApproverButton(BusinessDataVo businessDataVo)
+    {
+        ProcessActionButtonVo button = new ProcessActionButtonVo
+        {
+            ButtonType = (int)ButtonTypeEnum.BUTTON_TYPE_APPOINT_NEXT_NODE_APPROVER,
+            Name = ButtonTypeEnumExtensions.GetDescByCode((int)ButtonTypeEnum.BUTTON_TYPE_APPOINT_NEXT_NODE_APPROVER)
+        };
+
+        var pcButtons = businessDataVo.ProcessRecordInfo.PcButtons;
+        if (pcButtons == null)
+        {
+            return;
+        }
+        if (!pcButtons.TryGetValue(ButtonPageTypeEnumExtensions.GetName(ButtonPageTypeEnum.AUDIT),
+                out var pcProcButtons))
+        {
+            pcProcButtons = new List<ProcessActionButtonVo>();
+            pcButtons[ButtonPageTypeEnumExtensions.GetName(ButtonPageTypeEnum.AUDIT)] = pcProcButtons;
+        }
+
+        int buttonTypeCode = (int)ButtonTypeEnum.BUTTON_TYPE_APPOINT_NEXT_NODE_APPROVER;
+        if (pcProcButtons != null && !pcProcButtons.Any(a => buttonTypeCode.Equals(a.ButtonType)))
+        {
+            pcProcButtons.Add(button);
+        }
+    }
+
+    /// <summary>
+    /// 退回按钮行为配置: 检查当前节点formKey中是否含有退回行为标签,
+    /// 如有则从 nodeConfigJson 读取 DrawBackType 和 DrawBackNodeIds 并返回给前端.
+    /// 对应 Java ProcessApprovalServiceImpl.populateDrawBackConf.
+    /// </summary>
+    private void PopulateDrawBackConf(BusinessDataVo vo, BpmBusinessProcess bpmBusinessProcess)
+    {
+        try
+        {
+            if (vo?.ProcessRecordInfo == null) return;
+            string formKey = vo.ProcessRecordInfo.FormKey;
+            if (string.IsNullOrEmpty(formKey) || !formKey.StartsWith("{")) return;
+            var extraInfoDTO = System.Text.Json.JsonSerializer.Deserialize<NodeExtraInfoDTO>(formKey);
+            if (extraInfoDTO?.NodeLabelVOS == null || extraInfoDTO.NodeLabelVOS.Count == 0) return;
+            bool hasDrawBackLabel =
+                NodeLabelConstants.NodeLabelContainsAny(extraInfoDTO.NodeLabelVOS, StringConstants.AF_SYSLABEL_BACK_INITIATOR) ||
+                NodeLabelConstants.NodeLabelContainsAny(extraInfoDTO.NodeLabelVOS, StringConstants.AF_SYSLABEL_BACK_PREV) ||
+                NodeLabelConstants.NodeLabelContainsAny(extraInfoDTO.NodeLabelVOS, StringConstants.AF_SYSLABEL_BACK_SPECIFIED);
+            if (!hasDrawBackLabel) return;
+
+            // 获取当前节点的BpmnNode记录
+            string elementId = vo.ProcessRecordInfo.NodeId;
+            var multiplayer = _freeSql.Select<BpmVariable, BpmVariableMultiplayer>()
+                .InnerJoin((a, b) => a.Id == b.VariableId)
+                .Where((a, b) => a.ProcessNum == vo.ProcessNumber && b.ElementId == elementId)
+                .First((a, b) => b);
+            if (multiplayer == null || string.IsNullOrEmpty(multiplayer.NodeId)) return;
+            var bpmnNode = _freeSql.Select<BpmnNode>()
+                .Where(a => a.Id == long.Parse(multiplayer.NodeId))
+                .First();
+            if (bpmnNode == null || string.IsNullOrEmpty(bpmnNode.NodeConfigJson)) return;
+            var configJson = System.Text.Json.JsonSerializer.Deserialize<BpmnNodeConfigJson>(bpmnNode.NodeConfigJson);
+            if (configJson?.DrawBackType == null || configJson.DrawBackType == 0) return;
+            vo.DrawBackType = configJson.DrawBackType;
+
+            // 对于指定节点(4/5),解析节点名称
+            if ((configJson.DrawBackType == 4 || configJson.DrawBackType == 5)
+                && configJson.DrawBackNodeIds != null && configJson.DrawBackNodeIds.Count > 0)
+            {
+                long confId = bpmnNode.ConfId;
+                var drawBackNodes = new List<BaseIdTranStruVo>();
+                foreach (string nodeUuid in configJson.DrawBackNodeIds)
+                {
+                    var targetNode = _freeSql.Select<BpmnNode>()
+                        .Where(a => a.ConfId == confId && a.NodeId == nodeUuid && a.IsDel == 0)
+                        .First();
+                    if (targetNode != null)
+                    {
+                        // 返回主键id(非UUID), 因为 BackToModifyImpl 通过 getElementIdsdByNodeId 需要主键
+                        drawBackNodes.Add(new BaseIdTranStruVo
+                        {
+                            Id = targetNode.Id.ToString(),
+                            Name = targetNode.NodeName
+                        });
+                    }
+                }
+                vo.DrawBackNodes = drawBackNodes;
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(e, "PopulateDrawBackConf failed");
+        }
+    }
+
+    /// <summary>
+    /// 推进按钮行为配置: 检查当前节点formKey中是否含有推进标签,
+    /// 如有则从 nodeConfigJson 读取 ForwardType 和 ForwardNodeIds 并返回给前端.
+    /// 对应 Java ProcessApprovalServiceImpl.populateForwardConf.
+    /// </summary>
+    private void PopulateForwardConf(BusinessDataVo vo, BpmBusinessProcess bpmBusinessProcess)
+    {
+        try
+        {
+            if (vo?.ProcessRecordInfo == null) return;
+            // 直接从当前节点的 nodeConfigJson 读取推进配置,不依赖 formKey 标签
+            string elementId = vo.ProcessRecordInfo.NodeId;
+            if (string.IsNullOrEmpty(elementId)) return;
+            var multiplayer = _freeSql.Select<BpmVariable, BpmVariableMultiplayer>()
+                .InnerJoin((a, b) => a.Id == b.VariableId)
+                .Where((a, b) => a.ProcessNum == vo.ProcessNumber && b.ElementId == elementId)
+                .First((a, b) => b);
+            if (multiplayer == null || string.IsNullOrEmpty(multiplayer.NodeId)) return;
+            var bpmnNode = _freeSql.Select<BpmnNode>()
+                .Where(a => a.Id == long.Parse(multiplayer.NodeId))
+                .First();
+            if (bpmnNode == null || string.IsNullOrEmpty(bpmnNode.NodeConfigJson)) return;
+            var configJson = System.Text.Json.JsonSerializer.Deserialize<BpmnNodeConfigJson>(bpmnNode.NodeConfigJson);
+            if (configJson?.ForwardType == null) return;
+            vo.ForwardType = configJson.ForwardType;
+
+            // 对于指定节点(1),解析节点名称
+            if (configJson.ForwardType == 1
+                && configJson.ForwardNodeIds != null && configJson.ForwardNodeIds.Count > 0)
+            {
+                long confId = bpmnNode.ConfId;
+                var forwardNodes = new List<BaseIdTranStruVo>();
+                foreach (string nodeUuid in configJson.ForwardNodeIds)
+                {
+                    var targetNode = _freeSql.Select<BpmnNode>()
+                        .Where(a => a.ConfId == confId && a.NodeId == nodeUuid && a.IsDel == 0)
+                        .First();
+                    if (targetNode != null)
+                    {
+                        forwardNodes.Add(new BaseIdTranStruVo
+                        {
+                            Id = targetNode.Id.ToString(),
+                            Name = targetNode.NodeName
+                        });
+                    }
+                }
+                vo.ForwardNodes = forwardNodes;
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(e, "PopulateForwardConf failed");
+        }
+    }
+
+    /// <summary>
+    /// 检查当前节点是否贴有选择条件标签.
+    /// 从 ProcessRecordInfoVo.FormKey 读取 NodeExtraInfoDTO, 检查是否包含
+    /// af_syslabel_pick_condition 标签.
+    /// 对应 Java ProcessApprovalServiceImpl.hasPickConditionLabel.
+    /// </summary>
+    private bool HasPickConditionLabel(BusinessDataVo businessDataVo)
+    {
+        try
+        {
+            if (businessDataVo?.ProcessRecordInfo == null)
+            {
+                return false;
+            }
+            string formKey = businessDataVo.ProcessRecordInfo.FormKey;
+            if (string.IsNullOrEmpty(formKey) || !formKey.StartsWith("{"))
+            {
+                return false;
+            }
+            NodeExtraInfoDTO? extraInfoDTO = System.Text.Json.JsonSerializer.Deserialize<NodeExtraInfoDTO>(formKey);
+            if (extraInfoDTO?.NodeLabelVOS == null || extraInfoDTO.NodeLabelVOS.Count == 0)
+            {
+                return false;
+            }
+            return NodeLabelConstants.NodeLabelContainsAny(
+                extraInfoDTO.NodeLabelVOS,
+                StringConstants.AF_SYSLABEL_PICK_CONDITION);
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(e, "HasPickConditionLabel check failed");
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 添加[选择分支]按钮并查询可选分支列表.
+    /// 查找当前审批人节点下级的动态条件网关,再查网关下级的条件节点(排除默认条件).
+    /// 对应 Java ProcessApprovalServiceImpl.addPickConditionButtonAndBranches.
+    /// </summary>
+    private void AddPickConditionButtonAndBranches(BusinessDataVo businessDataVo, BpmBusinessProcess bpmBusinessProcess)
+    {
+        // 添加选择分支按钮
+        ProcessActionButtonVo button = new ProcessActionButtonVo
+        {
+            ButtonType = (int)ButtonTypeEnum.BUTTON_TYPE_PICK_CONDITION,
+            Name = ButtonTypeEnumExtensions.GetDescByCode((int)ButtonTypeEnum.BUTTON_TYPE_PICK_CONDITION)
+        };
+
+        var pcButtons = businessDataVo.ProcessRecordInfo.PcButtons;
+        if (pcButtons == null)
+        {
+            return;
+        }
+        if (!pcButtons.TryGetValue(ButtonPageTypeEnumExtensions.GetName(ButtonPageTypeEnum.AUDIT),
+                out var pcProcButtons))
+        {
+            pcProcButtons = new List<ProcessActionButtonVo>();
+            pcButtons[ButtonPageTypeEnumExtensions.GetName(ButtonPageTypeEnum.AUDIT)] = pcProcButtons;
+        }
+
+        int buttonTypeCode = (int)ButtonTypeEnum.BUTTON_TYPE_PICK_CONDITION;
+        if (pcProcButtons != null && !pcProcButtons.Any(a => buttonTypeCode.Equals(a.ButtonType)))
+        {
+            pcProcButtons.Add(button);
+        }
+
+        // 查询可选分支列表
+        try
+        {
+            string elementId = businessDataVo.ProcessRecordInfo.NodeId;
+            string processKey = bpmBusinessProcess.ProcessinessKey;
+
+            // 获取流程配置confId
+            var bpmnConf = _bpmnConfCommonService.GetBpmnConfByFormCode(processKey);
+            if (bpmnConf == null || bpmnConf.Id == 0)
+            {
+                return;
+            }
+            long confId = bpmnConf.Id;
+
+            // elementId(taskDefKey)转换为bpmn_node表的node_id(UUID):
+            // 先通过BpmVariableMultiplayer拿到bpmn_node主键id,再查bpmn_node获取node_id
+            string currentNodeId = null;
+            var multiplayer = _freeSql.Select<BpmVariableMultiplayer, BpmVariable>()
+                .InnerJoin((a, b) => a.VariableId == b.Id)
+                .Where((a, b) => a.ElementId == elementId && b.ProcessNum == bpmBusinessProcess.BusinessNumber)
+                .First();
+            if (multiplayer != null && !string.IsNullOrEmpty(multiplayer.NodeId))
+            {
+                var currentNode = _freeSql.Select<BpmnNode>()
+                    .Where(a => a.Id == long.Parse(multiplayer.NodeId))
+                    .First();
+                if (currentNode != null)
+                {
+                    currentNodeId = currentNode.NodeId;
+                }
+            }
+            if (currentNodeId == null) return;
+
+            // 查找当前审批人节点下级的动态条件网关
+            var gateways = _freeSql.Select<BpmnNode>()
+                .Where(a => a.ConfId == confId
+                    && a.NodeFrom == currentNodeId
+                    && a.IsDynamicCondition == true
+                    && a.IsDel == 0)
+                .ToList();
+
+            if (gateways == null || gateways.Count == 0)
+            {
+                return;
+            }
+
+            //动态条件并行网关:设置多选标识
+            if (gateways[0].IsParallel == true)
+            {
+                businessDataVo.PickConditionMultiSelect = true;
+            }
+
+            string gatewayNodeId = gateways[0].NodeId;
+
+            // 查找网关下级的条件节点(nodeType=3)
+            var conditionNodes = _freeSql.Select<BpmnNode>()
+                .Where(a => a.ConfId == confId
+                    && a.NodeFrom == gatewayNodeId
+                    && a.NodeType == (int)NodeTypeEnum.NODE_TYPE_CONDITIONS
+                    && a.IsDel == 0)
+                .ToList();
+
+            if (conditionNodes == null || conditionNodes.Count == 0)
+            {
+                return;
+            }
+
+            // 过滤默认条件节点,构建分支列表
+            var branches = new List<PickConditionBranchVo>();
+            foreach (var node in conditionNodes)
+            {
+                if (!IsDefaultConditionNode(node))
+                {
+                    branches.Add(new PickConditionBranchVo
+                    {
+                        Id = node.NodeId,
+                        Name = node.NodeName ?? node.NodeId
+                    });
+                }
+            }
+
+            if (branches.Count > 0)
+            {
+                businessDataVo.PickConditionBranches = branches;
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogWarning(e, "AddPickConditionButtonAndBranches query failed");
+        }
+    }
+
+    /// <summary>
+    /// 判断条件节点是否为默认条件.
+    /// 解析 nodeConfigJson.conditionsConf.conditionGroups[0].isDefault.
+    /// </summary>
+    private bool IsDefaultConditionNode(BpmnNode node)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(node.NodeConfigJson))
+            {
+                return false;
+            }
+            var configJson = JsonConfUtil.ParseNodeConfig(node.NodeConfigJson);
+            var groups = configJson?.ConditionsConf?.ConditionGroups;
+            if (groups == null || groups.Count == 0)
+            {
+                return false;
+            }
+            return groups[0].IsDefault == 1;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     public ResultAndPage<TaskMgmtVO> FindPcProcessList(PageDto pageDto, TaskMgmtVO vo)
     {
         SortedDictionary<String, SortTypeEnum> orderFieldMap = new SortedDictionary<string, SortTypeEnum>();
@@ -240,23 +609,14 @@ public class ProcessApprovalService : IProcessApprovalService
                 break;
             // recently build task
             case 3:
-                if (!string.IsNullOrEmpty(vo.ProcessType)) {
-                    vo.ProcessKeyList=_processNameRelevancyService.ProcessKeyList(Convert.ToInt64(vo.ProcessType));
-                }
                 page.Records=(this.ViewPcpNewlyBuildList(page, vo));
                 break;
             // already finished tasks
             case 4:
-                if (!string.IsNullOrEmpty(vo.ProcessType)) {
-                    vo.ProcessKeyList=_processNameRelevancyService.ProcessKeyList(Convert.ToInt64(vo.ProcessType));
-                }
                 page.Records=(this.ViewPcAlreadyDoneList(page, vo));
                 break;
             // running tasks
             case 5:
-                if (!string.IsNullOrEmpty(vo.ProcessType)) {
-                    vo.ProcessKeyList=_processNameRelevancyService.ProcessKeyList(Convert.ToInt64(vo.ProcessType));
-                }
                 page.Records=(this.ViewPcToDoList(page, vo));
                 break;
             // my draft
@@ -348,11 +708,11 @@ public class ProcessApprovalService : IProcessApprovalService
 
             if (!string.IsNullOrEmpty(record.ProcessKey))
             {
-                var bpmProcessVo = _bpmProcessNameService.Get(record.ProcessKey);
-                if (bpmProcessVo != null && !string.IsNullOrEmpty(bpmProcessVo.ProcessKey))
+                // Read process name from t_bpmn_conf.BpmnName (migrated from bpm_process_name)
+                if (bpmnConfMap.TryGetValue(record.ProcessKey, out var conf))
                 {
-                    record.ProcessTypeName = bpmProcessVo.ProcessName;
-                    record.ProcessCode = bpmProcessVo.ProcessKey;
+                    record.ProcessTypeName = conf.BpmnName;
+                    record.ProcessCode = conf.FormCode;
                 }
             }
         }
@@ -360,12 +720,37 @@ public class ProcessApprovalService : IProcessApprovalService
 }
 
 private bool IsOperatable(TaskMgmtVO taskMgmtVo)
-{
-    long count = _freeSql.Select<BpmProcessOperation>()
-        .Where(a=>a.ProcessNode==taskMgmtVo.TaskName&&a.ProcessKey==taskMgmtVo.ProcessKey&&a.Type==taskMgmtVo.Type)
-        .Count();
-    return count <= 0;
-}
+    {
+        // Read operationTypes from node_config_json (migrated from bpm_process_operation)
+        if (string.IsNullOrEmpty(taskMgmtVo.ProcessKey) || string.IsNullOrEmpty(taskMgmtVo.TaskName))
+        {
+            return true;
+        }
+
+        var bpmnConf = _bpmnConfCommonService.GetBpmnConfByFormCode(taskMgmtVo.ProcessKey);
+        if (bpmnConf == null || bpmnConf.Id == 0)
+        {
+            return true;
+        }
+
+        var nodes = _freeSql.Select<BpmnNode>()
+            .Where(a => a.ConfId == bpmnConf.Id && a.NodeId == taskMgmtVo.TaskName && a.IsDel == 0)
+            .ToList();
+
+        if (nodes == null || nodes.Count == 0)
+        {
+            return true;
+        }
+
+        var node = nodes[0];
+        var nodeConfig = JsonConfUtil.ParseNodeConfig(node.NodeConfigJson);
+        if (nodeConfig?.ButtonSignConf?.OperationTypes == null || nodeConfig.ButtonSignConf.OperationTypes.Count == 0)
+        {
+            return true;
+        }
+
+        return !nodeConfig.ButtonSignConf.OperationTypes.Contains(taskMgmtVo.Type);
+    }
 
 
 List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
@@ -460,6 +845,7 @@ List<TaskMgmtVO> ViewPcProcessList(Page<TaskMgmtVO> page, TaskMgmtVO taskMgmtVO)
                 ProcessInstanceId = a.t1.ProcInstId,
                 ProcessKey = a.t2.ProcessinessKey,
                 UserId = a.t2.CreateUser,
+                UserName = a.t2.UserName,
                 CreateTime = a.t2.CreateTime,
                 BusinessId= a.t2.BusinessId,
                 Description = a.t2.Description,

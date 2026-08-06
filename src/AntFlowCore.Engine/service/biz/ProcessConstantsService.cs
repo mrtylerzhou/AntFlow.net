@@ -21,18 +21,15 @@ public class ProcessConstantsService : IProcessConstantsService
     private readonly TaskMgmtService _taskMgmtService;
     private readonly IUserMessageService _userMessageService;
     private readonly IBpmProcessForwardService _processForwardService;
-    private readonly IBpmnNodeLfFormdataFieldControlService _bpmnNodeLfFormdataFieldControlService;
     private readonly IAFTaskService _afTaskService;
     private readonly ILogger<ProcessConstantsService> _logger;
 
     public ProcessConstantsService(IAfTaskInstService afTaskInstService, 
         IBpmBusinessProcessService bpmBusinessProcessService,
-       
         IBpmnEmployeeInfoProviderService employeeInfoProviderService,
         TaskMgmtService taskMgmtService,
         IUserMessageService userMessageService,
         IBpmProcessForwardService processForwardService,
-        IBpmnNodeLfFormdataFieldControlService bpmnNodeLfFormdataFieldControlService,
         IAFTaskService afTaskService,
         ILogger<ProcessConstantsService> logger)
     {
@@ -42,7 +39,6 @@ public class ProcessConstantsService : IProcessConstantsService
         _taskMgmtService = taskMgmtService;
         _userMessageService = userMessageService;
         _processForwardService = processForwardService;
-        _bpmnNodeLfFormdataFieldControlService = bpmnNodeLfFormdataFieldControlService;
         _afTaskService = afTaskService;
         _logger = logger;
     }
@@ -131,6 +127,9 @@ public class ProcessConstantsService : IProcessConstantsService
            }
            
             processInfoVo.TaskId = tasks[0].Id;
+            // 设置 FormKey (含节点标签 NodeExtraInfoDTO JSON),供 ProcessApprovalService.GetBusinessInfo
+            // 据此判断当前节点是否需要渲染[指定下一节点审批人]按钮
+            processInfoVo.FormKey = tasks[0].FormKey;
             processInfoVo.ViewNodeIds=viewNodeIds;
             processInfoVo.NodeId = taskDefKey;
         }
@@ -148,10 +147,7 @@ public class ProcessConstantsService : IProcessConstantsService
 
         if (!string.IsNullOrEmpty(taskDefKey) && bpmBusinessProcess.IsLowCodeFlow == 1)
         {
-            List<LFFieldControlVO> currentFieldControls = _bpmnNodeLfFormdataFieldControlService
-                .GetFieldControlByProcessNumberAndElementId(bpmBusinessProcess.BusinessNumber, taskDefKey);
-
-            processInfoVo.LfFieldControlVOs = currentFieldControls;
+            // IBpmnNodeLfFormdataFieldControlService has been removed; LF field control query is no longer supported
         }
 
         return processInfoVo;

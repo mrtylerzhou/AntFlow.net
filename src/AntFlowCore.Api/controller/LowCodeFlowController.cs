@@ -17,18 +17,37 @@ public class LowCodeFlowController
 {
     private readonly IBpmnConfLFFormDataBizService _lfformDataBizService;
     private readonly IDicDataBizSerivce _dicDataBizSerivce;
-    private readonly IDicDataSerivce _dicDataSerivce;
     private readonly IDictService _dictService;
 
-    public LowCodeFlowController(IBpmnConfLFFormDataBizService lfformDataBizService,IDicDataBizSerivce dicDataBizSerivce,IDicDataSerivce dicDataSerivce)
+    public LowCodeFlowController(IBpmnConfLFFormDataBizService lfformDataBizService,IDicDataBizSerivce dicDataBizSerivce,IDictService dicSerivce)
     {
         _lfformDataBizService = lfformDataBizService;
         _dicDataBizSerivce = dicDataBizSerivce;
-        _dicDataSerivce = dicDataSerivce;
+        _dictService = dicSerivce;
     }
     [HttpPost("createLowCodeFormCode")]
     public Result<int> CreateLowCodeFormCode([FromBody] BaseKeyValueStruVo vo){
         return Result<int>.Succ(_dictService.AddFormCode(vo));
+    }
+
+    /// <summary>
+    /// 新增 page-added DIY FormCode(dict_type=diylowcodeflow: LF 后端 + 自定义 Vue 前端)
+    /// </summary>
+    [HttpPost("createDIYFormCode")]
+    public Result<int> CreateDIYFormCode([FromBody] BaseKeyValueStruVo vo)
+    {
+        return Result<int>.Succ(_dictService.AddDIYFormCode(vo));
+    }
+
+    /// <summary>
+    /// 获取 page-added DIY FormCode Page List 模板列表使用
+    /// </summary>
+    [HttpPost("getDIYFormCodePageList")]
+    public ResultAndPage<BaseKeyValueStruVo> GetDIYFormCodePageList([FromBody] DetailRequestDto requestDto)
+    {
+        PageDto pageDto = requestDto.PageDto;
+        TaskMgmtVO taskMgmtVO = requestDto.TaskMgmtVO;
+        return _dicDataBizSerivce.SelectDIYFormCodePageList(pageDto, taskMgmtVO);
     }
     
     [HttpGet("getLowCodeFlowFormCodes")]

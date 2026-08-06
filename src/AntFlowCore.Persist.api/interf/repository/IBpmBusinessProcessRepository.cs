@@ -8,6 +8,7 @@ public interface IBpmBusinessProcessRepository: IBaseRepository<BpmBusinessProce
     void UpdateProcessDigest(string processNumber, string processDigest);
     void UpdateProcessState(long id, int processState);
     void UpdateProcInstId(long id, string procInstId);
+    void UpdateProcInstId(long id, string procInstId, string businessId);
 
     public void UpdateDto(BpmBusinessProcess bpmBusinessProcess);
 }

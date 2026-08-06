@@ -1,12 +1,12 @@
 using System.Collections;
 using System.Reflection;
 using System.Text.Json;
-using AntFlowCore.Abstraction;
 using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Abstraction.service.repository;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
+using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.extension;
 using AntFlowCore.Base.util;
@@ -16,7 +16,17 @@ using AntFlowCore.Persist.api.interf.repository;
 
 namespace AntFlowCore.Bpmn.service;
 
-public class BpmVariableMessageBizService: IBpmVariableMessageBizService
+/// <summary>
+/// Variable message business service.
+///
+/// This is the JSON-first adaptation of the legacy implementation. Message templates are
+/// read from <c>t_bpm_variable.variable_config_json</c> (field <c>messages[]</c>) instead of
+/// the dropped <c>t_bpm_variable_message</c> table, and notice channel types are read from
+/// <c>t_bpmn_conf.conf_config_json</c> (field <c>noticeChannelTypes</c>) instead of the dropped
+/// <c>bpm_process_notice</c> table. Behaviour mirrors the Java
+/// <c>BpmVariableMessageBizServiceImpl</c>.
+/// </summary>
+public class BpmVariableMessageBizService : IBpmVariableMessageBizService
 {
     private readonly IBpmVariableService _variableService;
     private readonly IBpmnConfService _bpmnConfService;
@@ -25,11 +35,8 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
     private readonly IAFTaskService _taskService;
     private readonly IRoleService _roleService;
     private readonly IUserService _userService;
-    private readonly IBpmProcessNoticeService _bpmProcessNoticeService;
     private readonly IBpmProcessForwardService _bpmProcessForwardService;
     private readonly IProcessBusinessContansService _processBusinessContansService;
-    private readonly IBpmVariableApproveRemindService _bpmVariableApproveRemindService;
-    private readonly IBpmVariableMessageService _bpmVariableMessageService;
 
     public BpmVariableMessageBizService(
         IBpmVariableService variableService,
@@ -39,12 +46,8 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
         IAFTaskService taskService,
         IRoleService roleService,
         IUserService userService,
-        IBpmProcessNoticeService bpmProcessNoticeService,
         IBpmProcessForwardService bpmProcessForwardService,
-        IProcessBusinessContansService processBusinessContansService,
-        IBpmVariableApproveRemindService bpmVariableApproveRemindService,
-        IBpmVariableMessageService bpmVariableMessageService
-    )
+        IProcessBusinessContansService processBusinessContansService)
     {
         _variableService = variableService;
         _bpmnConfService = bpmnConfService;
@@ -53,69 +56,63 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
         _taskService = taskService;
         _roleService = roleService;
         _userService = userService;
-        _bpmProcessNoticeService = bpmProcessNoticeService;
         _bpmProcessForwardService = bpmProcessForwardService;
         _processBusinessContansService = processBusinessContansService;
-        _bpmVariableApproveRemindService = bpmVariableApproveRemindService;
-        _bpmVariableMessageService = bpmVariableMessageService;
     }
-     public BpmVariableMessageVo GetBpmVariableMessageVo(BusinessDataVo businessDataVo)
+
+    /// <summary>
+    /// check whether to send messages by template
+    /// </summary>
+    public bool CheckIsSendByTemplate(BpmVariableMessageVo vo)
     {
-        if (businessDataVo == null)
+        BpmVariable bpmVariable = _variableService._repository
+            .Find(a => a.ProcessNum == vo.ProcessNumber)
+            .FirstOrDefault();
+
+        if (bpmVariable == null || string.IsNullOrEmpty(bpmVariable.VariableConfigJson))
         {
-            return null;
+            return false;
         }
 
-        if (businessDataVo.OperationType == null)
+        VariableConfigJson config = JsonConfUtil.ParseVariableConfig(bpmVariable.VariableConfigJson);
+        if (config == null || config.Messages.IsEmpty())
         {
-            throw new AFBizException("未知操作类型");
+            return false;
         }
 
-        //get event type by operation type
-        EventTypeEnum? eventTypeEnum =
-            EventTypeEnumExtensions.GetEnumByOperationType(businessDataVo.OperationType.Value);
-
-        if (eventTypeEnum == null || eventTypeEnum == 0)
+        int? messageType = vo.MessageType;
+        if (messageType == null)
         {
-            return null;
+            return false;
         }
 
-        //default link type is process type
-        int type = 2;
-
-
-        //if event type is cancel operation then link type is view type
-        if (eventTypeEnum == EventTypeEnum.PROCESS_CANCELLATION)
+        //如果节点存在自定义通知类型,则默认走自定义的,需要注意的是即便不设置只要开启了通知,流程仍然会通知,内部有一套默认通知机制.自定义通知主要是为了增加灵活性,慎用
+        if (messageType == 2)
         {
-            type = 1;
+            //in node messages
+            return config.Messages.Any(m => m.MessageType != null && m.MessageType == 2
+                                            && m.EventType != null && m.EventType == vo.EventType);
         }
 
-        BpmVariableMessageVo vo = new BpmVariableMessageVo
+        if (messageType == 1)
         {
-            ProcessNumber = businessDataVo.ProcessNumber,
-            FormCode = businessDataVo.FormCode,
-            EventType = (int)eventTypeEnum,
-            ForwardUsers = businessDataVo.UserIds,
-            SignUpUsers = businessDataVo.SignUpUsers.Select(a => a.Id).ToList(),
-            MessageType = eventTypeEnum.IsInNode() ? 2 : 1,
-            EventTypeEnum = eventTypeEnum.Value,
-            Type = type,
-        };
-        return GetBpmVariableMessageVo(vo);
+            //out of node messages
+            return config.Messages.Any(m => m.MessageType != null && m.MessageType == 1
+                                            && m.EventType != null && m.EventType == vo.EventType);
+        }
+
+        return false;
     }
 
-    /**
-    * build variable message vo for sending messages
-    *
-    * @param vo
-    */
+    /// <summary>
+    /// build variable message vo for sending messages
+    /// </summary>
     public BpmVariableMessageVo GetBpmVariableMessageVo(BpmVariableMessageVo vo)
     {
         if (vo == null)
         {
             return null;
         }
-
 
         BpmVariable bpmVariable = null;
         List<BpmVariable> bpmVariables =
@@ -131,10 +128,8 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
             return null;
         }
 
-
         //set variable id
         vo.VariableId = bpmVariable.Id;
-
 
         //get bpmn conf
         BpmnConf bpmnConf = _bpmnConfService._repository.Find(a => a.BpmnCode.Equals(bpmVariable.BpmnCode)).FirstOrDefault();
@@ -167,11 +162,9 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
             vo.ApprovalEmplId = bpmnStartConditionsVo.ApprovalEmplId ?? "0";
         }
 
-
         //query bpmn business process by process number
         BpmBusinessProcess businessProcess = _bpmBusinessProcessService._repository
             .FirstOrDefault(a => a.BusinessNumber.Equals(vo.ProcessNumber));
-
 
         if (businessProcess == null)
         {
@@ -188,7 +181,6 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
         //if the current node approver is empty, then get it from login user info
         if (string.IsNullOrEmpty(vo.Assignee))
         {
-
             vo.Assignee = SecurityUtils.GetLogInEmpId();
         }
 
@@ -221,7 +213,6 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
                     nextUserElement.ElementType == ElementTypeEnum.ELEMENT_TYPE_END_EVENT.Code)
                 {
                     //next element's id
-                    String nextElementId = nextUserElement.ElementId;
                     vo.NextNodeApproveds = nextUserElement.AssigneeMap?.Select(a => a.Key).ToList();
                 }
             }
@@ -230,245 +221,165 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
         return vo;
     }
 
-    public void InsertVariableMessage(long variableId, BpmnConfCommonVo bpmnConfCommonVo)
-    {
-        // Variable message list
-        List<BpmVariableMessage> bpmVariableMessages = new List<BpmVariableMessage>();
-
-        // Process node approval remind list
-        List<BpmVariableApproveRemind> bpmVariableApproveReminds = new List<BpmVariableApproveRemind>();
-
-        // Add out-of-node variable message config
-        if (bpmnConfCommonVo.TemplateVos != null && bpmnConfCommonVo.TemplateVos.Any())
-        {
-            bpmVariableMessages.AddRange(GetBpmVariableMessages(variableId, bpmnConfCommonVo.TemplateVos, string.Empty,
-                1));
-        }
-
-        // Add in-node message config
-        if (bpmnConfCommonVo.ElementList != null && bpmnConfCommonVo.ElementList.Any())
-        {
-            foreach (BpmnConfCommonElementVo elementVo in bpmnConfCommonVo.ElementList)
-            {
-                if (elementVo.TemplateVos == null || !elementVo.TemplateVos.Any())
-                {
-                    continue;
-                }
-
-                bpmVariableMessages.AddRange(GetBpmVariableMessages(variableId, elementVo.TemplateVos,
-                    elementVo.ElementId, 2));
-
-                // Add process node approval remind list
-                if (elementVo.ApproveRemindVo != null && elementVo.ApproveRemindVo.Days != null)
-                {
-                    bpmVariableApproveReminds.Add(new BpmVariableApproveRemind
-                    {
-                        VariableId = variableId,
-                        ElementId = elementVo.ElementId,
-                        Content = JsonSerializer.Serialize(elementVo.ApproveRemindVo)
-                    });
-                }
-            }
-        }
-
-        // Save variable messages in batch if not empty
-        if (bpmVariableMessages.Any())
-        {
-            _bpmVariableMessageService._repository.AddRange(bpmVariableMessages);
-        }
-
-        // Save approval reminds in batch if not empty
-        if (bpmVariableApproveReminds.Any())
-        {
-            _bpmVariableApproveRemindService._repository.AddRange(bpmVariableApproveReminds);
-        }
-    }
-
-    private List<BpmVariableMessage> GetBpmVariableMessages(long variableId, List<BpmnTemplateVo> templateVos,
-        string elementId, int messageType)
-    {
-        return templateVos
-            .Select(o => new BpmVariableMessage
-            {
-                VariableId = variableId,
-                ElementId = elementId,
-                MessageType = GetMessageSendType(o.Event,messageType),
-                EventType = o.Event,
-                Content = JsonSerializer.Serialize(o)
-                ,CreateTime = DateTime.Now
-            })
-            .ToList();
-    }
-
-    
-    private int GetMessageSendType(int messageEvent,int defaultMessageSendType){
-        if(messageEvent==null){
-            return defaultMessageSendType;
-        }
-
-        EventTypeEnum eventTypeEnum = (EventTypeEnum)messageEvent;
-        if(eventTypeEnum==null){
-            return defaultMessageSendType;
-        }
-
-        EventTypeEnumExtensions.EventTypeMappings.TryGetValue(eventTypeEnum, out var eventTypeMapping);
-        bool isInNode = eventTypeMapping?.IsInNode??false;
-        return isInNode?2:1;
-    }
-    /**
-
-    * check whether to to send messages by template
-    *
-    * @param vo
-    * @return
-    */
-    public bool CheckIsSendByTemplate(BpmVariableMessageVo vo)
-    {
-
-        BpmVariable bpmVariable = _variableService._repository
-            .Find(a => a.ProcessNum == vo.ProcessNumber)
-            .FirstOrDefault();
-
-        if (bpmVariable == null)
-        {
-            return false;
-        }
-
-        int? messageType = vo.MessageType;
-        if (messageType == null)
-        {
-            return false;
-        }
-    
-        //如果节点存在自定义通知类型,则默认走自定义的,需要注意的是即便不设置只要开启了通知,流程仍然会通知,内部有一套默认通知机制.自定义通知主要是为了增加灵活性,慎用
-        if (messageType == 2)
-        {
-            long count = _bpmVariableMessageService._repository
-                .Count(a=> 
-                             a.VariableId == bpmVariable.Id
-                           //&&a.ElementId == vo.ElementId
-                           && a.MessageType == messageType
-                           && a.EventType == vo.EventType);
-            return count > 0;
-        }else if (messageType == 1)
-        {
-            long count = _bpmVariableMessageService._repository
-                .Count(a=> 
-                              a.VariableId == bpmVariable.Id
-                           && a.MessageType == messageType
-                           && a.EventType == vo.EventType);
-            return count > 0;
-        }
-
-        return false;
-    }
-
     /// <summary>
-    /// end templated messages in sync way
+    /// send templated messages in sync way
     /// </summary>
-    /// <param name="vo"></param>
-    /// <returns></returns>
     public void SendTemplateMessages(BpmVariableMessageVo vo)
     {
         DoSendTemplateMessages(vo);
     }
-    public void SendTemplateMessages(BusinessDataVo businessDataVo) {
-        BpmVariableMessageVo bpmVariableMessageVo = FromBusinessDataVo(businessDataVo);
-        DoSendTemplateMessages(bpmVariableMessageVo);
-    }
-    /**
-   * do send templated messages
-   *
-   * @param vo
-   */
-    private void DoSendTemplateMessages(BpmVariableMessageVo vo)
+
+    /// <summary>
+    /// build variable message vo from business data vo
+    /// </summary>
+    public BpmVariableMessageVo FromBusinessDataVo(BusinessDataVo businessDataVo)
     {
-
-
-        //if next node's approvers is empty then query current tasks instead
-        if (vo.NextNodeApproveds.IsEmpty())
+        if (businessDataVo == null)
         {
-            List<BpmAfTask> tasks = _taskService._repository
-                .Find(a => a.ProcInstId == vo.ProcessInsId);
-
-            if (!tasks.IsEmpty())
-            {
-                vo.NextNodeApproveds = tasks.Select(a => a.Assignee).ToList();
-            }
+            return null;
         }
 
-        List<BpmVariableMessage> bpmVariableMessages = null;
+        //get event type by operation type
+        EventTypeEnum? eventTypeEnum = EventTypeEnumExtensions.GetEnumByOperationType(businessDataVo.OperationType ?? 0);
+
+        if (eventTypeEnum.Value == 0)
+        {
+            return null;
+        }
+
+        //default link type is process type
+        int type = 2;
+
+        //if event type is cancel operation then link type is view type
+        if (eventTypeEnum == EventTypeEnum.PROCESS_CANCELLATION)
+        {
+            type = 1;
+        }
+
+        BpmVariableMessageVo vo = new BpmVariableMessageVo
+        {
+            ProcessNumber = businessDataVo.ProcessNumber,
+            FormCode = businessDataVo.FormCode,
+            EventType = (int)eventTypeEnum,
+            ForwardUsers = businessDataVo.UserIds ?? new List<string>(),
+            SignUpUsers = businessDataVo.SignUpUsers?.Select(o => o.Id).ToList() ?? new List<string>(),
+            MessageType = eventTypeEnum.IsInNode() ? 2 : 1,
+            EventTypeEnum = eventTypeEnum.Value,
+            Type = type,
+        };
+
+        //build message vo
+        return GetBpmVariableMessageVo(vo);
+    }
+
+    /// <summary>
+    /// send templated messages asynchronously (fire-and-forget)
+    /// </summary>
+    public void SendTemplateMessagesAsync(BpmVariableMessageVo vo)
+    {
+        DoSendTemplateMessages(vo);
+    }
+
+    /// <summary>
+    /// do send templated messages
+    /// </summary>
+    private void DoSendTemplateMessages(BpmVariableMessageVo vo)
+    {
+        
+        //read messages from variable config JSON
+        BpmVariable bpmVariable = _variableService._repository
+            .Find(a => a.Id == vo.VariableId).FirstOrDefault();
+        if (bpmVariable == null || string.IsNullOrEmpty(bpmVariable.VariableConfigJson))
+        {
+            return;
+        }
+        VariableConfigJson config = JsonConfUtil.ParseVariableConfig(bpmVariable.VariableConfigJson);
+        if (config == null || config.Messages.IsEmpty())
+        {
+            return;
+        }
+        //out of node messages
+        List<VariableMessageItem> messageItems = null;
         if (vo.MessageType == 1)
         {
-            //out of node messages
-            bpmVariableMessages = _bpmVariableMessageService._repository
-                .Find(a =>
-                    a.VariableId == vo.VariableId
-                    && a.MessageType == 1
-                    && a.EventType == vo.EventType);
-            
+             messageItems= config.Messages
+                .Where(m => m.MessageType != null && m.MessageType == 1 && m.EventType == vo.EventType)
+                .ToList();
         }
         else if (vo.MessageType == 2)
         {
             //in node messages
-             bpmVariableMessages = _bpmVariableMessageService._repository
-                .Find(a =>
-                    a.VariableId == vo.VariableId
-                    && a.EventType == vo.EventType);
+             messageItems = config.Messages
+                .Where(m => m.EventType == vo.EventType)
+                .ToList();
             if (!string.IsNullOrEmpty(vo.ElementId))
             {
-                List<BpmVariableMessage> currentNodeVariableMessages = bpmVariableMessages.Where(a => a.ElementId == vo.ElementId).ToList();
-                if(!currentNodeVariableMessages.IsEmpty())
+                List<VariableMessageItem> currentNodeVariableMessages = messageItems
+                    .Where(a => a.ElementId == vo.ElementId).ToList();
+                if (!currentNodeVariableMessages.IsEmpty())
                 {
                     //如果当前节点有节点内通知消息,则覆盖全局通用的,否则使用全局的
-                    bpmVariableMessages = currentNodeVariableMessages;
+                    messageItems = currentNodeVariableMessages;
                 }
             }
-            if (!bpmVariableMessages.IsEmpty())
+        }
+
+        if (!messageItems.IsEmpty())
+        {
+            //if next node's approvers is empty then query current tasks instead
+            if (vo.NextNodeApproveds.IsEmpty())
             {
-                foreach (BpmVariableMessage bpmVariableMessage in bpmVariableMessages)
+                List<BpmAfTask> tasks = _taskService._repository
+                    .Find(a => a.ProcInstId == vo.ProcessInsId);
+
+                if (!tasks.IsEmpty())
                 {
-                    DoSendTemplateMessages(bpmVariableMessage, vo);
+                    vo.NextNodeApproveds = tasks.Select(a => a.Assignee).ToList();
                 }
+            }
+            foreach (VariableMessageItem messageItem in messageItems)
+            {
+                DoSendTemplateMessages(messageItem, vo);
             }
         }
     }
-    /**
-    * do send templated messages
-    *
-    * @param bpmVariableMessage
-    */
-    private void DoSendTemplateMessages(BpmVariableMessage bpmVariableMessage, BpmVariableMessageVo vo) {
 
+    /// <summary>
+    /// do send templated messages
+    /// </summary>
+    private void DoSendTemplateMessages(VariableMessageItem messageItem, BpmVariableMessageVo vo)
+    {
         BpmnTemplateVo bpmnTemplateVo = new BpmnTemplateVo();
-        if (!string.IsNullOrEmpty(bpmVariableMessage.Content)) {
-            bpmnTemplateVo = JsonSerializer.Deserialize<BpmnTemplateVo>(bpmVariableMessage.Content);
+        if (!string.IsNullOrEmpty(messageItem.Content))
+        {
+            bpmnTemplateVo = JsonConfUtil.ParseObject<BpmnTemplateVo>(messageItem.Content);
         }
 
-
         //query sender's info
-        List<String> sendToUsers = GetSendToUsers(vo, bpmnTemplateVo);
-
+        List<string> sendToUsers = GetSendToUsers(vo, bpmnTemplateVo);
 
         //if senders is empty then return
-        if (sendToUsers.IsEmpty()) {
+        if (sendToUsers.IsEmpty())
+        {
             return;
         }
 
         List<DetailedUser> detailedUserDetailByIds = _userService.GetEmployeeDetailByIds(sendToUsers.Distinct().ToList());
-        if(detailedUserDetailByIds.IsEmpty()){
+        if (detailedUserDetailByIds.IsEmpty())
+        {
             return;
         }
 
         //send messages
         SendMessage(vo, bpmnTemplateVo, detailedUserDetailByIds);
-
     }
-     private List<String> GetSendToUsers(BpmVariableMessageVo vo, BpmnTemplateVo bpmnTemplateVo)
-     {
-         List<String> sendUsers = new List<string>();
+
+    private List<string> GetSendToUsers(BpmVariableMessageVo vo, BpmnTemplateVo bpmnTemplateVo)
+    {
+        List<string> sendUsers = new List<string>();
         //specified assignees
-        if (!bpmnTemplateVo.EmpIdList.IsEmpty()) {
+        if (!bpmnTemplateVo.EmpIdList.IsEmpty())
+        {
             sendUsers.AddRange(bpmnTemplateVo.EmpIdList);
         }
 
@@ -482,60 +393,66 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
             }
             else
             {
-               users = _roleService.QueryUserByRoleIds(bpmnTemplateVo.RoleIdList);
+                users = _roleService.QueryUserByRoleIds(bpmnTemplateVo.RoleIdList);
             }
-           
+
             if (!users.IsEmpty())
             {
-                sendUsers.AddRange(users.Select(u => u.Id.ToString()));
+                sendUsers.AddRange(users.Select(u => u.Id));
             }
         }
 
         //todo functions
         //node sign up users
-        if (!vo.SignUpUsers.IsEmpty()) {
+        if (!vo.SignUpUsers.IsEmpty())
+        {
             sendUsers.AddRange(vo.SignUpUsers);
         }
 
         //forwarded
-        List<String> forwardUsers = null;
+        List<string> forwardUsers = null;
         List<BpmProcessForward> bpmProcessForwards = _bpmProcessForwardService._repository
-            .Find(a=>a.ProcessInstanceId==vo.ProcessInsId);
-            
-        if (!vo.ForwardUsers.IsEmpty() && !bpmProcessForwards.IsEmpty()) {
-            forwardUsers =new List<String>();
+            .Find(a => a.ProcessInstanceId == vo.ProcessInsId);
+
+        if (!vo.ForwardUsers.IsEmpty() && !bpmProcessForwards.IsEmpty())
+        {
+            forwardUsers = new List<string>();
             forwardUsers.AddRange(vo.ForwardUsers);
             forwardUsers.AddRange(bpmProcessForwards.Select(o => o.ForwardUserId).Distinct().ToList());
             forwardUsers = forwardUsers.Distinct().ToList();
-        } else if (vo.ForwardUsers.IsEmpty() && !bpmProcessForwards.IsEmpty())
+        }
+        else if (vo.ForwardUsers.IsEmpty() && !bpmProcessForwards.IsEmpty())
         {
             forwardUsers = new List<string>();
             forwardUsers.AddRange(bpmProcessForwards.Select(o => o.ForwardUserId).Distinct().ToList());
             forwardUsers = forwardUsers.Distinct().ToList();
-        } else if (!vo.ForwardUsers.IsEmpty() && bpmProcessForwards.IsEmpty())
+        }
+        else if (!vo.ForwardUsers.IsEmpty() && bpmProcessForwards.IsEmpty())
         {
             forwardUsers = new List<string>();
             forwardUsers.AddRange(vo.ForwardUsers);
             forwardUsers = forwardUsers.Distinct().ToList();
         }
-        vo.ForwardUsers=forwardUsers;
+        vo.ForwardUsers = forwardUsers;
 
         //inform users
-        if (!bpmnTemplateVo.InformIdList.IsEmpty()) {
-            foreach (String informId in bpmnTemplateVo.InformIdList) {
+        if (!bpmnTemplateVo.InformIdList.IsEmpty())
+        {
+            foreach (string informId in bpmnTemplateVo.InformIdList)
+            {
                 InformEnum? informEnum = InformEnumExtensions.GetEnumByCode(int.Parse(informId));
-                if(informEnum==InformEnum.ASSIGNED_USER||informEnum==InformEnum.ASSIGNEED_ROLES){
+                if (informEnum == InformEnum.ASSIGNED_USER || informEnum == InformEnum.ASSIGNEED_ROLES)
+                {
                     continue;
                 }
                 //todo check whether the result is valid
                 string? fileName = informEnum?.GetFileName();
-                Object filObject = null;
+                object filObject = null;
                 if (!string.IsNullOrEmpty(fileName))
                 {
-
                     filObject = ReflectionUtils.GetPropertyValue(vo, fileName);
                 }
-                if (filObject  is IEnumerable enumerable and not string)
+                if (filObject is IEnumerable enumerable and not string)
                 {
                     foreach (object o in enumerable)
                     {
@@ -544,45 +461,58 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
                             sendUsers.Add(o.ToString());
                         }
                     }
-                } else if (filObject!=null) {
+                }
+                else if (filObject != null)
+                {
                     sendUsers.Add(filObject.ToString());
                 }
             }
         }
         return sendUsers;
     }
-     private void SendMessage(BpmVariableMessageVo vo, BpmnTemplateVo bpmnTemplateVo, List<DetailedUser> employees) {
-        //query all types of the messages
-        List<MessageSendTypeEnum> messageSendTypeEnums = _bpmProcessNoticeService.ProcessNoticeList(vo.FormCode)
-            .Select(o => MessageSendTypeEnum.GetEnumByCode(o.Type)).ToList();
+
+    private void SendMessage(BpmVariableMessageVo vo, BpmnTemplateVo bpmnTemplateVo, List<DetailedUser> employees)
+    {
+        //query all types of the messages from conf_config_json
+        BpmnConf bpmnConf = _bpmnConfService._repository
+            .Find(a => a.FormCode == vo.FormCode && a.EffectiveStatus == 1).FirstOrDefault();
+        BpmnConfConfigJson? confConfig = bpmnConf != null ? JsonConfUtil.ParseConfConfig(bpmnConf.ConfConfigJson) : null;
+        List<int>? noticeChannelTypes = confConfig?.NoticeChannelTypes;
+        List<MessageSendTypeEnum> messageSendTypeEnums = (noticeChannelTypes == null || noticeChannelTypes.Count == 0)
+            ? new List<MessageSendTypeEnum>()
+            : noticeChannelTypes.Select(t => MessageSendTypeEnum.GetEnumByCode(t)).ToList();
 
         List<BaseNumIdStruVo> messageSendTypeList = bpmnTemplateVo.MessageSendTypeList;
-        if(!messageSendTypeEnums.IsEmpty()&&!messageSendTypeList.IsEmpty())//如果有模板自身的通知方式,则使用模板自身的通知方式,前提是有默认通知,即默认通知关闭以后节点也不会再通知
+        //如果有模板自身的通知方式,则使用模板自身的通知方式,前提是有默认通知,即默认通知关闭以后节点也不会再通知
+        if (!messageSendTypeEnums.IsEmpty() && !messageSendTypeList.IsEmpty())
         {
-            messageSendTypeEnums=messageSendTypeList.Select(o => MessageSendTypeEnum.GetEnumByCode((int)o.Id)).ToList();
+            messageSendTypeEnums = messageSendTypeList.Select(o => MessageSendTypeEnum.GetEnumByCode((int)o.Id)).ToList();
         }
-        Dictionary<int, String> wildcardCharacterMap = GetWildcardCharacterMap(vo);
+
+        Dictionary<int, string> wildcardCharacterMap = GetWildcardCharacterMap(vo);
         InformationTemplateVo templateVo = new InformationTemplateVo
         {
             Id = bpmnTemplateVo.TemplateId,
-            WildcardCharacterMap =wildcardCharacterMap
+            WildcardCharacterMap = wildcardCharacterMap
         };
         InformationTemplateVo informationTemplateVo = InformationTemplateUtils.TranslateInformationTemplate(templateVo);
 
         //get message urls
-        Dictionary<String, String> urlMap = GetUrlMap(vo, informationTemplateVo);
-       urlMap.TryGetValue("emailUrl", out string? emailUrl);
-       urlMap.TryGetValue("appUrl", out string? appUrl);
+        Dictionary<string, string> urlMap = GetUrlMap(vo, informationTemplateVo);
+        urlMap.TryGetValue("emailUrl", out string? emailUrl);
+        urlMap.TryGetValue("appUrl", out string? appUrl);
 
-        foreach (MessageSendTypeEnum messageSendTypeEnum in messageSendTypeEnums) {
-            if (messageSendTypeEnum==null) {
+        foreach (MessageSendTypeEnum messageSendTypeEnum in messageSendTypeEnums)
+        {
+            if (messageSendTypeEnum == null)
+            {
                 continue;
             }
 
             List<UserMsgBatchVo> userMsgBatchVos = employees
                 .Select(o => GetUserMsgBatchVo(o, informationTemplateVo.MailTitle,
                     informationTemplateVo.MailContent,
-                    vo.TaskId, emailUrl, appUrl, MessageSendTypeEnum.MAIL))
+                    vo.TaskId, emailUrl, appUrl, messageSendTypeEnum))
                 .ToList();
             UserMsgUtils.SendGeneralPurposeMessages(userMsgBatchVos);
         }
@@ -671,6 +601,7 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
 
         return wildcardCharacterMap;
     }
+
     public Dictionary<string, string> GetUrlMap(BpmVariableMessageVo vo, InformationTemplateVo informationTemplateVo)
     {
         var urlMap = new Dictionary<string, string>();
@@ -695,13 +626,13 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
             bool isOutside = vo.IsOutside;
 
             emailUrl = _processBusinessContansService.GetRoute(
-                MessageSendTypeEnum.MAIL.Code,
+                ProcessNoticeEnum.EMAIL_TYPE.Code,
                 processInfo,
                 isOutside
             );
 
             appUrl = _processBusinessContansService.GetRoute(
-                MessageSendTypeEnum.PUSH.Code,
+                ProcessNoticeEnum.APP_TYPE.Code,
                 processInfo,
                 isOutside
             );
@@ -717,45 +648,5 @@ public class BpmVariableMessageBizService: IBpmVariableMessageBizService
         urlMap["appUrl"] = appUrl;
 
         return urlMap;
-    }
-    public BpmVariableMessageVo FromBusinessDataVo(BusinessDataVo businessDataVo) {
-
-
-        if (businessDataVo == null) {
-            return null;
-        }
-
-        //get event type by operation type
-        EventTypeEnum eventTypeEnum = (EventTypeEnum)businessDataVo.OperationType;
-
-        if (eventTypeEnum==null) {
-            return null;
-        }
-
-
-        //default link type is process type
-        int type = 2;
-
-
-        //if event type is cancel operation then link type is view type
-        if (eventTypeEnum==EventTypeEnum.PROCESS_CANCELLATION) {
-            type = 1;
-        }
-
-        BpmVariableMessageVo bpmVariableMessageVo = new BpmVariableMessageVo()
-        {
-            ProcessNumber = businessDataVo.ProcessNumber,
-            FormCode = businessDataVo.FormCode,
-            EventType = (int)eventTypeEnum,
-            ForwardUsers = businessDataVo.UserIds ?? new List<string>(),
-            SignUpUsers = businessDataVo.SignUpUsers?.Select(o => o.Id).ToList() ?? new List<string>(),
-            MessageType = eventTypeEnum.IsInNode() ? 2 : 1,
-            EventTypeEnum = eventTypeEnum,
-            Type = type,
-        };
-
-        //build message vo
-        return this.GetBpmVariableMessageVo(bpmVariableMessageVo);
-
     }
 }

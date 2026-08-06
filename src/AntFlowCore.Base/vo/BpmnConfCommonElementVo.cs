@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using AntFlowCore.Core.vo;
 
 namespace AntFlowCore.Base.vo
@@ -78,8 +78,31 @@ namespace AntFlowCore.Base.vo
 
         [JsonPropertyName("approveRemindVo")]
         public BpmnApproveRemindVo ApproveRemindVo { get; set; }
+
+        /// <summary>
+        /// Node labels carried on the final BPMN element. Converted to BPMN element
+        /// extra attributes downstream. Populated from BpmnNodeVo.LabelList at runtime.
+        /// </summary>
+        [JsonPropertyName("labelList")]
+        public List<BpmnNodeLabelVO> LabelList { get; set; }
+
         [JsonPropertyName("signType")]
         public int SignType { get; set; }
+
+        /// <summary>
+        /// Required completed instances for arbitration sign completion condition.
+        /// N = ceil(n * ratio / 100), min 1, max n
+        /// </summary>
+        [JsonPropertyName("requiredCount")]
+        public int? RequiredCount { get; set; }
+
+        /// <summary>
+        /// Arbitration sign pass ratio (1-100), only used when signType=4.
+        /// Persisted into deployment content so it can be retrieved at runtime
+        /// to compute the oppose threshold M = ceil(n * (100 - ratio) / 100).
+        /// </summary>
+        [JsonPropertyName("arbitrationRatio")]
+        public int? ArbitrationRatio { get; set; }
         
         public bool? AggregationNode { get; set; }
     }

@@ -73,6 +73,10 @@ public class MailUtils
                 }
             }
         }
+        catch (Exception e)
+        {
+            _logger.LogError(e,"邮件服务器连接失败:");
+        }
         finally
         {
             await client.DisconnectAsync(true, ct);

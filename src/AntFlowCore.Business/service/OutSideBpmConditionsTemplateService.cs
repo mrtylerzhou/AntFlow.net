@@ -4,6 +4,7 @@ using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
+using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
@@ -19,8 +20,6 @@ public class OutSideBpmConditionsTemplateService : IOutSideBpmConditionsTemplate
     private readonly IUserService _employeeService;
     private readonly IBpmnConfRepository _bpmnConfRepository;
     private readonly IBpmnNodeService _bpmnNodeService;
-    private readonly IBpmnNodeConditionsConfRepository _bpmnNodeConditionsConfRepository;
-    private readonly IBpmnNodeConditionsParamConfRepository _bpmnNodeConditionsParamConfRepository;
 
     public OutSideBpmConditionsTemplateService(
         IOutSideBpmConditionsTemplateRepository repository,
@@ -29,9 +28,7 @@ public class OutSideBpmConditionsTemplateService : IOutSideBpmConditionsTemplate
         IBpmProcessAppApplicationRepository bpmProcessAppApplicationRepository,
         IUserService employeeService,
         IBpmnConfRepository bpmnConfRepository,
-        IBpmnNodeService bpmnNodeService,
-        IBpmnNodeConditionsConfRepository bpmnNodeConditionsConfRepository,
-        IBpmnNodeConditionsParamConfRepository bpmnNodeConditionsParamConfRepository)
+        IBpmnNodeService bpmnNodeService)
     {
         _repository = repository;
         _outSideBpmBaseService = outSideBpmBaseService;
@@ -40,8 +37,6 @@ public class OutSideBpmConditionsTemplateService : IOutSideBpmConditionsTemplate
         _employeeService = employeeService;
         _bpmnConfRepository = bpmnConfRepository;
         _bpmnNodeService = bpmnNodeService;
-        _bpmnNodeConditionsConfRepository = bpmnNodeConditionsConfRepository;
-        _bpmnNodeConditionsParamConfRepository = bpmnNodeConditionsParamConfRepository;
     }
 
     public IOutSideBpmConditionsTemplateRepository _repository { get; }
@@ -261,55 +256,74 @@ public class OutSideBpmConditionsTemplateService : IOutSideBpmConditionsTemplate
 
         if (!bpmnConfs.Any())
         {
-            var confIds = bpmnConfs.Select(c => c.Id).ToList();
-            var nodeTypeList = new List<int>
+            return false;
+        }
+
+        var confIds = bpmnConfs.Select(c => c.Id).ToList();
+        var nodeTypeList = new List<int>
+        {
+            (int)NodeTypeEnum.NODE_TYPE_CONDITIONS,
+            (int)NodeTypeEnum.NODE_TYPE_OUT_SIDE_CONDITIONS
+        };
+
+        var bpmnNodes = _bpmnNodeService._repository
+            .Find(node => confIds.Contains(node.ConfId) && nodeTypeList.Contains(node.NodeType));
+
+        foreach (BpmnNode node in bpmnNodes)
+        {
+            List<BpmnNodeConditionsConfJson.ConditionGroup>? groups =
+                JsonConfUtil.ParseNodeConfig(node.NodeConfigJson)?.ConditionsConf?.ConditionGroups;
+            if (groups == null || groups.Count == 0)
             {
-                (int)NodeTypeEnum.NODE_TYPE_CONDITIONS,
-                (int)NodeTypeEnum.NODE_TYPE_OUT_SIDE_CONDITIONS
-            };
+                continue;
+            }
 
-            var bpmnNodes = _bpmnNodeService._repository
-                .Find(node => confIds.Contains(node.ConfId) && nodeTypeList.Contains(node.NodeType));
-
-            if (bpmnNodes.Any())
+            foreach (BpmnNodeConditionsConfJson.ConditionGroup group in groups)
             {
-                List<long> nodeIds = bpmnNodes.Select(n => n.Id).ToList();
-
-                var bpmnNodeConditionsConfs = _bpmnNodeConditionsConfRepository
-                    .Find(conf => nodeIds.Contains(conf.BpmnNodeId));
-
-                if (bpmnNodeConditionsConfs.Any())
+                if (group.IsDefault == 1 || string.IsNullOrWhiteSpace(group.ExtJson))
                 {
-                    int conditionTemplatemark = 9999;
-                    var conditionIds = bpmnNodeConditionsConfs.Select(c => c.Id).ToList();
+                    continue;
+                }
 
-                    var paramConfs = _bpmnNodeConditionsParamConfRepository
-                        .Find(param => conditionIds.Contains(param.BpmnNodeConditionsId) &&
-                                        param.ConditionParamType == conditionTemplatemark);
+                List<List<BpmnNodeConditionsConfVueVo>>? extFieldsGroup =
+                    JsonSerializer.Deserialize<List<List<BpmnNodeConditionsConfVueVo>>>(
+                        group.ExtJson,
+                        JsonConfUtil.Options);
+                if (extFieldsGroup == null || extFieldsGroup.Count == 0)
+                {
+                    continue;
+                }
 
-                    if (paramConfs.Any())
+                foreach (List<BpmnNodeConditionsConfVueVo> groupList in extFieldsGroup)
+                {
+                    if (groupList.Any(cond => TemplateMarkConditionContains(cond, id)))
                     {
-                        var usedTempList = new List<int>();
-
-                        foreach (var param in paramConfs)
-                        {
-                            var json = param.ConditionParamJsom;
-                            var list = JsonSerializer.Deserialize<List<int>>(json);
-                            if (list != null)
-                            {
-                                usedTempList.AddRange(list);
-                            }
-                        }
-
-                        if (usedTempList.Contains(id))
-                        {
-                            return true;
-                        }
+                        return true;
                     }
                 }
             }
         }
 
         return false;
+    }
+
+    private static bool TemplateMarkConditionContains(BpmnNodeConditionsConfVueVo condition, int templateId)
+    {
+        const string templateMarkColumnId = "9999";
+        if (condition.ColumnId != templateMarkColumnId || string.IsNullOrWhiteSpace(condition.Zdy1))
+        {
+            return false;
+        }
+
+        string zdy1 = condition.Zdy1.Trim();
+        if (zdy1.StartsWith("[") && zdy1.EndsWith("]"))
+        {
+            zdy1 = zdy1.Substring(1, zdy1.Length - 2);
+        }
+
+        return zdy1
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(key => key.Trim('"'))
+            .Any(key => key == templateId.ToString());
     }
 }

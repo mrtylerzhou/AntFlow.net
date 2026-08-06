@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.bpmnmodel;
+using AntFlowCore.Base.bpmnmodel;
 using AntFlowCore.Base.vo;
 
 namespace AntFlowCore.Base.util;
@@ -55,6 +55,36 @@ namespace AntFlowCore.Base.util;
                 },
                 Assignee = FormatParamName(elementVariableName)
             };
+            SetTaskListener(userTask);
+            return userTask;
+        }
+
+        /// <summary>
+        /// create multi-user arbitration sign
+        /// parallel multi-instance with completion condition ${nrOfCompletedInstances >= N}
+        /// </summary>
+        public static UserTask CreateArbitrationSignUserTask(BpmnConfCommonElementVo elementVo)
+        {
+            var userTask = new UserTask
+            {
+                Id = elementVo.ElementId,
+                Name = elementVo.ElementName
+            };
+            string elementVariableName = $"{elementVo.CollectionName.Replace("List", "")}s";
+            var multiInstanceLoopCharacteristics = new MultiInstanceLoopCharacteristics
+            {
+                Sequential = false,
+                InputDataItem = FormatParamName(elementVo.CollectionName),
+                ElementVariable = elementVariableName
+            };
+            int? requiredCount = elementVo.RequiredCount;
+            if (requiredCount == null || requiredCount <= 0)
+            {
+                throw new ArgumentException("仲裁签节点未配置完成所需人数");
+            }
+            multiInstanceLoopCharacteristics.CompletionCondition = "${nrOfCompletedInstances >= " + requiredCount + " }";
+            userTask.LoopCharacteristics = multiInstanceLoopCharacteristics;
+            userTask.Assignee = FormatParamName(elementVariableName);
             SetTaskListener(userTask);
             return userTask;
         }

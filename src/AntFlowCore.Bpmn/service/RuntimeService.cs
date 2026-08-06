@@ -2,6 +2,7 @@ using System.Text.Json;
 using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Base.bpmnmodel;
 using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.extension;
@@ -103,6 +104,11 @@ public class RuntimeService
                     };
                     historyTaskInsts.Add(startTask);
                }
+               // serialize node labels into FormKey for BpmnTaskListener to read
+               string extraInfoJson = firstAssigneeNode.LabelList != null && firstAssigneeNode.LabelList.Count > 0
+                    ? System.Text.Json.JsonSerializer.Serialize(new NodeExtraInfoDTO { NodeLabelVOS = firstAssigneeNode.LabelList })
+                    : bpmnConfCommonVo.FormCode;
+
                foreach (var (key, value) in assigneeMap)
                {
                     BpmAfTask bpmAfTask = new BpmAfTask()
@@ -113,11 +119,13 @@ public class RuntimeService
                          ExecutionId = executionId,
                          Name = firstAssigneeNode.ElementName,
                          TaskDefKey = firstAssigneeNode.ElementId,
+                         NodeId = firstAssigneeNode.NodeId,
+                         NodeType = firstAssigneeNode.NodeType,
                          Owner = bpmnStartConditions.StartUserId,
                          Assignee = key,
                          AssigneeName = value,
                          CreateTime = nowTime.AddSeconds(1),
-                         FormKey = bpmnConfCommonVo.FormCode,
+                         FormKey = extraInfoJson,
                     };
                     tasks.Add(bpmAfTask);
                     if (signType == SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER.GetCode())
@@ -142,7 +150,33 @@ public class RuntimeService
           };
           return executionEntity;
      }
-     
+
+     /// <summary>
+     /// Deletes a running process instance and all of its executions / tasks / task history.
+     /// Mirrors Activiti's runtimeService.deleteProcessInstance(procInstId, deleteReason).
+     /// Used when a process is migrated (dynamic condition re-evaluation): the old running
+     /// instance is removed before bpmbusinessprocess is repointed to the new instance.
+     /// </summary>
+     public void DeleteProcessInstance(string procInstId, string deleteReason)
+     {
+          // delete executions
+          _executionService._repository.DeleteByExpression(a => a.ProcInstId == procInstId);
+
+          // delete running tasks
+          List<BpmAfTask> tasks = _afTaskService._repository.Find(a => a.ProcInstId == procInstId);
+          if (tasks.Count > 0)
+          {
+               _afTaskService._repository.RemoveRange(tasks);
+          }
+
+          // delete task history
+          List<BpmAfTaskInst> taskInsts = _afTaskInstService._repository.Find(a => a.ProcInstId == procInstId);
+          if (taskInsts.Count > 0)
+          {
+               _afTaskInstService._repository.RemoveRange(taskInsts);
+          }
+     }
+
      public void InsertTasks(BpmBusinessProcess bpmBusinessProcess,string taskDefKey)
      {
           string procInstId = bpmBusinessProcess.ProcInstId;
@@ -202,6 +236,8 @@ public class RuntimeService
                     ExecutionId = newExecutionId,
                     Name = bpmnConfCommonElementVo.ElementName,
                     TaskDefKey = bpmnConfCommonElementVo.ElementId,
+                    NodeId = bpmnConfCommonElementVo.NodeId,
+                    NodeType = bpmnConfCommonElementVo.NodeType,
                     Owner = bpmBusinessProcess.CreateUser,
                     Assignee = key,
                     AssigneeName = value,

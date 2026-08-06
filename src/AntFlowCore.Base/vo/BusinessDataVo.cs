@@ -119,6 +119,25 @@ namespace AntFlowCore.Base.vo
         public int? BackToModifyType { get; set; }
         [JsonPropertyName("backToNodeId"),JsonConverter(typeof(IntToStringConverter))]
         public String BackToNodeId { get; set; }
+        /// <summary>
+        /// 退回按钮行为配置(运行时返回给前端)
+        /// </summary>
+        [JsonPropertyName("drawBackType")]
+        public int? DrawBackType { get; set; }
+        /// <summary>退回可选目标节点列表(运行时, id为主键)</summary>
+        [JsonPropertyName("drawBackNodes")]
+        public List<BaseIdTranStruVo> DrawBackNodes { get; set; }
+        /// <summary>
+        /// 推进按钮行为配置(运行时返回给前端)
+        /// </summary>
+        [JsonPropertyName("forwardType")]
+        public int? ForwardType { get; set; }
+        /// <summary>推进可选目标节点列表(运行时, id为主键)</summary>
+        [JsonPropertyName("forwardNodes")]
+        public List<BaseIdTranStruVo> ForwardNodes { get; set; }
+        /// <summary>推进目标节点nodeId(前端提交时传入)</summary>
+        [JsonPropertyName("forwardToNodeId")]
+        public string ForwardToNodeId { get; set; }
         // Third party process
         [JsonPropertyName("formData")]
         public string FormData { get; set; }
@@ -141,6 +160,14 @@ namespace AntFlowCore.Base.vo
 
         [JsonPropertyName("isLowCodeFlow"),JsonConverter(typeof(BooleanToNullableIntJsonConverter))]
         public int? IsLowCodeFlow { get; set; } = 0;
+
+        /// <summary>
+        /// Whether this submit is a migration (dynamic condition re-evaluation) of a running
+        /// process. When true the original process number is reused and no new BpmBusinessProcess
+        /// is created; the existing one is updated with the new instance id.
+        /// </summary>
+        [JsonPropertyName("isMigration")]
+        public bool? IsMigration { get; set; }
 
         [JsonPropertyName("bpmFlowCallbackUrl")]
         public string BpmFlowCallbackUrl { get; set; }
@@ -183,5 +210,58 @@ namespace AntFlowCore.Base.vo
         
         [JsonPropertyName("approvalEmpls")]
         public List<BaseIdTranStruVo> ApprovalEmpls { get; set; }
+
+        /// <summary>
+        /// 上一节点审批人通过[指定下一节点审批人]按钮选择的下一节点实际审批人.
+        /// 由 ButtonOperationService 写入 ThreadLocalContainer, AFTaskService.InsertTasks 读取并替换虚拟审批人 -4.
+        /// 简化规则: 仅允许 1 人.
+        /// </summary>
+        [JsonPropertyName("nextNodeApprovers")]
+        public List<BaseIdTranStruVo> NextNodeApprovers { get; set; }
+
+        /// <summary>
+        /// 低代码表单字段及值. 由 UDLFApplyVo 上移至 BusinessDataVo,
+        /// 以便 NextNodeLabelsProcessor 等运行时处理器无需类型转换即可访问.
+        /// 对应 Java BusinessDataVo.lfFields.
+        /// </summary>
+        [JsonPropertyName("lfFields")]
+        public Dictionary<string, object> LfFields { get; set; }
+
+        /// <summary>
+        /// key is node id, value is a list of form-related assignee ids extracted from form data.
+        /// Populated by LowFlowApprovalService.ProcessFormRelatedUserConf during process start.
+        /// </summary>
+        [JsonPropertyName("node2formRelatedAssignees")]
+        public Dictionary<string, List<string>> Node2formRelatedAssignees { get; set; }
+
+        /// <summary>
+        /// 选择条件:用户选定的条件分支节点ID列表.
+        /// </summary>
+        [JsonPropertyName("pickConditionNodeIds")]
+        public List<string> PickConditionNodeIds { get; set; }
+
+        /// <summary>
+        /// 选择条件:可选分支列表(由getBusinessInfo返回给前端).
+        /// </summary>
+        [JsonPropertyName("pickConditionBranches")]
+        public List<PickConditionBranchVo> PickConditionBranches { get; set; }
+
+        /// <summary>
+        /// 选择条件分支是否支持多选(动态条件并行网关时为true).
+        /// </summary>
+        [JsonPropertyName("pickConditionMultiSelect")]
+        public bool? PickConditionMultiSelect { get; set; }
     }
 }
+
+    /// <summary>
+    /// 选择条件可选分支VO.
+    /// </summary>
+    public class PickConditionBranchVo
+    {
+        [JsonPropertyName("id")]
+        public string Id { get; set; }
+
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
+    }

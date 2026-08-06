@@ -4,7 +4,8 @@ public enum SignTypeEnum
 {
     SIGN_TYPE_SIGN = 1,
     SIGN_TYPE_OR_SIGN = 2,
-    SIGN_TYPE_SIGN_IN_ORDER = 3
+    SIGN_TYPE_SIGN_IN_ORDER = 3,
+    SIGN_TYPE_ARBITRATION = 4
 }
 
 public static class SignTypeEnumExtensions
@@ -19,6 +20,8 @@ public static class SignTypeEnumExtensions
                 return "或签（只需一名审批人同意或拒绝即可）";
             case SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER:
                 return "顺序会签(需要所有审批人同意,根据前端传入的顺序)";
+            case SignTypeEnum.SIGN_TYPE_ARBITRATION:
+                return "仲裁签(按通过比例完成)";
             default:
                 throw new ArgumentOutOfRangeException();
         }

@@ -1,4 +1,4 @@
-using AntFlowCore.Abstraction.Orm.util;
+﻿using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.adaptor.formoperation;
@@ -19,20 +19,17 @@ public class SubmitProcessService: IProcessOperationAdaptor
     private readonly IFormFactory _formFactory;
     private readonly IBpmnConfCommonService _bpmnConfCommonService;
     private readonly IBpmBusinessProcessService _bpmBusinessProcessService;
-    private readonly IBpmProcessNameService _bpmProcessNameService;
     private readonly ILogger<SubmitProcessService> _logger;
 
     public SubmitProcessService(
         IFormFactory formFactory,
         IBpmnConfCommonService bpmnConfCommonService,
         IBpmBusinessProcessService bpmBusinessProcessService,
-        IBpmProcessNameService bpmProcessNameService,
         ILogger<SubmitProcessService> logger)
     {
         _formFactory = formFactory;
         _bpmnConfCommonService = bpmnConfCommonService;
         _bpmBusinessProcessService = bpmBusinessProcessService;
-        _bpmProcessNameService = bpmProcessNameService;
         _logger = logger;
     }
     public void DoProcessButton(BusinessDataVo businessDataVo)
@@ -42,40 +39,66 @@ public class SubmitProcessService: IProcessOperationAdaptor
         //记得参照示例,给businessDataVo赋必要值
         formAdapter.OnSubmitData(businessDataVo);
         String entryId = businessDataVo.EntityName + ":" + businessDataVo.BusinessId;
+        // call the process's launch method to get launch parameters
         BpmnStartConditionsVo bpmnStartConditionsVo = formAdapter.PreviewSetCondition(businessDataVo);
+        bpmnStartConditionsVo.BusinessDataVo = businessDataVo;
         bpmnStartConditionsVo.ApproversList = businessDataVo.ApproversList;
-        bpmnStartConditionsVo.ProcessNum=(businessDataVo.FormCode + "_" + businessDataVo.BusinessId);
-        bpmnStartConditionsVo.EntryId=entryId;
-        bpmnStartConditionsVo.BusinessId=businessDataVo.BusinessId;
-        bpmnStartConditionsVo.ApprovalEmpls=businessDataVo.ApprovalEmpls;
-        if (!_bpmBusinessProcessService.CheckProcessData(entryId)) {
-            throw new AFBizException("the process has already been submitted！");
+
+        string processNumber = businessDataVo.FormCode + "_" + businessDataVo.BusinessId;
+        // migration (dynamic condition re-evaluation): keep the original process number so the
+        // business number stays constant and bpmbusinessprocess is updated instead of re-created.
+        if (businessDataVo.IsMigration == true)
+        {
+            processNumber = businessDataVo.ProcessNumber;
         }
+        if (string.IsNullOrEmpty(businessDataVo.ProcessNumber))
+        {
+            businessDataVo.ProcessNumber = processNumber;
+        }
+        bpmnStartConditionsVo.ProcessNum = processNumber;
+        bpmnStartConditionsVo.EntryId = entryId;
+        bpmnStartConditionsVo.BusinessId = businessDataVo.BusinessId;
+        bpmnStartConditionsVo.ApprovalEmpls = businessDataVo.ApprovalEmpls;
+        bpmnStartConditionsVo.IsLowCodeFlow = businessDataVo.IsLowCodeFlow == 1;
+        if (businessDataVo.IsMigration == true)
+        {
+            bpmnStartConditionsVo.IsMigration = businessDataVo.IsMigration;
+        }
+        else
+        {
+            if (!_bpmBusinessProcessService.CheckProcessData(entryId)) {
+                throw new AFBizException("the process has already been submitted！");
+            }
+        }
+
         //process's name
-        String processName = _bpmProcessNameService.GetBpmProcessName(businessDataVo.FormCode)?.ProcessName;
+        String processName = businessDataVo.FormCode;
         //apply user info
         String applyName = SecurityUtils.GetLogInEmpName();
-        string processNumber = businessDataVo.FormCode+"_"+businessDataVo.BusinessId;
         //save business and process information
-        BpmBusinessProcess bpmBusinessProcess = new BpmBusinessProcess
+        if (businessDataVo.IsMigration != true)
         {
-            BusinessId = businessDataVo.BusinessId,
-            ProcessinessKey = businessDataVo.FormCode,
-            BusinessNumber = processNumber,
-            IsLowCodeFlow = businessDataVo.IsLowCodeFlow??0,
-            CreateUser = businessDataVo.StartUserId,
-            UserName = businessDataVo.StartUserName,
-            CreateTime = DateTime.Now,
-            ProcessState = (int)ProcessStateEnum.HANDLING_STATE,
-            EntryId = entryId,
-            Description = applyName+"-"+processName,
-            DataSourceId = businessDataVo.DataSourceId,
-            ProcessDigest = businessDataVo.ProcessDigest,
-            Version = businessDataVo.BpmnCode,
-            TenantId = MultiTenantUtil.GetCurrentTenantId(),
-        };
-        _bpmBusinessProcessService._repository.Add(bpmBusinessProcess);
-        businessDataVo.ProcessNumber = processNumber;
+            BpmBusinessProcess bpmBusinessProcess = new BpmBusinessProcess
+            {
+                BusinessId = businessDataVo.BusinessId,
+                ProcessinessKey = businessDataVo.FormCode,
+                BusinessNumber = processNumber,
+                IsLowCodeFlow = businessDataVo.IsLowCodeFlow??0,
+                CreateUser = businessDataVo.StartUserId,
+                UserName = businessDataVo.StartUserName,
+                CreateTime = DateTime.Now,
+                ProcessState = (int)ProcessStateEnum.HANDLING_STATE,
+                EntryId = entryId,
+                Description = applyName+"-"+processName,
+                DataSourceId = businessDataVo.DataSourceId,
+                ProcessDigest = businessDataVo.ProcessDigest,
+                Version = businessDataVo.BpmnCode,
+                TenantId = MultiTenantUtil.GetCurrentTenantId(),
+            };
+            _bpmBusinessProcessService._repository.Add(bpmBusinessProcess);
+            //the process number is predictable
+            businessDataVo.ProcessNumber = businessDataVo.FormCode + "_" + businessDataVo.BusinessId;
+        }
         _bpmnConfCommonService.StartProcess(businessDataVo.BpmnCode, bpmnStartConditionsVo);
     }
 

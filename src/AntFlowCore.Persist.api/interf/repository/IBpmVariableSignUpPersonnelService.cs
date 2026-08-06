@@ -1,10 +1,10 @@
-using AntFlowCore.Base.entity;
-using AntFlowCore.Base.interf;
 using AntFlowCore.Base.vo;
 
 namespace AntFlowCore.Persist.api.interf.repository;
 
-public interface IBpmVariableSignUpPersonnelService : IAntFlowRepositoryMix<BpmVariableSignUpPersonnel, IBpmVariableSignUpPersonnelRepository>
+public interface IBpmVariableSignUpPersonnelService
 {
-    void InsertSignUpPersonnel(ITaskService taskService, string taskId, string processNumber, string taskTaskDefinitionKey, string assignee, List<BaseIdTranStruVo> signUpUsers);
+    void InsertSignUpPersonnel(string processNumber, string taskTaskDefinitionKey, string assignee, List<BaseIdTranStruVo> signUpUsers);
+
+    List<KeyValuePair<string, string>> GetSignUpNodeAssigneeMap(string procInstId, string elementId);
 }

@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.vo;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 
 namespace AntFlowCore.Engine.service.processor.lowcodeflow;
@@ -15,6 +15,9 @@ public interface ILFFormOperationAdaptor{
 
     // 同意审批时的回调
     void OnConsentData(UDLFApplyVo vo);
+
+    // 不同意审批时的回调
+    void OnDisagreeData(UDLFApplyVo vo);
 
     // 驳回到修改时的回调
     void OnBackToModifyData(UDLFApplyVo vo);

@@ -34,6 +34,7 @@ namespace AntFlowCore.Base.util
         public const string TENANT_USER = "tenantUser";
         public const string LOWCODE_FLOW_DICT_TYPE = "lowcodeflow";
         
+
     
         public  const String outSideMarker = "outSide";
        
@@ -55,5 +56,93 @@ namespace AntFlowCore.Base.util
         public const String HIDDEN_FIELD_PERMISSION="H";
         public const string HIDDEN_FIELD_VALUE = "******";
         public const string READ_ONLY_FIELD_PERMISSION="R";
+
+        // Node label value constants (aligned with Java StringConstants)
+        public const string DYNAMIC_CONDITION_NODE = "af_syslabel_dynamiccondition";
+        public const string COPY_NODE = "af_syslabel_copynode";
+        public const string COPY_NODEV2 = "af_syslabel_copynodeV2";
+        public const string AUTOMATIC_NODE = "auto_node";
+        public const string SKIPPED_ASSIGNEE = "lbl_skipped_assignee";
+
+        // 条件审批节点 / 条件抄送节点 (对等 Java 版 nodeType=12/13)
+        public const string CONDITION_APPROVE_NODE = "condition_approve_node";
+        public const string CONDITION_COPY_NODE = "condition_copy_node";
+
+        // 条件推进节点:条件审批(nodeType=12)子类型,自动勾选推进按钮(42,别名同意).满足条件自动推进到固定目标,不满足留给真实审批人.强制 forwardType=2 (对等 Java 版 condition_advance_node)
+        public const string CONDITION_ADVANCE_NODE = "condition_advance_node";
+
+        // 条件完成节点:条件推进(nodeType=12)子类型,目标设计时自动算最后一个审批人,不可编辑.运行时复用条件推进处理器.强制 forwardType=2 (对等 Java 版 condition_finish_node)
+        public const string CONDITION_FINISH_NODE = "condition_finish_node";
+
+        // 协助节点 (对等 Java 版 nodeType=17)
+        public const string ASSIST_NODE = "assist_node";
+
+        // 自动推进节点 (对等 Java 版 nodeType=18)
+        public const string AUTO_ADVANCE_NODE = "auto_advance_node";
+
+        // 自动完成节点:自动推进(nodeType=18)子类型,目标自动为最后一个审批人节点.仅前端反显区分+颜色区分,运行时复用 auto_advance_node 处理器 (对等 Java 版 auto_complete_node)
+        public const string AUTO_COMPLETE_NODE = "auto_complete_node";
+
+        // 自动退回节点:满足条件时退回到指定目标节点(FOUR_DISAGREE),不满足时和自动节点一样 complete (对等 Java 版 auto_return_node)
+        public const string AUTO_RETURN_NODE = "auto_return_node";
+
+        // 条件退回节点:满足条件时自动退回到不同意按钮配置的目标节点,不满足时留给真实审批人 (对等 Java 版 condition_return_node)
+        public const string CONDITION_RETURN_NODE = "condition_return_node";
+        // 条件退回发起人节点:满足条件时自动退回发起人节点,不满足时留给真实审批人 (对等 Java 版 condition_return_starter_node)
+        public const string CONDITION_RETURN_STARTER_NODE = "condition_return_starter_node";
+
+        // 完成审批节点:审批人节点+推进按钮,目标自动填充为流程最后一个审批人节点 (对等 Java 版 finish_approve_node)
+        public const string FINISH_APPROVE_NODE = "finish_approve_node";
+
+        // 条件审批/条件抄送运行时 verifyInfo 备注
+        public const string AF_CONDITION_APPROVE_AUTO_COMMENT = "条件审批自动通过,条件评估结果:True";
+        public const string AF_CONDITION_APPROVE_WAIT_COMMENT = "条件审批条件未满足,等待人工审批";
+        public const string AF_CONDITION_COPY_EXECUTE_COMMENT = "条件抄送执行,条件评估结果:True";
+        public const string AF_CONDITION_COPY_SKIP_COMMENT = "条件抄送跳过,条件评估结果:False";
+
+        // 自动节点运行时 verifyInfo 备注
+        public const string AF_AUTO_EVALUATE_SKIP_COMMENT = "自动节点自动跳过,条件评估结果:{0}";
+
+        // Dynamic condition related constants
+        public const string CONDITION_CHANGED = "condition_changed";
+        public const string CURRENT_USER_ALREADY_PROCESSED = "currentUserAlreadyProcessed";
+
+        // Adjacent deduplication auto-skip comment and suffix
+        public const string AF_AUTO_SKIP_COMMENT = "相同审批人自动跳过";
+        public const string AF_SKIP_ASSIGNEE_NODE_SUFFIX = "⬇️";
+
+        // Element name suffixes for special node types (aligned with Java StringConstants)
+        public const string AF_COPY_V2_NODE_SUFFIX = "\uD83D\uDCE2";        // 抄送节点v2后缀
+        public const string AF_NODE_SIGN_SUFFIX = "\uD83D\uDD00";           // 会签后缀
+        public const string AF_NODE_SIGN_IN_ORDER_SUFFIX = "\uD83D\uDD03";  // 顺序会签后缀
+        public const string AF_NODE_OR_SIGN_SUFFIX = "\uD83D\uDD02";        // 或签后缀
+        public const string AF_DEFAULT_NODE_NAME = "审核人";
+        public const string LASTNODE_COPY = "af_syslabel_lastnode_copy";
+
+        // Thread-local key for duplication process strategy (used by element adaptors)
+        public const string DUPLICATION_PROCESS_STRATEGY = "duplicationProcessStrategy";
+
+        // 选择条件节点标签 (对等 Java StringConstants.AF_SYSLABEL_PICK_CONDITION)
+        public const string AF_SYSLABEL_PICK_CONDITION = "af_syslabel_pick_condition";
+
+        // 上一节点指定审批人相关常量 (对等 Java StringConstants)
+        public const string AF_SYSLABEL_PREV_NODE_APPOINTED = "af_syslabel_prev_node_appointed";
+        public const string AF_SYSLABEL_APPOINT_NEXT_NODE_APPROVER = "af_syslabel_appoint_next_node_approver";
+        /// <summary>不同意按钮配置了退回行为时贴此标签,运行时EndProcessService据此转发BackToModifyService</summary>
+        public const string AF_SYSLABEL_DISAGREE_BACK = "af_syslabel_disagree_back";
+        /// <summary>退回按钮行为:退回发起人</summary>
+        public const string AF_SYSLABEL_BACK_INITIATOR = "af_syslabel_back_initiator";
+        /// <summary>退回按钮行为:退回上一节点</summary>
+        public const string AF_SYSLABEL_BACK_PREV = "af_syslabel_back_prev";
+        /// <summary>退回按钮行为:退回指定节点</summary>
+        public const string AF_SYSLABEL_BACK_SPECIFIED = "af_syslabel_back_specified";
+        /// <summary>推进按钮行为标签</summary>
+        public const string AF_SYSLABEL_FORWARD = "af_syslabel_forward";
+        // Thread-local key for passing nextNodeApprovers from ButtonOperationService to AFTaskService
+        public const string NEXT_NODE_APPROVER = "nextNodeApprover";
+        // Thread-local key for runtime BusinessDataVo (set by BpmnSendMessageAspect, read by BpmnTaskListener)
+        public const string AF_RUNTIME_BUISINESS_INFO = "af_runtime_business_info";
+        // Thread-local key for runtime BpmnConf (set by BpmnSendMessageAspect)
+        public const string AF_RUNTIME_BPMN_CONF = "af_runtime_bpmn_conf";
     }
 }
