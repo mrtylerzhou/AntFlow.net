@@ -233,7 +233,7 @@ namespace AntFlowCore.Base.vo;
         /// for runtime condition evaluation.
         /// </summary>
         [JsonPropertyName("autoNodeConf")]
-        public AutoNodeConfVo? AutoNodeConf { get; set; }
+        public BpmnNodeAutoNodeConfJson? AutoNodeConf { get; set; }
 
         /// <summary>
         /// 标识当前节点为"上一节点指定"审批人类型.
@@ -301,6 +301,14 @@ namespace AntFlowCore.Base.vo;
         [JsonPropertyName("lfFieldControlVOs")]
         public List<LFFieldControlVO> LfFieldControlVOs { get; set; }
 
+        /// <summary>
+        /// 外部表单模式: 节点级整表隐藏标记
+        /// Key = formdataId, Value = true 表示该表单在此节点整体隐藏
+        /// 仅外部表单模式使用; 内联模式为 null
+        /// </summary>
+        [JsonPropertyName("formHidden")]
+        public Dictionary<string, bool> FormHidden { get; set; }
+
         [JsonPropertyName("fromNodes")]
         public List<BpmnNodeVo> FromNodes { get; set; }
 
@@ -308,6 +316,7 @@ namespace AntFlowCore.Base.vo;
         public string ElementId { get; set; }
         [JsonPropertyName("noHeaderAction")]
         public int? NoHeaderAction { get; set; }
+
         private string? _nodeConfigJson;
         [JsonIgnore]
         public string? NodeConfigJson
@@ -354,20 +363,4 @@ namespace AntFlowCore.Base.vo;
             }
             return JsonConfUtil.ToNodeConfigJson(_nodeConfigJsonObj);
         }
-    }
-
-    /// <summary>
-    /// Condition configuration for condition-approve / condition-copy nodes.
-    /// Mirrors Java AutoNodeConf: { conditionList, groupRelation }.
-    /// conditionList is the same nested-array structure used by condition nodes
-    /// (nodeType=3) and is converted to BpmnNodeConditionsConfBaseVo at runtime
-    /// via BpmnConfNodePropertyConverter.FromVue3Model.
-    /// </summary>
-    public class AutoNodeConfVo
-    {
-        [JsonPropertyName("conditionList")]
-        public List<List<BpmnNodeConditionsConfVueVo>>? ConditionList { get; set; }
-
-        [JsonPropertyName("groupRelation")]
-        public bool? GroupRelation { get; set; }
     }

@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Base.constant.enums;
+namespace AntFlowCore.Base.constant.enums;
 
 public enum NodeTypeEnum
     {

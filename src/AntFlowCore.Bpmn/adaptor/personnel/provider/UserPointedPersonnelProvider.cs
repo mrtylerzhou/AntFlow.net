@@ -48,6 +48,8 @@ public class UserPointedPersonnelProvider : IBpmnPersonnelProviderService
             return _assigneeVoBuildUtils.BuildVOs(emplList, elementName, false);
         }
 
+        // 使用 emplList 构建指派人(对应Java: buildVOs 而非 buildVos),
+        // 这样自动节点的虚拟指派人 AUTO_NODE_SKIP(-3) 不需要经过员工信息查询
         return _assigneeVoBuildUtils.BuildVOs(emplList, elementName, false);
     }
 }

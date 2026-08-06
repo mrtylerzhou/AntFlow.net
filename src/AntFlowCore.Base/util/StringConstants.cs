@@ -1,4 +1,4 @@
-﻿
+
 namespace AntFlowCore.Base.util
 {
     public interface StringConstants

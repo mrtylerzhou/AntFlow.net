@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.exception;
 using AntFlowCore.Base.util;
 
@@ -14,6 +14,11 @@ public class LFMainField
     public long MainId { get; set; }
 
     public string FormCode { get; set; }
+
+    /// <summary>
+    /// 表单版本ID(t_bpmn_conf_lf_formdata.id);内联模式旧数据为NULL
+    /// </summary>
+    public long? FormdataId { get; set; }
 
     public string FieldId { get; set; }
 
@@ -63,6 +68,14 @@ public class LFMainField
     /// </summary>
     public static List<LFMainField> ParseFromMap(Dictionary<string, object> fieldMap, Dictionary<string, BpmnConfLfFormdataField> fieldConfigMap, long mainId, string formCode)
     {
+        return ParseFromMap(fieldMap, fieldConfigMap, mainId, formCode, null);
+    }
+
+    /// <summary>
+    /// 多表单重载: 额外传入 formdataId 以区分表单版本
+    /// </summary>
+    public static List<LFMainField> ParseFromMap(Dictionary<string, object> fieldMap, Dictionary<string, BpmnConfLfFormdataField> fieldConfigMap, long mainId, string formCode, long? formdataId)
+    {
         if (fieldMap == null || fieldMap.Count == 0)
             throw new Exception("form data has no value");
 
@@ -80,6 +93,7 @@ public class LFMainField
             var value = fieldEntry.Value;
             var mainField = BuildMainField(value, mainId, 0, fieldConfig);
             mainField.FormCode = formCode;
+            mainField.FormdataId = formdataId;
             mainFields.Add(mainField);
         }
 

@@ -230,6 +230,14 @@ public class BpmnConfBizService : IBpmnConfBizService
                 }
             }
             BpmnNodeConfigHolder.SetLowCodeConf(bpmnNodeVo);
+
+            // Transfer autoNodeConf from VO to node config JSON (for auto nodes)
+            if (bpmnNodeVo.AutoNodeConf != null)
+            {
+                BpmnNodeConfigJson nodeCfgJson = bpmnNodeVo.GetOrCreateNodeConfigJson();
+                nodeCfgJson.AutoNodeConf = bpmnNodeVo.AutoNodeConf;
+            }
+
             BpmnNode bpmnNode = bpmnNodeVo.MapToEntity();
             bpmnNode.ConfId=confId;
             bpmnNode.CreateTime=DateTime.Now;
@@ -481,7 +489,15 @@ public class BpmnConfBizService : IBpmnConfBizService
     public BpmnConfVo Detail(long id)
     {
         BpmnConf bpmnConf = _bpmnConfService._repository.Find(a => a.Id == id).FirstOrDefault();
-        return FormatConfVo(GetBpmnConfVo(bpmnConf));
+        BpmnConfVo confVo = FormatConfVo(GetBpmnConfVo(bpmnConf));
+        if (confVo.Nodes != null)
+        {
+            foreach (BpmnNodeVo node in confVo.Nodes)
+            {
+                AfNodeUtils.NodeLabelSpecialProcess(node);
+            }
+        }
+        return confVo;
     }
 
    
@@ -933,6 +949,11 @@ public class BpmnConfBizService : IBpmnConfBizService
         {
             bpmnNodeVo.LfFieldControlVOs = lowCodeConf.FieldControls;
         }
+        //set whole-form hide flags from lowCodeConf (external-form mode only)
+        if (lowCodeConf?.FormHidden != null && lowCodeConf.FormHidden.Count > 0)
+        {
+            bpmnNodeVo.FormHidden = lowCodeConf.FormHidden;
+        }
 
         //set labels from buttonSignConf
         if (bsConf?.Labels != null && bsConf.Labels.Count > 0)
@@ -975,26 +996,19 @@ public class BpmnConfBizService : IBpmnConfBizService
             {
                 bpmnNodeVo.IsAutoCompleteNode = true;
             }
+            // 自动节点:标签匹配时设置标记位
+            if (NodeLabelConstants.NodeLabelContainsAny(labelVOList, NodeLabelConstants.AutomaticNode.LabelValue))
+            {
+                bpmnNodeVo.DeduplicationExclude = true;
+                bpmnNodeVo.IsAutomaticNode = true;
+            }
             bpmnNodeVo.LabelList = labelVOList;
         }
 
         //set autoNodeConf from nodeConfig (for condition-approve 12 / condition-copy 13)
         if (nodeConfig.AutoNodeConf != null)
         {
-            bpmnNodeVo.AutoNodeConf = new AutoNodeConfVo
-            {
-                GroupRelation = nodeConfig.AutoNodeConf.GroupRelation,
-                // 反序列化每个 JsonElement 还原为 BpmnNodeConditionsConfVueVo
-                ConditionList = nodeConfig.AutoNodeConf.ConditionList?
-                    .Select(group => group?
-                        .Select(item => item.ValueKind == JsonValueKind.Null
-                            ? null
-                            : JsonSerializer.Deserialize<BpmnNodeConditionsConfVueVo>(item.GetRawText()))
-                        .Where(x => x != null)
-                        .Select(x => x!)
-                        .ToList() ?? new List<BpmnNodeConditionsConfVueVo>())
-                    .ToList() ?? new List<List<BpmnNodeConditionsConfVueVo>>()
-            };
+            bpmnNodeVo.AutoNodeConf = nodeConfig.AutoNodeConf;
         }
 
         // set draw-back config from node config JSON (for display)
@@ -1029,7 +1043,15 @@ public class BpmnConfBizService : IBpmnConfBizService
         if(bpmnConf==null){
             throw new AFBizException("can not get a bpmnConf by provided formCode");
         }
-        return GetBpmnConfVo(bpmnConf);
+        BpmnConfVo confVo = GetBpmnConfVo(bpmnConf);
+        if (confVo.Nodes != null)
+        {
+            foreach (BpmnNodeVo node in confVo.Nodes)
+            {
+                AfNodeUtils.NodeLabelSpecialProcess(node);
+            }
+        }
+        return confVo;
     }
 
     public int? GetCustomizeNodeSignType(long nodeId)

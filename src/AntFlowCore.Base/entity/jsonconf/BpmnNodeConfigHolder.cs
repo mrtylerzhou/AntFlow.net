@@ -217,19 +217,7 @@ public static class BpmnNodeConfigHolder
             return;
         }
         BpmnNodeConfigJson config = vo.GetOrCreateNodeConfigJson();
-
-        // Serialize conditionList (List<List<BpmnNodeConditionsConfVueVo>>) as raw JSON
-        // to preserve the front-end structure for runtime evaluation.
-        var autoNodeConfJson = new AutoNodeConfJson
-        {
-            ConditionList = vo.AutoNodeConf.ConditionList?
-                .Select(group => group?
-                    .Select(item => JsonSerializer.SerializeToElement(item))
-                    .ToList() ?? new List<JsonElement>())
-                .ToList() ?? new List<List<JsonElement>>(),
-            GroupRelation = vo.AutoNodeConf.GroupRelation
-        };
-        config.AutoNodeConf = autoNodeConfJson;
+        config.AutoNodeConf = vo.AutoNodeConf;
     }
 
     /// <summary>
@@ -380,13 +368,21 @@ public static class BpmnNodeConfigHolder
     /// </summary>
     public static void SetLowCodeConf(BpmnNodeVo vo)
     {
-        if (vo.LfFieldControlVOs == null || vo.LfFieldControlVOs.Count == 0) return;
+        bool hasFieldControls = vo.LfFieldControlVOs != null && vo.LfFieldControlVOs.Count > 0;
+        bool hasFormHidden = vo.FormHidden != null && vo.FormHidden.Count > 0;
+        if (!hasFieldControls && !hasFormHidden) return;
 
         var config = vo.GetOrCreateNodeConfigJson();
-        config.LowCodeConf = new BpmnNodeLowCodeConfJson
+        var lowCodeConf = new BpmnNodeLowCodeConfJson();
+        if (hasFieldControls)
         {
-            FieldControls = vo.LfFieldControlVOs
-        };
+            lowCodeConf.FieldControls = vo.LfFieldControlVOs;
+        }
+        if (hasFormHidden)
+        {
+            lowCodeConf.FormHidden = vo.FormHidden;
+        }
+        config.LowCodeConf = lowCodeConf;
     }
 
     /// <summary>

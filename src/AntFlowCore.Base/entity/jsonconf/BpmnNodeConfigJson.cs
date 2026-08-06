@@ -60,7 +60,7 @@ public class BpmnNodeConfigJson
     /// to align with the front-end (shared with Java version).
     /// </summary>
     [JsonPropertyName("autoNodeConf")]
-    public AutoNodeConfJson? AutoNodeConf { get; set; }
+    public BpmnNodeAutoNodeConfJson? AutoNodeConf { get; set; }
 
     /// <summary>
     /// Draw-back button behavior type.
@@ -91,19 +91,6 @@ public class BpmnNodeConfigJson
     /// </summary>
     [JsonPropertyName("forwardNodeIds")]
     public List<string>? ForwardNodeIds { get; set; }
-}
-
-/// <summary>
-/// Condition configuration JSON for condition-approve / condition-copy nodes.
-/// Mirrors the front-end autoNodeConf structure (conditionList + groupRelation).
-/// </summary>
-public class AutoNodeConfJson
-{
-    [JsonPropertyName("conditionList")]
-    public List<List<JsonElement>>? ConditionList { get; set; }
-
-    [JsonPropertyName("groupRelation")]
-    public bool? GroupRelation { get; set; }
 }
 
 /// <summary>
@@ -428,6 +415,17 @@ public class TemplateOvertimeConf
 /// </summary>
 public class BpmnNodeLowCodeConfJson
 {
+    /// <summary>
+    /// Form field permissions for this node (per formdataId via FieldControl.FormdataId)
+    /// </summary>
     [JsonPropertyName("fieldControls")]
     public List<LFFieldControlVO>? FieldControls { get; set; }
+
+    /// <summary>
+    /// Per-form whole-form hide flag for external-form mode.
+    /// Key = formdataId, Value = true if the whole form is hidden at this node.
+    /// Only used in external-form mode; null/empty in inline mode.
+    /// </summary>
+    [JsonPropertyName("formHidden")]
+    public Dictionary<string, bool>? FormHidden { get; set; }
 }
