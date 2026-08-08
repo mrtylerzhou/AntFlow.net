@@ -1,4 +1,4 @@
-
+﻿
 namespace AntFlowCore.Base.util
 {
     public interface StringConstants
@@ -93,6 +93,9 @@ namespace AntFlowCore.Base.util
 
         // 完成审批节点:审批人节点+推进按钮,目标自动填充为流程最后一个审批人节点 (对等 Java 版 finish_approve_node)
         public const string FINISH_APPROVE_NODE = "finish_approve_node";
+
+        // 同意推进节点:普通审批人节点勾选同意按钮"跳转至固定节点"选项,运行时通过同意按钮触发推进 (对等 Java 版 approve_forward_node)
+        public const string APPROVE_FORWARD_NODE = "approve_forward_node";
 
         // 条件审批/条件抄送运行时 verifyInfo 备注
         public const string AF_CONDITION_APPROVE_AUTO_COMMENT = "条件审批自动通过,条件评估结果:True";

@@ -55,6 +55,13 @@ public class AfNodeUtils
             bpmnNodeVo.SetOrAddLabelList(NodeLabelConstants.FinishApproveNode);
         }
 
+        // 同意推进节点:根据前端传入的 IsApproveForwardNode 标识自动贴标签
+        // 同意推进本质是普通审批人节点+同意按钮"跳转至固定节点"选项,运行时通过同意按钮触发推进
+        if (bpmnNodeVo.IsApproveForwardNode == true)
+        {
+            bpmnNodeVo.SetOrAddLabelList(NodeLabelConstants.ApproveForwardNode);
+        }
+
         // 自动完成节点:根据前端传入的 IsAutoCompleteNode 标识自动贴标签
         // 自动完成本质是自动推进(nodeType=18)子类型,目标自动为最后一个审批人,运行时复用 auto_advance_node 处理器
         // 此标签仅用于前端反显区分+颜色区分
@@ -241,6 +248,12 @@ public class AfNodeUtils
                 // 还原 nodeType=18, 标记 IsAutoCompleteNode 供前端反显区分+颜色区分
                 bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_AUTO_ADVANCE;
                 bpmnNodeVo.IsAutoCompleteNode = true;
+            }
+            else if (NodeLabelConstants.ApproveForwardNode.LabelValue.Equals(nodeLabelVO.LabelValue))
+            {
+                // 同意推进节点:普通审批人节点+同意按钮"跳转至固定节点"选项
+                // 标记 IsApproveForwardNode 供前端反显同意按钮行为
+                bpmnNodeVo.IsApproveForwardNode = true;
             }
         }
     }

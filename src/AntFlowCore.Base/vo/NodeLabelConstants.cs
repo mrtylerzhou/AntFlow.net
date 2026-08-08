@@ -103,6 +103,12 @@ namespace AntFlowCore.Base.vo
         public static readonly BpmnNodeLabelVO FinishApproveNode = new BpmnNodeLabelVO(StringConstants.FINISH_APPROVE_NODE, "完成审批节点");
 
         /// <summary>
+        /// 同意推进节点:普通审批人节点(nodeType=4)勾选同意按钮"跳转至固定节点"选项,强制 forwardType=2.
+        /// 运行时通过同意按钮触发推进逻辑,与推进按钮(42)互斥.对应 Java NodeLabelConstants.approveForwardNode.
+        /// </summary>
+        public static readonly BpmnNodeLabelVO ApproveForwardNode = new BpmnNodeLabelVO(StringConstants.APPROVE_FORWARD_NODE, "同意推进节点");
+
+        /// <summary>
         /// 不可操作节点,存在于引擎中,但是不可退回到的节点.
         /// 动态条件和抄送节点v1版本虽然也不可退回到,但是他们本身不会进入引擎.
         /// 条件抄送节点加入(总是自动完成);条件审批节点不加入(可能需要人工审批,支持退回).

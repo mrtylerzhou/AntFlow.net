@@ -1,4 +1,4 @@
-using AntFlowCore.Abstraction.Orm.util;
+﻿using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.adaptor.processoperation;
@@ -10,6 +10,8 @@ using AntFlowCore.Base.interf;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
+using AntFlowCore.Base.dto;
+using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Persist.api.interf.repository;
 using Microsoft.Extensions.Logging;
 
@@ -25,6 +27,9 @@ public class ResubmitProcessService: IProcessOperationAdaptor
         private readonly IBpmVariableSignUpPersonnelService _bpmVariableSignUpPersonnelService;
         private readonly IBpmnConfBizService _bpmnConfBizService;
         private readonly IBpmProcessMigrationService _bpmProcessMigrationService;
+        private readonly ForwardToNodeService _forwardToNodeService;
+        private readonly IBpmVariableService _bpmVariableService;
+        private readonly IBpmnNodeService _bpmnNodeService;
         private readonly ILogger<ResubmitProcessService> _logger;
 
         public ResubmitProcessService(
@@ -36,6 +41,9 @@ public class ResubmitProcessService: IProcessOperationAdaptor
            IBpmVariableSignUpPersonnelService bpmVariableSignUpPersonnelService,
            IBpmnConfBizService bpmnConfBizService,
            IBpmProcessMigrationService bpmProcessMigrationService,
+           ForwardToNodeService forwardToNodeService,
+           IBpmVariableService bpmVariableService,
+           IBpmnNodeService bpmnNodeService,
            ILogger<ResubmitProcessService> logger)
         {
             _formFactory = formFactory;
@@ -46,6 +54,9 @@ public class ResubmitProcessService: IProcessOperationAdaptor
             _bpmVariableSignUpPersonnelService = bpmVariableSignUpPersonnelService;
             _bpmnConfBizService = bpmnConfBizService;
             _bpmProcessMigrationService = bpmProcessMigrationService;
+            _forwardToNodeService = forwardToNodeService;
+            _bpmVariableService = bpmVariableService;
+            _bpmnNodeService = bpmnNodeService;
             _logger = logger;
         }
 
@@ -217,7 +228,109 @@ public class ResubmitProcessService: IProcessOperationAdaptor
                     vo.ProcessNumber, task.TaskDefKey, task.Assignee, vo.SignUpUsers);
             }
 
+            // 同意推进节点:检查是否为同意推进节点,若是则完成当前任务后推进到目标节点
+            if (TryApproveForward(vo, task, bpmBusinessProcess))
+            {
+                return;
+            }
+
+
+
             _processNodeSubmitBizService.ProcessComplete(task);
+        }
+
+        /// <summary>
+        /// 尝试执行"同意推进"逻辑。
+        /// 检测task.FormKey中是否含有approve_forward_node标签,
+        /// 若有则查询节点配置获取forwardNodeIds,完成当前任务后推进到目标节点。
+        /// 对应 Java BpmProcessNodeSubmitBizServiceImpl.tryApproveForward.
+        /// </summary>
+        /// <returns>true=已处理推进, false=非同意推进节点,继续走原有审批逻辑</returns>
+        private bool TryApproveForward(BusinessDataVo vo, BpmAfTask task, BpmBusinessProcess bpmBusinessProcess)
+        {
+            // 1. 快速短路:检查 formKey 是否含 approve_forward_node 标签
+            string formKey = task.FormKey;
+            if (string.IsNullOrEmpty(formKey))
+            {
+                return false;
+            }
+
+            NodeExtraInfoDTO? extraInfo;
+            try
+            {
+                extraInfo = System.Text.Json.JsonSerializer.Deserialize<NodeExtraInfoDTO>(formKey,
+                    new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+            catch
+            {
+                return false;
+            }
+
+            if (extraInfo?.NodeLabelVOS == null ||
+                !NodeLabelConstants.NodeLabelContainsAny(extraInfo.NodeLabelVOS, StringConstants.APPROVE_FORWARD_NODE))
+            {
+                return false;
+            }
+
+            // 2. 查询当前节点配置获取 forwardNodeIds
+            // 使用 GetNodeIdByElementId 直接获取 nodeId(避免集合方法的性能损耗)
+            var nodeElement = _bpmVariableService.GetNodeIdByElementId(vo.ProcessNumber, task.TaskDefKey);
+            if (nodeElement == null || string.IsNullOrEmpty(nodeElement.NodeId))
+            {
+                _logger.LogWarning("同意推进:未找到节点映射. processNumber={ProcessNumber}, taskDefKey={TaskDefKey}",
+                    vo.ProcessNumber, task.TaskDefKey);
+                return false;
+            }
+
+            long nodeId = long.Parse(nodeElement.NodeId);
+            var bpmnNode = _bpmnNodeService._repository.FirstOrDefault(a => a.Id == nodeId);
+            if (bpmnNode == null || string.IsNullOrEmpty(bpmnNode.NodeConfigJson))
+            {
+                _logger.LogWarning("同意推进:未找到节点配置. nodeId={NodeId}", nodeId);
+                return false;
+            }
+
+            var configJson = JsonConfUtil.ParseNodeConfig(bpmnNode.NodeConfigJson);
+            if (configJson?.ForwardNodeIds == null || configJson.ForwardNodeIds.Count == 0)
+            {
+                _logger.LogWarning("同意推进:节点配置缺少ForwardNodeIds. nodeId={NodeId}", nodeId);
+                return false;
+            }
+
+            // 3. 使用 confId + node_id(UUID) 查询目标节点主键 id
+            string targetNodeUuid = configJson.ForwardNodeIds[0];
+            var targetNode = _bpmnNodeService._repository.FirstOrDefault(
+                a => a.ConfId == bpmnNode.ConfId && a.NodeId == targetNodeUuid && a.IsDel == 0);
+            if (targetNode == null)
+            {
+                _logger.LogWarning("同意推进:未找到目标节点. confId={ConfId}, targetNodeUuid={TargetNodeUuid}",
+                    bpmnNode.ConfId, targetNodeUuid);
+                return false;
+            }
+
+            // 4. 转换目标节点主键 id 为 elementId(taskDefKey)
+            List<string> targetElementIds = _bpmVariableService.GetElementIdsdByNodeId(
+                vo.ProcessNumber, targetNode.Id.ToString());
+            if (targetElementIds == null || targetElementIds.Count == 0)
+            {
+                _logger.LogWarning("同意推进:未能根据nodeId获取目标节点taskDefKey. targetNodeId={TargetNodeId}",
+                    targetNode.Id);
+                return false;
+            }
+            string targetTaskDefKey = targetElementIds[0];
+
+            // 5. 完成当前任务(同意)
+            _taskService.Complete(task);
+
+            // 6. 推进到目标节点(复用 ForwardToNodeService 的公共推进逻辑)
+            _forwardToNodeService.MoveToTargetAfterComplete(
+                bpmBusinessProcess.ProcInstId, vo.ProcessNumber, targetTaskDefKey,
+                bpmBusinessProcess.ProcessinessKey);
+
+            _logger.LogInformation("同意推进成功:processNumber={ProcessNumber}, targetTaskDefKey={TargetTaskDefKey}",
+                vo.ProcessNumber, targetTaskDefKey);
+
+            return true;
         }
 
         public void SetSupportBusinessObjects()

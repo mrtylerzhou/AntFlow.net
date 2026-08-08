@@ -1,4 +1,4 @@
-using AntFlowCore.Abstraction.service.biz;
+﻿using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.adaptor.processoperation;
 using AntFlowCore.Base.constant.enums;
@@ -226,9 +226,60 @@ public class ForwardToNodeService : IProcessOperationAdaptor
     }
 
     /// <summary>
+    /// 公共推进逻辑:当前任务已 complete 后,查询新任务并推进到目标节点.
+    /// 供同意推进节点(ApproveForwardNode)复用,避免重复编写 complete 后的推进逻辑.
+    /// .NET 版同步执行(无需 Java 版的 afterCommit,因为 TaskService.Complete 是直接 DB 操作).
+    /// </summary>
+    /// <param name="procInstId">流程实例ID</param>
+    /// <param name="processNumber">流程编号</param>
+    /// <param name="targetTaskDefKey">目标节点 elementId(taskDefKey)</param>
+    /// <param name="processKey">流程key</param>
+    public void MoveToTargetAfterComplete(string procInstId, string processNumber,
+        string targetTaskDefKey, string processKey)
+    {
+        // 查 complete 后的新任务
+        List<BpmAfTask> newTasks = _afTaskInstService._repository
+            .Find(a => a.ProcInstId == procInstId);
+
+        // 如果空(流程已结束),return
+        if (newTasks.IsEmpty())
+        {
+            return;
+        }
+
+        // 取 newTaskDefKeys
+        var newTaskDefKeys = newTasks.Select(t => t.TaskDefKey).Distinct().ToList();
+
+        // 如果 newTaskDefKeys.Count==1 且 == targetTaskDefKey,return(目标已是下一节点)
+        if (newTaskDefKeys.Count == 1 && newTaskDefKeys[0] == targetTaskDefKey)
+        {
+            return;
+        }
+
+        // 否则推进
+        if (newTaskDefKeys.Count == 1)
+        {
+            // 顺序流: 使用 TurnTransition 直接跳转
+            BpmAfTask newCurrentTask = newTasks[0];
+            var variables = new Dictionary<string, object>
+            {
+                { StringConstants.VERIFY_COMMENT, "推进跳转" }
+            };
+            _processNodeJump.TurnTransition(newCurrentTask, targetTaskDefKey, null, variables);
+        }
+        else
+        {
+            // 并行流(多个taskDefKey): 使用递归 complete 方式推进
+            RecursiveCompleteToTarget(newTasks, procInstId, targetTaskDefKey,
+                processNumber, null, processKey);
+        }
+    }
+
+    /// <summary>
     /// 跨并行网关: 递归complete中间任务直到目标节点
     /// </summary>
-    private void RecursiveCompleteToTarget(List<BpmAfTask> taskList, string processInstanceId,
+    private void RecursiveCompleteToTarget
+(List<BpmAfTask> taskList, string processInstanceId,
         string forwardToNodeElementId, string processNumber, string verifyComment, string processKey)
     {
         if (taskList.IsEmpty())

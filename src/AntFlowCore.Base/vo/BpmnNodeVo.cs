@@ -204,6 +204,14 @@ namespace AntFlowCore.Base.vo;
         public bool? IsFinishApproveNode { get; set; }
 
         /// <summary>
+        /// 同意推进节点标记:普通审批人节点(nodeType=4)勾选同意按钮"跳转至固定节点"选项,强制 forwardType=2.
+        /// 运行时通过同意按钮触发推进逻辑,与推进按钮(42)互斥.
+        /// 前端提交该字段,AfNodeUtils.NodeSpecialProcess 据此贴 approve_forward_node 标签.
+        /// </summary>
+        [JsonPropertyName("isApproveForwardNode")]
+        public bool? IsApproveForwardNode { get; set; }
+
+        /// <summary>
         /// 自动完成节点标记:自动推进(nodeType=18)子类型,目标自动为最后一个审批人节点,不可编辑.
         /// 仅前端反显区分+颜色区分用,运行时复用 auto_advance_node 处理器.
         /// 前端提交该字段,AfNodeUtils.NodeSpecialProcess 据此贴 auto_complete_node 标签.
