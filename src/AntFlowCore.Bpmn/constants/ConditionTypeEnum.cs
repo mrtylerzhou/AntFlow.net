@@ -176,7 +176,17 @@ public enum ConditionTypeEnum
         AlignmentClass = typeof(BpmnStartConditionsVo),
         AlignmentFieldName = LOWFLOW_CONDITION_CONTAINER_FIELD_NAME,
         ConditionJudgeClass = typeof(LFCollectionConditionJudge))]
-    CONDITION_TYPE_LF_COLLECTION_CONDITION = 10004
+    CONDITION_TYPE_LF_COLLECTION_CONDITION = 10004,
+
+    [ConditionType("退回次数",
+        FieldName = "ReturnCount",
+        FieldType = 2,
+        FieldClass = typeof(string),
+        AdaptorClass = typeof(BpmnNodeConditionsEmptyAdaptor),
+        AlignmentClass = typeof(BpmnStartConditionsVo),
+        AlignmentFieldName = "ReturnCount",
+        ConditionJudgeClass = typeof(ReturnCountJudge))]
+    CONDITION_TYPE_RETURN_COUNT = 20002
 }
 
 public static class ConditionTypeEnumExtensions

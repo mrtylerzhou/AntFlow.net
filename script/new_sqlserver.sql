@@ -32,6 +32,7 @@ CREATE TABLE [dbo].[t_bpmn_conf]
     [is_all]              INT             NOT NULL DEFAULT 0,      -- COMMENT: 'is to all,0 no 1yes'
     [is_out_side_process] INT             NULL     DEFAULT 0,      -- COMMENT: 'is it a third party process'
     [is_lowcode_flow]     TINYINT         NULL     DEFAULT 0,      -- COMMENT: '是否是低代码审批流0,否,1是'
+    [return_count]         INT             NOT NULL DEFAULT 0,      -- COMMENT: '退回次数计数器(流程实例级,每次退回+1)'
     [business_party_id]   INT             NULL     DEFAULT NULL,   -- COMMENT: 'its belong to business party'
     [extra_flags]         INT             NULL,
     [conf_config_json]    NVARCHAR(MAX)   NULL,                    -- COMMENT: 'process-level consolidated json config'

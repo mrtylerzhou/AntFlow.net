@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace AntFlowCore.Base.vo
 {
@@ -51,6 +51,13 @@ namespace AntFlowCore.Base.vo
 
         [JsonPropertyName("leaveHour")]
         public string LeaveHour { get; set; }
+
+        /// <summary>
+        /// 退回次数阈值(单值如"3";区间如"1,5").运行时由 ReturnCountJudge 读取,
+        /// 与 bpm_business_process.return_count 比较.复用 NumberOperator 字段存运算符.
+        /// </summary>
+        [JsonPropertyName("returnCount")]
+        public string ReturnCount { get; set; }
 
         [JsonPropertyName("numberOperator")]
         public int? NumberOperator { get; set; }

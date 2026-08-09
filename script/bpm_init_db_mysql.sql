@@ -432,6 +432,7 @@ CREATE TABLE if not exists `bpm_business_process`
     user_name           varchar(255)           null,
     is_out_side_process tinyint     default 0  null comment 'is it an outside process,0 no,1 yes',
     is_lowcode_flow     tinyint     default 0  null comment '是否是低代码工作流0,否,1是',
+    return_count        int         default 0  null comment '退回次数计数器(流程实例级,每次退回+1)',
     PRIMARY KEY (`id`) USING BTREE,
     KEY `PROC_INST_ID_index` (`PROC_INST_ID_`) USING BTREE,
     KEY `process_entry_id` (`ENTRY_ID`) USING BTREE,

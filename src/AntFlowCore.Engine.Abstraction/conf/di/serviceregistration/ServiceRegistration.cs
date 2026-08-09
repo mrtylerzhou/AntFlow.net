@@ -268,6 +268,7 @@ public static class ServiceRegistration
         services.AddSingleton<IConditionJudge, LFDateConditionJudge>();
         services.AddSingleton<IConditionJudge, LFDateTimeConditionJudge>();
         services.AddSingleton<IConditionJudge, LFCollectionConditionJudge>();
+        services.AddSingleton<IConditionJudge, ReturnCountJudge>();
 
         services.AddSingleton<IBpmnDeduplicationFormat, BpmnDeduplicationFormatService>();
         services.AddSingleton<IBpmnOptionalDuplicatesAdaptor, BpmnOptionalDuplicateService>();

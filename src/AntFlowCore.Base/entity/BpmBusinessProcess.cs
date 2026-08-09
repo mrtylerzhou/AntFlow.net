@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Base.entity;
+namespace AntFlowCore.Base.entity;
 
 public class BpmBusinessProcess
 {
@@ -99,4 +99,10 @@ public class BpmBusinessProcess
     /// Is it a low-code flow: 0=no, 1=yes
     /// </summary>
     public int IsLowCodeFlow { get; set; }
+
+    /// <summary>
+    /// 退回次数计数器(流程实例级,单调递增,不清零).每次退回(除撤回和仲裁反对外)+1.
+    /// 供 nodeType=3 条件网关的退回次数条件读取.
+    /// </summary>
+    public int ReturnCount { get; set; } = 0;
 }

@@ -1,4 +1,4 @@
-﻿
+
 namespace AntFlowCore.Base.util
 {
     public interface StringConstants
@@ -47,6 +47,8 @@ namespace AntFlowCore.Base.util
         public const string DEFAULT_TASK_DELETE_REASON ="completed";
         public const string TASK_FINISH_REASON="finished";
         public const string BACK_TO_MODIFY_DESC = "打回修改";
+        /// <summary>退回次数字段名,存储在 bpm_business_process.return_count,每次退回(除撤回和仲裁反对外)+1</summary>
+        public const string RETURN_COUNT = "returnCount";
         public const string ADMIN_RIGHTS = "3060101";
         public const string DYNAMIC_APPROVER = "--";
         public const String TENANT_ID="tenantId";

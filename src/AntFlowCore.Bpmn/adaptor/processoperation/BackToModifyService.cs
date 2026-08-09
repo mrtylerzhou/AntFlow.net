@@ -251,6 +251,11 @@ public class BackToModifyService : IProcessOperationAdaptor
                     _processNodeJump.CommitProcess(task, varMap, backToNodeKey);
                 }
             }
+            //退回计数+1(排除发起人撤回)
+            if (!isStartUserDrawBack)
+            {
+                IncrementReturnCount(vo.ProcessNumber);
+            }
             //退回以后的任务
             List<BpmAfTask> currentTasks = _taskService._repository.Find(t => t.ProcInstId == procInstId).OrderByDescending(a=>a.CreateTime).ToList();
             if (currentTasks.Count > 0)
@@ -362,7 +367,28 @@ public class BackToModifyService : IProcessOperationAdaptor
                 CreateTime = DateTime.Now,
                 TenantId = MultiTenantUtil.GetCurrentTenantId(),
             });
+
+            // Step 5: 退回计数+1
+            IncrementReturnCount(processNumber);
         }
+
+        /// <summary>
+        /// 递增流程实例的退回次数计数器.每次退回(除发起人撤回和仲裁反对外)+1.
+        /// </summary>
+        public void IncrementReturnCount(string processNumber)
+        {
+            try
+            {
+                BpmBusinessProcess process = _bpmBusinessProcessService.GetBpmBusinessProcess(processNumber);
+                process.ReturnCount += 1;
+                _bpmBusinessProcessService.Update(process);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"IncrementReturnCount failed, processNumber={processNumber}, error={ex.Message}");
+            }
+        }
+
         public void SetSupportBusinessObjects()
         {
             ((IAdaptorService)this).AddSupportBusinessObjects(ProcessOperationEnum.BUTTON_TYPE_BACK_TO_MODIFY);
