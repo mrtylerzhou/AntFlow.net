@@ -207,7 +207,8 @@ public class BpmnInsertVariablesService : IBpmnInsertVariablesService
                 }
                 VariableConfigHolder.AddMessages(config, elementVo.TemplateVos, elementVo.ElementId, 2);
 
-                if (elementVo.ApproveRemindVo?.Days != null)
+                if (elementVo.ApproveRemindVo?.StandardMinutes != null
+                    && !elementVo.ApproveRemindVo.Days.IsEmpty())
                 {
                     VariableConfigHolder.AddApproveRemind(config, elementVo.ElementId, elementVo.ApproveRemindVo);
                 }

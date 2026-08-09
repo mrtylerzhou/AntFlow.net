@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using AntFlowCore.Base.vo;
 
@@ -394,7 +394,7 @@ public class BpmnNodeTemplateConfJson
     public List<BpmnTemplateVo>? Templates { get; set; }
 
     [JsonPropertyName("approveRemind")]
-    public BpmnApproveRemindVo? ApproveRemind { get; set; }
+    public ApproveRemindConf? ApproveRemind { get; set; }
 
     [JsonPropertyName("overtimeConf")]
     public TemplateOvertimeConf? OvertimeConf { get; set; }

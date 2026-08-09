@@ -70,7 +70,7 @@ public static class VariableConfigHolder
         string elementId,
         BpmnApproveRemindVo? approveRemindVo)
     {
-        if (approveRemindVo?.Days == null)
+        if (approveRemindVo == null || approveRemindVo.Days.IsEmpty())
         {
             return;
         }

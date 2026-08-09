@@ -349,9 +349,14 @@ public static class BpmnNodeConfigHolder
 
         // Approve remind
         var remind = vo.ApproveRemindVo;
-        if (remind != null)
-        {
-            tc.ApproveRemind = remind;
+        if (remind != null) {
+            tc.ApproveRemind = new ApproveRemindConf
+            {
+                TemplateId = remind.TemplateId,
+                Days = remind.Days,
+                StandardMinutes = remind.StandardMinutes,
+                NoticeTypes = remind.NoticeTypes
+            };
         }
 
         // Overtime conf (migrated from bpm_process_node_overtime)

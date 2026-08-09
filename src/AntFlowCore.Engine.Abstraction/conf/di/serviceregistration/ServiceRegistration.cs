@@ -154,7 +154,8 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmProcessForwardService, BpmProcessForwardService>();
         services.AddSingleton<ThirdPartyCallBackService>();
         services.AddSingleton<IThirdPartyCallBackService, ThirdPartyCallBackService>();
-        services.AddSingleton<BpmnInsertVariablesService>();
+        services.AddSingleton<BpmnInsertVariablesService>();
+        services.AddSingleton<BpmVariableApproveRemindBizService>();
         services.AddSingleton<IBpmnInsertVariablesService, BpmnInsertVariablesService>();
         services.AddSingleton<IBpmVariableMessageBizService, BpmVariableMessageBizService>();
         services.AddSingleton<IBpmVariableMessageListenerService, BpmVariableMessageListenerService>();

@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace AntFlowCore.Base.vo
 {
@@ -23,10 +23,13 @@ namespace AntFlowCore.Base.vo
         public string TemplateName { get; set; }
 
         [JsonPropertyName("days")]
-        public string Days { get; set; }
+        public List<int> Days { get; set; }
 
-        [JsonPropertyName("dayList")]
-        public List<int> DayList { get; set; }
+        [JsonPropertyName("standardMinutes")]
+        public int? StandardMinutes { get; set; }
+
+        [JsonPropertyName("noticeTypes")]
+        public List<int> NoticeTypes { get; set; }
 
         [JsonPropertyName("isDel")]
         public int IsDel { get; set; }

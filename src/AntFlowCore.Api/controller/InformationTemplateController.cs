@@ -6,7 +6,8 @@ using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
-using AntFlowCore.Business.service;
+using AntFlowCore.Business.service;
+using AntFlowCore.Engine.service.biz;
 using AntFlowCore.Persist.api.interf.repository;
 using AntFlowCore.VirtualNode.service;
 using Microsoft.AspNetCore.Mvc;
@@ -17,9 +18,22 @@ namespace AntFlowCore.Api.controller;
 public class InformationTemplateController
 {
     private readonly IInformationTemplateService _informationTemplateService;
-    public InformationTemplateController(InformationTemplateService informationTemplateService)
+    private readonly BpmVariableApproveRemindBizService _approveRemindBizService;
+    public InformationTemplateController(InformationTemplateService informationTemplateService,
+        BpmVariableApproveRemindBizService approveRemindBizService)
     {
         _informationTemplateService = informationTemplateService;
+        _approveRemindBizService = approveRemindBizService;
+    }
+
+    /// <summary>
+    /// test timeout remind. must be scheduled by external scheduler at most once per day
+    /// </summary>
+    [HttpGet("testDoTimeoutReminder")]
+    public Result<string> TestDoTimeoutReminder()
+    {
+        _approveRemindBizService.DoTimeoutReminder();
+        return ResultHelper.Success("ok");
     }
 
     [HttpPost("listPage")]

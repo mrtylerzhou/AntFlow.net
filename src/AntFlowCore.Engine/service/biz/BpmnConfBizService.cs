@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.Orm.util;
+using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.factory;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.biz;
@@ -742,11 +742,7 @@ public class BpmnConfBizService : IBpmnConfBizService
             return;
         }
 
-        vo.IsInuse = vo.TemplateId != null && !string.IsNullOrEmpty(vo.Days);
-        if (!string.IsNullOrEmpty(vo.Days) && vo.DayList.IsEmpty())
-        {
-            vo.DayList = vo.Days.Split(',').Select(int.Parse).ToList();
-        }
+        vo.IsInuse = vo.StandardMinutes != null && !vo.Days.IsEmpty();
 
         if (vo.TemplateId != null)
         {
@@ -918,7 +914,14 @@ public class BpmnConfBizService : IBpmnConfBizService
         //set approve remind from templateConf
         if (tcConf?.ApproveRemind != null)
         {
-            bpmnNodeVo.ApproveRemindVo = tcConf.ApproveRemind;
+            var remindConf = tcConf.ApproveRemind;
+            bpmnNodeVo.ApproveRemindVo = new BpmnApproveRemindVo
+            {
+                TemplateId = remindConf.TemplateId,
+                Days = remindConf.Days,
+                StandardMinutes = remindConf.StandardMinutes,
+                NoticeTypes = remindConf.NoticeTypes
+            };
         }
         HydrateApproveRemindVo(bpmnNodeVo.ApproveRemindVo);
 
