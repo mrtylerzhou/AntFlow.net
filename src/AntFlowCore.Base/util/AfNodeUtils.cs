@@ -173,6 +173,31 @@ public class AfNodeUtils
     }
 
     /// <summary>
+    /// 判断指定 BPMN 元素是否为不可操作节点(自动类型节点).
+    /// 不可操作节点无需人工操作,不可作为退回目标(对应 Java NodeUtil.isCurrentNodeNoneOperational).
+    /// 与 Java 版差异: .NET 版直接基于运行时元素 BpmnConfCommonElementVo.LabelList 判断,
+    /// 无需像 Java 版那样通过 nodeId 反查 t_bpmn_node 表的 nodeConfigJson.
+    /// </summary>
+    /// <param name="elementVo">运行时 BPMN 元素(携带 LabelList)</param>
+    /// <returns>true=不可操作节点(自动类型,不可退回); false=人工节点(可退回)</returns>
+    public static bool IsElementNoneOperational(BpmnConfCommonElementVo elementVo)
+    {
+        if (elementVo == null || elementVo.LabelList == null || elementVo.LabelList.Count == 0)
+        {
+            // 无标签视为不可操作(保守拒绝,与 Java 版 getLabelsFromNodeJson 返回 null 时一致)
+            return true;
+        }
+        foreach (BpmnNodeLabelVO noneOperationalLabel in NodeLabelConstants.NoneOperationalNodes)
+        {
+            if (NodeLabelConstants.NodeLabelContainsAny(elementVo.LabelList, noneOperationalLabel.LabelValue))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
     /// 反显(查看流程模板)时的特殊节点标签处理.
     /// 根据节点标签将普通审批人节点还原为抄送节点v2(nodeType=8)等特殊节点类型,
     /// 以便前端按对应节点的视觉效果渲染.

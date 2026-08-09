@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.Orm.util;
+using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.service.biz;
 using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.adaptor.processoperation;
@@ -17,7 +17,7 @@ public class BackToModifyService : IProcessOperationAdaptor
     {
         private readonly IBpmBusinessProcessService _bpmBusinessProcessService;
         private readonly IAFTaskService _taskService;
-       
+
         private readonly IBpmVerifyInfoService _verifyInfoService;
         private readonly IBpmProcessNodeSubmitService _processNodeSubmitService;
         private readonly IProcessNodeJumpService _processNodeJump;
@@ -100,7 +100,7 @@ public class BackToModifyService : IProcessOperationAdaptor
             }
 
             List<String> taskDefKeys = taskList.Select(a => a.TaskDefKey).ToList();
-            
+
             int backToModifyType = vo.BackToModifyType ?? ProcessDisagreeTypeEnum.THREE_DISAGREE.Code;
             if (taskDefKeys.Count > 1 && backToModifyType == ProcessDisagreeTypeEnum.FIVE_DISAGREE.Code) {
                 backToModifyType = ProcessDisagreeTypeEnum.FOUR_DISAGREE.Code;
@@ -113,6 +113,13 @@ public class BackToModifyService : IProcessOperationAdaptor
                     BpmAfTaskInst prevTask = _processConstants.GetPrevTask(taskData.TaskDefKey, procInstId);
                     if (prevTask == null)
                         throw new AFBizException("无前置节点, 无法回退上一节点!");
+                    // 校验上一节点是否为自动类型节点(不可人工操作,无法退回)
+                    List<BpmnConfCommonElementVo> elements = BpmnFlowUtil.GetElementVosByDeployId(taskData.ProcDefId);
+                    BpmnConfCommonElementVo prevElement = BpmnFlowUtil.GetCurrentTaskElement(elements, prevTask.TaskDefKey);
+                    if (AfNodeUtils.IsElementNoneOperational(prevElement))
+                    {
+                        throw new AFBizException("上一节点为自动类型节点,无法退回!");
+                    }
                     restoreNodeKey = taskData.TaskDefKey;
                     backToNodeKey = prevTask.TaskDefKey;
                 }
@@ -142,21 +149,34 @@ public class BackToModifyService : IProcessOperationAdaptor
                     {
                         elementId=_bpmVariableService.GetElementIdsdByNodeId(vo.ProcessNumber, vo.BackToNodeId)[0];
                     }
-                        
-                    backToNodeKey = elementId;
+                    // 校验目标节点是否为自动类型节点(不可人工操作,无法退回)
                     List<BpmnConfCommonElementVo> elements = BpmnFlowUtil.GetElementVosByDeployId(taskData.ProcDefId);
+                    BpmnConfCommonElementVo targetElement = BpmnFlowUtil.GetCurrentTaskElement(elements, elementId);
+                    if (AfNodeUtils.IsElementNoneOperational(targetElement))
+                    {
+                        throw new AFBizException("不可退回到自动类型节点,请重试!");
+                    }
+                    backToNodeKey = elementId;
                     var (assigneeNode, flowNode) = BpmnFlowUtil.GetNextNodeAndFlowNode(elements, elementId);
                     restoreNodeKey = assigneeNode.ElementId;
                 }else if (ProcessDisagreeTypeEnum.FIVE_DISAGREE == processDisagreeType)
                 {
+                    String elementId = _bpmVariableService.GetElementIdsdByNodeId(vo.ProcessNumber, vo.BackToNodeId)[0];
+                    // 校验目标节点是否为自动类型节点(不可人工操作,无法退回)
+                    List<BpmnConfCommonElementVo> elements = BpmnFlowUtil.GetElementVosByDeployId(taskData.ProcDefId);
+                    BpmnConfCommonElementVo targetElement = BpmnFlowUtil.GetCurrentTaskElement(elements, elementId);
+                    if (AfNodeUtils.IsElementNoneOperational(targetElement))
+                    {
+                        throw new AFBizException("不可退回到自动类型节点,请重试!");
+                    }
                     restoreNodeKey = taskData.TaskDefKey;
-                    backToNodeKey = _bpmVariableService.GetElementIdsdByNodeId(vo.ProcessNumber, vo.BackToNodeId)[0];
+                    backToNodeKey = elementId;
                 }
                 else
                 {
                     throw new AFBizException("未支持的打回类型!");
                 }
-                
+
 
             // 保存审批信息
             _verifyInfoService.AddVerifyInfo(new BpmVerifyInfo
@@ -222,7 +242,7 @@ public class BackToModifyService : IProcessOperationAdaptor
                 // 并行任务回退
                 foreach (BpmAfTask task in taskList)
                 {
-               
+
                     Dictionary<string, object> varMap = new Dictionary<string, object>
                     {
                         { StringConstants.TASK_ASSIGNEE_NAME, task.AssigneeName },
@@ -254,10 +274,10 @@ public class BackToModifyService : IProcessOperationAdaptor
                     }
                     _taskService._repository.DeleteByExpression(a => otherNewTaskIds.Contains(a.Id));
                     _afExecutionService._repository.DeleteByExpression(a => otherNewExecutionIds.Contains(a.Id));
-                   
+
 
                 }
-               
+
             }
             vo.BusinessId = bpmBusinessProcess.BusinessId;
 
@@ -351,6 +371,5 @@ public class BackToModifyService : IProcessOperationAdaptor
             ((IAdaptorService)this).AddSupportBusinessObjects(ProcessOperationEnum.BUTTON_TYPE_DRAW_BACK_AGREE);
         }
 
-      
-    }
 
+    }
