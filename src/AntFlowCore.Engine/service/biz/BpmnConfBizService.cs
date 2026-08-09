@@ -77,6 +77,11 @@ public class BpmnConfBizService : IBpmnConfBizService
         bpmnConfVo.ConfConfigJson = JsonConfUtil.ToConfConfigJson(BpmnConfConfigHolder.BuildConfConfig(bpmnConfVo));
         BpmnConf bpmnConf = bpmnConfVo.MapToEntity();
        
+        // 新版本默认未激活 (文档 version-management: 需手动"启动"才激活; 不接受客户端覆盖)
+        bpmnConf.EffectiveStatus = 0;
+        // 软删除标志位防御性置 0 (与 EffectiveStatus 同类状态标志, 不接受客户端覆盖)
+        bpmnConf.IsDel = 0;
+
         bpmnConf.BpmnCode=bpmnCode;
         bpmnConf.FormCode = formCode;
         bpmnConf.CreateUser=SecurityUtils.GetLogInEmpNameSafe();
@@ -239,9 +244,14 @@ public class BpmnConfBizService : IBpmnConfBizService
             }
 
             BpmnNode bpmnNode = bpmnNodeVo.MapToEntity();
+            // 软删除标志位防御性置 0 (与 conf 侧 IsDel 同类)
+            bpmnNode.IsDel = 0;
             bpmnNode.ConfId=confId;
             bpmnNode.CreateTime=DateTime.Now;
             bpmnNode.CreateUser=SecurityUtils.GetLogInEmpNameSafe();
+            // 审计字段由后端兜底: 之前缺失, 节点行的 update_time/update_user 落 NULL
+            bpmnNode.UpdateTime=DateTime.Now;
+            bpmnNode.UpdateUser=SecurityUtils.GetLogInEmpNameSafe();
             bpmnNode.Remark ??= "";
             bpmnNode.TenantId = MultiTenantUtil.GetCurrentTenantId();
             BpmnNode node = _bpmnNodeService._repository.Add(bpmnNode);

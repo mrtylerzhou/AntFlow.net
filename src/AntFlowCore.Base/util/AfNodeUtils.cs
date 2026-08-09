@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 
@@ -169,6 +169,20 @@ public class AfNodeUtils
         {
             bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_APPROVER;
             bpmnNodeVo.IsConditionReturnNode = true;
+        }
+        //仲裁签节点校验: signType=4 必须配置有效的 arbitrationRatio (0-100)
+        //项目记忆硬约束: deployment fails with ArgumentException if ratio is null
+        //运行期 OpposeProcessImpl 虽默认 100% (任意反对即终止), 但部署期应拒绝以避免静默降级
+        //放在所有 nodeType 转换之后: 自动节点(9/18/19)的 signType 已被强制为 1, 不会误判
+        var propForArbitration = bpmnNodeVo.Property;
+        if (propForArbitration != null && propForArbitration.SignType == 4)
+        {
+            int? ratio = propForArbitration.ArbitrationRatio;
+            if (ratio == null || ratio < 0 || ratio > 100)
+            {
+                throw new ArgumentException(
+                    $"仲裁签节点(signType=4)必须配置有效的 arbitrationRatio (0-100), 节点: {bpmnNodeVo.NodeName}");
+            }
         }
     }
 
