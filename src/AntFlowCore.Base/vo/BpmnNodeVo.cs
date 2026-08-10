@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.entity.jsonconf;
+using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.util;
 using AntFlowCore.Core.vo;
 using System.Text.Json.Serialization;
@@ -158,6 +158,14 @@ namespace AntFlowCore.Base.vo;
         /// </summary>
         [JsonPropertyName("isConditionFinishNode")]
         public bool? IsConditionFinishNode { get; set; }
+
+        /// <summary>
+        /// 条件拒绝节点标记:条件审批(nodeType=12)子类型.
+        /// 满足条件时自动拒绝(固定终止流程,忽略不同意退回配置),不满足时留给真实审批人.
+        /// 前端提交该字段,BpmnConfBizService 据此贴 condition_disagree_node 标签.
+        /// </summary>
+        [JsonPropertyName("isConditionDisagreeNode")]
+        public bool? IsConditionDisagreeNode { get; set; }
 
         /// <summary>
         /// Whether this node is a condition-copy node (nodeType=13 at design time,

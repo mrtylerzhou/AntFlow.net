@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using System.Reflection;
 using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Base.adaptor.formoperation;
@@ -169,6 +170,19 @@ public class ActivitiTagParser<T>: TagParser<IFormOperationAdaptor<T>,BusinessDa
             {
                 _inner.AutomaticAction(subClassVo, conditionResult);
                 return;
+            }
+            throw new ArgumentException($"The provided argument is not of the expected type {typeof(TSubClass).Name}.");
+        }
+
+        /// <summary>
+        /// 到达前设置(动态审批人): 将 vo cast 为 TSubClass 后委托给 inner.
+        /// 与其它方法同模式. 不实现则走接口默认(返 null)导致动态节点永远跳过, 故必须委托.
+        /// </summary>
+        public List<BaseIdTranStruVo> ProvideCurrentNodeAssignees(T vo)
+        {
+            if (vo is TSubClass subClassVo)
+            {
+                return _inner.ProvideCurrentNodeAssignees(subClassVo);
             }
             throw new ArgumentException($"The provided argument is not of the expected type {typeof(TSubClass).Name}.");
         }

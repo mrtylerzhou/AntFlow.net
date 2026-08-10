@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.dto;
@@ -34,6 +34,7 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
     private readonly IBpmnNodeService _bpmnNodeService;
     private readonly ForwardToNodeService _forwardToNodeService;
     private readonly BackToModifyService _backToModifyService;
+    private readonly EndProcessService _endProcessService;
     private readonly ILogger<NextNodeLabelsProcessor> _logger;
 
     public NextNodeLabelsProcessor(
@@ -46,6 +47,7 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
         IBpmnNodeService bpmnNodeService,
         ForwardToNodeService forwardToNodeService,
         BackToModifyService backToModifyService,
+        EndProcessService endProcessService,
         ILogger<NextNodeLabelsProcessor> logger)
     {
         _bpmProcessForwardService = bpmProcessForwardService;
@@ -57,6 +59,7 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
         _bpmnNodeService = bpmnNodeService;
         _forwardToNodeService = forwardToNodeService;
         _backToModifyService = backToModifyService;
+        _endProcessService = endProcessService;
         _logger = logger;
     }
 
@@ -97,6 +100,7 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
             ProcessAutoSkipNode(nodeLabelVO, assignee, procInstId, assigneeName, processNumber, delegateTask);
             ProcessConditionApproveNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, delegateTask);
             ProcessConditionAdvanceNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, procInstId, delegateTask);
+            ProcessConditionDisagreeNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, delegateTask);
             ProcessConditionCopyNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, procInstId, delegateTask);
             ProcessPrevNodeAppointed(nodeLabelVO, businessDataVo, delegateTask, formCode, processNumber);
         }
@@ -863,6 +867,88 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
                 TenantId = MultiTenantUtil.GetCurrentTenantId(),
             };
             _bpmVerifyInfoService.AddVerifyInfo(bpmVerifyInfo);
+        }
+        // conditionResult == false 或 null: 不 complete, 留给真实审批人
+    }
+
+    /// <summary>
+    /// 条件拒绝节点处理:复用条件评估;满足条件时自动拒绝(固定终止流程,忽略不同意退回配置),
+    /// 写虚拟人-3 拒绝记录(VerifyStatus=6) + EndProcessWithoutVerify(状态=6 + 删实例),
+    /// 内部流程补 OnDisagreeData 业务回调(对等 .NET 人工不同意路径);不满足时不 complete,留给真实审批人.
+    /// 对应 Java processConditionDisagreeNode.
+    /// </summary>
+    private void ProcessConditionDisagreeNode(BpmnNodeLabelVO nodeLabelVO, string processNumber, string elementId,
+        string formCode, BusinessDataVo? businessDataVo, bool isOutSide, BpmAfTask delegateTask)
+    {
+        if (!StringConstants.CONDITION_DISAGREE_NODE.Equals(nodeLabelVO.LabelValue))
+        {
+            return;
+        }
+
+        if (businessDataVo == null)
+        {
+            _logger.LogError("条件拒绝节点处理失败:businessDataVo 为空,processNumber={}", processNumber);
+            return;
+        }
+
+        businessDataVo.ProcessNumber = processNumber;
+        businessDataVo.TaskDefKey = elementId;
+        businessDataVo.FormCode = formCode;
+        businessDataVo.IsOutSideAccessProc = isOutSide;
+
+        var formAdaptor = _formFactory.GetFormAdaptor(businessDataVo);
+        if (formAdaptor == null)
+        {
+            throw new AFBizException($"未能根据流程formcode找到流程适配器信息! formCode={formCode}");
+        }
+
+        if ((businessDataVo.LfConditions == null || businessDataVo.LfConditions.Count == 0)
+            && businessDataVo.IsLowCodeFlow == 1)
+        {
+            businessDataVo.LfConditions = businessDataVo.LfFields;
+        }
+
+        bool? conditionResult = null;
+        try
+        {
+            conditionResult = formAdaptor.AutomaticCondition(businessDataVo);
+            if (conditionResult == null)
+            {
+                conditionResult = _conditionEvaluator.Evaluate(businessDataVo);
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "条件拒绝节点条件判断异常, processNumber={}, elementId={}", processNumber, elementId);
+        }
+
+        // 仅当条件满足时才自动拒绝(固定终止流程); 否则留给真实审批人
+        if (conditionResult == true)
+        {
+            string assigneeName = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Desc;
+            BpmVerifyInfo bpmVerifyInfo = new BpmVerifyInfo
+            {
+                VerifyDate = DateTime.Now,
+                TaskName = delegateTask.Name,
+                TaskId = delegateTask.Id,
+                RunInfoId = delegateTask.ProcInstId,
+                VerifyUserId = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Id,
+                VerifyUserName = assigneeName,
+                TaskDefKey = delegateTask.TaskDefKey,
+                VerifyStatus = (int)ProcessStateEnum.REJECT_STATE,
+                VerifyDesc = string.Format(StringConstants.AF_CONDITION_DISAGREE_AUTO_COMMENT, conditionResult),
+                ProcessCode = processNumber,
+                TenantId = MultiTenantUtil.GetCurrentTenantId(),
+            };
+            _bpmVerifyInfoService.AddVerifyInfo(bpmVerifyInfo);
+            // 固定终止流程: 更新状态=6 + 删除流程实例 (不走不同意退回分叉)
+            businessDataVo.Flag = false;
+            _endProcessService.EndProcessWithoutVerify(businessDataVo);
+            // 业务回调: 对等 .NET 人工不同意路径(内部流程走 OnDisagreeData; 外部流程的 OnCancellationData 已在 EndProcessWithoutVerify 内调用)
+            if (businessDataVo.IsOutSideAccessProc == null || !businessDataVo.IsOutSideAccessProc.Value)
+            {
+                _formFactory.GetFormAdaptor(businessDataVo).OnDisagreeData(businessDataVo);
+            }
         }
         // conditionResult == false 或 null: 不 complete, 留给真实审批人
     }

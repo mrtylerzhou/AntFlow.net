@@ -1401,3 +1401,27 @@ INSERT INTO t_dict_data(`dict_label`, `dict_value`, `dic_value_type`, `remark`,`
 VALUES ( '自定义审批人1', 'zdysp10', NULL, NULL, 'udr', NULL, NULL, NULL, 'N', 0, '', '系统');
 -- ----------------------------
 
+
+-- ----------------------------
+-- 流程表单字段变更审计表 (对齐 Java 版 t_bpm_process_audit)
+-- ----------------------------
+create table if not exists t_bpm_process_audit
+(
+    id               bigint auto_increment primary key,
+    process_number   varchar(64)  null comment '流程编号',
+    form_code        varchar(50)  null comment '表单编码',
+    field_name       varchar(64)  null comment '字段名(fieldId): 低代码为 inputId, DIY 为 vo 属性名',
+    field_label      varchar(128) null comment '字段 label(展示给业务用户; 低代码从 lfFormdataField.fieldName 读, DIY 为空)',
+    old_value        varchar(256) null comment '旧值(字符串形式, 对象/集合 JSON 序列化)',
+    new_value        varchar(256) null comment '新值(字符串形式, 对象/集合 JSON 序列化)',
+    tenant_id        varchar(255) null comment '租户ID',
+    task_name        varchar(64)  null comment '任务名称(节点名)',
+    task_def_key     varchar(64)  null comment '任务定义key(节点元素ID)',
+    create_user      varchar(50)  null comment '变更人(登录empId)',
+    create_user_name varchar(50)  null comment '变更人姓名(审批时快照, 用于审计溯源)',
+    create_time      timestamp    not null default CURRENT_TIMESTAMP comment '创建时间'
+) ENGINE = InnoDB
+  comment = '流程表单字段变更审计表' DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+create index idx_t_bpm_process_audit_process_number on t_bpm_process_audit (process_number);
+create index idx_t_bpm_process_audit_task_def_key on t_bpm_process_audit (task_def_key);

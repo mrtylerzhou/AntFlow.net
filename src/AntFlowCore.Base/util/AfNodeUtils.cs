@@ -249,6 +249,13 @@ public class AfNodeUtils
                 bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_CONDITION_APPROVE;
                 bpmnNodeVo.IsConditionFinishNode = true;
             }
+            else if (NodeLabelConstants.ConditionDisagreeNode.LabelValue.Equals(nodeLabelVO.LabelValue))
+            {
+                // 条件拒绝节点:条件审批(nodeType=12)子类型,满足条件自动拒绝终止流程
+                // 还原 nodeType=12 并标记 IsConditionDisagreeNode, 供前端反显图标/颜色
+                bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_CONDITION_APPROVE;
+                bpmnNodeVo.IsConditionDisagreeNode = true;
+            }
             else if (NodeLabelConstants.ConditionCopyNode.LabelValue.Equals(nodeLabelVO.LabelValue))
             {
                 bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_CONDITION_COPY;

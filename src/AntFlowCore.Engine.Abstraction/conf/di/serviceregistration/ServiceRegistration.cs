@@ -98,9 +98,11 @@ public static class ServiceRegistration
         services.AddSingleton<INextNodeTaskProcessor, NextNodeLabelsProcessor>();
         services.AddSingleton<INextNodeTaskProcessor, NextNodeForwardProcessor>();
         services.AddSingleton<INextNodeTaskProcessor, NextNodeProcessNoticeSendProcessor>();
+        services.AddSingleton<INextNodeTaskProcessor, NextNodeDynamicAssigneeProcessor>();
         services.AddSingleton<NextNodeLabelsProcessor>();
         services.AddSingleton<NextNodeForwardProcessor>();
         services.AddSingleton<NextNodeProcessNoticeSendProcessor>();
+        services.AddSingleton<NextNodeDynamicAssigneeProcessor>();
         services.AddSingleton<ProcessApprovalService>();
         services.AddSingleton<IProcessApprovalService, ProcessApprovalService>();
         services.AddSingleton<IFormOperationAdaptor<ThirdPartyAccountApplyVo>, ThirdPartyAccountApplyFlowService>();
@@ -137,6 +139,8 @@ public static class ServiceRegistration
         services.AddSingleton<IOutSideBpmConditionsTemplateService, OutSideBpmConditionsTemplateService>();
         services.AddSingleton<BpmVerifyInfoService>();
         services.AddSingleton<IBpmVerifyInfoService, BpmVerifyInfoService>();
+        services.AddSingleton<BpmProcessAuditService>();
+        services.AddSingleton<IBpmProcessAuditService, BpmProcessAuditService>();
         services.AddSingleton<BpmBusinessDraftService>();
         services.AddSingleton<IBpmBusinessDraftService, BpmBusinessDraftService>();
         services.AddSingleton<IBpmProcessDraftBizService, BpmProcessDraftBizServiceImpl>();
@@ -154,7 +158,7 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmProcessForwardService, BpmProcessForwardService>();
         services.AddSingleton<ThirdPartyCallBackService>();
         services.AddSingleton<IThirdPartyCallBackService, ThirdPartyCallBackService>();
-        services.AddSingleton<BpmnInsertVariablesService>();
+        services.AddSingleton<BpmnInsertVariablesService>();
         services.AddSingleton<BpmVariableApproveRemindBizService>();
         services.AddSingleton<IBpmnInsertVariablesService, BpmnInsertVariablesService>();
         services.AddSingleton<IBpmVariableMessageBizService, BpmVariableMessageBizService>();
@@ -421,6 +425,7 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmProcessForwardRepository, FsBpmProcessForwardRepository>();
         services.AddSingleton<IBpmProcessNodeSubmitRepository, FsBpmProcessNodeSubmitRepository>();
         services.AddSingleton<IBpmVerifyInfoRepository, FsBpmVerifyInfoRepository>();
+        services.AddSingleton<IBpmProcessAuditRepository, FsBpmProcessAuditRepository>();
         services.AddSingleton<IBpmBusinessDraftRepository, FsBpmBusinessDraftRepository>();
         services.AddSingleton<IBpmDynamicConditionChoosenRepository, FsBpmDynamicConditionChoosenRepository>();
         services.AddSingleton<ILFMainFieldRepository, FsLFMainFieldRepository>();

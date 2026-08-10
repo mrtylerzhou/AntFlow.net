@@ -27,6 +27,12 @@ public class AFSpecialAssigneeEnum
     /// 上一节点指定的审批人: 虚拟用户, 运行时由 AFTaskService.InsertTasks 替换为实际审批人
     /// </summary>
     public static readonly AFSpecialAssigneeEnum PREV_NODE_APPOINTED = new AFSpecialAssigneeEnum(-4, "-4", "上一节点指定的审批人");
+    /// <summary>
+    /// 到达前设置(动态审批人): 虚拟用户, 设计时作为节点 assignee 透传;
+    /// 运行到该节点时由 NextNodeDynamicAssigneeProcessor 调用
+    /// IFormOperationAdaptor.ProvideCurrentNodeAssignees 动态查询真实审批人并委托.
+    /// </summary>
+    public static readonly AFSpecialAssigneeEnum ARRIVAL_DYNAMIC_ASSIGNEE = new AFSpecialAssigneeEnum(-5, "-5", "到达前动态查询审批人");
     public static IEnumerable<AFSpecialAssigneeEnum> Values
     {
         get
@@ -37,6 +43,7 @@ public class AFSpecialAssigneeEnum
             yield return SKIP;
             yield return AUTO_NODE_SKIP;
             yield return PREV_NODE_APPOINTED;
+            yield return ARRIVAL_DYNAMIC_ASSIGNEE;
         }
     }
 

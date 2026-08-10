@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using AntFlowCore.Base.util;
 
 namespace AntFlowCore.Base.vo
@@ -36,6 +36,12 @@ namespace AntFlowCore.Base.vo
         /// 运行时复用条件推进处理器.对应 Java NodeLabelConstants.conditionFinishNode.
         /// </summary>
         public static readonly BpmnNodeLabelVO ConditionFinishNode = new BpmnNodeLabelVO(StringConstants.CONDITION_FINISH_NODE, "条件完成节点");
+
+        /// <summary>
+        /// 条件拒绝节点:条件审批(nodeType=12)子类型,满足条件自动拒绝终止流程(忽略不同意退回配置),不满足留给真实审批人.
+        /// 对应 Java NodeLabelConstants.conditionDisagreeNode. 不加入 NONE_OPERATIONAL_NODES.
+        /// </summary>
+        public static readonly BpmnNodeLabelVO ConditionDisagreeNode = new BpmnNodeLabelVO(StringConstants.CONDITION_DISAGREE_NODE, "条件拒绝节点");
 
         /// <summary>
         /// 条件抄送节点:本质是抄送V2节点 + 条件配置,总是自动完成,仅条件满足时写抄送记录.

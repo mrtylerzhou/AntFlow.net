@@ -715,6 +715,29 @@ public class LowFlowApprovalService : IFormOperationAdaptor<UDLFApplyVo>
         }
     }
 
+    /// <summary>
+    /// 到达前设置(动态审批人): 内联分发到匹配的 ILFFormOperationAdaptor
+    /// (按 LFFormServiceAnnoAttribute.SvcName==formCode), 返回其 ProvideCurrentNodeAssignees 结果;
+    /// 无匹配返回空列表(引擎按"查不到人"跳过).
+    /// <para>.NET 无 Spring AOP, 故 Java LowFlowApprovalServiceAspect 的后置分发在此内联完成:
+    /// 本方法不提供 per-flow 找人逻辑(避免臃肿), 仅做分发; 具体 LF 流程在 ILFFormOperationAdaptor 实现类里重写.</para>
+    /// 对应 Java LowFlowApprovalService.provideCurrentNodeAssignees + LowFlowApprovalServiceAspect.aroundProvideCurrentNodeAssignees.
+    /// </summary>
+    public List<BaseIdTranStruVo> ProvideCurrentNodeAssignees(UDLFApplyVo vo)
+    {
+        IEnumerable<ILFFormOperationAdaptor> lfFormOperationAdaptors = ServiceProviderUtils.GetServices<ILFFormOperationAdaptor>();
+        foreach (ILFFormOperationAdaptor o in lfFormOperationAdaptors)
+        {
+            LFFormServiceAnnoAttribute? lfFormServiceAnnoAttribute = o.GetType().GetCustomAttribute<LFFormServiceAnnoAttribute>();
+
+            if (lfFormServiceAnnoAttribute != null && lfFormServiceAnnoAttribute.SvcName.Equals(vo.FormCode))
+            {
+                return o.ProvideCurrentNodeAssignees(vo) ?? new List<BaseIdTranStruVo>();
+            }
+        }
+        return new List<BaseIdTranStruVo>();
+    }
+
     // ===================== 自动节点条件判断 =====================
 
     /// <summary>

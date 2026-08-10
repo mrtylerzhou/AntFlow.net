@@ -1,4 +1,5 @@
 using AntFlowCore.Base.vo;
+using System.Collections.Generic;
 
 namespace AntFlowCore.Base.adaptor.formoperation;
 
@@ -65,4 +66,16 @@ public interface IFormOperationAdaptor<in T> where T : BusinessDataVo
     /// 对应 Java FormOperationAdaptor.automaticAction.
     /// </summary>
     void AutomaticAction(T vo, bool? conditionResult) { }
+
+    /// <summary>
+    /// 到达前设置(动态审批人): 节点运行期到达时, 由具体业务实现根据业务数据动态查询当前节点的真实审批人.
+    /// <para>触发条件: 节点审批人为虚拟人 <c>AFSpecialAssigneeEnum.ARRIVAL_DYNAMIC_ASSIGNEE(-5)</c>.</para>
+    /// <para>引擎在 BpmnTaskListener 检测到 assignee==-5 时, 通过 FormFactory.GetFormAdaptor 拿到本适配器并调用本方法,
+    /// 将虚拟人任务委托(setAssignee)给查到的真人; 多人时首个承接, 其余加签; 返回 null/空时跳过当前虚拟人节点.</para>
+    /// <para>默认返回 null(未实现"到达前设置"), 由引擎按"查不到人"处理(跳过).
+    /// DIY 流程在自身适配器里重写; 低代码流程在 ILFFormOperationAdaptor 实现类里重写,
+    /// 由 LowFlowApprovalService.ProvideCurrentNodeAssignees 内联分发并返回其结果.</para>
+    /// 对应 Java FormOperationAdaptor.provideCurrentNodeAssignees.
+    /// </summary>
+    List<BaseIdTranStruVo>? ProvideCurrentNodeAssignees(T vo) => null;
 }

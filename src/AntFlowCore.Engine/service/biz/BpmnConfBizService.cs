@@ -161,6 +161,12 @@ public class BpmnConfBizService : IBpmnConfBizService
                     // 必须先于 IsConditionApproveNode 判断(条件推进节点两者都为 true),否则会误贴 condition_approve_node 标签导致运行时走条件审批
                     nodeLabelVO = NodeLabelConstants.ConditionAdvanceNode;
                 }
+                else if (bpmnNodeVo.IsConditionDisagreeNode == true)
+                {
+                    // 条件拒绝节点:条件审批(nodeType=12)子类型,满足条件自动拒绝终止流程,不满足留给审批人
+                    // 必须先于 IsConditionApproveNode 判断(条件拒绝节点两者都为 true),否则会误贴 condition_approve_node 标签导致运行时走条件审批
+                    nodeLabelVO = NodeLabelConstants.ConditionDisagreeNode;
+                }
                 else if (bpmnNodeVo.IsConditionApproveNode == true)
                 {
                     nodeLabelVO = NodeLabelConstants.ConditionApproveNode;
@@ -993,6 +999,11 @@ public class BpmnConfBizService : IBpmnConfBizService
             if (NodeLabelConstants.NodeLabelContainsAny(labelVOList, NodeLabelConstants.ConditionFinishNode.LabelValue))
             {
                 bpmnNodeVo.IsConditionFinishNode = true;
+            }
+            // 条件拒绝节点:标签匹配时设置标记位,前端据此反显为条件拒绝(图标/颜色)
+            if (NodeLabelConstants.NodeLabelContainsAny(labelVOList, NodeLabelConstants.ConditionDisagreeNode.LabelValue))
+            {
+                bpmnNodeVo.IsConditionDisagreeNode = true;
             }
             // 条件抄送节点:标签匹配时设置标记位
             if (NodeLabelConstants.NodeLabelContainsAny(labelVOList, NodeLabelConstants.ConditionCopyNode.LabelValue))

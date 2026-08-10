@@ -30,6 +30,7 @@ public class ResubmitProcessService: IProcessOperationAdaptor
         private readonly ForwardToNodeService _forwardToNodeService;
         private readonly IBpmVariableService _bpmVariableService;
         private readonly IBpmnNodeService _bpmnNodeService;
+        private readonly IBpmProcessAuditService _processAuditService;
         private readonly ILogger<ResubmitProcessService> _logger;
 
         public ResubmitProcessService(
@@ -44,6 +45,7 @@ public class ResubmitProcessService: IProcessOperationAdaptor
            ForwardToNodeService forwardToNodeService,
            IBpmVariableService bpmVariableService,
            IBpmnNodeService bpmnNodeService,
+           IBpmProcessAuditService processAuditService,
            ILogger<ResubmitProcessService> logger)
         {
             _formFactory = formFactory;
@@ -57,6 +59,7 @@ public class ResubmitProcessService: IProcessOperationAdaptor
             _forwardToNodeService = forwardToNodeService;
             _bpmVariableService = bpmVariableService;
             _bpmnNodeService = bpmnNodeService;
+            _processAuditService = processAuditService;
             _logger = logger;
         }
 
@@ -188,6 +191,17 @@ public class ResubmitProcessService: IProcessOperationAdaptor
 
             if (vo.IsOutSideAccessProc == null || !vo.IsOutSideAccessProc.Value)
             {
+                // 表单字段变更审计: 在 OnConsentData 写入新值之前捕获旧值, 记录到 t_bpm_process_audit.
+                // 覆盖 RESUBMIT / AGREE / JP 三种按钮, 以及 Assist 委托过来的 ASSIST.
+                try
+                {
+                    _processAuditService.SaveChanges(vo, task);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "SaveChanges failed, processNumber={ProcessNumber}", vo.ProcessNumber);
+                }
+
                 _formFactory.GetFormAdaptor(vo).OnConsentData(vo);
             }
 
