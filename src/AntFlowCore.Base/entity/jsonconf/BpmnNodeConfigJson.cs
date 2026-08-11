@@ -98,6 +98,12 @@ public class BpmnNodeConfigJson
     /// </summary>
     [JsonPropertyName("autoSignUpUsers")]
     public List<BaseIdTranStruVo>? AutoSignUpUsers { get; set; }
+
+    /// <summary>
+    /// 条件自动加批节点的加批规则子配置(增强版). 运行期由 AutoSignUpAssigneeResolver 解析; 为空时回退 autoSignUpUsers.
+    /// </summary>
+    [JsonPropertyName("autoSignUpConf")]
+    public JsonElement? AutoSignUpConf { get; set; }
 }
 
 /// <summary>

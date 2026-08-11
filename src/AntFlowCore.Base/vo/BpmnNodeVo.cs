@@ -1,6 +1,7 @@
 using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.util;
 using AntFlowCore.Core.vo;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace AntFlowCore.Base.vo;
@@ -179,6 +180,14 @@ namespace AntFlowCore.Base.vo;
         /// </summary>
         [JsonPropertyName("autoSignUpUsers")]
         public List<BaseIdTranStruVo>? AutoSignUpUsers { get; set; }
+
+        /// <summary>
+        /// 条件自动加批节点的加批规则子配置(增强版, 支持多种审批人规则).
+        /// 结构: {setType, nodeApproveList, directorLevel, property, nodeProperty, resolvedProperty}.
+        /// 运行期由 AutoSignUpAssigneeResolver 解析为具体用户; 为空时回退 AutoSignUpUsers.
+        /// </summary>
+        [JsonPropertyName("autoSignUpConf")]
+        public JsonElement? AutoSignUpConf { get; set; }
 
         /// <summary>
         /// Whether this node is a condition-copy node (nodeType=13 at design time,

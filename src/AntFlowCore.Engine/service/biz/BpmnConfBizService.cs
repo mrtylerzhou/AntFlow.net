@@ -441,16 +441,22 @@ public class BpmnConfBizService : IBpmnConfBizService
             }
         }
 
-        // 条件自动加批节点: autoSignUpUsers 持久化到 node config JSON, 发布校验非空
+        // 条件自动加批节点: autoSignUpConf(增强规则)/autoSignUpUsers(旧数据) 持久化到 node config JSON
         if (bpmnNodeVo.IsConditionAutoSignUpNode == true)
         {
-            var autoSignUpUsers = bpmnNodeVo.AutoSignUpUsers;
-            if (autoSignUpUsers == null || autoSignUpUsers.Count == 0)
-            {
-                throw new AFBizException($"节点[{bpmnNodeVo.NodeName}]为条件自动加批节点,必须配置至少一个加批人!");
-            }
             var nodeCfgJson3 = bpmnNodeVo.GetOrCreateNodeConfigJson();
-            nodeCfgJson3.AutoSignUpUsers = autoSignUpUsers;
+            if (bpmnNodeVo.AutoSignUpConf != null)
+            {
+                nodeCfgJson3.AutoSignUpConf = bpmnNodeVo.AutoSignUpConf;
+            }
+            else if (bpmnNodeVo.AutoSignUpUsers == null || bpmnNodeVo.AutoSignUpUsers.Count == 0)
+            {
+                throw new AFBizException($"节点[{bpmnNodeVo.NodeName}]为条件自动加批节点,必须配置加批人!");
+            }
+            if (bpmnNodeVo.AutoSignUpUsers != null && bpmnNodeVo.AutoSignUpUsers.Count > 0)
+            {
+                nodeCfgJson3.AutoSignUpUsers = bpmnNodeVo.AutoSignUpUsers;
+            }
         }
 
         // Node type-based adaptors
@@ -905,6 +911,12 @@ public class BpmnConfBizService : IBpmnConfBizService
         if (nodeConfig.AutoSignUpUsers != null && nodeConfig.AutoSignUpUsers.Count > 0)
         {
             bpmnNodeVo.AutoSignUpUsers = nodeConfig.AutoSignUpUsers;
+        }
+
+        // 条件自动加批反显: 读回 autoSignUpConf(增强规则)
+        if (nodeConfig.AutoSignUpConf != null)
+        {
+            bpmnNodeVo.AutoSignUpConf = nodeConfig.AutoSignUpConf;
         }
 
         //set buttons from buttonSignConf

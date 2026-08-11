@@ -36,6 +36,8 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
     private readonly BackToModifyService _backToModifyService;
     private readonly EndProcessService _endProcessService;
     private readonly IBpmVariableSignUpPersonnelService _bpmVariableSignUpPersonnelService;
+    private readonly AntFlowCore.Engine.service.biz.AutoSignUpAssigneeResolver _autoSignUpAssigneeResolver;
+    private readonly IBpmBusinessProcessService _bpmBusinessProcessService;
     private readonly ILogger<NextNodeLabelsProcessor> _logger;
 
     public NextNodeLabelsProcessor(
@@ -50,6 +52,8 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
         BackToModifyService backToModifyService,
         EndProcessService endProcessService,
         IBpmVariableSignUpPersonnelService bpmVariableSignUpPersonnelService,
+        AntFlowCore.Engine.service.biz.AutoSignUpAssigneeResolver autoSignUpAssigneeResolver,
+        IBpmBusinessProcessService bpmBusinessProcessService,
         ILogger<NextNodeLabelsProcessor> logger)
     {
         _bpmProcessForwardService = bpmProcessForwardService;
@@ -63,6 +67,8 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
         _backToModifyService = backToModifyService;
         _endProcessService = endProcessService;
         _bpmVariableSignUpPersonnelService = bpmVariableSignUpPersonnelService;
+        _autoSignUpAssigneeResolver = autoSignUpAssigneeResolver;
+        _bpmBusinessProcessService = bpmBusinessProcessService;
         _logger = logger;
     }
 
@@ -1028,7 +1034,23 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
                 .FirstOrDefault(a => a.ConfId == bpmnConfVo.Id && a.Id == nodePrimaryKey && a.IsDel == 0);
             BpmnNodeConfigJson? configJson = bpmnNode == null || string.IsNullOrEmpty(bpmnNode.NodeConfigJson)
                 ? null : JsonConfUtil.ParseNodeConfig(bpmnNode.NodeConfigJson);
-            var autoSignUpUsers = configJson?.AutoSignUpUsers;
+            List<BaseIdTranStruVo>? autoSignUpUsers = null;
+            if (configJson?.AutoSignUpConf != null)
+            {
+                // 增强规则: 运行期实时解析(角色/领导链/HRBP 等, 基准人为发起人)
+                string? startUserId = _bpmBusinessProcessService.GetBpmBusinessProcess(processNumber)?.CreateUser;
+                autoSignUpUsers = _autoSignUpAssigneeResolver.Resolve(configJson.AutoSignUpConf, startUserId, businessDataVo);
+                if (autoSignUpUsers != null && autoSignUpUsers.Count == 0)
+                {
+                    _logger.LogInformation("条件自动加批规则解析结果为空, 视为条件不满足, 留给审批人, processNumber={}, elementId={}", processNumber, elementId);
+                    return;
+                }
+            }
+            else
+            {
+                // 旧数据回退: 直接人员列表
+                autoSignUpUsers = configJson?.AutoSignUpUsers;
+            }
             if (autoSignUpUsers == null || autoSignUpUsers.Count == 0)
             {
                 _logger.LogError("条件自动加批节点未配置加批人, 跳过, processNumber={}, elementId={}", processNumber, elementId);

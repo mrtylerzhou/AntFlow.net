@@ -375,6 +375,7 @@ public static class ServiceRegistration
         services.AddSingleton<AddAssigneeProcessService>();
         services.AddSingleton<RemoveAssigneeProcessService>();
         services.AddSingleton<EndProcessService>();
+        services.AddSingleton<AntFlowCore.Engine.service.biz.AutoSignUpAssigneeResolver>();
 
         services.AddSingleton<AFDeploymentService>();
         services.AddSingleton<IAFDeploymentService, AFDeploymentService>();
