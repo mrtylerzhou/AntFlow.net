@@ -91,6 +91,13 @@ public class BpmnNodeConfigJson
     /// </summary>
     [JsonPropertyName("forwardNodeIds")]
     public List<string>? ForwardNodeIds { get; set; }
+
+    /// <summary>
+    /// 条件自动加批节点的加批人列表(必填).
+    /// 满足条件时由 ProcessConditionAutoSignUpNode 写入 signUp 子元素.
+    /// </summary>
+    [JsonPropertyName("autoSignUpUsers")]
+    public List<BaseIdTranStruVo>? AutoSignUpUsers { get; set; }
 }
 
 /// <summary>

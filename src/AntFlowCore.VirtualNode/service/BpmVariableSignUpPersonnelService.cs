@@ -25,6 +25,14 @@ public class BpmVariableSignUpPersonnelService : IBpmVariableSignUpPersonnelServ
     /// </summary>
     public void InsertSignUpPersonnel(string processNumber, string taskTaskDefinitionKey, string assignee, List<BaseIdTranStruVo> signUpUsers)
     {
+        InsertSignUpPersonnel(processNumber, taskTaskDefinitionKey, assignee, SecurityUtils.GetLogInEmpName(), signUpUsers);
+    }
+
+    /// <summary>
+    /// 自动加批场景重载: 回路 personnel 名称用传入的 assigneeName(自动场景无登录用户).
+    /// </summary>
+    public void InsertSignUpPersonnel(string processNumber, string taskTaskDefinitionKey, string assignee, string assigneeName, List<BaseIdTranStruVo> signUpUsers)
+    {
         if (signUpUsers == null || signUpUsers.Count == 0)
         {
             return;
@@ -76,13 +84,36 @@ public class BpmVariableSignUpPersonnelService : IBpmVariableSignUpPersonnelServ
                 new VariablePersonnelItem
                 {
                     Assignee = assignee,
-                    AssigneeName = SecurityUtils.GetLogInEmpName()
+                    AssigneeName = assigneeName
                 }
             };
         }
 
         bpmVariable.VariableConfigJson = JsonSerializer.Serialize(config, JsonConfUtil.Options);
         _bpmVariableService._repository.Update(bpmVariable);
+    }
+
+    /// <summary>
+    /// 幂等检查: 该节点(elementId)的 signUp personnel 是否已非空(已加批过).
+    /// </summary>
+    public bool HasSignUpPersonnel(string processNumber, string elementId)
+    {
+        BpmVariable bpmVariable = _bpmVariableService._repository.FindByProcessNum(processNumber);
+        if (bpmVariable == null || string.IsNullOrEmpty(bpmVariable.VariableConfigJson))
+        {
+            return false;
+        }
+        VariableConfigJson config = JsonSerializer.Deserialize<VariableConfigJson>(bpmVariable.VariableConfigJson, JsonConfUtil.Options);
+        if (config == null || config.SignUps == null || config.SignUps.Count == 0)
+        {
+            return false;
+        }
+        VariableSignUpItem? signUp = config.SignUps.FirstOrDefault(s => elementId == s.ElementId);
+        if (signUp == null || signUp.PersonnelByElement == null || signUp.PersonnelByElement.Count == 0)
+        {
+            return false;
+        }
+        return signUp.PersonnelByElement.Values.Any(list => list != null && list.Count > 0);
     }
 
     /// <summary>

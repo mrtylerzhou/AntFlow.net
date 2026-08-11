@@ -35,6 +35,7 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
     private readonly ForwardToNodeService _forwardToNodeService;
     private readonly BackToModifyService _backToModifyService;
     private readonly EndProcessService _endProcessService;
+    private readonly IBpmVariableSignUpPersonnelService _bpmVariableSignUpPersonnelService;
     private readonly ILogger<NextNodeLabelsProcessor> _logger;
 
     public NextNodeLabelsProcessor(
@@ -48,6 +49,7 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
         ForwardToNodeService forwardToNodeService,
         BackToModifyService backToModifyService,
         EndProcessService endProcessService,
+        IBpmVariableSignUpPersonnelService bpmVariableSignUpPersonnelService,
         ILogger<NextNodeLabelsProcessor> logger)
     {
         _bpmProcessForwardService = bpmProcessForwardService;
@@ -60,6 +62,7 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
         _forwardToNodeService = forwardToNodeService;
         _backToModifyService = backToModifyService;
         _endProcessService = endProcessService;
+        _bpmVariableSignUpPersonnelService = bpmVariableSignUpPersonnelService;
         _logger = logger;
     }
 
@@ -101,6 +104,7 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
             ProcessConditionApproveNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, delegateTask);
             ProcessConditionAdvanceNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, procInstId, delegateTask);
             ProcessConditionDisagreeNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, delegateTask);
+            ProcessConditionAutoSignUpNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, delegateTask);
             ProcessConditionCopyNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, procInstId, delegateTask);
             ProcessPrevNodeAppointed(nodeLabelVO, businessDataVo, delegateTask, formCode, processNumber);
         }
@@ -949,6 +953,119 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
             {
                 _formFactory.GetFormAdaptor(businessDataVo).OnDisagreeData(businessDataVo);
             }
+        }
+        // conditionResult == false 或 null: 不 complete, 留给真实审批人
+    }
+
+    /// <summary>
+    /// 条件自动加批节点处理:满足条件时幂等检查→读 configJson.AutoSignUpUsers→InsertSignUpPersonnel 写入 signUp 子元素
+    /// →写虚拟人-3 加批记录(VerifyStatus=9)→complete 当前任务(流程进入加批子节点);不满足时不 complete,留给真实审批人(加批按钮已屏蔽).
+    /// 对应 Java processConditionAutoSignUpNode.
+    /// </summary>
+    private void ProcessConditionAutoSignUpNode(BpmnNodeLabelVO nodeLabelVO, string processNumber, string elementId,
+        string formCode, BusinessDataVo? businessDataVo, bool isOutSide, BpmAfTask delegateTask)
+    {
+        if (!StringConstants.CONDITION_AUTO_SIGN_UP_NODE.Equals(nodeLabelVO.LabelValue))
+        {
+            return;
+        }
+
+        if (businessDataVo == null)
+        {
+            _logger.LogError("条件自动加批节点处理失败:businessDataVo 为空,processNumber={}", processNumber);
+            return;
+        }
+
+        businessDataVo.ProcessNumber = processNumber;
+        businessDataVo.TaskDefKey = elementId;
+        businessDataVo.FormCode = formCode;
+        businessDataVo.IsOutSideAccessProc = isOutSide;
+        var formAdaptor = _formFactory.GetFormAdaptor(businessDataVo);
+        if (formAdaptor == null)
+        {
+            throw new AFBizException($"未能根据流程formcode找到流程适配器信息! formCode={formCode}");
+        }
+
+        bool? conditionResult = null;
+        try
+        {
+            conditionResult = formAdaptor.AutomaticCondition(businessDataVo);
+            if (conditionResult == null)
+            {
+                conditionResult = _conditionEvaluator.Evaluate(businessDataVo);
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "条件自动加批节点条件判断异常, processNumber={}, elementId={}", processNumber, elementId);
+        }
+
+        // 仅当条件满足时才自动加批; 否则留给真实审批人
+        if (conditionResult == true)
+        {
+            // 幂等检查: 已加批过则跳过(防止加批后回到审批人时重复触发)
+            if (_bpmVariableSignUpPersonnelService.HasSignUpPersonnel(processNumber, elementId))
+            {
+                _logger.LogInformation("条件自动加批节点已加批过, 跳过重复触发, processNumber={}, elementId={}", processNumber, elementId);
+                return;
+            }
+
+            // 从 BpmnNode.NodeConfigJson 读取 autoSignUpUsers
+            BpmnConfVo? bpmnConfVo = businessDataVo.BpmnConfVo;
+            if (bpmnConfVo == null || bpmnConfVo.Id == 0)
+            {
+                _logger.LogError("条件自动加批节点配置读取失败: bpmnConfVo 为空, processNumber={}", processNumber);
+                return;
+            }
+            NodeElementDto? nodeElementDto = _bpmVariableService.GetNodeIdByElementId(processNumber, elementId);
+            if (nodeElementDto == null || string.IsNullOrEmpty(nodeElementDto.NodeId))
+            {
+                _logger.LogError("条件自动加批: 无法根据 elementId 找到 nodeId, processNumber={}, elementId={}", processNumber, elementId);
+                return;
+            }
+            long nodePrimaryKey = Convert.ToInt64(nodeElementDto.NodeId);
+            BpmnNode? bpmnNode = _bpmnNodeService._repository
+                .FirstOrDefault(a => a.ConfId == bpmnConfVo.Id && a.Id == nodePrimaryKey && a.IsDel == 0);
+            BpmnNodeConfigJson? configJson = bpmnNode == null || string.IsNullOrEmpty(bpmnNode.NodeConfigJson)
+                ? null : JsonConfUtil.ParseNodeConfig(bpmnNode.NodeConfigJson);
+            var autoSignUpUsers = configJson?.AutoSignUpUsers;
+            if (autoSignUpUsers == null || autoSignUpUsers.Count == 0)
+            {
+                _logger.LogError("条件自动加批节点未配置加批人, 跳过, processNumber={}, elementId={}", processNumber, elementId);
+                return;
+            }
+
+            // 解析真实 assignee 名称(回路 personnel 名称用, 从节点配置 personnelConf.employees 匹配)
+            string assigneeId = delegateTask.Assignee;
+            string assigneeName = "";
+            var employees = configJson?.ApproverConf?.PersonnelConf?.Employees;
+            if (employees != null)
+            {
+                assigneeName = employees.FirstOrDefault(o => o.EmplId != null && o.EmplId == assigneeId)?.EmplName ?? "";
+            }
+
+            _bpmVariableSignUpPersonnelService.InsertSignUpPersonnel(processNumber, elementId, assigneeId, assigneeName, autoSignUpUsers);
+
+            string assigneeSkipName = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Desc;
+            delegateTask.Assignee = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Id;
+            delegateTask.AssigneeName = assigneeSkipName;
+            var taskService = ServiceProviderUtils.GetService<ITaskService>();
+            taskService?.Complete(delegateTask);
+
+            _bpmVerifyInfoService.AddVerifyInfo(new BpmVerifyInfo
+            {
+                VerifyDate = DateTime.Now,
+                TaskName = delegateTask.Name,
+                TaskId = delegateTask.Id,
+                RunInfoId = delegateTask.ProcInstId,
+                VerifyUserId = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Id,
+                VerifyUserName = assigneeSkipName,
+                TaskDefKey = delegateTask.TaskDefKey,
+                VerifyStatus = (int)ProcessSubmitStateEnum.PROCESS_SIGN_UP,
+                VerifyDesc = string.Format(StringConstants.AF_CONDITION_AUTO_SIGNUP_COMMENT, conditionResult),
+                ProcessCode = processNumber,
+                TenantId = MultiTenantUtil.GetCurrentTenantId(),
+            });
         }
         // conditionResult == false 或 null: 不 complete, 留给真实审批人
     }

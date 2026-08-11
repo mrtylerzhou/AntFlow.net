@@ -44,6 +44,12 @@ namespace AntFlowCore.Base.vo
         public static readonly BpmnNodeLabelVO ConditionDisagreeNode = new BpmnNodeLabelVO(StringConstants.CONDITION_DISAGREE_NODE, "条件拒绝节点");
 
         /// <summary>
+        /// 条件自动加批节点:条件审批(nodeType=12)子类型,满足条件自动加批(autoSignUpUsers),不满足留给真实审批人(加批按钮屏蔽).
+        /// 对应 Java NodeLabelConstants.conditionAutoSignUpNode. 不加入 NONE_OPERATIONAL_NODES.
+        /// </summary>
+        public static readonly BpmnNodeLabelVO ConditionAutoSignUpNode = new BpmnNodeLabelVO(StringConstants.CONDITION_AUTO_SIGN_UP_NODE, "条件自动加批节点");
+
+        /// <summary>
         /// 条件抄送节点:本质是抄送V2节点 + 条件配置,总是自动完成,仅条件满足时写抄送记录.
         /// 对应 Java NodeLabelConstants.conditionCopyNode.
         /// </summary>

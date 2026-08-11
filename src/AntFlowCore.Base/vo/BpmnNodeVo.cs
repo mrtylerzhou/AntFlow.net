@@ -168,6 +168,19 @@ namespace AntFlowCore.Base.vo;
         public bool? IsConditionDisagreeNode { get; set; }
 
         /// <summary>
+        /// 条件自动加批节点标记:条件审批(nodeType=12)子类型.
+        /// 满足条件时自动加批(autoSignUpUsers),不满足时留给真实审批人(加批按钮屏蔽).
+        /// </summary>
+        [JsonPropertyName("isConditionAutoSignUpNode")]
+        public bool? IsConditionAutoSignUpNode { get; set; }
+
+        /// <summary>
+        /// 条件自动加批节点的加批人列表(必填), 存 nodeConfigJson.autoSignUpUsers.
+        /// </summary>
+        [JsonPropertyName("autoSignUpUsers")]
+        public List<BaseIdTranStruVo>? AutoSignUpUsers { get; set; }
+
+        /// <summary>
         /// Whether this node is a condition-copy node (nodeType=13 at design time,
         /// converted to nodeType=4 at runtime by AfNodeUtils.NodeSpecialProcess).
         /// Condition-copy node always completes; only writes BpmProcessForward

@@ -79,6 +79,9 @@ namespace AntFlowCore.Base.util
         // 条件拒绝节点:条件审批(nodeType=12)子类型.满足条件自动拒绝终止流程(忽略不同意退回配置),不满足留给真实审批人 (对等 Java 版 condition_disagree_node)
         public const string CONDITION_DISAGREE_NODE = "condition_disagree_node";
 
+        // 条件自动加批节点:条件审批(nodeType=12)子类型.满足条件自动加批(autoSignUpUsers),不满足留给真实审批人(加批按钮屏蔽) (对等 Java 版 condition_auto_sign_up_node)
+        public const string CONDITION_AUTO_SIGN_UP_NODE = "condition_auto_sign_up_node";
+
         // 协助节点 (对等 Java 版 nodeType=17)
         public const string ASSIST_NODE = "assist_node";
 
@@ -105,6 +108,7 @@ namespace AntFlowCore.Base.util
         // 条件审批/条件抄送运行时 verifyInfo 备注
         public const string AF_CONDITION_APPROVE_AUTO_COMMENT = "条件审批自动通过,条件评估结果:True";
         public const string AF_CONDITION_DISAGREE_AUTO_COMMENT = "条件拒绝自动拒绝,条件评估结果:True";
+        public const string AF_CONDITION_AUTO_SIGNUP_COMMENT = "条件自动加批,条件评估结果:True";
         public const string AF_CONDITION_APPROVE_WAIT_COMMENT = "条件审批条件未满足,等待人工审批";
         public const string AF_CONDITION_COPY_EXECUTE_COMMENT = "条件抄送执行,条件评估结果:True";
         public const string AF_CONDITION_COPY_SKIP_COMMENT = "条件抄送跳过,条件评估结果:False";

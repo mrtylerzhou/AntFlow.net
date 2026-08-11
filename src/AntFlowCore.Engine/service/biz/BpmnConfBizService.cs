@@ -167,6 +167,12 @@ public class BpmnConfBizService : IBpmnConfBizService
                     // 必须先于 IsConditionApproveNode 判断(条件拒绝节点两者都为 true),否则会误贴 condition_approve_node 标签导致运行时走条件审批
                     nodeLabelVO = NodeLabelConstants.ConditionDisagreeNode;
                 }
+                else if (bpmnNodeVo.IsConditionAutoSignUpNode == true)
+                {
+                    // 条件自动加批节点:条件审批(nodeType=12)子类型,满足条件自动加批,不满足留给审批人(加批按钮屏蔽)
+                    // 必须先于 IsConditionApproveNode 判断(条件自动加批节点两者都为 true),否则会误贴 condition_approve_node 标签导致运行时走条件审批
+                    nodeLabelVO = NodeLabelConstants.ConditionAutoSignUpNode;
+                }
                 else if (bpmnNodeVo.IsConditionApproveNode == true)
                 {
                     nodeLabelVO = NodeLabelConstants.ConditionApproveNode;
@@ -433,6 +439,18 @@ public class BpmnConfBizService : IBpmnConfBizService
             {
                 throw new AFBizException($"节点[{bpmnNodeVo.NodeName}]为自动退回节点,必须配置恰好1个退回目标节点!");
             }
+        }
+
+        // 条件自动加批节点: autoSignUpUsers 持久化到 node config JSON, 发布校验非空
+        if (bpmnNodeVo.IsConditionAutoSignUpNode == true)
+        {
+            var autoSignUpUsers = bpmnNodeVo.AutoSignUpUsers;
+            if (autoSignUpUsers == null || autoSignUpUsers.Count == 0)
+            {
+                throw new AFBizException($"节点[{bpmnNodeVo.NodeName}]为条件自动加批节点,必须配置至少一个加批人!");
+            }
+            var nodeCfgJson3 = bpmnNodeVo.GetOrCreateNodeConfigJson();
+            nodeCfgJson3.AutoSignUpUsers = autoSignUpUsers;
         }
 
         // Node type-based adaptors
@@ -883,6 +901,12 @@ public class BpmnConfBizService : IBpmnConfBizService
         bpmnNodeVo.ForwardType = nodeConfig.ForwardType;
         bpmnNodeVo.ForwardNodeIds = nodeConfig.ForwardNodeIds;
 
+        // 条件自动加批反显: 从 node_config_json 读回 autoSignUpUsers
+        if (nodeConfig.AutoSignUpUsers != null && nodeConfig.AutoSignUpUsers.Count > 0)
+        {
+            bpmnNodeVo.AutoSignUpUsers = nodeConfig.AutoSignUpUsers;
+        }
+
         //set buttons from buttonSignConf
         BpmnNodeButtonSignConfJson? bsConf = nodeConfig.ButtonSignConf;
         if (bsConf?.ButtonConfList != null && bsConf.ButtonConfList.Count > 0)
@@ -1004,6 +1028,11 @@ public class BpmnConfBizService : IBpmnConfBizService
             if (NodeLabelConstants.NodeLabelContainsAny(labelVOList, NodeLabelConstants.ConditionDisagreeNode.LabelValue))
             {
                 bpmnNodeVo.IsConditionDisagreeNode = true;
+            }
+            // 条件自动加批节点:标签匹配时设置标记位,前端据此反显为条件自动加批(图标/颜色)
+            if (NodeLabelConstants.NodeLabelContainsAny(labelVOList, NodeLabelConstants.ConditionAutoSignUpNode.LabelValue))
+            {
+                bpmnNodeVo.IsConditionAutoSignUpNode = true;
             }
             // 条件抄送节点:标签匹配时设置标记位
             if (NodeLabelConstants.NodeLabelContainsAny(labelVOList, NodeLabelConstants.ConditionCopyNode.LabelValue))
