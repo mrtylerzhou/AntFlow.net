@@ -268,9 +268,16 @@ public class UserService : IUserService
         return new List<BaseIdTranStruVo>();
     }
 
-    public long CheckEmployeeEffective(string userId)
+    /// <summary>
+    /// 查询员工可用性(办公状态)骨架空实现:不查询任何表,默认恒返回"可用"。
+    /// 真实场景由使用方自行实现(可联合查询员工表、工作日历表等,甚至调用三方接口),
+    /// 只需保证返回结构符合 UserAvailableVo 契约即可。
+    /// </summary>
+    /// <param name="userId">用户id</param>
+    public UserAvailableVo CheckEmployeeEffective(string userId)
     {
-        return _repository.Count(a => a.Id == Convert.ToInt64(userId));
+        // 骨架空实现:默认可用,不涉及转办。使用方按需覆盖此方法
+        return new UserAvailableVo { Available = true };
     }
 
     public DetailedUser GetDetailedUserById(string Id)

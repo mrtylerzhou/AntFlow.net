@@ -233,7 +233,9 @@ public static class UserMsgUtils
             return false;
         }
         var service = GetAfUserService();
-        return service.CheckEmployeeEffective(userId) > 0;
+        // 改造后:仅依据"是否可用"判断员工是否有效(不涉及转办),真实逻辑由使用方实现的 IUserService 提供
+        var availableVo = service.CheckEmployeeEffective(userId);
+        return availableVo != null && availableVo.Available == true;
     }
 
     private static IUserService GetAfUserService()

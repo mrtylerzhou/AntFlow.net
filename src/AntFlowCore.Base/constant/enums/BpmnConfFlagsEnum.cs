@@ -11,10 +11,12 @@ namespace AntFlowCore.Base.constant.enums;
         public static readonly BpmnConfFlagsEnum HAS_FORM_RELATED_ASSIGNEES = new BpmnConfFlagsEnum(0b100000, "包含表单中选取人员");
         public static readonly BpmnConfFlagsEnum USE_EXTERNAL_FORM = new BpmnConfFlagsEnum(0b1000000, "使用外部表单模式");
         public static readonly BpmnConfFlagsEnum USE_AUXILIARY_FORM = new BpmnConfFlagsEnum(0b10000000, "使用辅助表单(page-added DIY)");
+        //审批人非办公状态自动转办:勾选后,流程中审批人不在办公状态(不可用)时,将其审批任务自动转办给指定的人(IUserService.CheckEmployeeEffective 返回的 DelegateUser)
+        public static readonly BpmnConfFlagsEnum AUTO_DELEGATE_OFF_DUTY = new BpmnConfFlagsEnum(0b1000000000, "审批人非办公状态自动转办");
 
         private static readonly List<BpmnConfFlagsEnum> _allFlags = new List<BpmnConfFlagsEnum>
         {
-            NOTHING, HAS_NODE_LABELS, HAS_STARTUSER_CHOOSE_MODULES, HAS_DYNAMIC_CONDITIONS, HAS_COPY, HAS_LAST_NODE_COPY, HAS_FORM_RELATED_ASSIGNEES, USE_EXTERNAL_FORM, USE_AUXILIARY_FORM
+            NOTHING, HAS_NODE_LABELS, HAS_STARTUSER_CHOOSE_MODULES, HAS_DYNAMIC_CONDITIONS, HAS_COPY, HAS_LAST_NODE_COPY, HAS_FORM_RELATED_ASSIGNEES, USE_EXTERNAL_FORM, USE_AUXILIARY_FORM, AUTO_DELEGATE_OFF_DUTY
         };
 
         public int Code { get; }
