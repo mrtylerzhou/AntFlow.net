@@ -190,6 +190,20 @@ namespace AntFlowCore.Base.vo;
         public JsonElement? AutoSignUpConf { get; set; }
 
         /// <summary>
+        /// 条件自动转办节点标记:条件审批(nodeType=12)子类型.
+        /// 满足条件时逐任务自动转办(委托语义),不满足时留给真实审批人(转办按钮屏蔽).
+        /// </summary>
+        [JsonPropertyName("isConditionAutoTransferNode")]
+        public bool? IsConditionAutoTransferNode { get; set; }
+
+        /// <summary>
+        /// 条件自动转办节点的转办配置: {transferType:1|2, transferToUser, transferPairs}.
+        /// 运行期由 ProcessConditionAutoTransferNode 读取执行逐任务转办.
+        /// </summary>
+        [JsonPropertyName("autoTransferConf")]
+        public JsonElement? AutoTransferConf { get; set; }
+
+        /// <summary>
         /// Whether this node is a condition-copy node (nodeType=13 at design time,
         /// converted to nodeType=4 at runtime by AfNodeUtils.NodeSpecialProcess).
         /// Condition-copy node always completes; only writes BpmProcessForward

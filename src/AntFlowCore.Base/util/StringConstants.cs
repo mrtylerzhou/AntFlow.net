@@ -82,6 +82,9 @@ namespace AntFlowCore.Base.util
         // 条件自动加批节点:条件审批(nodeType=12)子类型.满足条件自动加批(autoSignUpUsers),不满足留给真实审批人(加批按钮屏蔽) (对等 Java 版 condition_auto_sign_up_node)
         public const string CONDITION_AUTO_SIGN_UP_NODE = "condition_auto_sign_up_node";
 
+        // 条件自动转办节点:条件审批(nodeType=12)子类型.满足条件逐任务自动转办(委托语义),不满足留给真实审批人(转办按钮屏蔽) (对等 Java 版 condition_auto_transfer_node)
+        public const string CONDITION_AUTO_TRANSFER_NODE = "condition_auto_transfer_node";
+
         // 协助节点 (对等 Java 版 nodeType=17)
         public const string ASSIST_NODE = "assist_node";
 

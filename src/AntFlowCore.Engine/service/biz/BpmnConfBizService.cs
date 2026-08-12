@@ -173,6 +173,12 @@ public class BpmnConfBizService : IBpmnConfBizService
                     // 必须先于 IsConditionApproveNode 判断(条件自动加批节点两者都为 true),否则会误贴 condition_approve_node 标签导致运行时走条件审批
                     nodeLabelVO = NodeLabelConstants.ConditionAutoSignUpNode;
                 }
+                else if (bpmnNodeVo.IsConditionAutoTransferNode == true)
+                {
+                    // 条件自动转办节点:条件审批(nodeType=12)子类型,满足条件逐任务自动转办,不满足留给审批人(转办按钮屏蔽)
+                    // 必须先于 IsConditionApproveNode 判断(条件自动转办节点两者都为 true),否则会误贴 condition_approve_node 标签导致运行时走条件审批
+                    nodeLabelVO = NodeLabelConstants.ConditionAutoTransferNode;
+                }
                 else if (bpmnNodeVo.IsConditionApproveNode == true)
                 {
                     nodeLabelVO = NodeLabelConstants.ConditionApproveNode;
@@ -457,6 +463,34 @@ public class BpmnConfBizService : IBpmnConfBizService
             {
                 nodeCfgJson3.AutoSignUpUsers = bpmnNodeVo.AutoSignUpUsers;
             }
+        }
+
+        // 条件自动转办节点: autoTransferConf 持久化到 node config JSON, 发布校验配置完整
+        if (bpmnNodeVo.IsConditionAutoTransferNode == true)
+        {
+            bool valid = false;
+            if (bpmnNodeVo.AutoTransferConf != null)
+            {
+                JsonElement confJson = bpmnNodeVo.AutoTransferConf.Value;
+                if (confJson.TryGetProperty("transferType", out var tt) && tt.ValueKind == JsonValueKind.Number)
+                {
+                    int transferType = tt.GetInt32();
+                    if (transferType == 1)
+                    {
+                        valid = confJson.TryGetProperty("transferToUser", out var tu) && tu.ValueKind == JsonValueKind.Object;
+                    }
+                    else if (transferType == 2)
+                    {
+                        valid = confJson.TryGetProperty("transferPairs", out var pairs) && pairs.ValueKind == JsonValueKind.Array && pairs.GetArrayLength() > 0;
+                    }
+                }
+            }
+            if (!valid)
+            {
+                throw new AFBizException($"节点[{bpmnNodeVo.NodeName}]为条件自动转办节点,必须配置完整的转办设置!");
+            }
+            var nodeCfgJson4 = bpmnNodeVo.GetOrCreateNodeConfigJson();
+            nodeCfgJson4.AutoTransferConf = bpmnNodeVo.AutoTransferConf;
         }
 
         // Node type-based adaptors
@@ -917,6 +951,12 @@ public class BpmnConfBizService : IBpmnConfBizService
         if (nodeConfig.AutoSignUpConf != null)
         {
             bpmnNodeVo.AutoSignUpConf = nodeConfig.AutoSignUpConf;
+        }
+
+        // 条件自动转办反显: 读回 autoTransferConf
+        if (nodeConfig.AutoTransferConf != null)
+        {
+            bpmnNodeVo.AutoTransferConf = nodeConfig.AutoTransferConf;
         }
 
         //set buttons from buttonSignConf

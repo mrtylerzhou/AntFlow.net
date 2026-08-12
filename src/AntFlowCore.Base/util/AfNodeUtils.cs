@@ -263,6 +263,13 @@ public class AfNodeUtils
                 bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_CONDITION_APPROVE;
                 bpmnNodeVo.IsConditionAutoSignUpNode = true;
             }
+            else if (NodeLabelConstants.ConditionAutoTransferNode.LabelValue.Equals(nodeLabelVO.LabelValue))
+            {
+                // 条件自动转办节点:条件审批(nodeType=12)子类型,满足条件逐任务自动转办
+                // 还原 nodeType=12 并标记 IsConditionAutoTransferNode, 供前端反显图标/颜色
+                bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_CONDITION_APPROVE;
+                bpmnNodeVo.IsConditionAutoTransferNode = true;
+            }
             else if (NodeLabelConstants.ConditionCopyNode.LabelValue.Equals(nodeLabelVO.LabelValue))
             {
                 bpmnNodeVo.NodeType = (int)NodeTypeEnum.NODE_TYPE_CONDITION_COPY;

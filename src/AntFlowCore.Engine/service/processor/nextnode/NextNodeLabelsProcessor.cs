@@ -111,6 +111,7 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
             ProcessConditionAdvanceNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, procInstId, delegateTask);
             ProcessConditionDisagreeNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, delegateTask);
             ProcessConditionAutoSignUpNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, delegateTask);
+            ProcessConditionAutoTransferNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, delegateTask);
             ProcessConditionCopyNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, procInstId, delegateTask);
             ProcessPrevNodeAppointed(nodeLabelVO, businessDataVo, delegateTask, formCode, processNumber);
         }
@@ -1090,6 +1091,112 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
             });
         }
         // conditionResult == false 或 null: 不 complete, 留给真实审批人
+    }
+
+    /// <summary>
+    /// 条件自动转办节点处理: 满足条件读 autoTransferConf → 类型1 target=transferToUser; 类型2 按 assignee 查映射;
+    /// target 非空且 ≠ 当前 assignee → setAssignee + 写 BpmFlowrunEntrust 委托记录(original→actual).
+    /// 不在映射/不满足: 不操作, 任务保留原审批人; 不 complete(任务继续, 仅换人).
+    /// 对应 Java processConditionAutoTransferNode.
+    /// </summary>
+    private void ProcessConditionAutoTransferNode(BpmnNodeLabelVO nodeLabelVO, string processNumber, string elementId,
+        string formCode, BusinessDataVo? businessDataVo, bool isOutSide, BpmAfTask delegateTask)
+    {
+        if (!StringConstants.CONDITION_AUTO_TRANSFER_NODE.Equals(nodeLabelVO.LabelValue))
+        {
+            return;
+        }
+
+        if (businessDataVo == null)
+        {
+            _logger.LogError("条件自动转办节点处理失败:businessDataVo 为空,processNumber={}", processNumber);
+            return;
+        }
+
+        businessDataVo.ProcessNumber = processNumber;
+        businessDataVo.TaskDefKey = elementId;
+        businessDataVo.FormCode = formCode;
+        businessDataVo.IsOutSideAccessProc = isOutSide;
+        var formAdaptor = _formFactory.GetFormAdaptor(businessDataVo);
+        if (formAdaptor == null)
+        {
+            throw new AFBizException($"未能根据流程formcode找到流程适配器信息! formCode={formCode}");
+        }
+
+        bool? conditionResult = null;
+        try
+        {
+            conditionResult = formAdaptor.AutomaticCondition(businessDataVo);
+            if (conditionResult == null)
+            {
+                conditionResult = _conditionEvaluator.Evaluate(businessDataVo);
+            }
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "条件自动转办节点条件判断异常, processNumber={}, elementId={}", processNumber, elementId);
+        }
+
+        // 仅当条件满足时才自动转办; 否则留给真实审批人
+        if (conditionResult == true)
+        {
+            BpmnConfVo? bpmnConfVo = businessDataVo.BpmnConfVo;
+            if (bpmnConfVo == null || bpmnConfVo.Id == 0)
+            {
+                _logger.LogError("条件自动转办节点配置读取失败: bpmnConfVo 为空, processNumber={}", processNumber);
+                return;
+            }
+            NodeElementDto? nodeElementDto = _bpmVariableService.GetNodeIdByElementId(processNumber, elementId);
+            if (nodeElementDto == null || string.IsNullOrEmpty(nodeElementDto.NodeId))
+            {
+                _logger.LogError("条件自动转办: 无法根据 elementId 找到 nodeId, processNumber={}, elementId={}", processNumber, elementId);
+                return;
+            }
+            long nodePrimaryKey = Convert.ToInt64(nodeElementDto.NodeId);
+            BpmnNode? bpmnNode = _bpmnNodeService._repository
+                .FirstOrDefault(a => a.ConfId == bpmnConfVo.Id && a.Id == nodePrimaryKey && a.IsDel == 0);
+            BpmnNodeConfigJson? configJson = bpmnNode == null || string.IsNullOrEmpty(bpmnNode.NodeConfigJson)
+                ? null : JsonConfUtil.ParseNodeConfig(bpmnNode.NodeConfigJson);
+            if (configJson?.AutoTransferConf == null)
+            {
+                _logger.LogError("条件自动转办节点未配置转办设置, 跳过, processNumber={}, elementId={}", processNumber, elementId);
+                return;
+            }
+            JsonElement confJson = configJson.AutoTransferConf.Value;
+            int? transferType = confJson.TryGetProperty("transferType", out var tt) && tt.ValueKind == JsonValueKind.Number ? tt.GetInt32() : null;
+            string oldUserId = delegateTask.Assignee;
+            string oldUserName = delegateTask.AssigneeName ?? "";
+            string? targetId = null;
+            string? targetName = null;
+            if (transferType == 1 && confJson.TryGetProperty("transferToUser", out var tu) && tu.ValueKind == JsonValueKind.Object)
+            {
+                targetId = tu.TryGetProperty("id", out var tid) ? tid.GetString() : null;
+                targetName = tu.TryGetProperty("name", out var tname) ? tname.GetString() : null;
+            }
+            else if (transferType == 2 && confJson.TryGetProperty("transferPairs", out var pairs) && pairs.ValueKind == JsonValueKind.Array)
+            {
+                foreach (JsonElement pair in pairs.EnumerateArray())
+                {
+                    if (pair.TryGetProperty("from", out var from) && from.ValueKind == JsonValueKind.Object
+                        && from.TryGetProperty("id", out var fid) && fid.GetString() == oldUserId
+                        && pair.TryGetProperty("to", out var to) && to.ValueKind == JsonValueKind.Object)
+                    {
+                        targetId = to.TryGetProperty("id", out var tid2) ? tid2.GetString() : null;
+                        targetName = to.TryGetProperty("name", out var tname2) ? tname2.GetString() : null;
+                        break;
+                    }
+                }
+            }
+            if (!string.IsNullOrEmpty(targetId) && targetId != oldUserId)
+            {
+                delegateTask.Assignee = targetId;
+                delegateTask.AssigneeName = targetName;
+                _bpmFlowrunEntrustService.AddFlowrunEntrust(targetId, targetName, oldUserId, oldUserName,
+                    delegateTask.Id, 1, delegateTask.ProcInstId, formCode, nodeElementDto.NodeId, 1);
+                _logger.LogInformation("条件自动转办生效, 转办前: {Old}, 转办后: {New}, processNumber={PN}, elementId={E}", oldUserId, targetId, processNumber, elementId);
+            }
+        }
+        // conditionResult == false 或 null: 不转办, 留给真实审批人
     }
 
     /// <summary>

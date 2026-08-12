@@ -104,6 +104,13 @@ public class BpmnNodeConfigJson
     /// </summary>
     [JsonPropertyName("autoSignUpConf")]
     public JsonElement? AutoSignUpConf { get; set; }
+
+    /// <summary>
+    /// 条件自动转办节点的转办配置: {transferType:1|2, transferToUser, transferPairs}.
+    /// 运行期由 ProcessConditionAutoTransferNode 读取执行逐任务转办.
+    /// </summary>
+    [JsonPropertyName("autoTransferConf")]
+    public JsonElement? AutoTransferConf { get; set; }
 }
 
 /// <summary>
