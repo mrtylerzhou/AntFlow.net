@@ -1425,3 +1425,27 @@ create table if not exists t_bpm_process_audit
 
 create index idx_t_bpm_process_audit_process_number on t_bpm_process_audit (process_number);
 create index idx_t_bpm_process_audit_task_def_key on t_bpm_process_audit (task_def_key);
+
+-- ----------------------------
+-- 流程沟通表 (对齐 Java 版 t_bpm_process_comment)
+-- ----------------------------
+create table if not exists t_bpm_process_comment
+(
+    id               bigint auto_increment primary key,
+    process_number   varchar(64)  null comment '流程实例编号(会话锚点)',
+    parent_id        bigint       null comment '回复哪条消息(根消息为 null)',
+    root_id          bigint       null comment '所属根消息 id(根=自身; 回复归到根, 二级分组用)',
+    content          text         null comment '消息正文',
+    attachment       text         null comment '图片/附件 url JSON 数组(仅预留)',
+    mentions         text         null comment '@提及 JSON [{userId,userName}]',
+    reply_to_user    varchar(64)  null comment '回复目标人 userId',
+    reply_to_user_name varchar(64) null comment '回复目标人姓名快照',
+    create_user      varchar(64)  null comment '发起人 empId',
+    create_user_name varchar(64)  null comment '发起人姓名快照',
+    create_time      timestamp    not null default CURRENT_TIMESTAMP comment '创建时间',
+    tenant_id        varchar(255) null comment '租户ID',
+    is_deleted       tinyint      null default 0 comment '0 正常 1 已撤回'
+) ENGINE = InnoDB
+  comment = '流程沟通表' DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+create index idx_t_bpm_process_comment_process_number on t_bpm_process_comment (process_number);

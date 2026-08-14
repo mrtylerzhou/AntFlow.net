@@ -141,6 +141,8 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmVerifyInfoService, BpmVerifyInfoService>();
         services.AddSingleton<BpmProcessAuditService>();
         services.AddSingleton<IBpmProcessAuditService, BpmProcessAuditService>();
+        services.AddSingleton<BpmProcessCommentService>();
+        services.AddSingleton<IBpmProcessCommentService, BpmProcessCommentService>();
         services.AddSingleton<BpmBusinessDraftService>();
         services.AddSingleton<IBpmBusinessDraftService, BpmBusinessDraftService>();
         services.AddSingleton<IBpmProcessDraftBizService, BpmProcessDraftBizServiceImpl>();
@@ -427,6 +429,7 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmProcessNodeSubmitRepository, FsBpmProcessNodeSubmitRepository>();
         services.AddSingleton<IBpmVerifyInfoRepository, FsBpmVerifyInfoRepository>();
         services.AddSingleton<IBpmProcessAuditRepository, FsBpmProcessAuditRepository>();
+        services.AddSingleton<IBpmProcessCommentRepository, FsBpmProcessCommentRepository>();
         services.AddSingleton<IBpmBusinessDraftRepository, FsBpmBusinessDraftRepository>();
         services.AddSingleton<IBpmDynamicConditionChoosenRepository, FsBpmDynamicConditionChoosenRepository>();
         services.AddSingleton<ILFMainFieldRepository, FsLFMainFieldRepository>();

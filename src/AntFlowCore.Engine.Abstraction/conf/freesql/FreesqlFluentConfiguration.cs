@@ -830,6 +830,23 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateUserName).Name("create_user_name");
                 a.Property(b => b.CreateTime).Name("create_time");
+            }).ConfigEntity<BpmProcessComment>(a =>
+            {
+                a.Name("t_bpm_process_comment");
+                a.Property(b => b.Id).IsPrimary(true).IsIdentity(true).Name("id");
+                a.Property(b => b.ProcessNumber).Name("process_number");
+                a.Property(b => b.ParentId).Name("parent_id");
+                a.Property(b => b.RootId).Name("root_id");
+                a.Property(b => b.Content).Name("content");
+                a.Property(b => b.Attachment).Name("attachment");
+                a.Property(b => b.Mentions).Name("mentions");
+                a.Property(b => b.ReplyToUser).Name("reply_to_user");
+                a.Property(b => b.ReplyToUserName).Name("reply_to_user_name");
+                a.Property(b => b.CreateUser).Name("create_user");
+                a.Property(b => b.CreateUserName).Name("create_user_name");
+                a.Property(b => b.CreateTime).Name("create_time");
+                a.Property(b => b.TenantId).Name("tenant_id");
+                a.Property(b => b.IsDeleted).Name("is_deleted");
             });
     }
 }
