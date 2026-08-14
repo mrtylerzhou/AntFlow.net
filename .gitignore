@@ -251,3 +251,7 @@ ModelManifest.xml
 # VS2022
 appsettings.json
 appsettings.Development.json
+
+# AI coding tools
+.workbuddy/
+.trae/

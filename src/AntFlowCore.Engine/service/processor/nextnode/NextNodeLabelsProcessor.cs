@@ -102,7 +102,7 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
         {
             ProcessCopy(elementId, processNumber, procInstId, nodeLabelVO);
             ProcessCopyV2(nodeLabelVO, procInstId, assignee, assigneeName, processNumber, delegateTask);
-            ProcessAutomaticNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, delegateTask);
+            ProcessAutomaticNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, procInstId, delegateTask);
             ProcessAutoAdvanceNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, procInstId, delegateTask);
             ProcessAutoReturnNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, procInstId, delegateTask);
             ProcessConditionReturnNode(nodeLabelVO, processNumber, elementId, formCode, businessDataVo, isOutSide, procInstId, delegateTask);
@@ -202,11 +202,15 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
     }
 
     /// <summary>
-    /// 自动节点处理:识别 auto_node 标签后,评估条件、执行动作、自动完成.
-    /// 条件评估先调用 formAdaptor.AutomaticCondition(用户可重写);返回 null 时回退到默认 DB 条件评估.
+    /// 自动节点处理(增强版, 对等 Java 版):
+    /// - 条件评估 (formAdaptor.AutomaticCondition + 默认 DB 评估回退) + automaticAction 自定义钩子
+    /// - 异常兜底: conditionResult=null → 默认 complete (保持现状)
+    /// - true  → 按 autoNodeConf.SatisfiedAction 分发: 0默认complete / 1跳转固定节点 / 2加批 / 3转办 / 4抄送
+    /// - false → 按 autoNodeConf.UnsatisfiedAction 分发: 0默认complete / 1结束流程 / 2退回指定节点(重新开始)
+    /// - 旧数据新字段为空 → 两分支均默认 complete, 零迁移
     /// </summary>
     private void ProcessAutomaticNode(BpmnNodeLabelVO nodeLabelVO, string processNumber, string elementId,
-        string formCode, BusinessDataVo? businessDataVo, bool isOutSide, BpmAfTask delegateTask)
+        string formCode, BusinessDataVo? businessDataVo, bool isOutSide, string procInstId, BpmAfTask delegateTask)
     {
         if (!StringConstants.AUTOMATIC_NODE.Equals(nodeLabelVO.LabelValue))
         {
@@ -218,6 +222,7 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
             _logger.LogError("自动节点处理失败:businessDataVo 为空,processNumber={}", processNumber);
             return;
         }
+        _logger.LogInformation("自动节点处理开始, processNumber={}, elementId={}", processNumber, elementId);
 
         businessDataVo.ProcessNumber = processNumber;
         businessDataVo.TaskDefKey = elementId;
@@ -230,22 +235,17 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
             throw new AFBizException($"未能根据流程formcode找到流程适配器信息! formCode={formCode}");
         }
 
-        // 低代码流程:lfConditions 为空时用 lfFields 填充
         if ((businessDataVo.LfConditions == null || businessDataVo.LfConditions.Count == 0)
             && businessDataVo.IsLowCodeFlow == 1)
         {
             businessDataVo.LfConditions = businessDataVo.LfFields;
         }
 
-        string assigneeName = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Desc;
         bool? conditionResult = null;
-
         try
         {
             conditionResult = formAdaptor.AutomaticCondition(businessDataVo);
             formAdaptor.AutomaticAction(businessDataVo, conditionResult);
-
-            // 用户未重写 AutomaticCondition(默认返回 null),回退到默认 DB 条件评估
             if (conditionResult == null)
             {
                 conditionResult = _conditionEvaluator.Evaluate(businessDataVo);
@@ -253,33 +253,285 @@ public class NextNodeLabelsProcessor : INextNodeTaskProcessor
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "自动节点条件判断或动作执行异常, processNumber={}, elementId={}", processNumber, elementId);
+            _logger.LogError(e, "自动节点条件判断或动作执行异常, 回退默认complete, processNumber={}, elementId={}", processNumber, elementId);
+            conditionResult = null;
         }
-        finally
-        {
-            // 无论条件评估或动作执行是否异常,都自动完成任务
-            delegateTask.Assignee = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Id;
-            delegateTask.AssigneeName = assigneeName;
 
+        BpmnNodeAutoNodeConfJson? autoConf = LoadAutoNodeConfByElement(processNumber, elementId, businessDataVo);
+
+        if (conditionResult == true)
+        {
+            ExecuteAutoNodeSatisfiedAction(autoConf, businessDataVo, processNumber, elementId, formCode, procInstId, delegateTask);
+        }
+        else if (conditionResult == false)
+        {
+            ExecuteAutoNodeUnsatisfiedAction(autoConf, businessDataVo, processNumber, elementId, procInstId, delegateTask);
+        }
+        else
+        {
+            // 异常兜底: 默认 complete (保持现状)
+            CompleteAsAutoSkip(delegateTask, processNumber, string.Format(StringConstants.AF_AUTO_EVALUATE_SKIP_COMMENT, conditionResult));
+        }
+    }
+
+    /// <summary>
+    /// 自动节点满足分支动作分发: 0/null默认complete / 1跳转固定节点 / 2加批 / 3转办 / 4抄送
+    /// </summary>
+    private void ExecuteAutoNodeSatisfiedAction(BpmnNodeAutoNodeConfJson? autoConf, BusinessDataVo businessDataVo,
+        string processNumber, string elementId, string formCode, string procInstId, BpmAfTask delegateTask)
+    {
+        int? action = autoConf?.SatisfiedAction;
+        string assigneeId = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Id;
+        string assigneeName = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Desc;
+        string skipComment = string.Format(StringConstants.AF_AUTO_EVALUATE_SKIP_COMMENT, true);
+        if (action == null || action == 0)
+        {
+            CompleteAsAutoSkip(delegateTask, processNumber, skipComment);
+            return;
+        }
+        if (action == 1)
+        {
+            // 跳转至固定节点 (同自动推进)
+            if (autoConf!.ForwardNodeIds == null || autoConf.ForwardNodeIds.Count == 0)
+                throw new AFBizException($"自动节点配置异常: 未配置跳转目标节点, processNumber={processNumber}, elementId={elementId}");
+            BpmnNode targetNode = ResolveTargetNode(businessDataVo, processNumber, autoConf.ForwardNodeIds[0], "自动节点跳转");
+            string targetElementId = ResolveElementIdByNode(processNumber, targetNode, "自动节点跳转");
+            _logger.LogInformation("自动节点: 条件满足, 跳转固定节点, processNumber={}, elementId={}, targetElementId={}, targetNodeName={}",
+                processNumber, elementId, targetElementId, targetNode.NodeName);
+            _forwardToNodeService.AdvanceToTargetNode(delegateTask, procInstId,
+                delegateTask.TaskDefKey, targetElementId, targetNode.NodeName ?? "", assigneeId, assigneeName, processNumber);
+            return;
+        }
+        if (action == 2)
+        {
+            // 加批 (同条件自动加批, 发布期已强制 AfterSignUpWay=2 不回到审批人)
+            if (_bpmVariableSignUpPersonnelService.HasSignUpPersonnel(processNumber, elementId))
+            {
+                _logger.LogInformation("自动节点已加批过, 跳过重复触发, processNumber={}, elementId={}", processNumber, elementId);
+                CompleteAsAutoSkip(delegateTask, processNumber, skipComment);
+                return;
+            }
+            List<BaseIdTranStruVo>? signUpUsers = ResolveAssigneeRule(autoConf!.AutoSignUpConf, businessDataVo, processNumber);
+            if (signUpUsers == null || signUpUsers.Count == 0)
+            {
+                _logger.LogError("自动节点加批规则解析结果为空, 回退默认complete, processNumber={}, elementId={}", processNumber, elementId);
+                CompleteAsAutoSkip(delegateTask, processNumber, skipComment);
+                return;
+            }
+            _bpmVariableSignUpPersonnelService.InsertSignUpPersonnel(processNumber, elementId, delegateTask.Assignee, assigneeName, signUpUsers);
+            delegateTask.Assignee = assigneeId;
+            delegateTask.AssigneeName = assigneeName;
             var taskService = ServiceProviderUtils.GetService<ITaskService>();
             taskService?.Complete(delegateTask);
-
-            BpmVerifyInfo bpmVerifyInfo = new BpmVerifyInfo
+            _bpmVerifyInfoService.AddVerifyInfo(new BpmVerifyInfo
             {
                 VerifyDate = DateTime.Now,
                 TaskName = delegateTask.Name,
                 TaskId = delegateTask.Id,
                 RunInfoId = delegateTask.ProcInstId,
-                VerifyUserId = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Id,
+                VerifyUserId = assigneeId,
                 VerifyUserName = assigneeName,
                 TaskDefKey = delegateTask.TaskDefKey,
-                VerifyStatus = (int)ProcessSubmitStateEnum.PROCESS_AGRESS_TYPE,
-                VerifyDesc = string.Format(StringConstants.AF_AUTO_EVALUATE_SKIP_COMMENT, conditionResult),
+                VerifyStatus = (int)ProcessSubmitStateEnum.PROCESS_SIGN_UP,
+                VerifyDesc = string.Format(StringConstants.AF_CONDITION_AUTO_SIGNUP_COMMENT, true),
                 ProcessCode = processNumber,
                 TenantId = MultiTenantUtil.GetCurrentTenantId(),
-            };
-            _bpmVerifyInfoService.AddVerifyInfo(bpmVerifyInfo);
+            });
+            return;
         }
+        if (action == 3)
+        {
+            // 转办 (同条件自动转办类型1: 转给指定人), 不 complete, 任务转人工
+            string? targetId = null;
+            string? targetName = null;
+            if (autoConf!.TransferToUser != null)
+            {
+                if (autoConf.TransferToUser.Value.TryGetProperty("id", out var idEl)) targetId = idEl.GetString();
+                if (autoConf.TransferToUser.Value.TryGetProperty("name", out var nameEl)) targetName = nameEl.GetString();
+            }
+            if (string.IsNullOrEmpty(targetId))
+            {
+                _logger.LogError("自动节点未配置转办目标, 回退默认complete, processNumber={}, elementId={}", processNumber, elementId);
+                CompleteAsAutoSkip(delegateTask, processNumber, skipComment);
+                return;
+            }
+            string oldUserId = delegateTask.Assignee;
+            if (targetId != oldUserId)
+            {
+                delegateTask.Assignee = targetId;
+                delegateTask.AssigneeName = targetName;
+                _bpmFlowrunEntrustService.AddFlowrunEntrust(targetId, targetName, oldUserId, assigneeName,
+                    delegateTask.Id, 1, delegateTask.ProcInstId, formCode, elementId, 1);
+                _logger.LogInformation("自动节点: 条件满足, 转办生效, 转办前: {}, 转办后: {}, processNumber={}, elementId={}", oldUserId, targetId, processNumber, elementId);
+            }
+            // 不 complete, 不写审批记录 (转办人处理时自然产生)
+            return;
+        }
+        if (action == 4)
+        {
+            // 抄送: 解析抄送人逐人写 BpmProcessForward + complete
+            List<BaseIdTranStruVo>? copyUsers = ResolveAssigneeRule(autoConf!.AutoCopyConf, businessDataVo, processNumber);
+            if (copyUsers == null || copyUsers.Count == 0)
+            {
+                _logger.LogError("自动节点抄送规则解析结果为空, 回退默认complete, processNumber={}, elementId={}", processNumber, elementId);
+                CompleteAsAutoSkip(delegateTask, processNumber, skipComment);
+                return;
+            }
+            foreach (var copyUser in copyUsers)
+            {
+                var exists = _bpmProcessForwardService._repository
+                    .Find(a => a.ProcessInstanceId == procInstId && a.ForwardUserId == copyUser.Id);
+                if (exists == null || exists.Count == 0)
+                {
+                    _bpmProcessForwardService.AddProcessForward(new BpmProcessForward
+                    {
+                        CreateTime = DateTime.Now,
+                        CreateUserId = assigneeId,
+                        ForwardUserId = copyUser.Id,
+                        ForwardUserName = copyUser.Name,
+                        ProcessInstanceId = procInstId,
+                        ProcessNumber = processNumber,
+                        IsRead = 0,
+                        IsDel = 0,
+                        TenantId = MultiTenantUtil.GetCurrentTenantId(),
+                    });
+                }
+            }
+            string copyNames = string.Join(",", copyUsers.Select(u => u.Name));
+            CompleteAsAutoSkip(delegateTask, processNumber, "(抄送给" + copyNames + ")自动通过");
+        }
+    }
+
+    /// <summary>
+    /// 自动节点不满足分支动作分发: 0/null默认complete / 1结束流程 / 2退回指定节点(重新开始)
+    /// </summary>
+    private void ExecuteAutoNodeUnsatisfiedAction(BpmnNodeAutoNodeConfJson? autoConf, BusinessDataVo businessDataVo,
+        string processNumber, string elementId, string procInstId, BpmAfTask delegateTask)
+    {
+        int? action = autoConf?.UnsatisfiedAction;
+        string assigneeId = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Id;
+        string assigneeName = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Desc;
+        if (action == null || action == 0)
+        {
+            CompleteAsAutoSkip(delegateTask, processNumber, string.Format(StringConstants.AF_AUTO_EVALUATE_SKIP_COMMENT, false));
+            return;
+        }
+        if (action == 1)
+        {
+            // 结束流程 (同条件拒绝: 拒绝记录 + EndProcessWithoutVerify)
+            _bpmVerifyInfoService.AddVerifyInfo(new BpmVerifyInfo
+            {
+                VerifyDate = DateTime.Now,
+                TaskName = delegateTask.Name,
+                TaskId = delegateTask.Id,
+                RunInfoId = delegateTask.ProcInstId,
+                VerifyUserId = assigneeId,
+                VerifyUserName = assigneeName,
+                TaskDefKey = delegateTask.TaskDefKey,
+                VerifyStatus = (int)ProcessStateEnum.REJECT_STATE,
+                VerifyDesc = "自动节点条件不满足, 结束流程",
+                ProcessCode = processNumber,
+                TenantId = MultiTenantUtil.GetCurrentTenantId(),
+            });
+            businessDataVo.Flag = false;
+            _endProcessService.EndProcessWithoutVerify(businessDataVo);
+            if (businessDataVo.IsOutSideAccessProc == null || !businessDataVo.IsOutSideAccessProc.Value)
+            {
+                _formFactory.GetFormAdaptor(businessDataVo).OnDisagreeData(businessDataVo);
+            }
+            return;
+        }
+        if (action == 2)
+        {
+            // 退回指定节点 (重新开始, backType=4)
+            if (string.IsNullOrEmpty(autoConf!.BackToNodeId))
+                throw new AFBizException($"自动节点配置异常: 未配置退回目标节点, processNumber={processNumber}, elementId={elementId}");
+            BpmnNode targetNode = ResolveTargetNode(businessDataVo, processNumber, autoConf.BackToNodeId, "自动节点退回");
+            string targetElementId = ResolveElementIdByNode(processNumber, targetNode, "自动节点退回");
+            _logger.LogInformation("自动节点: 条件不满足, 开始退回, processNumber={}, elementId={}, targetElementId={}, targetNodeName={}",
+                processNumber, elementId, targetElementId, targetNode.NodeName);
+            _backToModifyService.ReturnToTargetNode(delegateTask, procInstId, processNumber,
+                delegateTask.TaskDefKey, targetElementId, targetNode.NodeName ?? "",
+                assigneeId, "自动节点条件不满足自动退回", 4);
+        }
+    }
+
+    /// <summary>
+    /// 公共: 按 elementId 加载自动节点 autoNodeConf 配置
+    /// </summary>
+    private BpmnNodeAutoNodeConfJson? LoadAutoNodeConfByElement(string processNumber, string elementId, BusinessDataVo businessDataVo)
+    {
+        BpmnConfVo? bpmnConfVo = businessDataVo.BpmnConfVo;
+        if (bpmnConfVo == null || bpmnConfVo.Id == 0) return null;
+        NodeElementDto? nodeElementDto = _bpmVariableService.GetNodeIdByElementId(processNumber, elementId);
+        if (nodeElementDto == null || string.IsNullOrEmpty(nodeElementDto.NodeId)) return null;
+        long nodePrimaryKey = Convert.ToInt64(nodeElementDto.NodeId);
+        BpmnNode? bpmnNode = _bpmnNodeService._repository
+            .FirstOrDefault(a => a.ConfId == bpmnConfVo.Id && a.Id == nodePrimaryKey && a.IsDel == 0);
+        if (bpmnNode == null || string.IsNullOrEmpty(bpmnNode.NodeConfigJson)) return null;
+        return JsonConfUtil.ParseNodeConfig(bpmnNode.NodeConfigJson)?.AutoNodeConf;
+    }
+
+    /// <summary>
+    /// 公共: 设计态 UUID → BpmnNode (confId 限定当前流程)
+    /// </summary>
+    private BpmnNode ResolveTargetNode(BusinessDataVo businessDataVo, string processNumber, string targetNodeUuid, string logPrefix)
+    {
+        BpmnConfVo? bpmnConfVo = businessDataVo.BpmnConfVo;
+        if (bpmnConfVo == null || bpmnConfVo.Id == 0)
+            throw new AFBizException($"{logPrefix}: businessDataVo.bpmnConfVo 未填充, 无法定位流程配置, processNumber={processNumber}");
+        BpmnNode? targetNode = _bpmnNodeService._repository
+            .FirstOrDefault(a => a.ConfId == bpmnConfVo.Id && a.NodeId == targetNodeUuid && a.IsDel == 0);
+        if (targetNode == null)
+            throw new AFBizException($"{logPrefix}目标节点不存在, processNumber={processNumber}, confId={bpmnConfVo.Id}, nodeUuid={targetNodeUuid}");
+        return targetNode;
+    }
+
+    /// <summary>
+    /// 公共: BpmnNode → 运行期 elementId(taskDefKey)
+    /// </summary>
+    private string ResolveElementIdByNode(string processNumber, BpmnNode targetNode, string logPrefix)
+    {
+        List<string> targetElementIds = _bpmVariableService.GetElementIdsdByNodeId(processNumber, targetNode.Id.ToString());
+        if (targetElementIds == null || targetElementIds.Count == 0)
+            throw new AFBizException($"{logPrefix}: 未能根据nodeId获取目标节点taskDefKey, processNumber={processNumber}, targetNodeId={targetNode.Id}");
+        return targetElementIds[0];
+    }
+
+    /// <summary>
+    /// 公共: 自动节点式 complete + 虚拟人-3 审批记录
+    /// </summary>
+    private void CompleteAsAutoSkip(BpmAfTask delegateTask, string processNumber, string comment)
+    {
+        string assigneeName = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Desc;
+        delegateTask.Assignee = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Id;
+        delegateTask.AssigneeName = assigneeName;
+        var taskService = ServiceProviderUtils.GetService<ITaskService>();
+        taskService?.Complete(delegateTask);
+        _bpmVerifyInfoService.AddVerifyInfo(new BpmVerifyInfo
+        {
+            VerifyDate = DateTime.Now,
+            TaskName = delegateTask.Name,
+            TaskId = delegateTask.Id,
+            RunInfoId = delegateTask.ProcInstId,
+            VerifyUserId = AFSpecialAssigneeEnum.AUTO_NODE_SKIP.Id,
+            VerifyUserName = assigneeName,
+            TaskDefKey = delegateTask.TaskDefKey,
+            VerifyStatus = (int)ProcessSubmitStateEnum.PROCESS_AGRESS_TYPE,
+            VerifyDesc = comment,
+            ProcessCode = processNumber,
+            TenantId = MultiTenantUtil.GetCurrentTenantId(),
+        });
+    }
+
+    /// <summary>
+    /// 公共: 加批/抄送规则配置解析为具体用户 (基准人为发起人, 同条件自动加批)
+    /// </summary>
+    private List<BaseIdTranStruVo>? ResolveAssigneeRule(JsonElement? conf, BusinessDataVo businessDataVo, string processNumber)
+    {
+        if (conf == null) return null;
+        string? startUserId = _bpmBusinessProcessService.GetBpmBusinessProcess(processNumber)?.CreateUser;
+        return _autoSignUpAssigneeResolver.Resolve(conf, startUserId, businessDataVo);
     }
 
     /// <summary>

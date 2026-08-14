@@ -259,6 +259,35 @@ public class BpmnConfBizService : IBpmnConfBizService
             {
                 BpmnNodeConfigJson nodeCfgJson = bpmnNodeVo.GetOrCreateNodeConfigJson();
                 nodeCfgJson.AutoNodeConf = bpmnNodeVo.AutoNodeConf;
+                // 自动节点(nodeType=9)动作配置发布校验: 选了动作但子配置缺失则拒绝发布 (对等 Java 版)
+                if (bpmnNodeVo.NodeType == (int)NodeTypeEnum.NODE_TYPE_AUTO_NODE)
+                {
+                    var autoConf = bpmnNodeVo.AutoNodeConf;
+                    int? satisfiedAction = autoConf.SatisfiedAction;
+                    int? unsatisfiedAction = autoConf.UnsatisfiedAction;
+                    if (satisfiedAction == 1 && (autoConf.ForwardNodeIds == null || autoConf.ForwardNodeIds.Count == 0))
+                        throw new AFBizException($"节点[{bpmnNodeVo.NodeName}]满足动作配置了跳转至固定节点但未选择目标节点!");
+                    if (satisfiedAction == 2)
+                    {
+                        if (autoConf.AutoSignUpConf == null)
+                            throw new AFBizException($"节点[{bpmnNodeVo.NodeName}]满足动作配置了加批但未配置加批人!");
+                        // 自动节点加批强制不回到审批人(回到虚拟人-3会死锁)
+                        if (bpmnNodeVo.Property == null) bpmnNodeVo.Property = new BpmnNodePropertysVo();
+                        bpmnNodeVo.Property.AfterSignUpWay = 2;
+                    }
+                    if (satisfiedAction == 3)
+                    {
+                        string? toId = null;
+                        if (autoConf.TransferToUser != null && autoConf.TransferToUser.Value.TryGetProperty("id", out var idEl))
+                            toId = idEl.GetString();
+                        if (string.IsNullOrEmpty(toId))
+                            throw new AFBizException($"节点[{bpmnNodeVo.NodeName}]满足动作配置了转办但未选择转办目标!");
+                    }
+                    if (satisfiedAction == 4 && autoConf.AutoCopyConf == null)
+                        throw new AFBizException($"节点[{bpmnNodeVo.NodeName}]满足动作配置了抄送但未配置抄送人!");
+                    if (unsatisfiedAction == 2 && string.IsNullOrEmpty(autoConf.BackToNodeId))
+                        throw new AFBizException($"节点[{bpmnNodeVo.NodeName}]不满足动作配置了退回但未选择退回目标节点!");
+                }
             }
 
             BpmnNode bpmnNode = bpmnNodeVo.MapToEntity();
