@@ -586,7 +586,7 @@ CREATE TABLE IF NOT EXISTS `bpm_process_category` (
     PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='BPM Process Category Table';
 
-CREATE TABLE IF NOT EXISTS pm_process_permissions (
+CREATE TABLE IF NOT EXISTS bpm_process_permissions (
      id BIGINT AUTO_INCREMENT COMMENT 'Primary key',
      object_type INT COMMENT 'Authorize object type (1 for user, 2 for department, 3 for role)',
      object_id varchar(64) COMMENT 'Authorize object ID (user ID/department ID/role ID)',

@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using AntFlowCore.Abstraction.Orm.util;
 using AntFlowCore.Abstraction.service;
 using AntFlowCore.Abstraction.service.repository;
@@ -12,6 +12,7 @@ using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
 
 using AntFlowCore.Persist.api.interf.repository;
+using FreeSql;
 
 namespace AntFlowCore.Business.service;
 
@@ -36,6 +37,10 @@ public class DemoDataBusinessDataService : IDemoDataBusinessDataService
     private readonly IProcessPermissionsRepository _processPermissionsRepository;
     private readonly IRoleService _roleService;
     private readonly IBpmnProcessAdminProvider _bpmnProcessAdminProvider;
+    private readonly IUserRepository _userRepository;
+    private readonly IDepartmentRepository _departmentRepository;
+    private readonly IRoleRepository _roleRepository;
+    private readonly IFreeSql _freeSql;
 
     public DemoDataBusinessDataService(
         IBpmBusinessProcessService bpmBusinessProcessService,
@@ -49,7 +54,11 @@ public class DemoDataBusinessDataService : IDemoDataBusinessDataService
         IBpmFlowrunEntrustService bpmFlowrunEntrustService,
         IProcessPermissionsRepository processPermissionsRepository,
         IRoleService roleService,
-        IBpmnProcessAdminProvider bpmnProcessAdminProvider)
+        IBpmnProcessAdminProvider bpmnProcessAdminProvider,
+        IUserRepository userRepository,
+        IDepartmentRepository departmentRepository,
+        IRoleRepository roleRepository,
+        IFreeSql freeSql)
     {
         _bpmBusinessProcessService = bpmBusinessProcessService;
         _bpmnConfService = bpmnConfService;
@@ -63,6 +72,10 @@ public class DemoDataBusinessDataService : IDemoDataBusinessDataService
         _processPermissionsRepository = processPermissionsRepository;
         _roleService = roleService;
         _bpmnProcessAdminProvider = bpmnProcessAdminProvider;
+        _userRepository = userRepository;
+        _departmentRepository = departmentRepository;
+        _roleRepository = roleRepository;
+        _freeSql = freeSql;
     }
 
     // ==================== 列表 ====================
@@ -541,6 +554,190 @@ public class DemoDataBusinessDataService : IDemoDataBusinessDataService
         return false;
     }
 
+    // ==================== 人员/部门/角色管理 ====================
+
+    /// <summary>
+    /// 人员管理分页列表(姓名/手机号模糊搜索,关联部门名称/直属领导姓名/HRBP姓名)
+    /// </summary>
+    public ResultAndPage<DemoDataUserVo> UserListPage(DemoDataMgmtPageReq req)
+    {
+        PageDto pageDto = req.PageDto ?? PageDto.First();
+        int pageNo = pageDto.Page < 1 ? 1 : pageDto.Page;
+        int pageSize = pageDto.PageSize < 1 ? 20 : (pageDto.PageSize > MaxPageSize ? MaxPageSize : pageDto.PageSize);
+
+        string? userName = string.IsNullOrWhiteSpace(req.UserName) ? null : req.UserName.Trim();
+        string? mobile = string.IsNullOrWhiteSpace(req.Mobile) ? null : req.Mobile.Trim();
+
+        var query = _userRepository.GetQueryable();
+        if (userName != null)
+        {
+            query = query.Where(a => a.Name != null && a.Name.Contains(userName));
+        }
+        if (mobile != null)
+        {
+            query = query.Where(a => a.Mobile != null && a.Mobile.Contains(mobile));
+        }
+        int total = query.Count();
+        List<User> records = query.OrderBy(a => a.Id).Skip((pageNo - 1) * pageSize).Take(pageSize).ToList();
+
+        // 批量补部门/直属领导/HRBP 名称(不 join demo 表,内存关联)
+        List<long> deptIds = records.Where(a => a.DepartmentId.HasValue).Select(a => a.DepartmentId!.Value).Distinct().ToList();
+        List<long> leaderIds = records.Where(a => a.LeaderId.HasValue).Select(a => a.LeaderId!.Value).Distinct().ToList();
+        List<long> hrbpIds = records.Where(a => a.HrbpId.HasValue).Select(a => a.HrbpId!.Value).Distinct().ToList();
+        Dictionary<long, string> deptNameMap = BuildDeptNameMap(deptIds);
+        Dictionary<long, string> userNameMap = BuildUserNameMap(leaderIds.Concat(hrbpIds).Distinct().ToList());
+
+        List<DemoDataUserVo> vos = records.Select(u => new DemoDataUserVo
+        {
+            Id = u.Id,
+            UserName = u.Name,
+            Mobile = u.Mobile,
+            Email = u.Email,
+            DepartmentId = u.DepartmentId,
+            DepartmentName = u.DepartmentId.HasValue && deptNameMap.TryGetValue(u.DepartmentId.Value, out var dn) ? dn : null,
+            LeaderId = u.LeaderId,
+            LeaderName = u.LeaderId.HasValue && userNameMap.TryGetValue(u.LeaderId.Value, out var ln) ? ln : null,
+            HrbpId = u.HrbpId,
+            HrbpName = u.HrbpId.HasValue && userNameMap.TryGetValue(u.HrbpId.Value, out var hn) ? hn : null,
+            IsDel = u.IsDel == true ? 1 : 0,
+        }).ToList();
+
+        return PageUtils.GetResultAndPage(vos, PageDto.BuildCountedPage(pageDto, total));
+    }
+
+    /// <summary>
+    /// 部门管理分页列表(名称模糊搜索,关联上级部门名称/负责人姓名)
+    /// </summary>
+    public ResultAndPage<DemoDataDepartmentVo> DepartmentListPage(DemoDataMgmtPageReq req)
+    {
+        PageDto pageDto = req.PageDto ?? PageDto.First();
+        int pageNo = pageDto.Page < 1 ? 1 : pageDto.Page;
+        int pageSize = pageDto.PageSize < 1 ? 20 : (pageDto.PageSize > MaxPageSize ? MaxPageSize : pageDto.PageSize);
+
+        string? deptName = string.IsNullOrWhiteSpace(req.DeptName) ? null : req.DeptName.Trim();
+
+        var query = _departmentRepository.GetQueryable();
+        if (deptName != null)
+        {
+            query = query.Where(a => a.Name != null && a.Name.Contains(deptName));
+        }
+        int total = query.Count();
+        List<Department> records = query.OrderBy(a => a.Id).Skip((pageNo - 1) * pageSize).Take(pageSize).ToList();
+
+        // 批量补上级部门/负责人名称(内存关联)
+        List<long> parentIds = records.Where(a => a.ParentId.HasValue).Select(a => (long)a.ParentId!.Value).Distinct().ToList();
+        List<long> leaderIds = records.Where(a => a.LeaderId.HasValue).Select(a => a.LeaderId!.Value).Distinct().ToList();
+        Dictionary<long, string> parentNameMap = BuildDeptNameMap(parentIds);
+        Dictionary<long, string> userNameMap = BuildUserNameMap(leaderIds);
+
+        List<DemoDataDepartmentVo> vos = records.Select(d => new DemoDataDepartmentVo
+        {
+            Id = d.Id,
+            Name = d.Name,
+            ShortName = d.ShortName,
+            ParentId = d.ParentId,
+            ParentName = d.ParentId.HasValue && parentNameMap.TryGetValue(d.ParentId.Value, out var pn) ? pn : null,
+            LeaderId = d.LeaderId,
+            LeaderName = d.LeaderId.HasValue && userNameMap.TryGetValue(d.LeaderId.Value, out var ln) ? ln : null,
+            Level = d.Level,
+            Sort = d.Sort,
+            IsDel = d.IsDel == true ? 1 : 0,
+        }).ToList();
+
+        return PageUtils.GetResultAndPage(vos, PageDto.BuildCountedPage(pageDto, total));
+    }
+
+    /// <summary>
+    /// 角色管理分页列表(名称模糊搜索,含角色下关联人数)
+    /// </summary>
+    public ResultAndPage<DemoDataRoleVo> RoleListPage(DemoDataMgmtPageReq req)
+    {
+        PageDto pageDto = req.PageDto ?? PageDto.First();
+        int pageNo = pageDto.Page < 1 ? 1 : pageDto.Page;
+        int pageSize = pageDto.PageSize < 1 ? 20 : (pageDto.PageSize > MaxPageSize ? MaxPageSize : pageDto.PageSize);
+
+        string? roleName = string.IsNullOrWhiteSpace(req.RoleName) ? null : req.RoleName.Trim();
+
+        var query = _roleRepository.GetQueryable();
+        if (roleName != null)
+        {
+            query = query.Where(a => a.RoleName != null && a.RoleName.Contains(roleName));
+        }
+        int total = query.Count();
+        List<Role> records = query.OrderBy(a => a.Id).Skip((pageNo - 1) * pageSize).Take(pageSize).ToList();
+
+        // 批量统计角色下人员数量
+        List<long> roleIds = records.Select(a => a.Id).ToList();
+        Dictionary<long, int> userCountMap = new();
+        if (roleIds.Count > 0)
+        {
+            userCountMap = _freeSql.Select<UserRole>()
+                .Where(a => a.RoleId != null && roleIds.Contains(a.RoleId ?? 0L))
+                .ToList()
+                .GroupBy(a => a.RoleId!.Value)
+                .ToDictionary(g => g.Key, g => g.Count());
+        }
+
+        List<DemoDataRoleVo> vos = records.Select(r => new DemoDataRoleVo
+        {
+            Id = r.Id,
+            RoleName = r.RoleName,
+            UserCount = userCountMap.TryGetValue(r.Id, out int cnt) ? cnt : 0,
+        }).ToList();
+
+        return PageUtils.GetResultAndPage(vos, PageDto.BuildCountedPage(pageDto, total));
+    }
+
+    /// <summary>
+    /// 角色详情:角色下人员分页列表(关联部门名称)
+    /// </summary>
+    public ResultAndPage<DemoDataRoleUserVo> RoleUsers(DemoDataMgmtPageReq req)
+    {
+        if (req == null || req.RoleId == null)
+        {
+            throw new AFBizException("请选择角色");
+        }
+        PageDto pageDto = req.PageDto ?? PageDto.First();
+        int pageNo = pageDto.Page < 1 ? 1 : pageDto.Page;
+        int pageSize = pageDto.PageSize < 1 ? 20 : (pageDto.PageSize > MaxPageSize ? MaxPageSize : pageDto.PageSize);
+
+        List<UserRole> all = _freeSql.Select<UserRole>().Where(a => a.RoleId == req.RoleId.Value).ToList();
+        List<UserRole> ordered = all.OrderBy(a => a.UserId ?? 0L).ToList();
+        int total = ordered.Count;
+        List<UserRole> pageItems = ordered.Skip((pageNo - 1) * pageSize).Take(pageSize).ToList();
+
+        // 批量补用户信息 + 部门名称(内存关联)
+        List<long> userIds = pageItems.Where(a => a.UserId.HasValue).Select(a => a.UserId!.Value).Distinct().ToList();
+        Dictionary<long, User> userMap = new();
+        if (userIds.Count > 0)
+        {
+            foreach (User u in _userRepository.Find(a => userIds.Contains(a.Id)))
+            {
+                userMap.TryAdd(u.Id, u);
+            }
+        }
+        List<long> deptIds = userMap.Values.Where(a => a.DepartmentId.HasValue).Select(a => a.DepartmentId!.Value).Distinct().ToList();
+        Dictionary<long, string> deptNameMap = BuildDeptNameMap(deptIds);
+
+        List<DemoDataRoleUserVo> vos = pageItems
+            .Where(a => a.UserId.HasValue && userMap.TryGetValue(a.UserId.Value, out _))
+            .Select(a =>
+            {
+                User u = userMap[a.UserId!.Value];
+                return new DemoDataRoleUserVo
+                {
+                    Id = u.Id,
+                    UserName = u.Name,
+                    Mobile = u.Mobile,
+                    Email = u.Email,
+                    DepartmentName = u.DepartmentId.HasValue && deptNameMap.TryGetValue(u.DepartmentId.Value, out var dn)
+                        ? dn : null,
+                };
+            }).ToList();
+
+        return PageUtils.GetResultAndPage(vos, PageDto.BuildCountedPage(pageDto, total));
+    }
+
     // ==================== 工具 ====================
 
     private static string FieldKey(string fieldId)
@@ -551,5 +748,40 @@ public class DemoDataBusinessDataService : IDemoDataBusinessDataService
     private static string FormatProcessState(int processState)
     {
         return ProcessStateEnumExtensions.GetDescByCode(processState);
+    }
+
+    /// <summary>
+    /// 部门 id 集合 -> 部门名称 映射(空集合返回空字典)
+    /// </summary>
+    private Dictionary<long, string> BuildDeptNameMap(List<long> deptIds)
+    {
+        var map = new Dictionary<long, string>();
+        if (deptIds.Count == 0)
+        {
+            return map;
+        }
+        List<int> ids = deptIds.Select(x => (int)x).ToList();
+        foreach (Department d in _departmentRepository.Find(a => ids.Contains(a.Id)))
+        {
+            map.TryAdd(d.Id, d.Name ?? string.Empty);
+        }
+        return map;
+    }
+
+    /// <summary>
+    /// 用户 id 集合 -> 用户姓名 映射(空集合返回空字典)
+    /// </summary>
+    private Dictionary<long, string> BuildUserNameMap(List<long> userIds)
+    {
+        var map = new Dictionary<long, string>();
+        if (userIds.Count == 0)
+        {
+            return map;
+        }
+        foreach (User u in _userRepository.Find(a => userIds.Contains(a.Id)))
+        {
+            map.TryAdd(u.Id, u.Name ?? string.Empty);
+        }
+        return map;
     }
 }
