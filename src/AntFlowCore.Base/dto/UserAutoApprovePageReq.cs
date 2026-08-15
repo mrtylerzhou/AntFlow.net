@@ -10,9 +10,14 @@ namespace AntFlowCore.Base.dto
         public PageDto PageDto { get; set; }
 
         /// <summary>
-        /// 归属人姓名(模糊)
+        /// 归属人姓名(模糊, 未传OwnerUserId时生效)
         /// </summary>
         public string OwnerUserName { get; set; }
+
+        /// <summary>
+        /// 归属人 id(精确过滤, 优先于 OwnerUserName)
+        /// </summary>
+        public string OwnerUserId { get; set; }
 
         /// <summary>
         /// formCode(模糊)

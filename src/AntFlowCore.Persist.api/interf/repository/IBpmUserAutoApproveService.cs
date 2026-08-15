@@ -1,4 +1,4 @@
-using AntFlowCore.Base.dto;
+﻿using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.vo;
 
@@ -9,7 +9,7 @@ namespace AntFlowCore.Persist.api.interf.repository;
 /// </summary>
 public interface IBpmUserAutoApproveService : IAntFlowRepositoryMix<BpmUserAutoApprove, IBpmUserAutoApproveRepository>
 {
-    ResultAndPage<UserAutoApproveVo> ListPage(PageDto pageDto, string ownerUserName, string formCode);
+    ResultAndPage<UserAutoApproveVo> ListPage(PageDto pageDto, string ownerUserName, string ownerUserId, string formCode);
 
     /// <summary>
     /// 活跃流程下拉(三类: DIY/LF/第三方)

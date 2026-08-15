@@ -1,4 +1,4 @@
-using AntFlowCore.Abstraction.adaptor;
+﻿using AntFlowCore.Abstraction.adaptor;
 using AntFlowCore.Abstraction.factory;
 using AntFlowCore.Abstraction.formatter;
 using AntFlowCore.Abstraction.formatter.filter;
@@ -200,6 +200,8 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmUserAutoApproveService, UserAutoApproveService>();
         services.AddSingleton<ProcessPermissionsService>();
         services.AddSingleton<IProcessPermissionsService, ProcessPermissionsService>();
+        services.AddSingleton<DemoDataBusinessDataService>();
+        services.AddSingleton<IDemoDataBusinessDataService, DemoDataBusinessDataService>();
 
         services.AddSingleton<AbstractOrderedSignNodeAdp, BpmnLoopSignNodeAdp>();
         services.AddSingleton<AbstractOrderedSignNodeAdp, OutSideOrderedSignNodeAdp>();

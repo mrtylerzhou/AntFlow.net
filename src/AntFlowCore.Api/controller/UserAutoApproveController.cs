@@ -26,7 +26,7 @@ public class UserAutoApproveController
     [HttpPost("listPage")]
     public ResultAndPage<UserAutoApproveVo> ListPage([FromBody] UserAutoApprovePageReq req)
     {
-        return _userAutoApproveService.ListPage(req.PageDto, req.OwnerUserName, req.FormCode);
+        return _userAutoApproveService.ListPage(req.PageDto, req.OwnerUserName, req.OwnerUserId, req.FormCode);
     }
 
     /// <summary>

@@ -11,5 +11,5 @@ public interface IBpmUserAutoApproveRepository : IBaseRepository<BpmUserAutoAppr
     /// <summary>
     /// 分页查询(按id倒序)
     /// </summary>
-    List<BpmUserAutoApprove> QueryPageList(string ownerUserName, string formCode, string tenantId, Page<BpmUserAutoApprove> page);
+    List<BpmUserAutoApprove> QueryPageList(string ownerUserName, string ownerUserId, string formCode, string tenantId, Page<BpmUserAutoApprove> page);
 }

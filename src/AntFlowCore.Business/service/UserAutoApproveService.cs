@@ -29,11 +29,11 @@ public class UserAutoApproveService : IBpmUserAutoApproveService
 
     // ==================== 列表 ====================
 
-    public ResultAndPage<UserAutoApproveVo> ListPage(PageDto pageDto, string ownerUserName, string formCode)
+    public ResultAndPage<UserAutoApproveVo> ListPage(PageDto pageDto, string ownerUserName, string ownerUserId, string formCode)
     {
         Page<BpmUserAutoApprove> page = PageUtils.GetPageByPageDto<BpmUserAutoApprove>(pageDto);
         string tenantId = MultiTenantUtil.GetCurrentTenantId();
-        List<BpmUserAutoApprove> records = _repository.QueryPageList(ownerUserName, formCode, tenantId, page);
+        List<BpmUserAutoApprove> records = _repository.QueryPageList(ownerUserName, ownerUserId, formCode, tenantId, page);
 
         Dictionary<string, string> formCode2ActiveBpmnCode = new();
         Dictionary<string, BpmnConf> bpmnCode2Conf = new();

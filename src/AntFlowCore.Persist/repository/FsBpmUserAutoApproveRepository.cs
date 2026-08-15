@@ -16,7 +16,7 @@ public class FsBpmUserAutoApproveRepository : RepositoryBase<BpmUserAutoApprove>
     {
     }
 
-    public List<BpmUserAutoApprove> QueryPageList(string ownerUserName, string formCode, string tenantId, Page<BpmUserAutoApprove> page)
+    public List<BpmUserAutoApprove> QueryPageList(string ownerUserName, string ownerUserId, string formCode, string tenantId, Page<BpmUserAutoApprove> page)
     {
         BasePagingInfo pagingInfo = page.ToPagingInfo().ToBasePagingInfo();
         var query = _ormContext.FreeSql.Select<BpmUserAutoApprove>()
@@ -25,7 +25,12 @@ public class FsBpmUserAutoApproveRepository : RepositoryBase<BpmUserAutoApprove>
         {
             query = query.Where(a => a.TenantId == tenantId);
         }
-        if (!string.IsNullOrEmpty(ownerUserName))
+        //下拉搜索选中归属人: 精确匹配 id(优先于姓名模糊)
+        if (!string.IsNullOrEmpty(ownerUserId))
+        {
+            query = query.Where(a => a.OwnerUserId == ownerUserId);
+        }
+        else if (!string.IsNullOrEmpty(ownerUserName))
         {
             query = query.Where(a => a.OwnerUserName.Contains(ownerUserName));
         }
