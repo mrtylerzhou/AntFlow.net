@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Base.entity;
+namespace AntFlowCore.Base.entity;
 public class Department
 {
     public int Id { get; set; }
@@ -15,4 +15,10 @@ public class Department
     public string? UpdateUser { get; set; }
     public DateTime? CreateTime { get; set; } = DateTime.Now;
     public DateTime? UpdateTime { get; set; }=DateTime.Now;
+
+    /// <summary>
+    /// 是否叶子节点(非表字段, 接口返回供前端懒加载判断)
+    /// </summary>
+    [FreeSql.DataAnnotations.Column(IsIgnore = true)]
+    public bool? IsLeaf { get; set; }
 }

@@ -83,6 +83,25 @@ public class AutoNodeConditionEvaluator
     }
 
     /// <summary>
+    /// 评估给定的条件配置(用户自动审批设置场景). 对应 Java AutoConditionEvaluator.evaluate.
+    /// </summary>
+    /// <param name="conf">条件配置(conditionList + groupRelation)</param>
+    /// <param name="formFields">表单字段值 map</param>
+    /// <returns>true=条件满足; false=不满足; null=无条件配置</returns>
+    public bool? EvaluateConf(BpmnNodeAutoNodeConfJson conf, Dictionary<string, object> formFields)
+    {
+        if (conf == null || conf.ConditionList == null || conf.ConditionList.Count == 0)
+        {
+            return null;
+        }
+        if (formFields == null || formFields.Count == 0)
+        {
+            return false;
+        }
+        return EvaluateConditions(conf, formFields);
+    }
+
+    /// <summary>
     /// 从 DB 加载节点配置 autoNodeConf.
     /// 对应 Java AbstractFormOperationAdaptor.loadAutoNodeConf.
     /// </summary>

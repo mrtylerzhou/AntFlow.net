@@ -1,4 +1,4 @@
-using AntFlowCore.Abstraction.util;
+﻿using AntFlowCore.Abstraction.util;
 using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.util;
@@ -27,11 +27,27 @@ public class UserController
         return ResultHelper.Success(users);
     }
 
+    /// <summary>
+    /// 角色列表: name 为空返回全量, 非空模糊查询(搜索下拉用)
+    /// </summary>
     [HttpGet("getRoleInfo")]
-    public Result<List<BaseIdTranStruVo>> GetRoleInfo()
-    { 
-        List<BaseIdTranStruVo> roles = _roleService.GetAllRoles(); 
+    public Result<List<BaseIdTranStruVo>> GetRoleInfo([FromQuery] string? name)
+    {
+        if (!string.IsNullOrEmpty(name))
+        {
+            return ResultHelper.Success(_roleService.QueryRoleByNameFuzzy(name));
+        }
+        List<BaseIdTranStruVo> roles = _roleService.GetAllRoles();
         return ResultHelper.Success(roles);
+    }
+
+    /// <summary>
+    /// 用户名称模糊查询(搜索下拉用)
+    /// </summary>
+    [HttpGet("queryUserByNameFuzzy")]
+    public Result<List<BaseIdTranStruVo>> QueryUserByNameFuzzy([FromQuery] string? userName)
+    {
+        return ResultHelper.Success(_userService.QueryUserByNameFuzzy(userName ?? ""));
     }
 
     [HttpPost("getUserPageList")]

@@ -41,7 +41,7 @@ public class NextNodeProcessNoticeSendProcessor : INextNodeTaskProcessor
         _logger = logger;
     }
 
-    public int Order() => 2;
+    public int Order() => 3;
 
     public void PostProcess(BpmNextTaskDto dto)
     {

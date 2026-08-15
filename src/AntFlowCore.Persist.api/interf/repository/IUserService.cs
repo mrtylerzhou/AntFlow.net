@@ -1,4 +1,4 @@
-using AntFlowCore.Base.dto;
+﻿using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
@@ -18,6 +18,10 @@ public interface IUserService : IAntFlowRepositoryMix<User, IUserRepository>
     BaseIdTranStruVo GetById(string userId);
     ResultAndPage<BaseIdTranStruVo> SelectUserPageList(Page<BaseIdTranStruVo> page, TaskMgmtVO taskMgmtVo);
     List<BaseIdTranStruVo> SelectAll();
+    /// <summary>
+    /// 用户名称模糊查询(搜索下拉用)
+    /// </summary>
+    List<BaseIdTranStruVo> QueryUserByNameFuzzy(string userName);
     DetailedUser GetEmployeeDetailById(string id);
     List<DetailedUser> GetEmployeeDetailByIds(IEnumerable<string> ids);
     List<BaseIdTranStruVo> GetLevelLeadersByEmployeeIdAndTier(string employeeId, int tier);

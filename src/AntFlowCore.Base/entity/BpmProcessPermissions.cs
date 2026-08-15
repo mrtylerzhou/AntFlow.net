@@ -1,7 +1,8 @@
 ﻿namespace AntFlowCore.Base.entity;
 
 /// <summary>
-/// Represents BPM process permissions.
+/// 流程权限记录. 对应 Java BpmProcessPermissions(统一对象模型: objectType + objectId).
+/// 对象类型: 1=人员 2=部门 3=角色
 /// </summary>
 public class BpmProcessPermissions
 {
@@ -11,14 +12,14 @@ public class BpmProcessPermissions
     public long Id { get; set; }
 
     /// <summary>
-    /// User ID.
+    /// 授权对象类型 1=人员 2=部门 3=角色
     /// </summary>
-    public string UserId { get; set; }
+    public int? ObjectType { get; set; }
 
     /// <summary>
-    /// Department ID.
+    /// 授权对象 id(人员id/部门id/角色id)
     /// </summary>
-    public long DepId { get; set; }
+    public string? ObjectId { get; set; }
 
     /// <summary>
     /// Permission type:
@@ -26,12 +27,12 @@ public class BpmProcessPermissions
     /// 2: Create
     /// 3: Monitor
     /// </summary>
-    public int PermissionsType { get; set; }
+    public int? PermissionsType { get; set; }
 
     /// <summary>
-    /// Create user.
+    /// Create user id.
     /// </summary>
-    public string CreateUser { get; set; }
+    public string? CreateUser { get; set; }
 
     /// <summary>
     /// Create time.
@@ -39,17 +40,14 @@ public class BpmProcessPermissions
     public DateTime? CreateTime { get; set; } = DateTime.Now;
 
     /// <summary>
-    /// Process key.
+    /// Process key (form code).
     /// </summary>
-    public string ProcessKey { get; set; }
+    public string? ProcessKey { get; set; }
 
-    /// <summary>
-    /// Office ID.
-    /// </summary>
-    public long OfficeId { get; set; }
     /// <summary>
     /// Deletion Status (0: Not Deleted, 1: Deleted)
     /// </summary>
     public int IsDel { get; set; }
-    public string TenantId { get; set; }
+
+    public string? TenantId { get; set; }
 }

@@ -110,6 +110,10 @@ namespace AntFlowCore.Base.util
 
         // 条件审批/条件抄送运行时 verifyInfo 备注
         public const string AF_CONDITION_APPROVE_AUTO_COMMENT = "条件审批自动通过,条件评估结果:True";
+        // 用户自动审批设置运行时 verifyInfo 备注
+        public const string AF_AUTO_APPROVE_PREFIX = "【自动审批】";
+        public const string AF_AUTO_APPROVE_COMMENT = "自动审批代为完成,条件评估结果:{0}";
+        public const string AF_AUTO_APPROVE_UNCONDITIONAL_COMMENT = "无条件自动审批代为完成";
         public const string AF_CONDITION_DISAGREE_AUTO_COMMENT = "条件拒绝自动拒绝,条件评估结果:True";
         public const string AF_CONDITION_AUTO_SIGNUP_COMMENT = "条件自动加批,条件评估结果:True";
         public const string AF_CONDITION_APPROVE_WAIT_COMMENT = "条件审批条件未满足,等待人工审批";

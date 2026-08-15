@@ -345,13 +345,12 @@ public static class FreesqlFluentConfiguration
             {
                 a.Name("bpm_process_permissions");
                 a.Property(b => b.Id).IsPrimary(true).IsIdentity(true).Name("id");
-                a.Property(b => b.UserId).Name("user_id");
-                a.Property(b => b.DepId).Name("dep_id");
+                a.Property(b => b.ObjectType).Name("object_type");
+                a.Property(b => b.ObjectId).Name("object_id");
                 a.Property(b => b.PermissionsType).Name("permissions_type");
                 a.Property(b => b.CreateUser).Name("create_user");
                 a.Property(b => b.CreateTime).Name("create_time");
                 a.Property(b => b.ProcessKey).Name("process_key");
-                a.Property(b => b.OfficeId).Name("office_id");
                 a.Property(b => b.IsDel).Name("is_del");
                 a.Property(b => b.TenantId).Name("tenant_id");
             }).ConfigEntity<BpmTaskconfig>(a =>
@@ -706,6 +705,24 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.UpdateUser).Name("update_user");
                 a.Property(b => b.IsDel).Name("is_del");
                 a.Property(b => b.TenantId).Name("tenant_id");
+            }).ConfigEntity<BpmUserAutoApprove>(a =>
+            {
+                a.Name("bpm_user_auto_approve");
+                a.Property(b => b.Id).IsPrimary(true).IsIdentity(true);
+                a.Property(b => b.OwnerUserId).Name("owner_user_id");
+                a.Property(b => b.OwnerUserName).Name("owner_user_name");
+                a.Property(b => b.FormCode).Name("form_code");
+                a.Property(b => b.BpmnCode).Name("bpmn_code");
+                a.Property(b => b.NodeScopeJson).Name("node_scope_json");
+                a.Property(b => b.ConditionJson).Name("condition_json");
+                a.Property(b => b.DefaultComment).Name("default_comment");
+                a.Property(b => b.Enabled).Name("enabled");
+                a.Property(b => b.IsDel).Name("is_del");
+                a.Property(b => b.TenantId).Name("tenant_id");
+                a.Property(b => b.CreateUser).Name("create_user");
+                a.Property(b => b.CreateTime).Name("create_time");
+                a.Property(b => b.UpdateUser).Name("update_user");
+                a.Property(b => b.UpdateTime).Name("update_time");
             }).ConfigEntity<UserMessage>(a =>
             {
                 a.Name("t_user_message");

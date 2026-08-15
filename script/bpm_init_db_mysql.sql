@@ -586,19 +586,19 @@ CREATE TABLE IF NOT EXISTS `bpm_process_category` (
     PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='BPM Process Category Table';
 
-CREATE TABLE IF NOT EXISTS `bpm_process_permissions` (
-     `id` BIGINT AUTO_INCREMENT COMMENT 'Primary key',
-     `user_id` varchar(64) COMMENT 'User ID',
-    `dep_id` BIGINT COMMENT 'Department ID',
-    `permissions_type` INT COMMENT 'Permission type (1 for view, 2 for create, 3 for monitor)',
-    `create_user` varchar(64) COMMENT 'Create user ID',
-    `create_time` timestamp not null default current_timestamp COMMENT 'Create time',
-    `process_key` VARCHAR(50) COMMENT 'Process key',
-    `office_id` BIGINT COMMENT 'Office ID',
-    `is_del` int(11) NOT NULL DEFAULT '0' COMMENT '0 for normal 1 for delete',
-    `tenant_id` varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
-    PRIMARY KEY (`id`)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='process permission';
+CREATE TABLE IF NOT EXISTS pm_process_permissions (
+     id BIGINT AUTO_INCREMENT COMMENT 'Primary key',
+     object_type INT COMMENT 'Authorize object type (1 for user, 2 for department, 3 for role)',
+     object_id varchar(64) COMMENT 'Authorize object ID (user ID/department ID/role ID)',
+     permissions_type INT COMMENT 'Permission type (1 for view, 2 for create, 3 for monitor)',
+     create_user varchar(64) COMMENT 'Create user ID',
+     create_time timestamp not null default current_timestamp COMMENT 'Create time',
+     process_key VARCHAR(50) COMMENT 'Process key',
+     is_del int(11) NOT NULL DEFAULT '0' COMMENT '0 for normal 1 for delete',
+     	enant_id varchar(64)  NULL DEFAULT '' COMMENT 'tenantId',
+     PRIMARY KEY (id),
+     UNIQUE KEY uk_object_type_object_id_permissions_type_process_key_is_del (object_type, object_id, permissions_type, process_key, is_del)
+     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='process permission';
 
 
 CREATE TABLE IF NOT EXISTS  `t_out_side_bpm_access_business` (
@@ -1449,3 +1449,30 @@ create table if not exists t_bpm_process_comment
   comment = '流程沟通表' DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 
 create index idx_t_bpm_process_comment_process_number on t_bpm_process_comment (process_number);
+
+
+-- ----------------------------
+-- 用户自动审批设置 (对应 Java bpm_user_auto_approve)
+-- ----------------------------
+DROP TABLE IF EXISTS `bpm_user_auto_approve`;
+CREATE TABLE if not exists `bpm_user_auto_approve`
+(
+    `id`               int          NOT NULL AUTO_INCREMENT,
+    `owner_user_id`    varchar(64)  NOT NULL COMMENT '归属人id',
+    `owner_user_name`  varchar(100) DEFAULT NULL COMMENT '归属人姓名',
+    `form_code`        varchar(100) NOT NULL COMMENT '流程formCode',
+    `bpmn_code`        varchar(50)  NOT NULL COMMENT '配置时活跃版本bpmnCode',
+    `node_scope_json`  text         NULL COMMENT '节点范围JSON [{elementId,nodeName}], 空=整个流程',
+    `condition_json`   text         NULL COMMENT '条件JSON {conditionList,groupRelation}, 仅LF',
+    `default_comment`  varchar(500) DEFAULT NULL COMMENT '默认审批意见',
+    `enabled`          int          DEFAULT '1' COMMENT '启用 1是 0否',
+    `is_del`           int          DEFAULT '0',
+    `tenant_id`        varchar(255) NOT NULL DEFAULT '' COMMENT 'tenantId',
+    `create_user`      varchar(50)  DEFAULT '',
+    `create_time`      datetime     DEFAULT CURRENT_TIMESTAMP,
+    `update_user`      varchar(50)  DEFAULT '',
+    `update_time`      datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`) USING BTREE,
+    KEY `idx_owner_form` (`owner_user_id`, `form_code`) USING BTREE
+) ENGINE = InnoDB
+COMMENT ='用户自动审批设置';

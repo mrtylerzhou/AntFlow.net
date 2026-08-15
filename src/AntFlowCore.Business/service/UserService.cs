@@ -1,4 +1,4 @@
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.exception;
@@ -26,6 +26,19 @@ public class UserService : IUserService
     }
 
     public IUserRepository _repository { get; }
+
+    public List<BaseIdTranStruVo> QueryUserByNameFuzzy(string userName)
+    {
+        if (string.IsNullOrEmpty(userName))
+        {
+            return new List<BaseIdTranStruVo>();
+        }
+        return _repository.GetQueryable()
+            .Where(a => a.Name.Contains(userName))
+            .ToList()
+            .Select(a => a.ToBaseIdTranStruVo())
+            .ToList();
+    }
 
     public BaseIdTranStruVo QueryUserById(string userId)
     {

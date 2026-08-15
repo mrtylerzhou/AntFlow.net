@@ -99,10 +99,12 @@ public static class ServiceRegistration
         services.AddSingleton<INextNodeTaskProcessor, NextNodeForwardProcessor>();
         services.AddSingleton<INextNodeTaskProcessor, NextNodeProcessNoticeSendProcessor>();
         services.AddSingleton<INextNodeTaskProcessor, NextNodeDynamicAssigneeProcessor>();
+        services.AddSingleton<INextNodeTaskProcessor, NextNodeAutoApproveProcessor>();
         services.AddSingleton<NextNodeLabelsProcessor>();
         services.AddSingleton<NextNodeForwardProcessor>();
         services.AddSingleton<NextNodeProcessNoticeSendProcessor>();
         services.AddSingleton<NextNodeDynamicAssigneeProcessor>();
+        services.AddSingleton<NextNodeAutoApproveProcessor>();
         services.AddSingleton<ProcessApprovalService>();
         services.AddSingleton<IProcessApprovalService, ProcessApprovalService>();
         services.AddSingleton<IFormOperationAdaptor<ThirdPartyAccountApplyVo>, ThirdPartyAccountApplyFlowService>();
@@ -194,6 +196,10 @@ public static class ServiceRegistration
         services.AddSingleton<IConfigFlowButtonContantService, ConfigFlowButtonContantService>();
         services.AddSingleton<UserEntrustService>();
         services.AddSingleton<IUserEntrustService, UserEntrustService>();
+        services.AddSingleton<UserAutoApproveService>();
+        services.AddSingleton<IBpmUserAutoApproveService, UserAutoApproveService>();
+        services.AddSingleton<ProcessPermissionsService>();
+        services.AddSingleton<IProcessPermissionsService, ProcessPermissionsService>();
 
         services.AddSingleton<AbstractOrderedSignNodeAdp, BpmnLoopSignNodeAdp>();
         services.AddSingleton<AbstractOrderedSignNodeAdp, OutSideOrderedSignNodeAdp>();
@@ -444,6 +450,8 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmProcessAppApplicationRepository, FsBpmProcessAppApplicationRepository>();
         services.AddSingleton<IBpmnNodeToRepository, FsBpmnNodeToRepository>();
         services.AddSingleton<IUserEntrustRepository, FsUserEntrustRepository>();
+        services.AddSingleton<IBpmUserAutoApproveRepository, FsBpmUserAutoApproveRepository>();
+        services.AddSingleton<IProcessPermissionsRepository, FsProcessPermissionsRepository>();
         services.AddSingleton<IInformationTemplateRepository, FsInformationTemplateRepository>();
         services.AddSingleton<IOutSideBpmApproveTemplateRepository, FsOutSideBpmApproveTemplateRepository>();
         services.AddSingleton<IRoleRepository, FsRoleRepository>();
