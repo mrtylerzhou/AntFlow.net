@@ -171,10 +171,10 @@ namespace AntFlowCore.Business.service
             {
                 throw new AFBizException("400008", "授权对象类型不合法");
             }
-            //部门权限禁止监控
-            if (objectType == 2 && vo.PermissionsTypes.Contains(3))
+            //部门权限禁止监控/模板编辑
+            if (objectType == 2 && (vo.PermissionsTypes.Contains(3) || vo.PermissionsTypes.Contains(4)))
             {
-                throw new AFBizException("400003", "部门权限不支持选择监控权限");
+                throw new AFBizException("400003", "部门权限不支持选择监控/模板编辑权限");
             }
             if (vo.ObjectIds == null || vo.ObjectIds.Count == 0)
             {
