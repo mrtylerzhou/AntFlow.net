@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.adaptor;
+using AntFlowCore.Abstraction.adaptor;
 using AntFlowCore.Abstraction.factory;
 using AntFlowCore.Abstraction.formatter;
 using AntFlowCore.Abstraction.formatter.filter;
@@ -200,6 +200,9 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmUserAutoApproveService, UserAutoApproveService>();
         services.AddSingleton<ProcessPermissionsService>();
         services.AddSingleton<IProcessPermissionsService, ProcessPermissionsService>();
+        //App版本管理(对应Java SysVersionController)
+        services.AddSingleton<SysVersionManageService>();
+        services.AddSingleton<ISysVersionManageService, SysVersionManageService>();
         services.AddSingleton<DemoDataBusinessDataService>();
         services.AddSingleton<IDemoDataBusinessDataService, DemoDataBusinessDataService>();
 
@@ -454,6 +457,9 @@ public static class ServiceRegistration
         services.AddSingleton<IUserEntrustRepository, FsUserEntrustRepository>();
         services.AddSingleton<IBpmUserAutoApproveRepository, FsBpmUserAutoApproveRepository>();
         services.AddSingleton<IProcessPermissionsRepository, FsProcessPermissionsRepository>();
+        services.AddSingleton<ISysVersionRepository, FsSysVersionRepository>();
+        services.AddSingleton<IBpmProcessAppDataRepository, FsBpmProcessAppDataRepository>();
+        services.AddSingleton<IQuickEntryRepository, FsQuickEntryRepository>();
         services.AddSingleton<IInformationTemplateRepository, FsInformationTemplateRepository>();
         services.AddSingleton<IOutSideBpmApproveTemplateRepository, FsOutSideBpmApproveTemplateRepository>();
         services.AddSingleton<IRoleRepository, FsRoleRepository>();

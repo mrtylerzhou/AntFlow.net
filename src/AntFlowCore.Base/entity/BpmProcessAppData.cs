@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Base.entity;
+namespace AntFlowCore.Base.entity;
 
 
 /// <summary>
@@ -52,12 +52,12 @@ public class BpmProcessAppData
     public long VersionId { get; set; }
 
     /// <summary>
-    /// Application ID.
+    /// Application ID(与Java String一致: type=1/3存对象id字符串, type=2存formCode).
     /// </summary>
-    public long ApplicationId { get; set; }
+    public string ApplicationId { get; set; }
 
     /// <summary>
-    /// Type (1 for version app, 2 for app data).
+    /// Type (1 for version app, 2 for app data, 3 for quick entry).
     /// </summary>
     public int Type { get; set; }
 }

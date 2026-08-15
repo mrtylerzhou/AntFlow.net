@@ -653,7 +653,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.Version).Name("version");
                 a.Property(b => b.Description).Name("description");
-                a.Property(b => b.Index).Name("index");
+                a.Property(b => b.Index).Name("indx");
                 a.Property(b => b.IsForce).Name("is_force");
                 a.Property(b => b.AndroidUrl).Name("android_url");
                 a.Property(b => b.IosUrl).Name("ios_url");
