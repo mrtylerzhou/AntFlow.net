@@ -308,4 +308,56 @@ public class UserService : IUserService
         };
         return employee;
     }
+
+    public List<BaseIdTranStruVo> GetUserRolesById(string userId)
+    {
+        if (!long.TryParse(userId, out long uid))
+        {
+            return new List<BaseIdTranStruVo>();
+        }
+        List<UserRole> userRoles = _repository.QueryUserRolesByUserId(uid);
+        if (userRoles == null || userRoles.Count == 0)
+        {
+            return new List<BaseIdTranStruVo>();
+        }
+        List<string> roleIds = userRoles
+            .Where(r => r.RoleId != null)
+            .Select(r => r.RoleId!.Value.ToString())
+            .Distinct()
+            .ToList();
+        if (roleIds.Count == 0)
+        {
+            return new List<BaseIdTranStruVo>();
+        }
+        return _roleService.QueryRoleByIds(roleIds);
+    }
+
+    public List<BaseIdTranStruVo> GetUserDepartmentsById(string userId)
+    {
+        if (!long.TryParse(userId, out long uid))
+        {
+            return new List<BaseIdTranStruVo>();
+        }
+        List<Department> departments = _repository.QueryDepartmentAndUserByUserId(uid);
+        if (departments == null || departments.Count == 0)
+        {
+            return new List<BaseIdTranStruVo>();
+        }
+        //用户所在部门 + path 前缀子部门(去重)
+        Dictionary<long, string> result = new();
+        foreach (Department dept in departments)
+        {
+            result.TryAdd(dept.Id, dept.Name);
+            if (!string.IsNullOrEmpty(dept.Path))
+            {
+                List<Department> children = _departmentService._repository
+                    .Find(d => d.Path != null && d.Path.StartsWith(dept.Path));
+                foreach (Department child in children)
+                {
+                    result.TryAdd(child.Id, child.Name);
+                }
+            }
+        }
+        return result.Select(kv => new BaseIdTranStruVo { Id = kv.Key.ToString(), Name = kv.Value }).ToList();
+    }
 }

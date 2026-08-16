@@ -20,6 +20,13 @@ public class FsUserRepository : RepositoryBase<User>, IUserRepository
             .Where((a, b) => b.Id == userId)
             .ToList();
     }
+
+    public List<UserRole> QueryUserRolesByUserId(long userId)
+    {
+        return _ormContext.FreeSql.Select<UserRole>()
+            .Where(a => a.UserId == userId)
+            .ToList();
+    }
     
     public List<User> QueryUserListByExpression( Expression<Func<User, bool>> expression, PagingInfo pagingInfo)
     {

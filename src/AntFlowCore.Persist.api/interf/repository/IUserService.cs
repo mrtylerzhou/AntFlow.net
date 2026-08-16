@@ -34,4 +34,14 @@ public interface IUserService : IAntFlowRepositoryMix<User, IUserRepository>
     /// DelegateUser(不可用且需要转办时的目标人)</returns>
     UserAvailableVo CheckEmployeeEffective(string userId);
     DetailedUser GetDetailedUserById(string Id);
+
+    /// <summary>
+    /// 查询用户拥有的角色列表(id+name)
+    /// </summary>
+    List<BaseIdTranStruVo> GetUserRolesById(string userId);
+
+    /// <summary>
+    /// 查询用户所在部门及其全部子部门(id+name), 用于权限匹配(从主体出发, 不展开部门全量人员)
+    /// </summary>
+    List<BaseIdTranStruVo> GetUserDepartmentsById(string userId);
 }
