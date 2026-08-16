@@ -83,6 +83,8 @@ public static class ServiceRegistration
         services.AddSingleton<IRoleService,RoleService>();
         services.AddSingleton<DepartmentService>();
         services.AddSingleton<IDepartmentService, DepartmentService>();
+        //部门抽象层扩展点(对等 Java AfDepartmentService), 用户可注册自定义实现覆盖
+        services.AddSingleton<IAfDepartmentService, DepartmentService>();
         services.AddSingleton<BpmnConfLfFormdataService>();
         services.AddSingleton<IBpmnConfLfFormdataService, BpmnConfLfFormdataService>();
         services.AddSingleton<BpmnConfLfFormdataFieldService>();
