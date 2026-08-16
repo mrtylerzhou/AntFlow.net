@@ -12,10 +12,12 @@ namespace AntFlowCore.Bpmn.util;
 public class BpmnNodeFormatService : IBpmnNodeFormatService
 {
     private readonly IAdaptorFactory _adaptorFactory;
+    private readonly BpmnGeneralPurposeElementAdaptor _generalPurposeElementAdaptor;
 
-    public BpmnNodeFormatService(IAdaptorFactory adaptorFactory)
+    public BpmnNodeFormatService(IAdaptorFactory adaptorFactory, BpmnGeneralPurposeElementAdaptor generalPurposeElementAdaptor)
     {
         _adaptorFactory = adaptorFactory;
+        _generalPurposeElementAdaptor = generalPurposeElementAdaptor;
     }
     public List<BpmnConfCommonElementVo> GetBpmnConfCommonElementVoList(
         BpmnConfCommonVo bpmnConfCommonVo,
@@ -509,7 +511,8 @@ public class BpmnNodeFormatService : IBpmnNodeFormatService
         BpmnElementAdaptor elementAdaptor = _adaptorFactory.GetBpmnElementAdaptor(nodePropertyEnum.Value);
         if (elementAdaptor == null)
         {
-            throw new AFBizException($"can not get element adaptor by node property:{nodePropertyEnum}");
+            // 兜底适配器: 找不到具体节点类型适配器时使用
+            elementAdaptor = _generalPurposeElementAdaptor;
         }
         elementAdaptor.DoFormatNodesToElements(bpmnConfCommonElementVos,nextNodeVo,nodeCode, sequenceFlowNum, numMap);
         // If there is still a next node, then continue formatting

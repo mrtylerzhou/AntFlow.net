@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AntFlowCore.Base.constant.enums;
+using AntFlowCore.Base.entity;
 using AntFlowCore.Base.factory;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
@@ -32,6 +33,27 @@ public abstract class AbstractCommonBpmnElementAdaptor : BpmnElementAdaptor
         int? paramType = paramsVo.ParamType;
         string varName = ProvideVarName();
 
+        // general 兜底: 拼接流程名拼音首字母大写 (对等 Java AbstractCommonBpmnElementAdaptor.commonElementVo)
+        // 数据通道: 优先 ThreadLocal 中的 BusinessDataVo.BpmnName, 兜底读 AF_RUNTIME_BPMN_CONF 的 BpmnConf.BpmnName
+        if (varName == "general")
+        {
+            string bpmnName = null;
+            var businessDataVo = ThreadLocalContainer.Get(StringConstants.AF_RUNTIME_BUISINESS_INFO) as BusinessDataVo;
+            if (businessDataVo != null)
+            {
+                bpmnName = businessDataVo.BpmnName;
+            }
+            if (string.IsNullOrEmpty(bpmnName))
+            {
+                var bpmnConf = ThreadLocalContainer.Get(StringConstants.AF_RUNTIME_BPMN_CONF) as BpmnConf;
+                bpmnName = bpmnConf?.BpmnName;
+            }
+            if (!string.IsNullOrEmpty(bpmnName))
+            {
+                varName += StrUtils.GetFirstLetters(bpmnName);
+            }
+        }
+
         if ((int)BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_SINGLE == paramType)
         {
             var bpmnNodeParamsAssigneeVo = paramsVo.Assignee ?? new BpmnNodeParamsAssigneeVo();
@@ -52,6 +74,8 @@ public abstract class AbstractCommonBpmnElementAdaptor : BpmnElementAdaptor
             int? signType = property == null ? (int)SignTypeEnum.SIGN_TYPE_SIGN : property.SignType;
 
             var assigneeMap = new Dictionary<string, string>();
+            // 保序集合: 按 assigneeList 顺序收集去重后的审批人 (对等 Java LinkedHashMap 语义)
+            var orderedAssigneeKeys = new List<string>();
 
             // Java passes BpmnStartConditionsVo; in .NET the duplication strategy is
             // carried in the thread-local container (see BpmnElementAdaptor).
@@ -66,12 +90,14 @@ public abstract class AbstractCommonBpmnElementAdaptor : BpmnElementAdaptor
             {
                 if (assigneeVo.IsDeduplication == 0)
                 {
+                    orderedAssigneeKeys.Add(assigneeVo.Assignee);
                     assigneeMap[assigneeVo.Assignee] = assigneeVo.AssigneeName;
                 }
                 else if (assigneeVo.IsDeduplication == 1)
                 {
                     if (DuplicationProcessStrategyEnum.SKIP.Code.Equals(strategy))
                     {
+                        orderedAssigneeKeys.Add(assigneeVo.Assignee);
                         assigneeMap[assigneeVo.Assignee] = assigneeVo.AssigneeName;
                     }
                 }
@@ -81,22 +107,22 @@ public abstract class AbstractCommonBpmnElementAdaptor : BpmnElementAdaptor
             if ((int)SignTypeEnum.SIGN_TYPE_SIGN == signType)
             {
                 return BpmnElementUtils.GetMultiplayerSignElement(elementId, elementName,
-                    elementCodeStr, assigneeMap.Keys.ToList(), assigneeMap);
+                    elementCodeStr, orderedAssigneeKeys, assigneeMap);
             }
             else if ((int)SignTypeEnum.SIGN_TYPE_SIGN_IN_ORDER == signType)
             {
                 return BpmnElementUtils.GetMultiplayerSignInOrderElement(elementId, elementName,
-                    elementCodeStr, assigneeMap.Keys.ToList(), assigneeMap);
+                    elementCodeStr, orderedAssigneeKeys, assigneeMap);
             }
             else if ((int)SignTypeEnum.SIGN_TYPE_ARBITRATION == signType)
             {
                 return BpmnElementUtils.GetMultiplayerArbitrationElement(elementId, elementName,
-                    elementCodeStr, assigneeMap.Keys.ToList(), assigneeMap, property?.ArbitrationRatio);
+                    elementCodeStr, orderedAssigneeKeys, assigneeMap, property?.ArbitrationRatio);
             }
             else
             {
                 return BpmnElementUtils.GetMultiplayerOrSignElement(elementId, elementName,
-                    elementCodeStr, assigneeMap.Keys.ToList(), assigneeMap);
+                    elementCodeStr, orderedAssigneeKeys, assigneeMap);
             }
         }
     }
