@@ -200,6 +200,9 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmUserAutoApproveService, UserAutoApproveService>();
         services.AddSingleton<ProcessPermissionsService>();
         services.AddSingleton<IProcessPermissionsService, ProcessPermissionsService>();
+        //字典管理(对应Java DictDataController)
+        services.AddSingleton<DictDataBizService>();
+        services.AddSingleton<IDictDataBizService, DictDataBizService>();
         //App版本管理(对应Java SysVersionController)
         services.AddSingleton<SysVersionManageService>();
         services.AddSingleton<ISysVersionManageService, SysVersionManageService>();

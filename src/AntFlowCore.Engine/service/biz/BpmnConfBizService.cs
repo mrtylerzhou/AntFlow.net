@@ -1136,6 +1136,11 @@ public class BpmnConfBizService : IBpmnConfBizService
                 bpmnNodeVo.DeduplicationExclude = true;
                 bpmnNodeVo.IsAutomaticNode = true;
             }
+            // 抗去重: 自动/条件语义节点(自动推进/自动退回/自动完成/条件推进/条件完成/条件拒绝/条件自动加批/条件自动转办/条件退回/条件退回发起人等)服务端强制排除去重
+            if (NodeLabelConstants.IsAutoConditionNode(labelVOList))
+            {
+                bpmnNodeVo.DeduplicationExclude = true;
+            }
             bpmnNodeVo.LabelList = labelVOList;
         }
 

@@ -159,5 +159,46 @@ namespace AntFlowCore.Base.vo
             }
             return false;
         }
+
+        /// <summary>
+        /// 自动/条件语义节点标签集合: 命中任一即服务端强制抗去重(天然不参与审批人去重).
+        /// 覆盖: 自动节点(9)/自动推进(18)/自动退回(19)/自动完成(18子型)/条件审批家族(12: 条件审批/条件推进/条件完成/条件拒绝/条件自动加批/条件自动转办)/条件抄送(13)/条件退回(20)/条件退回发起人(21).
+        /// 注意: 12 家族子类型在保存时只贴各自子类型标签(如 condition_advance_node), 不贴 condition_approve_node, 故必须全部枚举.
+        /// </summary>
+        private static readonly List<string> AutoConditionNodeLabels = new List<string>
+        {
+            StringConstants.AUTOMATIC_NODE,
+            StringConstants.CONDITION_APPROVE_NODE,
+            StringConstants.CONDITION_COPY_NODE,
+            StringConstants.CONDITION_ADVANCE_NODE,
+            StringConstants.CONDITION_FINISH_NODE,
+            StringConstants.CONDITION_DISAGREE_NODE,
+            StringConstants.CONDITION_AUTO_SIGN_UP_NODE,
+            StringConstants.CONDITION_AUTO_TRANSFER_NODE,
+            StringConstants.AUTO_ADVANCE_NODE,
+            StringConstants.AUTO_COMPLETE_NODE,
+            StringConstants.AUTO_RETURN_NODE,
+            StringConstants.CONDITION_RETURN_NODE,
+            StringConstants.CONDITION_RETURN_STARTER_NODE
+        };
+
+        /// <summary>
+        /// 是否自动/条件语义节点(按标签判断): 是则流程构建时强制 DeduplicationExclude = true.
+        /// </summary>
+        public static bool IsAutoConditionNode(List<BpmnNodeLabelVO> nodeLabelVOs)
+        {
+            if (nodeLabelVOs == null || nodeLabelVOs.Count == 0)
+            {
+                return false;
+            }
+            foreach (var label in nodeLabelVOs)
+            {
+                if (label != null && AutoConditionNodeLabels.Contains(label.LabelValue))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

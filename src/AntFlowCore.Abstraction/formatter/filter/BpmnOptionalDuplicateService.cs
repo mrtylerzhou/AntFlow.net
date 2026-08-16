@@ -30,6 +30,12 @@ public class BpmnOptionalDuplicateService: IBpmnOptionalDuplicatesAdaptor
             {
                 bpmnNodeVo = mapNodes[bpmnNodeVo.Params.NodeTo];
 
+                // 抗去重节点: 不参与自选去重(不进 approverList, 也不作为自选去重目标)
+                if (bpmnNodeVo.DeduplicationExclude)
+                {
+                    continue;
+                }
+
                 if (bpmnNodeVo.NodeProperty == 7 && bpmnNodeVo.IsDeduplication == 1)
                 {
                     optionalNode = bpmnNodeVo.NodeId;
@@ -48,7 +54,9 @@ public class BpmnOptionalDuplicateService: IBpmnOptionalDuplicatesAdaptor
                 }
             }
 
-            if (!string.IsNullOrEmpty(optionalNode) && mapNodes.ContainsKey(optionalNode))
+            //self chosen node deduplication
+            if (!string.IsNullOrEmpty(optionalNode) && mapNodes.ContainsKey(optionalNode)
+                && !mapNodes[optionalNode].DeduplicationExclude)
             {
                 bpmnNodeVo = mapNodes[optionalNode];
                 List<BpmnNodeParamsAssigneeVo> assigneeList = bpmnNodeVo.Params.AssigneeList;
