@@ -228,6 +228,17 @@ public class BpmVerifyInfoBizService : IBpmVerifyInfoBizService
             VerifyStatus = endVerifyStatus
         });
         bpmVerifyInfoVos= bpmVerifyInfoVos.Where(a => a.NodeType != (int)NodeTypeEnum.NODE_TYPE_COPY&&a.VerifyUserName!=StringConstants.DYNAMIC_APPROVER).ToList();
+
+        // 流程诊断支持: 有 id 的真实记录应携带 node_id; 发起/流程结束/未来路径预测为虚拟记录(Id 为空), 豁免
+        foreach (var vo in bpmVerifyInfoVos)
+        {
+            if (!string.IsNullOrEmpty(vo.Id) && string.IsNullOrEmpty(vo.NodeId))
+            {
+                _logger.LogError("verify record id={}, processNumber={}, taskName={} has no corresponding node_id in bpm_af_taskinst/bpm_af_task",
+                    vo.Id, processNumber, vo.TaskName);
+            }
+        }
+
         return bpmVerifyInfoVos;
     }
 

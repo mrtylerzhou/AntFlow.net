@@ -21,6 +21,11 @@ public class BpmAfTaskInst
     public string TaskDefKey { get; set; }
 
     /// <summary>
+    /// 流程图节点主键 id (t_bpmn_node.id, 流程诊断与设计图对齐用)
+    /// </summary>
+    public string NodeId { get; set; }
+
+    /// <summary>
     /// 流程实例 ID
     /// </summary>
     public string ProcInstId { get; set; }

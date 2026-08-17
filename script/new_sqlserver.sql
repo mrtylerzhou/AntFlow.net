@@ -1288,9 +1288,11 @@ CREATE TABLE [dbo].[bpm_af_taskinst]
     [tenant_id]              NVARCHAR(255) NULL     DEFAULT N'',
     [description]            NVARCHAR(4000)NULL,
     [update_user]            NVARCHAR(64)  NULL,
+    [node_id]                NVARCHAR(64)  NULL     DEFAULT N'',  -- COMMENT: 'bpmn node id (t_bpmn_node.id), 流程诊断用'
     CONSTRAINT [PK_bpm_af_taskinst] PRIMARY KEY ([id])
 );
 CREATE INDEX [AF_HI_TASK_INST_PROCINST] ON [dbo].[bpm_af_taskinst] ([proc_inst_id]);
+-- 存量库升级: ALTER TABLE [dbo].[bpm_af_taskinst] ADD [node_id] NVARCHAR(64) NULL DEFAULT N'';
 CREATE INDEX [idx_assignee_name]        ON [dbo].[bpm_af_taskinst] ([assignee_name]);
 CREATE INDEX [idx_task_def_key]         ON [dbo].[bpm_af_taskinst] ([task_def_key]);
 END;

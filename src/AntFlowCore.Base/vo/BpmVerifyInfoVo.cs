@@ -57,6 +57,9 @@ namespace AntFlowCore.Base.vo
         [JsonPropertyName("elementId")]
         public string ElementId { get; set; }
 
+        [JsonPropertyName("nodeId")]
+        public string NodeId { get; set; }
+
         [JsonPropertyName("sort")]
         public int? Sort { get; set; }
         [JsonPropertyName("nodeType")]

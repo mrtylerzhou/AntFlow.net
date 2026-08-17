@@ -1105,7 +1105,8 @@ create table bpm_af_taskinst
     category       varchar(255)            null,
     tenant_id      varchar(255) default '' null,
     description    varchar(4000)           null,
-    update_user       varchar(64)            null
+    update_user       varchar(64)            null,
+    node_id        varchar(64)             null comment 'bpmn node id (t_bpmn_node.id), 流程诊断用'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 create index AF_HI_TASK_INST_PROCINST
@@ -1116,6 +1117,8 @@ create index idx_assignee_name
 
 create index idx_task_def_key
     on bpm_af_taskinst (task_def_key);
+
+-- 存量库升级: ALTER TABLE bpm_af_taskinst ADD COLUMN node_id varchar(64) NULL COMMENT 'bpmn node id (t_bpmn_node.id), 流程诊断用';
 
 create table bpm_af_task
 (

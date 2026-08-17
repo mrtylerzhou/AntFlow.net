@@ -101,6 +101,7 @@ public class BpmVerifyInfoService : IBpmVerifyInfoService
                 VerifyUserName = t.AssigneeName,
                 VerifyStatusName = "处理中",
                 ElementId = t.TaskDefKey,
+                NodeId = t.NodeId,
                 VerifyDesc = "",
                 VerifyDate = null,
             }

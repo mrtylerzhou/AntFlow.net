@@ -188,6 +188,8 @@ public static class ServiceRegistration
         services.AddSingleton<ILFMainFieldService, LFMainFieldService>();
         services.AddSingleton<BpmVerifyInfoBizService>();
         services.AddSingleton<IBpmVerifyInfoBizService, BpmVerifyInfoBizService>();
+        services.AddSingleton<ProcessDiagnosisBizService>();
+        services.AddSingleton<IProcessDiagnosisBizService, ProcessDiagnosisBizService>();
         services.AddSingleton<ProcessConstantsService>();
         services.AddSingleton<IProcessConstantsService, ProcessConstantsService>();
         services.AddSingleton<ActivitiAdditionalInfoService>();

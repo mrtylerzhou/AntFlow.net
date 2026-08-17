@@ -130,6 +130,7 @@ public static class BpmAfTaskExtensions
             ProcDefId = bpmAfTask.ProcDefId,
             ProcInstId = bpmAfTask.ProcInstId,
             TaskDefKey = bpmAfTask.TaskDefKey,
+            NodeId = bpmAfTask.NodeId,
             ExecutionId = bpmAfTask.ExecutionId,
             Owner = bpmAfTask.Owner,
             Assignee = bpmAfTask.Assignee,

@@ -19,6 +19,7 @@ public class BpmnConfController
     private readonly IProcessApprovalService _processApprovalService;
     private readonly IBpmVerifyInfoBizService _bpmVerifyInfoBizService;
     private readonly IBpmnConfService _bpmnConfService;
+    private readonly IProcessDiagnosisBizService _processDiagnosisBizService;
     private readonly IFreeSql _freeSql;
     public IBpmnConfBizService _bpmnConfBizService;
     private readonly IBpmnConfCommonService _bpmnConfCommonService;
@@ -29,12 +30,14 @@ public class BpmnConfController
         IProcessApprovalService processApprovalService,
         IBpmVerifyInfoBizService bpmVerifyInfoBizService,
         IBpmnConfService bpmnConfService,
+        IProcessDiagnosisBizService processDiagnosisBizService,
         IFreeSql freeSql
         )
     {
         _processApprovalService = processApprovalService;
         _bpmVerifyInfoBizService = bpmVerifyInfoBizService;
         _bpmnConfService = bpmnConfService;
+        _processDiagnosisBizService = processDiagnosisBizService;
         _freeSql = freeSql;
         _bpmnConfBizService = bpmnConfBizService;
         _bpmnConfCommonService = bpmnConfCommonService;
@@ -120,6 +123,24 @@ public class BpmnConfController
     [HttpGet("getBpmVerifyInfoVos")]
     public Result<List<BpmVerifyInfoVo>> GetBpmVerifyInfoVos(String processNumber) {
         return Result<List<BpmVerifyInfoVo>>.Succ(_bpmVerifyInfoBizService.GetBpmVerifyInfoVos(processNumber, false));
+    }
+
+    /// <summary>
+    /// 流程诊断: 初始化 (processNumber → confId/bpmnCode/发起人/当前表单值)
+    /// </summary>
+    [HttpGet("diagnosisInit")]
+    public Result<ProcessDiagnosisInitVo> DiagnosisInit(String processNumber)
+    {
+        return Result<ProcessDiagnosisInitVo>.Succ(_processDiagnosisBizService.DiagnosisInit(processNumber));
+    }
+
+    /// <summary>
+    /// 流程诊断: 节点归因诊断 (短路矩阵见 .scratch/process-diagnosis-design.md)
+    /// </summary>
+    [HttpPost("diagnoseNode")]
+    public Result<NodeDiagnosisVo> DiagnoseNode([FromBody] NodeDiagnosisRequestVo requestVo)
+    {
+        return Result<NodeDiagnosisVo>.Succ(_processDiagnosisBizService.DiagnoseNode(requestVo));
     }
     [HttpPost("process/viewBusinessProcess")]
     public Result<dynamic> ViewBusinessProcess( [FromServices] IHttpContextAccessor accessor, String formCode) {
