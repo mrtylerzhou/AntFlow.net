@@ -5,7 +5,7 @@ using AntFlowCore.Base.vo;
 namespace AntFlowCore.Bpmn.adaptor.bpmnelementadp;
 
 /// <summary>
-/// Element adaptor for role nodes. Mirrors Java BpmnElementRoleAdp (varName "roleUserList").
+/// Element adaptor for role nodes.
 /// </summary>
 public class BpmnElementRoleAdaptor : AbstractCommonBpmnElementAdaptor
 {

@@ -190,6 +190,8 @@ public static class ServiceRegistration
         services.AddSingleton<IBpmVerifyInfoBizService, BpmVerifyInfoBizService>();
         services.AddSingleton<ProcessDiagnosisBizService>();
         services.AddSingleton<IProcessDiagnosisBizService, ProcessDiagnosisBizService>();
+        services.AddSingleton<ProcessCompareBizService>();
+        services.AddSingleton<IProcessCompareBizService, ProcessCompareBizService>();
         services.AddSingleton<ProcessConstantsService>();
         services.AddSingleton<IProcessConstantsService, ProcessConstantsService>();
         services.AddSingleton<ActivitiAdditionalInfoService>();

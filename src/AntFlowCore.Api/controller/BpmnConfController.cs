@@ -20,6 +20,7 @@ public class BpmnConfController
     private readonly IBpmVerifyInfoBizService _bpmVerifyInfoBizService;
     private readonly IBpmnConfService _bpmnConfService;
     private readonly IProcessDiagnosisBizService _processDiagnosisBizService;
+    private readonly IProcessCompareBizService _processCompareBizService;
     private readonly IFreeSql _freeSql;
     public IBpmnConfBizService _bpmnConfBizService;
     private readonly IBpmnConfCommonService _bpmnConfCommonService;
@@ -31,6 +32,7 @@ public class BpmnConfController
         IBpmVerifyInfoBizService bpmVerifyInfoBizService,
         IBpmnConfService bpmnConfService,
         IProcessDiagnosisBizService processDiagnosisBizService,
+        IProcessCompareBizService processCompareBizService,
         IFreeSql freeSql
         )
     {
@@ -38,6 +40,7 @@ public class BpmnConfController
         _bpmVerifyInfoBizService = bpmVerifyInfoBizService;
         _bpmnConfService = bpmnConfService;
         _processDiagnosisBizService = processDiagnosisBizService;
+        _processCompareBizService = processCompareBizService;
         _freeSql = freeSql;
         _bpmnConfBizService = bpmnConfBizService;
         _bpmnConfCommonService = bpmnConfCommonService;
@@ -141,6 +144,26 @@ public class BpmnConfController
     public Result<NodeDiagnosisVo> DiagnoseNode([FromBody] NodeDiagnosisRequestVo requestVo)
     {
         return Result<NodeDiagnosisVo>.Succ(_processDiagnosisBizService.DiagnoseNode(requestVo));
+    }
+
+    /// <summary>
+    /// 流程对比: 候选实例搜索 (同 formCode, 全状态, 排除已删除)
+    /// 设计: .scratch/process-instance-compare-design.md §4.1
+    /// </summary>
+    [HttpGet("compareCandidates")]
+    public Result<List<ProcessCompareCandidateVo>> CompareCandidates(String formCode, String keyword)
+    {
+        return Result<List<ProcessCompareCandidateVo>>.Succ(_processCompareBizService.CompareCandidates(formCode, keyword));
+    }
+
+    /// <summary>
+    /// 流程对比: 某实例全部加签/减签/转办记录 (bpm_flowrun_entrust, 自带 node_id)
+    /// 设计: .scratch/process-instance-compare-design.md §4.2
+    /// </summary>
+    [HttpGet("compareEntrusts")]
+    public Result<List<ProcessCompareEntrustVo>> CompareEntrusts(String processNumber)
+    {
+        return Result<List<ProcessCompareEntrustVo>>.Succ(_processCompareBizService.CompareEntrusts(processNumber));
     }
     [HttpPost("process/viewBusinessProcess")]
     public Result<dynamic> ViewBusinessProcess( [FromServices] IHttpContextAccessor accessor, String formCode) {

@@ -131,6 +131,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.TenantId).Name("tenant_id");
                 a.Property(b => b.Description).Name("description");
                 a.Property(b => b.UpdateUser).Name("update_user");
+                a.Property(b => b.NodeId).Name("node_id");
             })
             .ConfigEntity<BpmBusinessProcess>(a =>
             {
@@ -155,6 +156,7 @@ public static class FreesqlFluentConfiguration
                 a.Property(b => b.BackUserId).Name("back_user_id");
                 a.Property(b => b.IsOutSideProcess).Name("is_out_side_process");
                 a.Property(b => b.IsLowCodeFlow).Name("is_lowcode_flow");
+                a.Property(b => b.ReturnCount).Name("return_count");
             })
             .ConfigEntity<BpmFlowrunEntrust>(a =>
             {
