@@ -42,9 +42,10 @@ namespace AntFlowCore.Base.vo;
             set
             {
                 _nodeFroms = value;
+                //与 Java setNodeFroms 对等: 直接写后备字段, 避免经属性互调造成无限递归
                 if (!string.IsNullOrEmpty(value))
                 {
-                    PrevId = new List<string>(value.Split(','));
+                    _prevId = new List<string>(value.Split(','));
                 }
             }
         }
@@ -57,9 +58,10 @@ namespace AntFlowCore.Base.vo;
             set
             {
                 _prevId = value;
+                //与 Java setPrevId 对等: 直接写后备字段, 避免经属性互调造成无限递归
                 if (_prevId != null && _prevId.Count > 0)
                 {
-                    NodeFroms = string.Join(",", _prevId);
+                    _nodeFroms = string.Join(",", _prevId);
                 }
             }
         }
