@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Abstraction.Orm.ext;
+using AntFlowCore.Abstraction.Orm.ext;
 using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.dto;
 using AntFlowCore.Base.entity;
@@ -36,7 +36,12 @@ namespace AntFlowCore.Persist.repository
             {
                 query = query.Where(a => a.PermissionsType == req.PermissionsType);
             }
-            if (!string.IsNullOrEmpty(req.ObjectId))
+            if (req.ObjectType == 4)
+            {
+                //全员: 只按 object_type=4 过滤, 无对象 id(忽略 objectId/objectName)
+                query = query.Where(a => a.ObjectType == 4);
+            }
+            else if (!string.IsNullOrEmpty(req.ObjectId))
             {
                 //下拉搜索选中: 精确过滤 object_type + object_id
                 if (req.ObjectType != null)

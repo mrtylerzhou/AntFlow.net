@@ -141,8 +141,13 @@ public class ProcessCategoryService : IProcessCategoryService
 
     public List<BpmProcessCategory> ProcessCategoryList(BpmProcessCategoryVo vo)
     {
-        List<BpmProcessCategory> list = _repository.Find(a => a.IsDel == 0
-            && (vo.IsApp == null || a.IsApp == vo.IsApp.Value));
+        //条件式构建: IsApp 为空时不加 is_app 过滤(避免生成 NULL IS NULL 之类异常 SQL), 与 Java 对等
+        var query = _repository.GetQueryable().Where(a => a.IsDel == 0);
+        if (vo.IsApp != null)
+        {
+            query = query.Where(a => a.IsApp == vo.IsApp.Value);
+        }
+        List<BpmProcessCategory> list = query.ToList();
         list.Sort((x, y) => x.Sort.CompareTo(y.Sort));
         return list;
     }

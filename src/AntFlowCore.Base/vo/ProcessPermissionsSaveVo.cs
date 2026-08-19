@@ -1,4 +1,4 @@
-﻿namespace AntFlowCore.Base.vo
+namespace AntFlowCore.Base.vo
 {
     /// <summary>
     /// 流程权限管理批量保存请求. 对应 Java ProcessPermissionsSaveVo.
@@ -22,7 +22,7 @@
         public bool? IsDepartment { get; set; }
 
         /// <summary>
-        /// 授权对象类型 1=人员 2=部门 3=角色(优先于 IsDepartment)
+        /// 授权对象类型 1=人员 2=部门 3=角色 4=全员(优先于 IsDepartment)
         /// </summary>
         public int? ObjectType { get; set; }
 

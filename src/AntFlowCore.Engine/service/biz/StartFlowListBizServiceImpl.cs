@@ -237,17 +237,20 @@ public class StartFlowListBizServiceImpl : IStartFlowListBizService
         List<string> deptIds = depts.Where(d => !string.IsNullOrEmpty(d.Id)).Select(d => d.Id).ToList();
         List<string> roleIds = roles.Where(r => !string.IsNullOrEmpty(r.Id)).Select(r => r.Id).ToList();
 
-        List<BpmProcessPermissions> perms = _processPermissionsRepository
-            .Find(a => a.PermissionsType == 2 && a.IsDel == 0);
+        //与 Java 对等: 匹配条件下推到 DB(object_type 4/1/2/3 一组 OR), 避免全量拉取后内存过滤
+        List<BpmProcessPermissions> perms = _processPermissionsRepository.GetQueryable()
+            .Where(a => a.PermissionsType == 2 && a.IsDel == 0)
+            .Where(a =>
+                a.ObjectType == 4
+                || (a.ObjectType == 1 && a.ObjectId == userId)
+                || (deptIds.Count > 0 && a.ObjectType == 2 && deptIds.Contains(a.ObjectId))
+                || (roleIds.Count > 0 && a.ObjectType == 3 && roleIds.Contains(a.ObjectId)))
+            .ToList();
 
         var allowed = new HashSet<string>(StringComparer.Ordinal);
         foreach (BpmProcessPermissions p in perms)
         {
-            bool hit = p.ObjectType == 4
-                || (p.ObjectType == 1 && p.ObjectId == userId)
-                || (p.ObjectType == 2 && deptIds.Contains(p.ObjectId))
-                || (p.ObjectType == 3 && roleIds.Contains(p.ObjectId));
-            if (hit && !string.IsNullOrEmpty(p.ProcessKey))
+            if (!string.IsNullOrEmpty(p.ProcessKey))
             {
                 allowed.Add(p.ProcessKey);
             }
