@@ -2,6 +2,7 @@ using AntFlowCore.Abstraction.Orm.ext;
 using AntFlowCore.Abstraction.Orm.repository;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.extension;
+using AntFlowCore.Base.vo;
 using AntFlowCore.Core.vo;
 using AntFlowCore.Persist.api.interf.repository;
 using FreeSql.Internal.Model;
@@ -211,5 +212,28 @@ public class FsBpmnConfRepository : RepositoryBase<BpmnConf>, IBpmnConfRepositor
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// 发起流程页: 聚合所有可用流程(effective_status=1, is_del=0),
+    /// 左连 bpm_process_app_application(process_key=form_code) 取 applicationId.
+    /// 对应 Java BpmnConfMapper.selectStartFlowList.
+    /// </summary>
+    public List<StartFlowListRowVo> SelectStartFlowList()
+    {
+        return _ormContext.FreeSql
+            .Select<BpmnConf, BpmProcessAppApplication>()
+            .LeftJoin((a, b) => a.FormCode == b.ProcessKey)
+            .Where((a, b) => a.IsDel == 0 && a.EffectiveStatus == 1)
+            .ToList((a, b) => new StartFlowListRowVo
+            {
+                FormCode = a.FormCode,
+                BpmnName = a.BpmnName,
+                BpmnType = a.BpmnType,
+                IsLowCodeFlow = a.IsLowCodeFlow,
+                IsOutSideProcess = a.IsOutSideProcess,
+                CreateTime = a.CreateTime,
+                ApplicationId = b.Id,
+            });
     }
 }

@@ -192,6 +192,12 @@ public static class ServiceRegistration
         services.AddSingleton<IProcessDiagnosisBizService, ProcessDiagnosisBizService>();
         services.AddSingleton<ProcessCompareBizService>();
         services.AddSingleton<IProcessCompareBizService, ProcessCompareBizService>();
+        //发起流程页(任务中心) 对应 Java StartFlowListBizServiceImpl
+        services.AddSingleton<StartFlowListBizServiceImpl>();
+        services.AddSingleton<IStartFlowListBizService, StartFlowListBizServiceImpl>();
+        //流程分类 对应 Java BpmProcessCategoryServiceImpl
+        services.AddSingleton<ProcessCategoryService>();
+        services.AddSingleton<IProcessCategoryService, ProcessCategoryService>();
         services.AddSingleton<ProcessConstantsService>();
         services.AddSingleton<IProcessConstantsService, ProcessConstantsService>();
         services.AddSingleton<ActivitiAdditionalInfoService>();
@@ -469,6 +475,7 @@ public static class ServiceRegistration
         services.AddSingleton<IUserEntrustRepository, FsUserEntrustRepository>();
         services.AddSingleton<IBpmUserAutoApproveRepository, FsBpmUserAutoApproveRepository>();
         services.AddSingleton<IProcessPermissionsRepository, FsProcessPermissionsRepository>();
+        services.AddSingleton<IBpmProcessCategoryRepository, FsBpmProcessCategoryRepository>();
         services.AddSingleton<ISysVersionRepository, FsSysVersionRepository>();
         services.AddSingleton<IBpmProcessAppDataRepository, FsBpmProcessAppDataRepository>();
         services.AddSingleton<IQuickEntryRepository, FsQuickEntryRepository>();
