@@ -99,7 +99,7 @@ public abstract class BpmnElementAdaptor : IAdaptorService
     }
 
     // 设置签到节点属性
-    private void SetSignUpProperty(BpmnNodeVo nodeVo, BpmnConfCommonElementVo elementVo)
+    protected void SetSignUpProperty(BpmnNodeVo nodeVo, BpmnConfCommonElementVo elementVo)
     {
         elementVo.IsSignUp = nodeVo.IsSignUp;
         elementVo.AfterSignUpWay = nodeVo.Property?.AfterSignUpWay ?? 0;
@@ -173,7 +173,7 @@ public abstract class BpmnElementAdaptor : IAdaptorService
     }
 
     // 处理加批
-    private void DoSignUp(List<BpmnConfCommonElementVo> bpmnConfCommonElementVos, BpmnConfCommonElementVo fatherElementVo, Dictionary<string, int> numMap)
+    protected void DoSignUp(List<BpmnConfCommonElementVo> bpmnConfCommonElementVos, BpmnConfCommonElementVo fatherElementVo, Dictionary<string, int> numMap)
     {
         if (fatherElementVo.IsSignUp == 1)
         {
@@ -211,7 +211,7 @@ public abstract class BpmnElementAdaptor : IAdaptorService
         backApprovalElementVo.IsBackSignUp = 1; // 设置为回到加批人
         backApprovalElementVo.SignUpElementId = fatherElementVo.ElementId;
 
-        SetSignUpElementButtons(backApprovalElementVo);
+        InheritButtonsFromFather(fatherElementVo, backApprovalElementVo);
         bpmnConfCommonElementVos.Add(backApprovalElementVo);
 
         bpmnConfCommonElementVos.Add(BpmnElementUtils.GetSequenceFlow(elementSequenceFlowNum, ProcessNodeEnum.GetDescByCode(nodeCode), backApprovalElementVo.ElementId));
@@ -237,7 +237,8 @@ public abstract class BpmnElementAdaptor : IAdaptorService
         int elementSequenceFlowNum = sequenceFlowNum + 1;
 
         BpmnConfCommonElementVo signUpElementVo;
-        switch (fatherElementVo.SignUpType)
+        int? signUpType = fatherElementVo.SignUpType == 0 ? 1 : fatherElementVo.SignUpType;
+        switch (signUpType)
         {
             case 1: // 顺序签到
                 signUpElementVo = BpmnElementUtils.GetSignUpElement(elementId, fatherElementVo, ElementPropertyEnum.ELEMENT_PROPERTY_SIGN_UP_SERIAL.Code);
@@ -256,7 +257,7 @@ public abstract class BpmnElementAdaptor : IAdaptorService
         signUpElementVo.IsSignUpSubElement = 1; // 设置为签到子元素
         signUpElementVo.SignUpElementId = fatherElementVo.ElementId; // 设置签到元素 ID
 
-        SetSignUpElementButtons(signUpElementVo);
+        InheritButtonsFromFather(fatherElementVo, signUpElementVo);
         bpmnConfCommonElementVos.Add(signUpElementVo);
 
         var signUpSequenceFlow = BpmnElementUtils.GetSequenceFlow(elementSequenceFlowNum, ProcessNodeEnum.GetDescByCode(nodeCode), signUpElementVo.ElementId);
@@ -272,26 +273,35 @@ public abstract class BpmnElementAdaptor : IAdaptorService
         return signUpElementVo;
     }
     /// <summary>
-    /// Set sign up element buttons
+    /// 加批槽位节点的审批页按钮继承自父节点,并排除加批按钮(加批槽位节点自身没有加批槽位);
+    /// 父节点没有审批页按钮时回退为默认的同意/不同意按钮.
     /// </summary>
-    /// <param name="elementVo">The BpmnConfCommonElementVo object</param>
-    private void SetSignUpElementButtons(BpmnConfCommonElementVo elementVo)
+    private void InheritButtonsFromFather(BpmnConfCommonElementVo fatherElementVo, BpmnConfCommonElementVo elementVo)
     {
+        var fatherApprovalPage = fatherElementVo.Buttons?.ApprovalPage;
+        if (fatherApprovalPage == null || fatherApprovalPage.Count == 0)
+        {
+            fatherApprovalPage = new List<BpmnConfCommonButtonPropertyVo>
+            {
+                new BpmnConfCommonButtonPropertyVo
+                {
+                    ButtonType = (int)ButtonTypeEnum.BUTTON_TYPE_AGREE,
+                    ButtonName = ButtonTypeEnumExtensions.GetDescByCode((int)ButtonTypeEnum.BUTTON_TYPE_AGREE)
+                },
+                new BpmnConfCommonButtonPropertyVo
+                {
+                    ButtonType = (int)ButtonTypeEnum.BUTTON_TYPE_DISAGREE,
+                    ButtonName = ButtonTypeEnumExtensions.GetDescByCode((int)ButtonTypeEnum.BUTTON_TYPE_DISAGREE)
+                }
+            };
+        }
+        //排除加批按钮:加批槽位节点自身没有加批槽位,不能再加批
+        var inheritedButtons = fatherApprovalPage
+            .Where(b => b.ButtonType != (int)ButtonTypeEnum.BUTTON_TYPE_JP)
+            .ToList();
         elementVo.Buttons = new BpmnConfCommonButtonsVo
         {
-            ApprovalPage = new List<BpmnConfCommonButtonPropertyVo>
-                {
-                    new BpmnConfCommonButtonPropertyVo
-                    {
-                        ButtonType = (int)ButtonTypeEnum.BUTTON_TYPE_AGREE,
-                        ButtonName = ButtonTypeEnumExtensions.GetDescByCode((int)ButtonTypeEnum.BUTTON_TYPE_AGREE)
-                    },
-                    new BpmnConfCommonButtonPropertyVo
-                    {
-                        ButtonType = (int)ButtonTypeEnum.BUTTON_TYPE_DISAGREE,
-                        ButtonName =ButtonTypeEnumExtensions.GetDescByCode((int)ButtonTypeEnum.BUTTON_TYPE_DISAGREE)
-                    }
-                }
+            ApprovalPage = inheritedButtons
         };
     }
 

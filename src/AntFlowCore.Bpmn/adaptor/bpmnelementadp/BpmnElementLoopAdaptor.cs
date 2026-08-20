@@ -1,4 +1,4 @@
-﻿using AntFlowCore.Base.adaptor;
+using AntFlowCore.Base.adaptor;
 using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.vo;
 using AntFlowCore.Bpmn.util;
@@ -68,6 +68,10 @@ public class BpmnElementLoopAdaptor : BpmnElementAdaptor
                 numMap["nodeCode"] = nodeCode;
                 numMap["sequenceFlowNum"] = sequenceFlowNum;
 
+                // 处理加批(与普通节点一致),使层层审批节点也能生成加批槽位
+                SetSignUpProperty(nodeVo, elementVo);
+                DoSignUp(bpmnConfCommonElementVos, elementVo, numMap);
+
                 return;
             }
 
@@ -109,6 +113,13 @@ public class BpmnElementLoopAdaptor : BpmnElementAdaptor
 
                 numMap["nodeCode"] = nodeCode;
                 numMap["sequenceFlowNum"] = sequenceFlowNum;
+
+                // 为当前元素处理加批(覆盖每个复制出来的层层审批节点)
+                SetSignUpProperty(nodeVo, elementVo);
+                DoSignUp(bpmnConfCommonElementVos, elementVo, numMap);
+                // DoSignUp 可能推进编号,从 numMap 刷新本地计数
+                nodeCode = numMap["nodeCode"];
+                sequenceFlowNum = numMap["sequenceFlowNum"];
             }
         }
 

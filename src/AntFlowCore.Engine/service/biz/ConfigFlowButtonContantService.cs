@@ -6,6 +6,8 @@ using AntFlowCore.Base.constant.enums;
 using AntFlowCore.Base.entity;
 using AntFlowCore.Base.entity.jsonconf;
 using AntFlowCore.Base.exception;
+
+using AntFlowCore.Base.interf;
 using AntFlowCore.Base.extension;
 using AntFlowCore.Base.util;
 using AntFlowCore.Base.vo;
@@ -25,6 +27,8 @@ public class ConfigFlowButtonContantService : IConfigFlowButtonContantService
     private readonly IBpmnConfService _bpmnConfService;
     private readonly ILogger<ConfigFlowButtonContantService> _logger;
 
+    private readonly ITaskService _taskService;
+
     public ConfigFlowButtonContantService(IBpmBusinessProcessService bpmbusinessProcessService,
        IAFDeploymentService afDeploymentService,
        IAfTaskInstService afTaskInstService,
@@ -32,7 +36,8 @@ public class ConfigFlowButtonContantService : IConfigFlowButtonContantService
         IBpmVariableService bpmVariableService,
         IBpmnNodeService bpmnNodeService,
         IBpmnConfService bpmnConfService,
-        ILogger<ConfigFlowButtonContantService> logger)
+        ILogger<ConfigFlowButtonContantService> logger,
+        ITaskService taskService)
     {
         _bpmbusinessProcessService = bpmbusinessProcessService;
         _afDeploymentService = afDeploymentService;
@@ -42,6 +47,7 @@ public class ConfigFlowButtonContantService : IConfigFlowButtonContantService
         _bpmnNodeService = bpmnNodeService;
         _bpmnConfService = bpmnConfService;
         _logger = logger;
+        _taskService = taskService;
     }
     public Dictionary<string, List<ProcessActionButtonVo>> GetButtons(string processNum, string elementId,List<String> viewNodeIds,
         bool? isJurisdiction, bool? isInitiate)
@@ -123,6 +129,14 @@ public class ConfigFlowButtonContantService : IConfigFlowButtonContantService
                 auditButtons.Clear();
                 auditButtons.Add(undertake);
             }
+
+            // 流程任务已回到发起人节点(如撤回后)时,隐藏查看页的撤回按钮,避免重复撤回报错
+            if (IsTaskAlreadyBackToStarter(bpmBusinessProcess))
+            {
+                toViewButtons = toViewButtons
+                    .Where(b => b.ButtonType != (int)ButtonTypeEnum.BUTTON_TYPE_PROCESS_DRAW_BACK)
+                    .ToList();
+            }
         }
         else if (bpmBusinessProcess.ProcessState == (int)ProcessStateEnum.HANDLE_STATE
                  || bpmBusinessProcess.ProcessState == (int)ProcessStateEnum.REJECT_STATE
@@ -163,6 +177,28 @@ public class ConfigFlowButtonContantService : IConfigFlowButtonContantService
 
         return buttonMap;
     }
+
+
+
+    /// <summary>
+    /// 判断当前流程的运行任务是否已全部回到发起人节点(撤回后任务会停留在发起人节点)。
+    /// 此时查看页不应再展示撤回按钮,避免重复点击撤回导致报错。
+    /// </summary>
+    private bool IsTaskAlreadyBackToStarter(BpmBusinessProcess bpmBusinessProcess)
+    {
+        string procInstId = bpmBusinessProcess?.ProcInstId;
+        if (string.IsNullOrEmpty(procInstId))
+        {
+            return false;
+        }
+        List<BpmAfTask> runningTasks = _taskService.CreateTaskQuery(t => t.ProcInstId == procInstId);
+        if (runningTasks == null || runningTasks.Count == 0)
+        {
+            return false;
+        }
+        return runningTasks.All(t => t.TaskDefKey == ProcessNodeEnum.START_TASK_KEY.Description);
+    }
+
 
     private VariableConfigJson? GetVariableConfig(string processNum)
     {
