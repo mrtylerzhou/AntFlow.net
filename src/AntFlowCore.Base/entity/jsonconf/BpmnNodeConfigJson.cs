@@ -285,6 +285,12 @@ public class ApproverFormRelatedUserConf
 
     [JsonPropertyName("valueTypeName")]
     public string? ValueTypeName { get; set; }
+
+    /// <summary>
+    /// DIY form field name for approver (used with DIY forms, setType=20)
+    /// </summary>
+    [JsonPropertyName("diyFormFieldName")]
+    public string? DiyFormFieldName { get; set; }
 }
 
 public class ApproverPrevNodeRelatedUserConf

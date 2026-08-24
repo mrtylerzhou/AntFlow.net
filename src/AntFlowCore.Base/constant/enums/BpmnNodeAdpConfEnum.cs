@@ -39,14 +39,18 @@ public static class BpmnNodeAdpConfEnumExtensions
         { BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_HRBP, NodePropertyEnum.NODE_PROPERTY_HRBP },
         { BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_BUSINESSTABLE, NodePropertyEnum.NODE_PROPERTY_BUSINESSTABLE },
         { BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_DIRECT_LEADER, NodePropertyEnum.NODE_PROPERTY_DIRECT_LEADER },
-        {BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_CUSTOMIZE,NodePropertyEnum.NODE_PROPERTY_CUSTOMIZE},
+        { BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_CUSTOMIZE,NodePropertyEnum.NODE_PROPERTY_CUSTOMIZE},
         { BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_FORM_RELATED_USERS, NodePropertyEnum.NODE_PROPERTY_FORM_RELATED },
         { BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_UDR_USERS, NodePropertyEnum.NODE_PROPERTY_ZDY_RULES },
         { BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_PREV_NODE_RELATED_USERS, NodePropertyEnum.NODE_PROPERTY_PREV_NODE_RELATED },
         { BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_APPROVED_USERS, NodePropertyEnum.NODE_PROPERTY_APPROVED_USERS }
     };
 
-    
+    // DIY 表单关联人员映射（使用与 FORM_RELATED 相同的适配器）
+    private static readonly Dictionary<NodePropertyEnum, BpmnNodeAdpConfEnum> ReverseMappings = new()
+    {
+        { NodePropertyEnum.NODE_PROPERTY_DIYFORM_RELATED, BpmnNodeAdpConfEnum.ADP_CONF_NODE_PROPERTY_FORM_RELATED_USERS }
+    };
 
     // 根据 Enum 获取对应的 BpmnNodeAdpConfEnum
     public static BpmnNodeAdpConfEnum? GetBpmnNodeAdpConfEnumByEnum(Enum? enumValue)
@@ -55,6 +59,13 @@ public static class BpmnNodeAdpConfEnumExtensions
         {
             return null;
         }
+
+        // 先检查是否在反向映射中（用于特殊情况，如 DIY 表单）
+        if (enumValue is NodePropertyEnum nodeProperty && ReverseMappings.TryGetValue(nodeProperty, out var result))
+        {
+            return result;
+        }
+
         return MappingsDictionary.FirstOrDefault(x => Equals(x.Value, enumValue)).Key;
     }
 
