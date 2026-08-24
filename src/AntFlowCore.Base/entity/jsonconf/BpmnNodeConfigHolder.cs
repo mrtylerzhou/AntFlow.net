@@ -432,19 +432,22 @@ public static class BpmnNodeConfigHolder
     public static void SetFormRelatedUserConf(BpmnNodeVo vo)
     {
         var prop = vo.Property;
-        if (prop == null || prop.FormInfos == null) return;
+        // 对于 LF 表单（nodeProperty=16），需要 FormInfos
+        // 对于 DIY 表单（nodeProperty=20），需要 DiyFormFieldName
+        if (prop == null || (prop.FormInfos == null && string.IsNullOrEmpty(prop.DiyFormFieldName))) return;
 
         var approverConf = GetOrCreateApproverConf(vo);
         approverConf.FormRelatedUserConfList ??= new List<ApproverFormRelatedUserConf>();
         approverConf.FormRelatedUserConfList.Add(new ApproverFormRelatedUserConf
         {
-            ValueJson = JsonConfUtil.ToJsonString(prop.FormInfos),
+            ValueJson = prop.FormInfos != null ? JsonConfUtil.ToJsonString(prop.FormInfos) : null,
             SignType = prop.SignType,
             ArbitrationRatio = prop.ArbitrationRatio,
             ValueType = prop.FormAssigneeProperty,
             ValueTypeName = prop.FormAssigneeProperty != null
                 ? NodeFormAssigneePropertyEnumExtensions.GetDescByCode(prop.FormAssigneeProperty.Value)
-                : null
+                : null,
+            DiyFormFieldName = prop.DiyFormFieldName  // 添加 DIY 表单字段名
         });
     }
 

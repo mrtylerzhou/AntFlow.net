@@ -149,5 +149,11 @@ namespace AntFlowCore.Base.vo
         /// </summary>
         [JsonPropertyName("formAssigneeProperty")]
         public int? FormAssigneeProperty { get; set; }
+
+        /// <summary>
+        /// DIY form field name for approver (used with setType=20)
+        /// </summary>
+        [JsonPropertyName("diyFormFieldName")]
+        public string DiyFormFieldName { get; set; }
     }
 }

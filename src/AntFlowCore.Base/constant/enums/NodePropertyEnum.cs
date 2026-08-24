@@ -17,7 +17,8 @@ public enum NodePropertyEnum
     NODE_PROPERTY_APPROVED_USERS = 15,
     NODE_PROPERTY_FORM_RELATED = 16,
     NODE_PROPERTY_ZDY_RULES = 17,
-    NODE_PROPERTY_PREV_NODE_RELATED = 18
+    NODE_PROPERTY_PREV_NODE_RELATED = 18,
+    NODE_PROPERTY_DIYFORM_RELATED = 20
 }
 public static class NodePropertyEnumExtensions
 {
@@ -37,6 +38,7 @@ public static class NodePropertyEnumExtensions
             { NodePropertyEnum.NODE_PROPERTY_DIRECT_LEADER, ("直属领导", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) },
             { NodePropertyEnum.NODE_PROPERTY_APPROVED_USERS, ("被审批人自己", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) },
             { NodePropertyEnum.NODE_PROPERTY_FORM_RELATED, ("表单中相关人员", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) },
+            { NodePropertyEnum.NODE_PROPERTY_DIYFORM_RELATED, ("DIY表单中相关人员", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) },
             { NodePropertyEnum.NODE_PROPERTY_ZDY_RULES, ("自定义规则", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) },
             { NodePropertyEnum.NODE_PROPERTY_PREV_NODE_RELATED, ("上一节点相关人员", 1, BpmnNodeParamTypeEnum.BPMN_NODE_PARAM_MULTIPLAYER) }
         };

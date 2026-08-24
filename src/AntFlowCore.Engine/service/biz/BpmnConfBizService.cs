@@ -135,7 +135,12 @@ public class BpmnConfBizService : IBpmnConfBizService
             if((int)NodePropertyEnum.NODE_PROPERTY_FORM_RELATED==bpmnNodeVo.NodeProperty){
                 hasChooseFromLowCodeform = BpmnConfFlagsEnum.HAS_FORM_RELATED_ASSIGNEES.Code;
             }
-            
+
+            if ((int)NodePropertyEnum.NODE_PROPERTY_DIYFORM_RELATED == bpmnNodeVo.NodeProperty)
+            {  // NODE_PROPERTY_DIYFORM_RELATED
+                hasChooseFromLowCodeform = BpmnConfFlagsEnum.HAS_FORM_RELATED_ASSIGNEES.Code;
+            }
+
             // NodeSpecialProcess 将 nodeType=8/12/13 转为 nodeType=4 并置标记位,
             // 此处根据标记位将对应标签写入 LabelList,最终持久化到 buttonSignConf.labels
             if ((int)NodeTypeEnum.NODE_TYPE_APPROVER == bpmnNodeVo.NodeType)
@@ -432,6 +437,10 @@ public class BpmnConfBizService : IBpmnConfBizService
                 BpmnNodeConfigHolder.SetUdrConf(bpmnNodeVo);
             }
             else if (nodeProperty == (int)NodePropertyEnum.NODE_PROPERTY_FORM_RELATED)
+            {
+                BpmnNodeConfigHolder.SetFormRelatedUserConf(bpmnNodeVo);
+            }
+            else if (nodeProperty == (int)NodePropertyEnum.NODE_PROPERTY_DIYFORM_RELATED)  // DIY 表单字段审批人
             {
                 BpmnNodeConfigHolder.SetFormRelatedUserConf(bpmnNodeVo);
             }

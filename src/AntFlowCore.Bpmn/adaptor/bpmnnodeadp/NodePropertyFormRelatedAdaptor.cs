@@ -40,6 +40,7 @@ public class NodePropertyFormRelatedAdaptor : AbstractAdditionSignNodeAdaptor
                 p.ArbitrationRatio = fr.ArbitrationRatio;
                 p.FormAssigneeProperty = fr.ValueType;
                 p.FormInfos = formInfos;
+                p.DiyFormFieldName = fr.DiyFormFieldName;  // 添加 DIY 表单字段名的回显
             });
         }
     }

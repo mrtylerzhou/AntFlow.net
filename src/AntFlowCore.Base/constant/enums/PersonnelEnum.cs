@@ -1,28 +1,28 @@
 namespace AntFlowCore.Base.constant.enums;
 
 public enum PersonnelEnum
-    {
-        NODE_LOOP_PERSONNEL,
-        NODE_LEVEL_PERSONNEL,
-        ROLE_PERSONNEL,
-        USERAPPOINTED_PERSONNEL,
-        CUSTOMIZABLE_PERSONNEL,
-        HRBP_PERSONNEL,
-        OUT_SIDE_ACCESS_PERSONNEL,
-        START_USER_PERSONNEL,
-        DIRECT_LEADER_PERSONNEL,
-        APPROVED_USERS_PERSONNEL,
-        BUSINESS_TABLE_PERSONNEL,
-        FORM_USERS_PERSONNEL,
-        UDR_USERS_PERSONNEL,
-        PREV_NODE_USERS_PERSONNEL
-    }
+{
+    NODE_LOOP_PERSONNEL,
+    NODE_LEVEL_PERSONNEL,
+    ROLE_PERSONNEL,
+    USERAPPOINTED_PERSONNEL,
+    CUSTOMIZABLE_PERSONNEL,
+    HRBP_PERSONNEL,
+    OUT_SIDE_ACCESS_PERSONNEL,
+    START_USER_PERSONNEL,
+    DIRECT_LEADER_PERSONNEL,
+    APPROVED_USERS_PERSONNEL,
+    BUSINESS_TABLE_PERSONNEL,
+    FORM_USERS_PERSONNEL,
+    UDR_USERS_PERSONNEL,
+    PREV_NODE_USERS_PERSONNEL
+}
 
-    public static class PersonnelEnumExtensions
+public static class PersonnelEnumExtensions
+{
+    private static readonly Dictionary<PersonnelEnum, (NodePropertyEnum NodeProperty, string Description)> PersonnelMappings =
+        new Dictionary<PersonnelEnum, (NodePropertyEnum, string)>
     {
-        private static readonly Dictionary<PersonnelEnum, (NodePropertyEnum NodeProperty, string Description)> PersonnelMappings = 
-            new Dictionary<PersonnelEnum, (NodePropertyEnum, string)>
-        {
             { PersonnelEnum.NODE_LOOP_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_LOOP, "层层审批") },
             { PersonnelEnum.NODE_LEVEL_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_LEVEL, "指定层级审批") },
             { PersonnelEnum.ROLE_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_ROLE, "指定角色") },
@@ -37,20 +37,27 @@ public enum PersonnelEnum
             { PersonnelEnum.FORM_USERS_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_FORM_RELATED, "表单中相关人员") },
             { PersonnelEnum.UDR_USERS_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_ZDY_RULES, "用户自定义规则人员") },
             { PersonnelEnum.PREV_NODE_USERS_PERSONNEL, (NodePropertyEnum.NODE_PROPERTY_PREV_NODE_RELATED, "上一节点上下文人员") }
-        };
+    };
 
-        public static NodePropertyEnum GetNodeProperty(this PersonnelEnum personnelEnum)
-        {
-            return PersonnelMappings[personnelEnum].NodeProperty;
-        }
-
-        public static string GetDescription(this PersonnelEnum personnelEnum)
-        {
-            return PersonnelMappings[personnelEnum].Description;
-        }
-
-        public static PersonnelEnum? FromNodePropertyEnum(NodePropertyEnum nodePropertyEnum)
-        {
-            return PersonnelMappings.FirstOrDefault(x => x.Value.NodeProperty == nodePropertyEnum).Key;
-        }
+    public static NodePropertyEnum GetNodeProperty(this PersonnelEnum personnelEnum)
+    {
+        return PersonnelMappings[personnelEnum].NodeProperty;
     }
+
+    public static string GetDescription(this PersonnelEnum personnelEnum)
+    {
+        return PersonnelMappings[personnelEnum].Description;
+    }
+
+    public static PersonnelEnum? FromNodePropertyEnum(NodePropertyEnum nodePropertyEnum)
+    {
+        // 特殊处理：NODE_PROPERTY_DIYFORM_RELATED (20) 也使用 FORM_USERS_PERSONNEL
+        if (nodePropertyEnum == NodePropertyEnum.NODE_PROPERTY_DIYFORM_RELATED)
+        {
+            return PersonnelEnum.FORM_USERS_PERSONNEL;
+        }
+
+        // 标准映射查找
+        return PersonnelMappings.FirstOrDefault(x => x.Value.NodeProperty == nodePropertyEnum).Key;
+    }
+}
